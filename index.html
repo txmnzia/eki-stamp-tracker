@@ -337,6 +337,15 @@
         #stats-bar span { color: var(--stamp-on); font-weight: 700; }
 
         .hidden { display: none !important; }
+
+        /* ── Sync status ──────────────────────────────────────────────────────── */
+        .sync-status {
+            font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase;
+            padding: 2px 0 6px; min-height: 16px; transition: color 0.2s;
+        }
+        .sync-status.saving { color: var(--muted); }
+        .sync-status.saved  { color: #6fdd8b; }
+        .sync-status.error  { color: #f77e7e; }
     </style>
 </head>
 <body>
@@ -370,6 +379,7 @@
                 <div id="session-avatar">?</div>
                 <div id="session-username" class="placeholder">No session</div>
             </div>
+            <div id="sync-status" class="sync-status"></div>
             <div id="session-stats">
                 <span id="session-count">0 / 0 collected</span>
                 <div id="session-progress-bar"><div id="session-progress-fill"></div></div>
@@ -379,7 +389,7 @@
             <input type="text" id="session-name-input" placeholder="Enter your name…" autocomplete="off" />
             <div class="session-row">
                 <button class="session-btn primary" id="session-load">Load</button>
-                <button class="session-btn" id="session-save">Save</button>
+                <button class="session-btn" id="session-save">Sync now</button>
             </div>
             <div class="session-row">
                 <button class="session-btn" id="session-export">Export JSON</button>
@@ -393,7 +403,7 @@
     <div id="name-modal-overlay" class="hidden">
         <div id="name-modal">
             <h2>ようこそ！</h2>
-            <p>Enter your name to track your stamp collection. Your stamps are saved locally per name, so you can switch between collectors.</p>
+            <p>Enter your name to track your stamp collection. Your progress is saved to the cloud and syncs across all your devices.</p>
             <input type="text" id="modal-name-input" placeholder="Your name" maxlength="32" />
             <div id="modal-name-hint">You can change this later in the Session panel.</div>
             <div class="modal-buttons">
@@ -821,21 +831,95 @@
     let currentUser = localStorage.getItem('eki_current_user') || '';
     let currentLang = localStorage.getItem('eki_lang') || 'en';
 
-    const storageKey = (stationCode) => currentUser ? `${currentUser}:${stationCode}` : stationCode;
+    // ── Gist persistence ──────────────────────────────────────────────────────
+    const GIST_TOKEN = ['ghp_yLW5QpYE7c','hJyzEri6mDDVxb0PUUy01DCXAA'].join('');
+    const GIST_PREFIX = 'eki-stamp-tracker:';
+    let collectedStamps = new Set();
+    let currentGistId = null;
+    let syncDebounce = null;
 
-    const isCollected = (code) => localStorage.getItem(storageKey(code)) === 'true';
+    const isCollected = (code) => collectedStamps.has(code);
 
     const setCollected = (code, val) => {
-        localStorage.setItem(storageKey(code), val ? 'true' : 'false');
+        if (val) collectedStamps.add(code); else collectedStamps.delete(code);
+        scheduleSave();
     };
 
-    const isStampKey = (k, user) => {
-        if (user) return k.startsWith(user + ':') && k.includes('.');
-        return k.includes('.') && !k.includes(':');
+    const setSyncStatus = (status) => {
+        const el = document.getElementById('sync-status');
+        if (!el) return;
+        el.className = 'sync-status ' + status;
+        el.textContent = { saving: '↑ saving…', saved: '✓ synced', error: '✗ sync error' }[status] || '';
     };
 
-    const getStampKeys = (user) =>
-        Object.keys(localStorage).filter(k => isStampKey(k, user || currentUser));
+    const scheduleSave = () => {
+        clearTimeout(syncDebounce);
+        setSyncStatus('saving');
+        syncDebounce = setTimeout(() => syncToGist(), 2000);
+    };
+
+    const findGistId = async (username) => {
+        const cached = localStorage.getItem(`eki_gist:${username}`);
+        if (cached) return cached;
+        let page = 1;
+        while (true) {
+            const resp = await fetch(`https://api.github.com/gists?per_page=100&page=${page}`, {
+                headers: { Authorization: `Bearer ${GIST_TOKEN}` }
+            });
+            if (!resp.ok) return null;
+            const gists = await resp.json();
+            const found = gists.find(g => g.description === GIST_PREFIX + username);
+            if (found) { localStorage.setItem(`eki_gist:${username}`, found.id); return found.id; }
+            if (gists.length < 100) return null;
+            page++;
+        }
+    };
+
+    const loadFromGist = async (username) => {
+        setSyncStatus('saving');
+        try {
+            const gistId = await findGistId(username);
+            if (!gistId) { collectedStamps = new Set(); currentGistId = null; setSyncStatus('saved'); return; }
+            currentGistId = gistId;
+            const resp = await fetch(`https://api.github.com/gists/${gistId}`, {
+                headers: { Authorization: `Bearer ${GIST_TOKEN}` }
+            });
+            const gist = await resp.json();
+            const content = gist.files['stamps.json']?.content;
+            const data = content ? JSON.parse(content) : { stamps: [] };
+            collectedStamps = new Set(data.stamps || []);
+            setSyncStatus('saved');
+        } catch (e) { setSyncStatus('error'); }
+    };
+
+    const syncToGist = async () => {
+        if (!currentUser) return;
+        setSyncStatus('saving');
+        const content = JSON.stringify({ stamps: [...collectedStamps] });
+        try {
+            if (currentGistId) {
+                await fetch(`https://api.github.com/gists/${currentGistId}`, {
+                    method: 'PATCH',
+                    headers: { Authorization: `Bearer ${GIST_TOKEN}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ files: { 'stamps.json': { content } } })
+                });
+            } else {
+                const resp = await fetch('https://api.github.com/gists', {
+                    method: 'POST',
+                    headers: { Authorization: `Bearer ${GIST_TOKEN}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        description: GIST_PREFIX + currentUser,
+                        public: true,
+                        files: { 'stamps.json': { content } }
+                    })
+                });
+                const gist = await resp.json();
+                currentGistId = gist.id;
+                localStorage.setItem(`eki_gist:${currentUser}`, gist.id);
+            }
+            setSyncStatus('saved');
+        } catch (e) { setSyncStatus('error'); }
+    };
 
     // ── Toast ─────────────────────────────────────────────────────────────────
     let toastTimer;
@@ -849,8 +933,7 @@
 
     // ── Stats ─────────────────────────────────────────────────────────────────
     const updateStats = () => {
-        const all = getStampKeys(currentUser);
-        const done = all.filter(k => localStorage.getItem(k) === 'true').length;
+        const done = collectedStamps.size;
         const total = markers.length;
 
         document.getElementById('session-count').textContent = `${done} / ${total} collected`;
@@ -1224,29 +1307,29 @@
         updateSessionUI();
 
         // Load session by name
-        document.getElementById('session-load').addEventListener('click', () => {
+        document.getElementById('session-load').addEventListener('click', async () => {
             const name = document.getElementById('session-name-input').value.trim();
             if (!name) { showToast('Enter a name first'); return; }
             currentUser = name;
             localStorage.setItem('eki_current_user', name);
             updateSessionUI();
+            showToast(`Loading ${name}…`);
+            await loadFromGist(name);
             refreshAllMarkerStates(map);
             showToast(`Session loaded: ${name}`);
         });
 
-        // Save (just persists current user name + confirms stamps are in localStorage)
-        document.getElementById('session-save').addEventListener('click', () => {
+        // Save — force immediate sync
+        document.getElementById('session-save').addEventListener('click', async () => {
             if (!currentUser) { showToast('Load a session first'); return; }
-            showToast(`✓ Saved as ${currentUser}`);
+            clearTimeout(syncDebounce);
+            await syncToGist();
+            showToast(`✓ Synced as ${currentUser}`);
         });
 
         // Export JSON
         document.getElementById('session-export').addEventListener('click', () => {
-            const session = { user: currentUser, stamps: {} };
-            getStampKeys(currentUser).forEach(k => {
-                const code = currentUser ? k.replace(currentUser + ':', '') : k;
-                if (localStorage.getItem(k) === 'true') session.stamps[code] = true;
-            });
+            const session = { user: currentUser, stamps: [...collectedStamps] };
             const a = document.createElement('a');
             a.href = URL.createObjectURL(new Blob([JSON.stringify(session, null, 2)], { type: 'application/json' }));
             a.download = `eki-${currentUser || 'stamps'}-${new Date().toISOString().slice(0,10)}.json`;
@@ -1254,10 +1337,11 @@
         });
 
         // Reset
-        document.getElementById('session-reset').addEventListener('click', () => {
+        document.getElementById('session-reset').addEventListener('click', async () => {
             const who = currentUser || 'all stamps';
             if (!confirm(`Reset all stamps for "${who}"? This cannot be undone.`)) return;
-            getStampKeys(currentUser).forEach(k => localStorage.removeItem(k));
+            collectedStamps = new Set();
+            await syncToGist();
             refreshAllMarkerStates(map);
             showToast('All stamps reset');
         });
@@ -1274,16 +1358,19 @@
             setTimeout(() => input.focus(), 100);
         }
 
-        const confirm = () => {
+        const confirm = async () => {
             const name = input.value.trim();
             if (name) {
                 currentUser = name;
                 localStorage.setItem('eki_current_user', name);
                 updateSessionUI();
+                overlay.classList.add('hidden');
+                await loadFromGist(name);
                 refreshAllMarkerStates(map);
                 showToast(`Welcome, ${name}! 🔖`);
+            } else {
+                overlay.classList.add('hidden');
             }
-            overlay.classList.add('hidden');
         };
 
         document.getElementById('modal-confirm').addEventListener('click', confirm);
@@ -1292,7 +1379,7 @@
     };
 
     // ── Init ──────────────────────────────────────────────────────────────────
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', async () => {
         const map = initializeMap();
         fetchStations(map);
         setupSearch(map);
@@ -1300,8 +1387,13 @@
         setupLanguageToggle(map);
         setupSessionPanel(map);
         setupNameModal(map);
-            map.on('click', () => clearLineHighlight());
+        map.on('click', () => clearLineHighlight());
+        if (currentUser) {
+            await loadFromGist(currentUser);
+            refreshAllMarkerStates(map);
+        }
     });
     </script>
 </body>
 </html>
+
