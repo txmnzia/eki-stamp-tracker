@@ -1,0 +1,1307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eki Stamp Tracker</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;700&family=Space+Mono&display=swap" rel="stylesheet">
+    <style>
+        /* ── Reset & base ─────────────────────────────────────────────────── */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg:         #0f0f12;
+            --surface:    #18181e;
+            --surface2:   #22222a;
+            --border:     #2e2e3a;
+            --text:       #e4e4ec;
+            --muted:      #686878;
+            --accent:     #7eb8f7;
+            --accent-dim: rgba(126,184,247,0.12);
+            --stamp-on:   #f7c948;
+            --stamp-off:  #3a3a48;
+            --radius:     6px;
+            --ui-font:    'Space Mono', monospace;
+            --jp-font:    'Zen Kaku Gothic New', sans-serif;
+        }
+
+        html, body { height: 100%; background: var(--bg); color: var(--text); font-family: var(--ui-font); }
+
+        /* ── Map ──────────────────────────────────────────────────────────── */
+        #map { height: 100vh; width: 100%; }
+
+        /* Using CartoDB dark_all tiles natively — no CSS filter needed */
+
+        /* Leaflet attribution dark */
+        .leaflet-control-attribution {
+            background: rgba(15,15,18,0.85) !important;
+            color: var(--muted) !important;
+            font-size: 10px;
+        }
+        .leaflet-control-attribution a { color: var(--accent) !important; }
+        .leaflet-control-zoom a {
+            background: var(--surface) !important;
+            color: var(--text) !important;
+            border-color: var(--border) !important;
+        }
+        .leaflet-control-zoom a:hover { background: var(--surface2) !important; }
+
+        /* ── Stamp marker ─────────────────────────────────────────────────── */
+        .stamp-marker {
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 50%;
+            transition: transform 0.15s ease;
+            cursor: pointer;
+        }
+        .stamp-marker.collected {
+            background: var(--stamp-on);
+            box-shadow: 0 0 0 2px rgba(247,201,72,0.35), 0 2px 8px rgba(247,201,72,0.25);
+        }
+        .stamp-marker.uncollected {
+            background: var(--stamp-off);
+            border: 1.5px solid #4a4a5a;
+        }
+        .stamp-marker svg { display: block; }
+
+        /* Pulse animation on collect */
+        @keyframes stamp-pulse {
+            0%   { transform: scale(1); box-shadow: 0 0 0 0 rgba(247,201,72,0.6); }
+            40%  { transform: scale(1.4); box-shadow: 0 0 0 8px rgba(247,201,72,0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(247,201,72,0); }
+        }
+        .stamp-marker.pulse { animation: stamp-pulse 0.4s ease forwards; }
+
+        /* ── UI panel shared styles ───────────────────────────────────────── */
+        .ui-panel {
+            position: absolute;
+            z-index: 1000;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: 0 4px 24px rgba(0,0,0,0.5);
+        }
+
+        .ui-btn {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 8px 14px;
+            font-family: var(--ui-font); font-size: 11px; font-weight: 700;
+            letter-spacing: 0.08em; text-transform: uppercase;
+            background: var(--surface); color: var(--text);
+            border: 1px solid var(--border); border-radius: var(--radius);
+            cursor: pointer;
+            transition: background 0.15s, border-color 0.15s, color 0.15s;
+        }
+        .ui-btn:hover { background: var(--surface2); border-color: var(--accent); color: var(--accent); }
+        .ui-btn.active { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
+
+        /* ── Search ───────────────────────────────────────────────────────── */
+        #search-container {
+            position: absolute; top: 16px; left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000; width: min(360px, calc(100vw - 32px));
+        }
+
+        #search-wrap {
+            display: flex; align-items: center; gap: 8px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 8px 12px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+            transition: border-color 0.15s;
+        }
+        #search-wrap:focus-within { border-color: var(--accent); }
+
+        #search-icon { color: var(--muted); flex-shrink: 0; }
+
+        #stationSearch {
+            flex: 1; background: none; border: none; outline: none;
+            font-family: var(--ui-font); font-size: 13px; color: var(--text);
+        }
+        #stationSearch::placeholder { color: var(--muted); }
+
+        #suggestions {
+            position: absolute; top: calc(100% + 6px); left: 0; right: 0;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+            display: none; overflow: hidden;
+        }
+
+        .suggestion-item {
+            padding: 10px 14px;
+            cursor: pointer;
+            display: flex; justify-content: space-between; align-items: center;
+            font-size: 12px;
+            border-bottom: 1px solid var(--border);
+            transition: background 0.1s;
+        }
+        .suggestion-item:last-child { border-bottom: none; }
+        .suggestion-item:hover { background: var(--surface2); }
+        .suggestion-item .jp { font-family: var(--jp-font); font-size: 14px; }
+        .suggestion-item .en { color: var(--muted); font-size: 11px; }
+        .suggestion-item .collected-badge {
+            font-size: 10px; padding: 2px 6px;
+            background: rgba(247,201,72,0.15); color: var(--stamp-on);
+            border-radius: 10px; border: 1px solid rgba(247,201,72,0.3);
+            flex-shrink: 0; margin-left: 8px;
+        }
+
+        /* ── Controls row ─────────────────────────────────────────────────── */
+        #controls {
+            position: absolute; top: 16px; right: 16px;
+            z-index: 1000; display: flex; gap: 6px;
+        }
+
+        /* ── Popup ────────────────────────────────────────────────────────── */
+        .leaflet-popup-content-wrapper {
+            background: var(--surface) !important;
+            border: 1px solid var(--border) !important;
+            border-radius: var(--radius) !important;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5) !important;
+            padding: 0 !important;
+        }
+        .leaflet-popup-tip { background: var(--surface) !important; }
+        .leaflet-popup-content { margin: 0 !important; }
+
+        .popup-inner {
+            padding: 14px 16px;
+            min-width: 180px;
+        }
+        .popup-name {
+            font-family: var(--jp-font); font-size: 17px; font-weight: 700;
+            color: var(--text); margin-bottom: 2px;
+        }
+        .popup-name-en {
+            font-size: 11px; color: var(--muted); letter-spacing: 0.06em;
+            margin-bottom: 10px;
+        }
+        .popup-line {
+            display: inline-flex; align-items: center; gap: 5px;
+            font-size: 11px; color: var(--muted);
+            background: var(--surface2);
+            border-radius: 4px; padding: 3px 7px;
+            margin-bottom: 12px;
+        }
+        .popup-line-dot {
+            width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+        }
+        .popup-status {
+            display: flex; align-items: center; gap: 6px;
+            font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase;
+        }
+        .popup-status.stamped { color: var(--stamp-on); }
+        .popup-status.unstamped { color: var(--muted); }
+        .popup-status-icon { font-size: 14px; }
+
+        /* ── Session panel ────────────────────────────────────────────────── */
+        #session-panel {
+            position: absolute; top: 58px; right: 16px;
+            z-index: 1000; width: 260px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+            overflow: hidden;
+        }
+
+        #session-header {
+            padding: 14px 16px 10px;
+            border-bottom: 1px solid var(--border);
+        }
+        #session-user-row {
+            display: flex; align-items: center; gap: 8px; margin-bottom: 4px;
+        }
+        #session-avatar {
+            width: 28px; height: 28px; border-radius: 50%;
+            background: var(--accent-dim); border: 1px solid var(--accent);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 12px; font-weight: 700; color: var(--accent);
+            flex-shrink: 0;
+        }
+        #session-username {
+            font-size: 13px; font-weight: 700; color: var(--text);
+        }
+        #session-username.placeholder { color: var(--muted); font-weight: 400; font-style: italic; }
+
+        #session-stats {
+            font-size: 11px; color: var(--muted);
+            display: flex; align-items: center; gap: 8px;
+        }
+        #session-progress-bar {
+            flex: 1; height: 3px; background: var(--surface2); border-radius: 2px; overflow: hidden;
+        }
+        #session-progress-fill {
+            height: 100%; background: var(--stamp-on);
+            border-radius: 2px; transition: width 0.4s ease;
+            width: 0%;
+        }
+
+        #session-body { padding: 12px; display: flex; flex-direction: column; gap: 6px; }
+
+        #session-name-input {
+            width: 100%; padding: 8px 10px;
+            background: var(--surface2); border: 1px solid var(--border);
+            border-radius: 4px; color: var(--text);
+            font-family: var(--ui-font); font-size: 12px; outline: none;
+            transition: border-color 0.15s;
+        }
+        #session-name-input:focus { border-color: var(--accent); }
+        #session-name-input::placeholder { color: var(--muted); }
+
+        .session-row { display: flex; gap: 6px; }
+
+        .session-btn {
+            flex: 1; padding: 7px 10px;
+            font-family: var(--ui-font); font-size: 10px; font-weight: 700;
+            letter-spacing: 0.08em; text-transform: uppercase;
+            background: var(--surface2); color: var(--text);
+            border: 1px solid var(--border); border-radius: 4px;
+            cursor: pointer; transition: background 0.15s, border-color 0.15s, color 0.15s;
+        }
+        .session-btn:hover { background: var(--border); }
+        .session-btn.primary { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
+        .session-btn.primary:hover { background: rgba(126,184,247,0.2); }
+        .session-btn.danger { color: #f77e7e; border-color: #5a2a2a; }
+        .session-btn.danger:hover { background: rgba(247,126,126,0.1); border-color: #f77e7e; }
+
+        /* ── Name modal ───────────────────────────────────────────────────── */
+        #name-modal-overlay {
+            position: fixed; inset: 0; z-index: 2000;
+            background: rgba(0,0,0,0.7);
+            display: flex; align-items: center; justify-content: center;
+            backdrop-filter: blur(4px);
+        }
+        #name-modal {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 28px 28px 24px;
+            width: min(340px, calc(100vw - 32px));
+            box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+        }
+        #name-modal h2 {
+            font-family: var(--jp-font); font-size: 20px;
+            color: var(--text); margin-bottom: 6px;
+        }
+        #name-modal p { font-size: 12px; color: var(--muted); margin-bottom: 20px; line-height: 1.6; }
+        #modal-name-input {
+            width: 100%; padding: 10px 12px; margin-bottom: 8px;
+            background: var(--surface2); border: 1px solid var(--border);
+            border-radius: 4px; color: var(--text);
+            font-family: var(--jp-font); font-size: 16px; outline: none;
+            transition: border-color 0.15s;
+        }
+        #modal-name-input:focus { border-color: var(--accent); }
+        #modal-name-hint { font-size: 11px; color: var(--muted); margin-bottom: 18px; }
+        .modal-buttons { display: flex; gap: 8px; }
+        .modal-btn {
+            flex: 1; padding: 10px;
+            font-family: var(--ui-font); font-size: 11px; font-weight: 700;
+            letter-spacing: 0.08em; text-transform: uppercase;
+            border-radius: 4px; cursor: pointer; border: 1px solid var(--border);
+            transition: background 0.15s, color 0.15s;
+        }
+        .modal-btn.secondary { background: var(--surface2); color: var(--muted); }
+        .modal-btn.secondary:hover { color: var(--text); }
+        .modal-btn.confirm { background: var(--accent-dim); color: var(--accent); border-color: var(--accent); }
+        .modal-btn.confirm:hover { background: rgba(126,184,247,0.2); }
+
+        /* ── Toast ────────────────────────────────────────────────────────── */
+        #toast {
+            position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
+            z-index: 3000;
+            background: var(--surface2); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 10px 18px;
+            font-size: 12px; color: var(--text);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            opacity: 0; pointer-events: none; white-space: nowrap;
+        }
+        #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+        /* ── Stats bar ────────────────────────────────────────────────────── */
+        #stats-bar {
+            position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%);
+            z-index: 1000;
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 20px; padding: 6px 16px;
+            font-size: 11px; color: var(--muted);
+            box-shadow: 0 2px 12px rgba(0,0,0,0.4);
+            letter-spacing: 0.06em;
+        }
+        #stats-bar span { color: var(--stamp-on); font-weight: 700; }
+
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <!-- Search -->
+    <div id="search-container">
+        <div id="search-wrap">
+            <svg id="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            <input type="text" id="stationSearch" placeholder="Search station…" autocomplete="off" />
+        </div>
+        <div id="suggestions"></div>
+    </div>
+
+    <!-- Controls -->
+    <div id="controls">
+        <button class="ui-btn" id="lang-toggle">JP</button>
+        <button class="ui-btn" id="session-toggle">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+            </svg>
+            Session
+        </button>
+    </div>
+
+    <!-- Session panel -->
+    <div id="session-panel" class="hidden">
+        <div id="session-header">
+            <div id="session-user-row">
+                <div id="session-avatar">?</div>
+                <div id="session-username" class="placeholder">No session</div>
+            </div>
+            <div id="session-stats">
+                <span id="session-count">0 / 0 collected</span>
+                <div id="session-progress-bar"><div id="session-progress-fill"></div></div>
+            </div>
+        </div>
+        <div id="session-body">
+            <input type="text" id="session-name-input" placeholder="Enter your name…" autocomplete="off" />
+            <div class="session-row">
+                <button class="session-btn primary" id="session-load">Load</button>
+                <button class="session-btn" id="session-save">Save</button>
+            </div>
+            <div class="session-row">
+                <button class="session-btn" id="session-export">Export JSON</button>
+                <button class="session-btn danger" id="session-reset">Reset</button>
+            </div>
+            <input type="file" id="session-import-file" accept=".json" style="display:none">
+        </div>
+    </div>
+
+    <!-- Name modal (shown on first visit) -->
+    <div id="name-modal-overlay" class="hidden">
+        <div id="name-modal">
+            <h2>ようこそ！</h2>
+            <p>Enter your name to track your stamp collection. Your stamps are saved locally per name, so you can switch between collectors.</p>
+            <input type="text" id="modal-name-input" placeholder="Your name" maxlength="32" />
+            <div id="modal-name-hint">You can change this later in the Session panel.</div>
+            <div class="modal-buttons">
+                <button class="modal-btn secondary" id="modal-skip">Skip</button>
+                <button class="modal-btn confirm" id="modal-confirm">Start collecting →</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast notification -->
+    <div id="toast"></div>
+
+    <!-- Stats bar -->
+    <div id="stats-bar"><span id="bar-count">0</span> stamps collected</div>
+
+    <!-- Map -->
+    <div id="map"></div>
+
+    <script>
+    // ── Line data: official colours + English names ──────────────────────────
+    // Official colours sourced from operator style guides / Wikipedia
+    // Format: JP name → { color, en }
+    const LINE_DATA = {
+        // ── Tokyo Metro ──
+        '3号線銀座線':          { color: '#F39700', en: 'Ginza Line' },
+        '2号線日比谷線':        { color: '#9CAABF', en: 'Hibiya Line' },
+        '5号線東西線':          { color: '#009BBF', en: 'Tozai Line' },
+        '9号線千代田線':        { color: '#00A651', en: 'Chiyoda Line' },
+        '8号線有楽町線':        { color: '#C1A000', en: 'Yurakucho Line' },
+        '11号線半蔵門線':       { color: '#8F76D6', en: 'Hanzomon Line' },
+        '7号線南北線':          { color: '#00ACA9', en: 'Namboku Line' },
+        '13号線副都心線':       { color: '#9C5E31', en: 'Fukutoshin Line' },
+        // ── Toei ──
+        '1号線浅草線':          { color: '#EF454A', en: 'Asakusa Line' },
+        '6号線三田線':          { color: '#2B7BB9', en: 'Mita Line' },
+        '10号線新宿線':         { color: '#6CBB5A', en: 'Shinjuku Line' },
+        '12号線大江戸線':       { color: '#B6007A', en: 'Oedo Line' },
+        // ── JR East Tokyo area ──
+        '山手線':               { color: '#9ACD32', en: 'Yamanote Line' },
+        '中央線':               { color: '#F15A22', en: 'Chuo Line' },
+        '総武線':               { color: '#F5E626', en: 'Sobu Line' },
+        '京浜東北線':           { color: '#00BFFF', en: 'Keihin-Tohoku Line' },
+        '東北線（埼京線）':     { color: '#00B261', en: 'Saikyo Line' },
+        '赤羽線（埼京線）':     { color: '#00B261', en: 'Akabane Line (Saikyo)' },
+        '常磐線':               { color: '#007AC0', en: 'Joban Line' },
+        '常磐新線':             { color: '#7DC929', en: 'Tsukuba Express' },
+        '東海道線':             { color: '#F68B1E', en: 'Tokaido Line' },
+        '横須賀線':             { color: '#0068B7', en: 'Yokosuka Line' },
+        '南武線':               { color: '#F5E500', en: 'Nambu Line' },
+        '横浜線':               { color: '#00B050', en: 'Yokohama Line' },
+        '根岸線':               { color: '#00BFFF', en: 'Negishi Line' },
+        '武蔵野線':             { color: '#F7931E', en: 'Musashino Line' },
+        '京葉線':               { color: '#DC143C', en: 'Keiyo Line' },
+        '宇都宮線':             { color: '#F68B1E', en: 'Utsunomiya Line' },
+        '高崎線':               { color: '#F68B1E', en: 'Takasaki Line' },
+        '青梅線':               { color: '#F15A22', en: 'Ome Line' },
+        '五日市線':             { color: '#F15A22', en: 'Itsukaichi Line' },
+        '八高線':               { color: '#F15A22', en: 'Hachiko Line' },
+        '川越線':               { color: '#00B261', en: 'Kawagoe Line' },
+        '東金線':               { color: '#F68B1E', en: 'Togane Line' },
+        '成田線':               { color: '#F68B1E', en: 'Narita Line' },
+        '成田空港線':           { color: '#F68B1E', en: 'Narita Airport Line' },
+        '鶴見線':               { color: '#F5E500', en: 'Tsurumi Line' },
+        '外房線':               { color: '#F68B1E', en: 'Sotoboso Line' },
+        '内房線':               { color: '#F68B1E', en: 'Uchiboso Line' },
+        '総武線':               { color: '#F5E626', en: 'Sobu Line' },
+        '久里浜線':             { color: '#0068B7', en: 'Kurihama Line' },
+        '逗子線':               { color: '#0068B7', en: 'Zushi Line' },
+        '千葉線':               { color: '#F5E626', en: 'Chiba Line' },
+        '東西線':               { color: '#009BBF', en: 'Tozai Line' },
+        '片町線':               { color: '#009BBF', en: 'Katamachi Line' },
+        'JR東西線':             { color: '#009BBF', en: 'JR Tozai Line' },
+        // ── JR East regional ──
+        '東北線':               { color: '#F68B1E', en: 'Tohoku Line' },
+        '上越線':               { color: '#F68B1E', en: 'Joetsu Line' },
+        '信越線':               { color: '#F68B1E', en: 'Shinetsu Line' },
+        '奥羽線':               { color: '#F68B1E', en: 'Ou Line' },
+        '仙石線':               { color: '#007AC0', en: 'Senseki Line' },
+        '仙山線':               { color: '#F68B1E', en: 'Senzan Line' },
+        '磐越西線':             { color: '#F68B1E', en: 'Banetsu West Line' },
+        '磐越東線':             { color: '#F68B1E', en: 'Banetsu East Line' },
+        '只見線':               { color: '#F68B1E', en: 'Tadami Line' },
+        '会津線':               { color: '#F68B1E', en: 'Aizu Line' },
+        '陸羽東線':             { color: '#F68B1E', en: 'Rikuu East Line' },
+        '陸羽西線':             { color: '#F68B1E', en: 'Rikuu West Line' },
+        '北上線':               { color: '#F68B1E', en: 'Kitakami Line' },
+        '釜石線':               { color: '#F68B1E', en: 'Kamaishi Line' },
+        '大船渡線':             { color: '#F68B1E', en: 'Ofunato Line' },
+        '気仙沼線':             { color: '#F68B1E', en: 'Kesennuma Line' },
+        '八戸線':               { color: '#F68B1E', en: 'Hachinohe Line' },
+        '五能線':               { color: '#F68B1E', en: 'Gonosen Line' },
+        '男鹿線':               { color: '#F68B1E', en: 'Oga Line' },
+        '田沢湖線':             { color: '#F68B1E', en: 'Tazawako Line' },
+        '花輪線':               { color: '#F68B1E', en: 'Hanawa Line' },
+        // ── JR shinkansen ──
+        '東海道新幹線':         { color: '#0060A9', en: 'Tokaido Shinkansen' },
+        '山陽新幹線':           { color: '#0060A9', en: 'Sanyo Shinkansen' },
+        '東北新幹線':           { color: '#009B6B', en: 'Tohoku Shinkansen' },
+        '上越新幹線':           { color: '#E60012', en: 'Joetsu Shinkansen' },
+        '北陸新幹線':           { color: '#E60012', en: 'Hokuriku Shinkansen' },
+        '九州新幹線':           { color: '#C1272D', en: 'Kyushu Shinkansen' },
+        '北海道新幹線':         { color: '#009B6B', en: 'Hokkaido Shinkansen' },
+        '西九州線':             { color: '#C1272D', en: 'Nishi-Kyushu Shinkansen' },
+        // ── JR West ──
+        '山陰線':               { color: '#F68B1E', en: "San'in Line" },
+        '山陽線':               { color: '#F68B1E', en: 'Sanyo Line' },
+        '関西線':               { color: '#F68B1E', en: 'Kansai Line' },
+        '大阪環状線':           { color: '#E56000', en: 'Osaka Loop Line' },
+        'おおさか東線':         { color: '#00B261', en: 'Osaka Higashi Line' },
+        '阪和線':               { color: '#007AC0', en: 'Hanwa Line' },
+        '桜島線':               { color: '#00B050', en: 'Sakurajima Line' },
+        '大和路線':             { color: '#F68B1E', en: 'Yamatoji Line' },
+        '湖西線':               { color: '#F68B1E', en: 'Kosei Line' },
+        '草津線':               { color: '#F68B1E', en: 'Kusatsu Line' },
+        '福知山線':             { color: '#F68B1E', en: 'Fukuchiyama Line' },
+        '舞鶴線':               { color: '#F68B1E', en: 'Maizuru Line' },
+        '山口線':               { color: '#F68B1E', en: 'Yamaguchi Line' },
+        '播但線':               { color: '#F68B1E', en: 'Bantan Line' },
+        '姫新線':               { color: '#F68B1E', en: 'Kishin Line' },
+        '赤穂線':               { color: '#F68B1E', en: 'Ako Line' },
+        '北陸線':               { color: '#F68B1E', en: 'Hokuriku Line' },
+        '嵯峨野観光線':         { color: '#A0522D', en: 'Sagano Scenic Line' },
+        // ── JR Central (Tokai) ──
+        '中央線':               { color: '#F15A22', en: 'Chuo Line' },
+        '東海道線':             { color: '#F68B1E', en: 'Tokaido Line' },
+        '高山線':               { color: '#F68B1E', en: 'Takayama Line' },
+        '太多線':               { color: '#F68B1E', en: 'Taita Line' },
+        '名松線':               { color: '#F68B1E', en: 'Meisho Line' },
+        '参宮線':               { color: '#F68B1E', en: 'Sangu Line' },
+        '武豊線':               { color: '#F68B1E', en: 'Taketoyo Line' },
+        '御殿場線':             { color: '#F68B1E', en: 'Gotemba Line' },
+        '身延線':               { color: '#F68B1E', en: 'Minobu Line' },
+        '飯田線':               { color: '#F68B1E', en: 'Iida Line' },
+        '篠ノ井線':             { color: '#F68B1E', en: 'Shinonoi Line' },
+        '紀勢線':               { color: '#F68B1E', en: 'Kisei Line' },
+        // ── JR Kyushu ──
+        '鹿児島線':             { color: '#F68B1E', en: 'Kagoshima Line' },
+        '長崎線':               { color: '#F68B1E', en: 'Nagasaki Line' },
+        '佐世保線':             { color: '#F68B1E', en: 'Sasebo Line' },
+        '日豊線':               { color: '#F68B1E', en: 'Nippo Line' },
+        '豊肥線':               { color: '#F68B1E', en: 'Hohi Line' },
+        '久大線':               { color: '#F68B1E', en: 'Kyudai Line' },
+        '筑豊線':               { color: '#F68B1E', en: 'Chikuho Line' },
+        '篠栗線':               { color: '#F68B1E', en: 'Sasaguri Line' },
+        '日田彦山線':           { color: '#F68B1E', en: 'Hita-Hikosan Line' },
+        '香椎線':               { color: '#F68B1E', en: 'Kashii Line' },
+        '筑肥線':               { color: '#F68B1E', en: 'Chikuhi Line' },
+        '唐津線':               { color: '#F68B1E', en: 'Karatsu Line' },
+        '吉都線':               { color: '#F68B1E', en: 'Kitto Line' },
+        '日南線':               { color: '#F68B1E', en: 'Nichinan Line' },
+        '指宿枕崎線':           { color: '#F68B1E', en: 'Ibusuki-Makurazaki Line' },
+        '宮崎空港線':           { color: '#F68B1E', en: 'Miyazaki Airport Line' },
+        '肥薩線':               { color: '#F68B1E', en: 'Hisatsu Line' },
+        // ── JR Hokkaido ──
+        '函館線':               { color: '#F68B1E', en: 'Hakodate Line' },
+        '室蘭線':               { color: '#F68B1E', en: 'Muroran Line' },
+        '千歳線':               { color: '#F68B1E', en: 'Chitose Line' },
+        '石勝線':               { color: '#F68B1E', en: 'Sekisho Line' },
+        '根室線':               { color: '#F68B1E', en: 'Nemuro Line' },
+        '釧網線':               { color: '#F68B1E', en: 'Senmo Line' },
+        '石北線':               { color: '#F68B1E', en: 'Sekihoku Line' },
+        '宗谷線':               { color: '#F68B1E', en: 'Soya Line' },
+        '留萌線':               { color: '#F68B1E', en: 'Rumoi Line' },
+        '富良野線':             { color: '#F68B1E', en: 'Furano Line' },
+        '札沼線':               { color: '#F68B1E', en: 'Sassho Line' },
+        // ── Hankyu ──
+        '京都線':               { color: '#008B00', en: 'Kyoto Line' },
+        '神戸線':               { color: '#008B00', en: 'Kobe Line' },
+        '宝塚線':               { color: '#008B00', en: 'Takarazuka Line' },
+        '今津線':               { color: '#008B00', en: 'Imazu Line' },
+        '甲陽線':               { color: '#008B00', en: 'Koyo Line' },
+        '伊丹線':               { color: '#008B00', en: 'Itami Line' },
+        '嵐山本線':             { color: '#008B00', en: 'Arashiyama Line' },
+        '千里線':               { color: '#008B00', en: 'Senri Line' },
+        '箕面線':               { color: '#008B00', en: 'Minoo Line' },
+        '能勢電鉄':             { color: '#008B00', en: 'Nose Electric Railway' },
+        '北野線':               { color: '#008B00', en: 'Kitano Line' },
+        // ── Keio ──
+        '京王線':               { color: '#0F63B3', en: 'Keio Line' },
+        '相模原線':             { color: '#0F63B3', en: 'Sagamihara Line' },
+        '高尾線':               { color: '#0F63B3', en: 'Takao Line' },
+        '競馬場線':             { color: '#0F63B3', en: 'Keibajo Line' },
+        '動物園線':             { color: '#0F63B3', en: 'Dobutsuen Line' },
+        '井の頭線':             { color: '#0077BF', en: 'Inokashira Line' },
+        '拝島線':               { color: '#0F63B3', en: 'Haijima Line' },
+        '多摩線':               { color: '#0F63B3', en: 'Tama Line' },
+        // ── Tokyu ──
+        '東横線':               { color: '#EF0012', en: 'Toyoko Line' },
+        '田園都市線':           { color: '#21B24B', en: 'Den-en-toshi Line' },
+        '大井町線':             { color: '#F39700', en: 'Oimachi Line' },
+        '池上線':               { color: '#EF0012', en: 'Ikegami Line' },
+        '東急多摩川線':         { color: '#EF0012', en: 'Tokyu Tamagawa Line' },
+        '目黒線':               { color: '#00B5AD', en: 'Meguro Line' },
+        '世田谷線':             { color: '#EF0012', en: 'Setagaya Line' },
+        'みなとみらい21線':     { color: '#EF0012', en: 'Minatomirai Line' },
+        // ── Keikyu ──
+        '空港線':               { color: '#E60012', en: 'Airport Line' },
+        '久里浜線':             { color: '#E60012', en: 'Kurihama Line' },
+        // ── Odakyu ──
+        '小田原線':             { color: '#00ADEF', en: 'Odawara Line' },
+        '江ノ島線':             { color: '#00ADEF', en: 'Enoshima Line' },
+        '多摩線':               { color: '#00ADEF', en: 'Tama Line' },
+        // ── Seibu ──
+        '池袋線':               { color: '#FFD700', en: 'Ikebukuro Line' },
+        '新宿線':               { color: '#FFD700', en: 'Shinjuku Line' },
+        '有楽町線':             { color: '#FFD700', en: 'Yurakucho Line' },
+        '豊島線':               { color: '#FFD700', en: 'Toshima Line' },
+        '拝島線':               { color: '#FFD700', en: 'Haijima Line' },
+        '多摩湖線':             { color: '#FFD700', en: 'Tamakohan Line' },
+        '国分寺線':             { color: '#FFD700', en: 'Kokubunji Line' },
+        '狭山線':               { color: '#FFD700', en: 'Sayama Line' },
+        '西武秩父線':           { color: '#FFD700', en: 'Seibu Chichibu Line' },
+        '西武有楽町線':         { color: '#FFD700', en: 'Seibu Yurakucho Line' },
+        '西武園線':             { color: '#FFD700', en: 'Seibuyen Line' },
+        // ── Tobu ──
+        '伊勢崎線':             { color: '#F39700', en: 'Isesaki Line' },
+        '日光線':               { color: '#F39700', en: 'Nikko Line' },
+        '東上本線':             { color: '#F39700', en: 'Tojo Line' },
+        '野田線':               { color: '#F39700', en: 'Noda Line' },
+        '佐野線':               { color: '#F39700', en: 'Sano Line' },
+        '桐生線':               { color: '#F39700', en: 'Kiryu Line' },
+        '小泉線':               { color: '#F39700', en: 'Koizumi Line' },
+        '宇都宮線':             { color: '#F39700', en: 'Utsunomiya Line' },
+        '亀戸線':               { color: '#F39700', en: 'Kameido Line' },
+        '大師線':               { color: '#F39700', en: 'Daishi Line' },
+        '鬼怒川線':             { color: '#F39700', en: 'Kinugawa Line' },
+        '会津鬼怒川線':         { color: '#F39700', en: 'Aizu-Kinugawa Line' },
+        // ── Kintetsu ──
+        '大阪線':               { color: '#EE0012', en: 'Osaka Line' },
+        '名古屋線':             { color: '#EE0012', en: 'Nagoya Line' },
+        '京都線':               { color: '#EE0012', en: 'Kyoto Line' },
+        '橿原線':               { color: '#EE0012', en: 'Kashihara Line' },
+        '天理線':               { color: '#EE0012', en: 'Tenri Line' },
+        '南大阪線':             { color: '#EE0012', en: 'Minami-Osaka Line' },
+        '吉野線':               { color: '#EE0012', en: 'Yoshino Line' },
+        '田原本線':             { color: '#EE0012', en: 'Tawaramoto Line' },
+        '道明寺線':             { color: '#EE0012', en: 'Domyoji Line' },
+        '御所線':               { color: '#EE0012', en: 'Gose Line' },
+        '湯の山線':             { color: '#EE0012', en: 'Yunoyama Line' },
+        '鈴鹿線':               { color: '#EE0012', en: 'Suzuka Line' },
+        '山田線':               { color: '#EE0012', en: 'Yamada Line' },
+        '鳥羽線':               { color: '#EE0012', en: 'Toba Line' },
+        '志摩線':               { color: '#EE0012', en: 'Shima Line' },
+        '伊賀線':               { color: '#EE0012', en: 'Iga Line' },
+        '長野線':               { color: '#EE0012', en: 'Nagano Line' },
+        '信貴線':               { color: '#EE0012', en: 'Shigi Line' },
+        '生駒線':               { color: '#EE0012', en: 'Ikoma Line' },
+        '名古屋本線':           { color: '#EE0012', en: 'Nagoya Main Line' },
+        '犬山線':               { color: '#EE0012', en: 'Inuyama Line' },
+        '各務原線':             { color: '#EE0012', en: 'Kakamigahara Line' },
+        '豊田線':               { color: '#EE0012', en: 'Toyota Line' },
+        '広見線':               { color: '#EE0012', en: 'Hiomi Line' },
+        '小牧線':               { color: '#EE0012', en: 'Komaki Line' },
+        '尾西線':               { color: '#EE0012', en: 'Bisai Line' },
+        '蒲郡線':               { color: '#EE0012', en: 'Gamagori Line' },
+        '三河線':               { color: '#EE0012', en: 'Mikawa Line' },
+        '常滑線':               { color: '#EE0012', en: 'Tokoname Line' },
+        '河和線':               { color: '#EE0012', en: 'Kowa Line' },
+        '知多新線':             { color: '#EE0012', en: 'Chita New Line' },
+        '竹鼻線':               { color: '#EE0012', en: 'Takehana Line' },
+        '羽島線':               { color: '#EE0012', en: 'Hashima Line' },
+        '西名古屋港線':         { color: '#EE0012', en: 'Nishi-Nagoyako Line' },
+        '津島線':               { color: '#EE0012', en: 'Tsushima Line' },
+        // ── Hanshin ──
+        '阪神なんば線':         { color: '#0072BC', en: 'Hanshin Namba Line' },
+        '阪神本線':             { color: '#0072BC', en: 'Hanshin Main Line' },
+        // ── Keihan ──
+        '京阪本線':             { color: '#009F6B', en: 'Keihan Main Line' },
+        '鴨東線':               { color: '#009F6B', en: 'Kamotou Line' },
+        '中之島線':             { color: '#009F6B', en: 'Nakanoshima Line' },
+        '交野線':               { color: '#009F6B', en: 'Katano Line' },
+        '宇治線':               { color: '#009F6B', en: 'Uji Line' },
+        '京津線':               { color: '#009F6B', en: 'Keishin Line' },
+        '石山坂本線':           { color: '#009F6B', en: 'Ishiyama-Sakamoto Line' },
+        // ── Osaka Metro ──
+        '1号線(御堂筋線)':      { color: '#E5171F', en: 'Midosuji Line' },
+        '2号線(谷町線)':        { color: '#8F4098', en: 'Tanimachi Line' },
+        '3号線(四つ橋線)':      { color: '#0078BA', en: 'Yotsubashi Line' },
+        '4号線(中央線)':        { color: '#019A66', en: 'Chuo Line' },
+        '5号線(千日前線)':      { color: '#E44D93', en: 'Sennichimae Line' },
+        '6号線(堺筋線)':        { color: '#B5640B', en: 'Sakaisuji Line' },
+        '7号線(長堀鶴見緑地線)':{ color: '#83BC22', en: 'Nagahori Tsurumi-ryokuchi Line' },
+        '8号線（今里筋線）':    { color: '#E86812', en: 'Imazatosuji Line' },
+        '2号線名城線':          { color: '#8F4098', en: 'Meijo Line' },
+        '2号線名港線':          { color: '#2CA6E0', en: 'Meiko Line' },
+        // ── Nagoya Municipal ──
+        '1号線東山線':          { color: '#F9C000', en: 'Higashiyama Line' },
+        '3号線鶴舞線':          { color: '#0066B3', en: 'Tsurumai Line' },
+        '4号線名城線':          { color: '#8F4098', en: 'Meijo Line' },
+        '6号線桜通線':          { color: '#E5171F', en: 'Sakura-dori Line' },
+        '上飯田線':             { color: '#E86812', en: 'Kami-Iida Line' },
+        // ── Kyoto Municipal ──
+        '烏丸線':               { color: '#009B6B', en: 'Karasuma Line' },
+        '東西線':               { color: '#E5171F', en: 'Tozai Line' },
+        // ── Kobe Municipal ──
+        '西神線':               { color: '#0068B7', en: 'Seishin Line' },
+        '西神延伸線':           { color: '#0068B7', en: 'Seishin Ext. Line' },
+        '山手線':               { color: '#0068B7', en: 'Yamate Line' },
+        '海岸線':               { color: '#E5171F', en: 'Kaigan Line' },
+        // ── Sapporo Municipal ──
+        '南北線':               { color: '#009B6B', en: 'Namboku Line' },
+        '東西線':               { color: '#E5171F', en: 'Tozai Line' },
+        '東豊線':               { color: '#F39700', en: 'Toho Line' },
+        // ── Sendai Municipal ──
+        '南北線':               { color: '#009B6B', en: 'Namboku Line' },
+        '東西線':               { color: '#E5171F', en: 'Tozai Line' },
+        // ── Fukuoka / Nishitetsu ──
+        '天神大牟田線':         { color: '#EE0012', en: 'Tenjin-Omuta Line' },
+        '太宰府線':             { color: '#EE0012', en: 'Dazaifu Line' },
+        '甘木線':               { color: '#EE0012', en: 'Amagi Line' },
+        '貝塚線':               { color: '#EE0012', en: 'Kaizuka Line' },
+        // ── Fukuoka Municipal ──
+        '1号線(空港線)':        { color: '#EE0012', en: 'Airport Line' },
+        '2号線(箱崎線)':        { color: '#009B6B', en: 'Hakozaki Line' },
+        '3号線(七隈線)':        { color: '#CF8B00', en: 'Nanakuma Line' },
+        '4号線':                { color: '#009B6B', en: 'Line 4' },
+        // ── Yokohama ──
+        'ブルーライン':         { color: '#0075C2', en: 'Blue Line' },
+        'グリーンライン':       { color: '#00A95F', en: 'Green Line' },
+        // ── Monorail / Automated ──
+        '東京モノレール羽田線': { color: '#EF0012', en: 'Tokyo Monorail' },
+        '多摩都市モノレール線': { color: '#009F6B', en: 'Tama Monorail' },
+        '大阪モノレール線':     { color: '#EE0012', en: 'Osaka Monorail' },
+        '沖縄都市モノレール線': { color: '#009F6B', en: 'Yui Rail' },
+        'りんかい線':           { color: '#009F6B', en: 'Rinkai Line' },
+        'ゆりかもめ':           { color: '#00ADEF', en: 'Yurikamome' },
+        '東京臨海新交通臨海線': { color: '#00ADEF', en: 'Tokyo Waterfront Line' },
+        '日暮里・舎人線':       { color: '#E5171F', en: 'Nippori-Toneri Liner' },
+        '北総線':               { color: '#009BBF', en: 'Hokuso Line' },
+        '東葉高速線':           { color: '#EF0012', en: 'Toyo Rapid Line' },
+        '埼玉高速鉄道線':       { color: '#00ACA9', en: 'Saitama Railway Line' },
+        '常磐新線':             { color: '#7DC929', en: 'Tsukuba Express' },
+        'けいはんな線':         { color: '#009B6B', en: 'Keihanna Line' },
+        '六甲アイランド線':     { color: '#0068B7', en: 'Rokko Island Line' },
+        '神戸高速線':           { color: '#0068B7', en: 'Kobe Rapid Line' },
+        '北神線':               { color: '#0068B7', en: 'Hokushin Line' },
+        '南港ポートタウン線':   { color: '#009F6B', en: 'Nanko Port Town Line' },
+        'ポートアイランド線':   { color: '#009F6B', en: 'Port Island Line' },
+        '金沢シーサイドライン': { color: '#00ADEF', en: 'Kanazawa Seaside Line' },
+        '仙台空港線':           { color: '#009B6B', en: 'Sendai Airport Line' },
+        'ディズニーリゾートライン':{ color: '#EE0012', en: 'Disney Resort Line' },
+        '広島新交通1号線':      { color: '#009F6B', en: 'Hiroshima New Transit Line 1' },
+        // ── Private regionals ──
+        '小田急線':             { color: '#00ADEF', en: 'Odakyu Line' },
+        'いずみ野線':           { color: '#3A7AD2', en: 'Izumino Line' },
+        '江ノ島電鉄線':         { color: '#00ADEF', en: 'Enoshima Electric Railway' },
+        '湘南モノレール江の島線':{ color: '#009F6B', en: 'Shonan Monorail' },
+        '横浜市営地下鉄':       { color: '#0075C2', en: 'Yokohama Subway' },
+        '相鉄新横浜線':         { color: '#0068A9', en: 'Sotetsu Shin-Yokohama Line' },
+        '相模線':               { color: '#009F6B', en: 'Sagami Line' },
+        '新京成線':             { color: '#F68B1E', en: 'Shin-Keisei Line' },
+        '東葉高速線':           { color: '#EF0012', en: 'Toyo Rapid Line' },
+        '流山線':               { color: '#009F6B', en: 'Nagareyama Line' },
+        '真岡線':               { color: '#F68B1E', en: 'Moka Line' },
+        'わたらせ渓谷線':       { color: '#009F6B', en: 'Watarase Gorge Line' },
+        '秩父本線':             { color: '#009F6B', en: 'Chichibu Main Line' },
+        '上毛線':               { color: '#009F6B', en: 'Jomo Line' },
+        '上信線':               { color: '#009F6B', en: 'Joshin Line' },
+        '富山港線':             { color: '#009F6B', en: 'Toyama Port Line' },
+        '富山都心線':           { color: '#F39700', en: 'Toyama City Center Line' },
+        '万葉線':               { color: '#F39700', en: 'Manyo Line' },
+        '富山地方鉄道':         { color: '#EE0012', en: 'Toyama Local Railway' },
+        'あいの風とやま鉄道線': { color: '#009F6B', en: 'Ainokaze Toyama Line' },
+        'IRいしかわ鉄道線':     { color: '#009F6B', en: 'IR Ishikawa Line' },
+        'ほくほく線':           { color: '#009F6B', en: 'HokuHoku Line' },
+        'しなの鉄道線':         { color: '#009F6B', en: 'Shinano Railway' },
+        '北しなの線':           { color: '#009F6B', en: 'Kita-Shinano Line' },
+        '妙高はねうまライン':   { color: '#009F6B', en: 'Myoko Haneum Line' },
+        'いわて銀河鉄道線':     { color: '#009F6B', en: 'Iwate Galaxy Railway' },
+        '青い森鉄道線':         { color: '#009F6B', en: 'Aoimori Railway' },
+        '道南いさりび鉄道線':   { color: '#009F6B', en: 'Donan Isaribi Line' },
+        '肥薩おれんじ鉄道線':   { color: '#F39700', en: 'Hisatsu Orange Railway' },
+        '智頭線':               { color: '#009F6B', en: 'Chizu Express Line' },
+        '錦川清流線':           { color: '#009F6B', en: 'Nishiki River Scenic Line' },
+        '若桜線':               { color: '#009F6B', en: 'Wakasa Line' },
+        '因美線':               { color: '#F68B1E', en: 'Inbi Line' },
+        '木次線':               { color: '#F68B1E', en: 'Kisuki Line' },
+        '三江線':               { color: '#F68B1E', en: 'Sanko Line' },
+        '芸備線':               { color: '#F68B1E', en: 'Geibi Line' },
+        '呉線':                 { color: '#F68B1E', en: 'Kure Line' },
+        '可部線':               { color: '#F68B1E', en: 'Kabe Line' },
+        'リアス線':             { color: '#009F6B', en: 'Rias Line' },
+        '伊豆急行線':           { color: '#EF0012', en: 'Izu Kyuko Line' },
+        '大井川本線':           { color: '#009F6B', en: 'Oigawa Main Line' },
+        '遠州鉄道線':           { color: '#EF0012', en: 'Enshu Railway' },
+        '天竜浜名湖線':         { color: '#009F6B', en: 'Tenryu-Hamanako Line' },
+        '静岡清水線':           { color: '#EF0012', en: 'Shizuoka-Shimizu Line' },
+        '岳南線':               { color: '#009F6B', en: 'Gakunan Line' },
+        '御殿場線':             { color: '#F68B1E', en: 'Gotemba Line' },
+        '箱根登山鉄道線':       { color: '#EF0012', en: 'Hakone Tozan Line' },
+        '大雄山線':             { color: '#009F6B', en: 'Daiyuzan Line' },
+        '伊豆箱根鉄道':         { color: '#009F6B', en: 'Izu-Hakone Railway' },
+        '江ノ島線':             { color: '#00ADEF', en: 'Enoshima Line' },
+        '多摩川線':             { color: '#EF0012', en: 'Tamagawa Line' },
+        '池上線':               { color: '#EF0012', en: 'Ikegami Line' },
+        '東急池上線':           { color: '#EF0012', en: 'Tokyu Ikegami Line' },
+    };
+
+    // Fallback muted palette for lines not in LINE_DATA
+    const FALLBACK_PALETTE = [
+        '#6fa8dc', '#e06c75', '#98c379', '#e5c07b', '#c678dd',
+        '#56b6c2', '#d19a66', '#a3b8cc', '#c49fd4', '#79c9c9',
+        '#88b4e0', '#9ec475', '#b0a0e0', '#70c4b0', '#e0b870',
+        '#8ab8d0', '#d490a8', '#78d0a0', '#90a8d8', '#80c8b0'
+    ];
+
+    const hashName = (name) => {
+        let h = 0;
+        for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) >>> 0;
+        return h;
+    };
+
+    const getLineColor = (name) => {
+        if (LINE_DATA[name]) return LINE_DATA[name].color;
+        return FALLBACK_PALETTE[hashName(name) % FALLBACK_PALETTE.length];
+    };
+
+    const getLineEn = (name) => {
+        if (LINE_DATA[name]) return LINE_DATA[name].en;
+        // Attempt generic romanisation hint from the map
+        return '';
+    };
+
+    // ── Session / user state ──────────────────────────────────────────────────
+    let currentUser = localStorage.getItem('eki_current_user') || '';
+    let currentLang = localStorage.getItem('eki_lang') || 'en';
+
+    const storageKey = (stationCode) => currentUser ? `${currentUser}:${stationCode}` : stationCode;
+
+    const isCollected = (code) => localStorage.getItem(storageKey(code)) === 'true';
+
+    const setCollected = (code, val) => {
+        localStorage.setItem(storageKey(code), val ? 'true' : 'false');
+    };
+
+    const isStampKey = (k, user) => {
+        if (user) return k.startsWith(user + ':') && k.includes('.');
+        return k.includes('.') && !k.includes(':');
+    };
+
+    const getStampKeys = (user) =>
+        Object.keys(localStorage).filter(k => isStampKey(k, user || currentUser));
+
+    // ── Toast ─────────────────────────────────────────────────────────────────
+    let toastTimer;
+    const showToast = (msg, duration = 2200) => {
+        const el = document.getElementById('toast');
+        el.textContent = msg;
+        el.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => el.classList.remove('show'), duration);
+    };
+
+    // ── Stats ─────────────────────────────────────────────────────────────────
+    const updateStats = () => {
+        const all = getStampKeys(currentUser);
+        const done = all.filter(k => localStorage.getItem(k) === 'true').length;
+        const total = markers.length;
+
+        document.getElementById('session-count').textContent = `${done} / ${total} collected`;
+        document.getElementById('bar-count').textContent = done;
+
+        const pct = total > 0 ? (done / total) * 100 : 0;
+        document.getElementById('session-progress-fill').style.width = pct + '%';
+    };
+
+    // ── Map ───────────────────────────────────────────────────────────────────
+    const initializeMap = () => {
+        const map = L.map('map', { zoomControl: true }).setView([35.682839, 139.759455], 13);
+        // CartoDB dark tiles
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+            subdomains: 'abcd', maxZoom: 20
+        }).addTo(map);
+        return map;
+    };
+
+    // ── Lines ─────────────────────────────────────────────────────────────────
+    const CACHE_TTL = 24 * 60 * 60 * 1000;
+    const lineColorMap = {};
+
+    let highlightedLine = null;
+    const allPolylines = [];
+
+    const clearLineHighlight = () => {
+        if (highlightedLine) highlightedLine = null;
+        allPolylines.forEach(p => p.setStyle({ weight: 2.5, opacity: 0.75 }));
+    };
+
+    const renderLines = (map, data) => {
+        data.features.forEach(feature => {
+            const name = feature.properties.路線名;
+            const color = getLineColor(name);
+            lineColorMap[name] = color;
+            const enName = getLineEn(name);
+            const polyline = L.polyline(
+                feature.geometry.coordinates.map(c => [c[1], c[0]]),
+                { color, weight: 2.5, opacity: 0.75 }
+            ).addTo(map);
+            const popupHtml = `<div class="popup-inner">
+                <div class="popup-name">${name}</div>
+                ${enName ? `<div class="popup-name-en">${enName}</div>` : ''}
+            </div>`;
+            polyline.bindPopup(popupHtml, { closeButton: false });
+            polyline.on('mouseover', function(e) {
+                if (highlightedLine !== this) {
+                    this.setStyle({ weight: 4, opacity: 1 });
+                }
+                this.openPopup(e.latlng);
+            });
+            polyline.on('mouseout', function() {
+                if (highlightedLine !== this) {
+                    this.setStyle({ weight: 2.5, opacity: 0.75 });
+                }
+                this.closePopup();
+            });
+            polyline.on('mousemove', function(e) {
+                this.getPopup().setLatLng(e.latlng);
+            });
+            polyline.on('click', function(e) {
+                L.DomEvent.stopPropagation(e);
+                if (highlightedLine === this) {
+                    clearLineHighlight();
+                    return;
+                }
+                clearLineHighlight();
+                highlightedLine = this;
+                allPolylines.forEach(p => {
+                    if (p !== highlightedLine) p.setStyle({ opacity: 0.15, weight: 1.5 });
+                });
+                this.setStyle({ weight: 5, opacity: 1 });
+                this.bringToFront();
+            });
+            allPolylines.push(polyline);
+        });
+    };
+
+    const addTrainLinesToMap = (map) => {
+        try {
+            const cached = sessionStorage.getItem('eki_lines');
+            const ts = sessionStorage.getItem('eki_lines_ts');
+            if (cached && ts && Date.now() - Number(ts) < CACHE_TTL) {
+                renderLines(map, JSON.parse(cached)); return;
+            }
+        } catch(e) {}
+        fetch('data/railroad-section.geojson').then(r => r.json()).then(data => {
+            try {
+                sessionStorage.setItem('eki_lines', JSON.stringify(data));
+                sessionStorage.setItem('eki_lines_ts', String(Date.now()));
+            } catch(e) {}
+            renderLines(map, data);
+        }).catch(err => console.error('Error loading train lines:', err));
+    };
+
+    // ── Markers ───────────────────────────────────────────────────────────────
+    const markers = [];
+
+    const getDisplayName = (station, code) => {
+        if (currentLang === 'jp' && station.name_kanji) return station.name_kanji;
+        const raw = code.includes('.') ? code.split('.').pop() : code;
+        return raw.replace(/([A-Z])/g, ' $1').trim() || station.name_kanji || code;
+    };
+
+    const getEnName = (code) => {
+        const raw = code.includes('.') ? code.split('.').pop() : code;
+        return raw.replace(/([A-Z])/g, ' $1').trim();
+    };
+
+    const createStationIcon = (collected, zoom) => {
+        const base = 10;
+        const size = Math.max(base, Math.round(base * Math.pow(1.22, zoom - 12)));
+        const inner = Math.round(size * 0.45);
+
+        const html = collected
+            ? `<div class="stamp-marker collected" style="width:${size}px;height:${size}px;">
+                 <svg width="${inner}" height="${inner}" viewBox="0 0 12 12">
+                   <path d="M2 6.5l3 3 5-5" stroke="#1a1a22" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                 </svg>
+               </div>`
+            : `<div class="stamp-marker uncollected" style="width:${size}px;height:${size}px;">
+                 <svg width="${inner}" height="${inner}" viewBox="0 0 12 12">
+                   <circle cx="6" cy="6" r="2.5" fill="#5a5a6a"/>
+                 </svg>
+               </div>`;
+
+        return L.divIcon({ html, className: '', iconSize: [size, size], iconAnchor: [size/2, size/2] });
+    };
+
+    const buildPopupHtml = (marker) => {
+        const s = marker._stationData;
+        const code = s.code;
+        const jpName = s.name_kanji || '';
+        const enName = getEnName(code);
+        const lineColor = lineColorMap[s.line_code] || '#6b6b7a';
+        const lineLabel = s.line_code.replace(/\./g, ' › ');
+        const collected = marker._isCollected;
+
+        return `<div class="popup-inner">
+            <div class="popup-name">${jpName || enName}</div>
+            <div class="popup-name-en">${enName}</div>
+            <div class="popup-line">
+                <span class="popup-line-dot" style="background:${lineColor}"></span>
+                ${lineLabel}
+            </div>
+            <div class="popup-status ${collected ? 'stamped' : 'unstamped'}">
+                <span class="popup-status-icon">${collected ? '🔖' : '○'}</span>
+                ${collected ? 'Stamp collected' : 'Not yet collected'}
+            </div>
+        </div>`;
+    };
+
+    // Deduplication: one marker per physical station (same name + coords)
+    const placedMarkerKeys = new Set();
+
+    const createMarker = (station, map) => {
+        const code = station.code;
+        if (!code || !station.line_code) return;
+
+        const dedupeKey = `${station.name_kanji}|${station.lat.toFixed(3)}|${station.lon.toFixed(3)}`;
+        if (placedMarkerKeys.has(dedupeKey)) return;
+        placedMarkerKeys.add(dedupeKey);
+
+        const collected = isCollected(code);
+        const marker = L.marker([station.lat, station.lon], {
+            icon: createStationIcon(collected, map.getZoom())
+        });
+
+        marker._stationData = station;
+        marker._isCollected = collected;
+        marker.stationName = getDisplayName(station, code);
+        marker.stationNameKanji = station.name_kanji || '';
+        marker.stationNameEn = getEnName(code);
+
+        marker.bindPopup(buildPopupHtml(marker), {
+            offset: L.point(0, -4),
+            closeButton: false,
+            maxWidth: 240
+        });
+        marker.on('mouseover', () => marker.openPopup());
+        marker.on('mouseout', () => marker.closePopup());
+
+        marker.on('click', () => {
+            const next = !marker._isCollected;
+            marker._isCollected = next;
+            setCollected(code, next);
+
+            // Animate: briefly add pulse class
+            const el = marker.getElement();
+            if (el) {
+                const stampEl = el.querySelector('.stamp-marker');
+                if (stampEl) {
+                    stampEl.classList.remove('pulse');
+                    void stampEl.offsetWidth; // reflow
+                    stampEl.classList.add('pulse');
+                }
+            }
+
+            marker.setIcon(createStationIcon(next, map.getZoom()));
+            marker.setPopupContent(buildPopupHtml(marker));
+            updateStats();
+
+            showToast(next
+                ? `🔖 ${marker.stationName} — stamped!`
+                : `${marker.stationName} — removed`
+            );
+        });
+
+        markers.push(marker);
+        marker.addTo(map);
+    };
+
+    const loadMarkersInView = (map) => {
+        const bounds = map.getBounds();
+        let shown = 0;
+        markers.forEach(m => {
+            if (bounds.contains(m.getLatLng())) {
+                if (!map.hasLayer(m) && shown < 400) { m.addTo(map); shown++; }
+            } else {
+                if (map.hasLayer(m)) map.removeLayer(m);
+            }
+        });
+    };
+
+    const updateMarkerSizes = (map) => {
+        const zoom = map.getZoom();
+        markers.forEach(m => m.setIcon(createStationIcon(m._isCollected, zoom)));
+    };
+
+    const refreshAllMarkerStates = (map) => {
+        markers.forEach(m => {
+            const code = m._stationData.code;
+            m._isCollected = isCollected(code);
+            m.setIcon(createStationIcon(m._isCollected, map.getZoom()));
+            m.setPopupContent(buildPopupHtml(m));
+        });
+        updateStats();
+    };
+
+    const fetchStations = (map) => {
+        const load = (stations, excluded) => {
+            stations.forEach(g => g.stations.forEach(s => {
+                if (!excluded.includes(s.line_code)) createMarker(s, map);
+            }));
+            loadMarkersInView(map);
+            map.on('moveend', () => loadMarkersInView(map));
+            map.on('zoomend', () => updateMarkerSizes(map));
+            updateStats();
+        };
+
+        try {
+            const cs = sessionStorage.getItem('eki_stations');
+            const ts = sessionStorage.getItem('eki_stations_ts');
+            const ce = sessionStorage.getItem('eki_excluded');
+            if (cs && ts && ce && Date.now() - Number(ts) < CACHE_TTL) {
+                load(JSON.parse(cs), JSON.parse(ce)); return;
+            }
+        } catch(e) {}
+
+        Promise.all([
+            fetch('data/stations.json').then(r => r.json()),
+            fetch('data/no-stamps-lines.json').then(r => r.json()).then(d => d.map(l => l.line_code))
+        ]).then(([stations, excluded]) => {
+            try {
+                sessionStorage.setItem('eki_stations', JSON.stringify(stations));
+                sessionStorage.setItem('eki_stations_ts', String(Date.now()));
+                sessionStorage.setItem('eki_excluded', JSON.stringify(excluded));
+            } catch(e) {}
+            load(stations, excluded);
+        }).catch(err => {
+            console.error('Error fetching stations:', err);
+            alert('Failed to load stations data. Please try again later.');
+        });
+    };
+
+    // ── Language toggle ───────────────────────────────────────────────────────
+    const setupLanguageToggle = (map) => {
+        const btn = document.getElementById('lang-toggle');
+        btn.textContent = currentLang === 'jp' ? 'EN' : 'JP';
+        btn.addEventListener('click', () => {
+            currentLang = currentLang === 'en' ? 'jp' : 'en';
+            localStorage.setItem('eki_lang', currentLang);
+            btn.textContent = currentLang === 'jp' ? 'EN' : 'JP';
+            markers.forEach(m => {
+                if (!m._stationData) return;
+                m.stationName = getDisplayName(m._stationData, m._stationData.code);
+                m.setPopupContent(buildPopupHtml(m));
+            });
+        });
+    };
+
+    // ── Search ────────────────────────────────────────────────────────────────
+    const setupSearch = (map) => {
+        const input = document.getElementById('stationSearch');
+        const suggestions = document.getElementById('suggestions');
+
+        input.addEventListener('input', () => {
+            const term = input.value.toLowerCase().trim();
+            suggestions.innerHTML = '';
+            suggestions.style.display = 'none';
+            if (!term) return;
+
+            const hits = markers.filter(m =>
+                (m.stationNameEn || '').toLowerCase().includes(term) ||
+                (m.stationNameKanji || '').toLowerCase().includes(term)
+            ).slice(0, 6);
+
+            if (!hits.length) return;
+            suggestions.style.display = 'block';
+            hits.forEach(m => {
+                const item = document.createElement('div');
+                item.className = 'suggestion-item';
+
+                const nameWrap = document.createElement('div');
+                nameWrap.innerHTML = `<div class="jp">${m.stationNameKanji || m.stationNameEn}</div><div class="en">${m.stationNameEn}</div>`;
+
+                item.appendChild(nameWrap);
+
+                if (m._isCollected) {
+                    const badge = document.createElement('span');
+                    badge.className = 'collected-badge';
+                    badge.textContent = '🔖';
+                    item.appendChild(badge);
+                }
+
+                item.onclick = () => {
+                    map.setView(m.getLatLng(), 15);
+                    setTimeout(() => m.openPopup(), 300);
+                    suggestions.style.display = 'none';
+                    input.value = '';
+                };
+                suggestions.appendChild(item);
+            });
+        });
+
+        document.addEventListener('click', e => {
+            if (!e.target.closest('#search-container')) suggestions.style.display = 'none';
+        });
+    };
+
+    // ── Session panel ─────────────────────────────────────────────────────────
+    const updateSessionUI = () => {
+        const avatarEl = document.getElementById('session-avatar');
+        const nameEl = document.getElementById('session-username');
+        const inputEl = document.getElementById('session-name-input');
+
+        if (currentUser) {
+            avatarEl.textContent = currentUser.charAt(0).toUpperCase();
+            nameEl.textContent = currentUser;
+            nameEl.classList.remove('placeholder');
+            if (inputEl) inputEl.value = currentUser;
+        } else {
+            avatarEl.textContent = '?';
+            nameEl.textContent = 'No session';
+            nameEl.classList.add('placeholder');
+        }
+        updateStats();
+    };
+
+    const setupSessionPanel = (map) => {
+        // Toggle panel
+        document.getElementById('session-toggle').addEventListener('click', () => {
+            const panel = document.getElementById('session-panel');
+            const btn = document.getElementById('session-toggle');
+            panel.classList.toggle('hidden');
+            btn.classList.toggle('active');
+        });
+
+        updateSessionUI();
+
+        // Load session by name
+        document.getElementById('session-load').addEventListener('click', () => {
+            const name = document.getElementById('session-name-input').value.trim();
+            if (!name) { showToast('Enter a name first'); return; }
+            currentUser = name;
+            localStorage.setItem('eki_current_user', name);
+            updateSessionUI();
+            refreshAllMarkerStates(map);
+            showToast(`Session loaded: ${name}`);
+        });
+
+        // Save (just persists current user name + confirms stamps are in localStorage)
+        document.getElementById('session-save').addEventListener('click', () => {
+            if (!currentUser) { showToast('Load a session first'); return; }
+            showToast(`✓ Saved as ${currentUser}`);
+        });
+
+        // Export JSON
+        document.getElementById('session-export').addEventListener('click', () => {
+            const session = { user: currentUser, stamps: {} };
+            getStampKeys(currentUser).forEach(k => {
+                const code = currentUser ? k.replace(currentUser + ':', '') : k;
+                if (localStorage.getItem(k) === 'true') session.stamps[code] = true;
+            });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(new Blob([JSON.stringify(session, null, 2)], { type: 'application/json' }));
+            a.download = `eki-${currentUser || 'stamps'}-${new Date().toISOString().slice(0,10)}.json`;
+            a.click();
+        });
+
+        // Reset
+        document.getElementById('session-reset').addEventListener('click', () => {
+            const who = currentUser || 'all stamps';
+            if (!confirm(`Reset all stamps for "${who}"? This cannot be undone.`)) return;
+            getStampKeys(currentUser).forEach(k => localStorage.removeItem(k));
+            refreshAllMarkerStates(map);
+            showToast('All stamps reset');
+        });
+    };
+
+    // ── Name modal ────────────────────────────────────────────────────────────
+    const setupNameModal = (map) => {
+        const overlay = document.getElementById('name-modal-overlay');
+        const input = document.getElementById('modal-name-input');
+
+        // Show on first visit if no user set
+        if (!currentUser) {
+            overlay.classList.remove('hidden');
+            setTimeout(() => input.focus(), 100);
+        }
+
+        const confirm = () => {
+            const name = input.value.trim();
+            if (name) {
+                currentUser = name;
+                localStorage.setItem('eki_current_user', name);
+                updateSessionUI();
+                refreshAllMarkerStates(map);
+                showToast(`Welcome, ${name}! 🔖`);
+            }
+            overlay.classList.add('hidden');
+        };
+
+        document.getElementById('modal-confirm').addEventListener('click', confirm);
+        document.getElementById('modal-skip').addEventListener('click', () => overlay.classList.add('hidden'));
+        input.addEventListener('keydown', e => { if (e.key === 'Enter') confirm(); });
+    };
+
+    // ── Init ──────────────────────────────────────────────────────────────────
+    document.addEventListener('DOMContentLoaded', () => {
+        const map = initializeMap();
+        fetchStations(map);
+        setupSearch(map);
+        addTrainLinesToMap(map);
+        setupLanguageToggle(map);
+        setupSessionPanel(map);
+        setupNameModal(map);
+            map.on('click', () => clearLineHighlight());
+    });
+    </script>
+</body>
+</html>
