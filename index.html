@@ -6,6 +6,9 @@
     <title>Eki Stamp Tracker</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css" />
+    <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;700&family=Space+Mono&display=swap" rel="stylesheet">
     <style>
@@ -337,6 +340,18 @@
         #stats-bar span { color: var(--stamp-on); font-weight: 700; }
 
         .hidden { display: none !important; }
+
+        /* ── Marker cluster ───────────────────────────────────────────────────── */
+        .marker-cluster-small, .marker-cluster-medium, .marker-cluster-large {
+            background-color: rgba(126,184,247,0.18) !important;
+        }
+        .marker-cluster-small div, .marker-cluster-medium div, .marker-cluster-large div {
+            background-color: rgba(126,184,247,0.55) !important;
+            color: #fff !important;
+            font-family: var(--ui-font) !important;
+            font-size: 11px !important;
+            font-weight: 700 !important;
+        }
 
         /* ── Sync status ──────────────────────────────────────────────────────── */
         .sync-status {
@@ -944,18 +959,51 @@
     };
 
     // ── Map ───────────────────────────────────────────────────────────────────
+    const canvasRenderer = L.canvas({ padding: 0.5 });
+    let clusterGroup;
+
     const initializeMap = () => {
-        const map = L.map('map', { zoomControl: true }).setView([35.682839, 139.759455], 13);
-        // CartoDB dark tiles
+        const map = L.map('map', { zoomControl: true, preferCanvas: true }).setView([35.682839, 139.759455], 13);
         L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
             subdomains: 'abcd', maxZoom: 20
         }).addTo(map);
+
+        clusterGroup = L.markerClusterGroup({
+            maxClusterRadius: 40,
+            disableClusteringAtZoom: 14,
+            spiderfyOnMaxZoom: false,
+            chunkedLoading: true,
+            chunkDelay: 50
+        });
+        map.addLayer(clusterGroup);
         return map;
     };
 
+    // ── IndexedDB cache (sessionStorage is too small for 14 MB geojson) ────────
+    const CACHE_TTL = 7 * 24 * 60 * 60 * 1000; // 7 days
+    const _db = new Promise((res, rej) => {
+        const req = indexedDB.open('eki-cache', 1);
+        req.onupgradeneeded = e => e.target.result.createObjectStore('data');
+        req.onsuccess = e => res(e.target.result);
+        req.onerror = rej;
+    });
+    const cacheGet = async (key) => {
+        const db = await _db;
+        return new Promise((res, rej) => {
+            const req = db.transaction('data').objectStore('data').get(key);
+            req.onsuccess = () => res(req.result); req.onerror = rej;
+        });
+    };
+    const cacheSet = async (key, val) => {
+        const db = await _db;
+        return new Promise((res, rej) => {
+            const req = db.transaction('data','readwrite').objectStore('data').put(val, key);
+            req.onsuccess = () => res(); req.onerror = rej;
+        });
+    };
+
     // ── Lines ─────────────────────────────────────────────────────────────────
-    const CACHE_TTL = 24 * 60 * 60 * 1000;
     const lineColorMap = {};
 
     let highlightedLine = null;
@@ -967,68 +1015,69 @@
     };
 
     const renderLines = (map, data) => {
-        data.features.forEach(feature => {
-            const name = feature.properties.路線名;
-            const color = getLineColor(name);
-            lineColorMap[name] = color;
-            const enName = getLineEn(name);
-            const polyline = L.polyline(
-                feature.geometry.coordinates.map(c => [c[1], c[0]]),
-                { color, weight: 2.5, opacity: 0.75 }
-            ).addTo(map);
-            const popupHtml = `<div class="popup-inner">
-                <div class="popup-name">${name}</div>
-                ${enName ? `<div class="popup-name-en">${enName}</div>` : ''}
-            </div>`;
-            polyline.bindPopup(popupHtml, { closeButton: false });
-            polyline.on('mouseover', function(e) {
-                if (highlightedLine !== this) {
-                    this.setStyle({ weight: 4, opacity: 1 });
-                }
-                this.openPopup(e.latlng);
-            });
-            polyline.on('mouseout', function() {
-                if (highlightedLine !== this) {
-                    this.setStyle({ weight: 2.5, opacity: 0.75 });
-                }
-                this.closePopup();
-            });
-            polyline.on('mousemove', function(e) {
-                this.getPopup().setLatLng(e.latlng);
-            });
-            polyline.on('click', function(e) {
-                L.DomEvent.stopPropagation(e);
-                if (highlightedLine === this) {
-                    clearLineHighlight();
-                    return;
-                }
-                clearLineHighlight();
-                highlightedLine = this;
-                allPolylines.forEach(p => {
-                    if (p !== highlightedLine) p.setStyle({ opacity: 0.15, weight: 1.5 });
+        const features = data.features;
+        const BATCH = 150;
+        let i = 0;
+
+        const processBatch = () => {
+            const end = Math.min(i + BATCH, features.length);
+            for (; i < end; i++) {
+                const feature = features[i];
+                const name = feature.properties.路線名;
+                const color = getLineColor(name);
+                lineColorMap[name] = color;
+                const enName = getLineEn(name);
+                const polyline = L.polyline(
+                    feature.geometry.coordinates.map(c => [c[1], c[0]]),
+                    { color, weight: 2.5, opacity: 0.75, renderer: canvasRenderer }
+                ).addTo(map);
+                const popupHtml = `<div class="popup-inner">
+                    <div class="popup-name">${name}</div>
+                    ${enName ? `<div class="popup-name-en">${enName}</div>` : ''}
+                </div>`;
+                polyline.bindPopup(popupHtml, { closeButton: false });
+                polyline.on('mouseover', function(e) {
+                    if (highlightedLine !== this) this.setStyle({ weight: 4, opacity: 1 });
+                    this.openPopup(e.latlng);
                 });
-                this.setStyle({ weight: 5, opacity: 1 });
-                this.bringToFront();
-            });
-            allPolylines.push(polyline);
-        });
+                polyline.on('mouseout', function() {
+                    if (highlightedLine !== this) this.setStyle({ weight: 2.5, opacity: 0.75 });
+                    this.closePopup();
+                });
+                polyline.on('mousemove', function(e) { this.getPopup().setLatLng(e.latlng); });
+                polyline.on('click', function(e) {
+                    L.DomEvent.stopPropagation(e);
+                    if (highlightedLine === this) { clearLineHighlight(); return; }
+                    clearLineHighlight();
+                    highlightedLine = this;
+                    allPolylines.forEach(p => {
+                        if (p !== highlightedLine) p.setStyle({ opacity: 0.15, weight: 1.5 });
+                    });
+                    this.setStyle({ weight: 5, opacity: 1 });
+                    this.bringToFront();
+                });
+                allPolylines.push(polyline);
+            }
+            if (i < features.length) requestAnimationFrame(processBatch);
+        };
+
+        requestAnimationFrame(processBatch);
     };
 
-    const addTrainLinesToMap = (map) => {
+    const addTrainLinesToMap = async (map) => {
         try {
-            const cached = sessionStorage.getItem('eki_lines');
-            const ts = sessionStorage.getItem('eki_lines_ts');
-            if (cached && ts && Date.now() - Number(ts) < CACHE_TTL) {
-                renderLines(map, JSON.parse(cached)); return;
+            const cached = await cacheGet('eki_lines');
+            if (cached && Date.now() - cached.ts < CACHE_TTL) {
+                renderLines(map, cached.data); return;
             }
         } catch(e) {}
-        fetch('data/railroad-section.geojson').then(r => r.json()).then(data => {
-            try {
-                sessionStorage.setItem('eki_lines', JSON.stringify(data));
-                sessionStorage.setItem('eki_lines_ts', String(Date.now()));
-            } catch(e) {}
-            renderLines(map, data);
-        }).catch(err => console.error('Error loading train lines:', err));
+        fetch('data/railroad-section.geojson')
+            .then(r => r.json())
+            .then(async data => {
+                renderLines(map, data);
+                try { await cacheSet('eki_lines', { data, ts: Date.now() }); } catch(e) {}
+            })
+            .catch(err => console.error('Error loading train lines:', err));
     };
 
     // ── Markers ───────────────────────────────────────────────────────────────
@@ -1145,24 +1194,17 @@
         });
 
         markers.push(marker);
-        marker.addTo(map);
+        clusterGroup.addLayer(marker);
     };
 
-    const loadMarkersInView = (map) => {
-        const bounds = map.getBounds();
-        let shown = 0;
-        markers.forEach(m => {
-            if (bounds.contains(m.getLatLng())) {
-                if (!map.hasLayer(m) && shown < 400) { m.addTo(map); shown++; }
-            } else {
-                if (map.hasLayer(m)) map.removeLayer(m);
-            }
-        });
-    };
-
+    let zoomDebounce;
     const updateMarkerSizes = (map) => {
-        const zoom = map.getZoom();
-        markers.forEach(m => m.setIcon(createStationIcon(m._isCollected, zoom)));
+        clearTimeout(zoomDebounce);
+        zoomDebounce = setTimeout(() => {
+            const zoom = map.getZoom();
+            markers.forEach(m => m.setIcon(createStationIcon(m._isCollected, zoom)));
+            clusterGroup.refreshClusters();
+        }, 150);
     };
 
     const refreshAllMarkerStates = (map) => {
@@ -1172,39 +1214,32 @@
             m.setIcon(createStationIcon(m._isCollected, map.getZoom()));
             m.setPopupContent(buildPopupHtml(m));
         });
+        clusterGroup.refreshClusters();
         updateStats();
     };
 
-    const fetchStations = (map) => {
+    const fetchStations = async (map) => {
         const load = (stations, excluded) => {
             stations.forEach(g => g.stations.forEach(s => {
                 if (!excluded.includes(s.line_code)) createMarker(s, map);
             }));
-            loadMarkersInView(map);
-            map.on('moveend', () => loadMarkersInView(map));
             map.on('zoomend', () => updateMarkerSizes(map));
             updateStats();
         };
 
         try {
-            const cs = sessionStorage.getItem('eki_stations');
-            const ts = sessionStorage.getItem('eki_stations_ts');
-            const ce = sessionStorage.getItem('eki_excluded');
-            if (cs && ts && ce && Date.now() - Number(ts) < CACHE_TTL) {
-                load(JSON.parse(cs), JSON.parse(ce)); return;
+            const cached = await cacheGet('eki_stations');
+            if (cached && Date.now() - cached.ts < CACHE_TTL) {
+                load(cached.stations, cached.excluded); return;
             }
         } catch(e) {}
 
         Promise.all([
             fetch('data/stations.json').then(r => r.json()),
             fetch('data/no-stamps-lines.json').then(r => r.json()).then(d => d.map(l => l.line_code))
-        ]).then(([stations, excluded]) => {
-            try {
-                sessionStorage.setItem('eki_stations', JSON.stringify(stations));
-                sessionStorage.setItem('eki_stations_ts', String(Date.now()));
-                sessionStorage.setItem('eki_excluded', JSON.stringify(excluded));
-            } catch(e) {}
+        ]).then(async ([stations, excluded]) => {
             load(stations, excluded);
+            try { await cacheSet('eki_stations', { stations, excluded, ts: Date.now() }); } catch(e) {}
         }).catch(err => {
             console.error('Error fetching stations:', err);
             alert('Failed to load stations data. Please try again later.');
@@ -1381,13 +1416,16 @@
     // ── Init ──────────────────────────────────────────────────────────────────
     document.addEventListener('DOMContentLoaded', async () => {
         const map = initializeMap();
-        fetchStations(map);
         setupSearch(map);
-        addTrainLinesToMap(map);
         setupLanguageToggle(map);
         setupSessionPanel(map);
         setupNameModal(map);
         map.on('click', () => clearLineHighlight());
+
+        // Load stations first (markers appear quickly), then lines in background
+        await fetchStations(map);
+        setTimeout(() => addTrainLinesToMap(map), 100);
+
         if (currentUser) {
             await loadFromGist(currentUser);
             refreshAllMarkerStates(map);
