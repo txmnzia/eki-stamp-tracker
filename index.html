@@ -6,9 +6,7 @@
     <title>Eki Stamp Tracker</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css" />
-    <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;700&family=Space+Mono&display=swap" rel="stylesheet">
     <style>
@@ -52,30 +50,6 @@
         }
         .leaflet-control-zoom a:hover { background: var(--surface2) !important; }
 
-        /* ── Stamp marker ─────────────────────────────────────────────────── */
-        .stamp-marker {
-            display: flex; align-items: center; justify-content: center;
-            border-radius: 50%;
-            transition: transform 0.15s ease;
-            cursor: pointer;
-        }
-        .stamp-marker.collected {
-            background: var(--stamp-on);
-            box-shadow: 0 0 0 2px rgba(247,201,72,0.35), 0 2px 8px rgba(247,201,72,0.25);
-        }
-        .stamp-marker.uncollected {
-            background: var(--stamp-off);
-            border: 1.5px solid #4a4a5a;
-        }
-        .stamp-marker svg { display: block; }
-
-        /* Pulse animation on collect */
-        @keyframes stamp-pulse {
-            0%   { transform: scale(1); box-shadow: 0 0 0 0 rgba(247,201,72,0.6); }
-            40%  { transform: scale(1.4); box-shadow: 0 0 0 8px rgba(247,201,72,0); }
-            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(247,201,72,0); }
-        }
-        .stamp-marker.pulse { animation: stamp-pulse 0.4s ease forwards; }
 
         /* ── UI panel shared styles ───────────────────────────────────────── */
         .ui-panel {
@@ -341,17 +315,6 @@
 
         .hidden { display: none !important; }
 
-        /* ── Marker cluster ───────────────────────────────────────────────────── */
-        .marker-cluster-small, .marker-cluster-medium, .marker-cluster-large {
-            background-color: rgba(126,184,247,0.18) !important;
-        }
-        .marker-cluster-small div, .marker-cluster-medium div, .marker-cluster-large div {
-            background-color: rgba(126,184,247,0.55) !important;
-            color: #fff !important;
-            font-family: var(--ui-font) !important;
-            font-size: 11px !important;
-            font-weight: 700 !important;
-        }
 
         /* ── Sync status ──────────────────────────────────────────────────────── */
         .sync-status {
@@ -960,8 +923,6 @@
 
     // ── Map ───────────────────────────────────────────────────────────────────
     const canvasRenderer = L.canvas({ padding: 0.5 });
-    let clusterGroup;
-
     const initializeMap = () => {
         const map = L.map('map', { zoomControl: true, preferCanvas: true }).setView([35.682839, 139.759455], 13);
         L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
@@ -969,14 +930,7 @@
             subdomains: 'abcd', maxZoom: 20
         }).addTo(map);
 
-        clusterGroup = L.markerClusterGroup({
-            maxClusterRadius: 40,
-            disableClusteringAtZoom: 14,
-            spiderfyOnMaxZoom: false,
-            chunkedLoading: true,
-            chunkDelay: 50
-        });
-        map.addLayer(clusterGroup);
+
         return map;
     };
 
@@ -1094,24 +1048,13 @@
         return raw.replace(/([A-Z])/g, ' $1').trim();
     };
 
-    const createStationIcon = (collected, zoom) => {
-        const base = 10;
-        const size = Math.max(base, Math.round(base * Math.pow(1.22, zoom - 12)));
-        const inner = Math.round(size * 0.45);
-
-        const html = collected
-            ? `<div class="stamp-marker collected" style="width:${size}px;height:${size}px;">
-                 <svg width="${inner}" height="${inner}" viewBox="0 0 12 12">
-                   <path d="M2 6.5l3 3 5-5" stroke="#1a1a22" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-                 </svg>
-               </div>`
-            : `<div class="stamp-marker uncollected" style="width:${size}px;height:${size}px;">
-                 <svg width="${inner}" height="${inner}" viewBox="0 0 12 12">
-                   <circle cx="6" cy="6" r="2.5" fill="#5a5a6a"/>
-                 </svg>
-               </div>`;
-
-        return L.divIcon({ html, className: '', iconSize: [size, size], iconAnchor: [size/2, size/2] });
+    const circleStyle = (collected, zoom) => {
+        const r = Math.max(4, Math.round(4 * Math.pow(1.18, zoom - 12)));
+        return collected
+            ? { radius: r + 3, fillColor: '#f7c948', fillOpacity: 1,
+                color: 'rgba(247,201,72,0.4)', weight: 2, renderer: canvasRenderer }
+            : { radius: r, fillColor: '#3a3a48', fillOpacity: 1,
+                color: '#4a4a5a', weight: 1.5, renderer: canvasRenderer };
     };
 
     const buildPopupHtml = (marker) => {
@@ -1149,9 +1092,7 @@
         placedMarkerKeys.add(dedupeKey);
 
         const collected = isCollected(code);
-        const marker = L.marker([station.lat, station.lon], {
-            icon: createStationIcon(collected, map.getZoom())
-        });
+        const marker = L.circleMarker([station.lat, station.lon], circleStyle(collected, map.getZoom()));
 
         marker._stationData = station;
         marker._isCollected = collected;
@@ -1171,22 +1112,9 @@
             const next = !marker._isCollected;
             marker._isCollected = next;
             setCollected(code, next);
-
-            // Animate: briefly add pulse class
-            const el = marker.getElement();
-            if (el) {
-                const stampEl = el.querySelector('.stamp-marker');
-                if (stampEl) {
-                    stampEl.classList.remove('pulse');
-                    void stampEl.offsetWidth; // reflow
-                    stampEl.classList.add('pulse');
-                }
-            }
-
-            marker.setIcon(createStationIcon(next, map.getZoom()));
+            marker.setStyle(circleStyle(next, map.getZoom()));
             marker.setPopupContent(buildPopupHtml(marker));
             updateStats();
-
             showToast(next
                 ? `🔖 ${marker.stationName} — stamped!`
                 : `${marker.stationName} — removed`
@@ -1194,7 +1122,7 @@
         });
 
         markers.push(marker);
-        clusterGroup.addLayer(marker);
+        marker.addTo(map);
     };
 
     let zoomDebounce;
@@ -1202,19 +1130,17 @@
         clearTimeout(zoomDebounce);
         zoomDebounce = setTimeout(() => {
             const zoom = map.getZoom();
-            markers.forEach(m => m.setIcon(createStationIcon(m._isCollected, zoom)));
-            clusterGroup.refreshClusters();
+            markers.forEach(m => m.setStyle(circleStyle(m._isCollected, zoom)));
         }, 150);
     };
 
     const refreshAllMarkerStates = (map) => {
+        const zoom = map.getZoom();
         markers.forEach(m => {
-            const code = m._stationData.code;
-            m._isCollected = isCollected(code);
-            m.setIcon(createStationIcon(m._isCollected, map.getZoom()));
+            m._isCollected = isCollected(m._stationData.code);
+            m.setStyle(circleStyle(m._isCollected, zoom));
             m.setPopupContent(buildPopupHtml(m));
         });
-        clusterGroup.refreshClusters();
         updateStats();
     };
 
