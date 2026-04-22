@@ -951,7 +951,7 @@
     // ── IndexedDB cache (sessionStorage is too small for 14 MB geojson) ────────
     const CACHE_TTL = 7 * 24 * 60 * 60 * 1000; // 7 days
     const _db = new Promise((res, rej) => {
-        const req = indexedDB.open('eki-cache', 1);
+        const req = indexedDB.open('eki-cache', 2);
         req.onupgradeneeded = e => e.target.result.createObjectStore('data');
         req.onsuccess = e => res(e.target.result);
         req.onerror = rej;
@@ -1085,17 +1085,21 @@
         const code = s.code;
         const jpName = s.name_kanji || '';
         const enName = getEnName(code);
-        const lineColor = lineColorMap[s.line_code] || '#6b6b7a';
-        const lineLabel = s.line_code.replace(/\./g, ' › ');
         const collected = marker._isCollected;
+
+        const lineBadges = (marker._lineCodes || [s.line_code]).map(lc => {
+            const color = lineColorMap[lc] || '#6b6b7a';
+            const label = lc.replace(/\./g, ' › ');
+            return `<div class="popup-line">
+                <span class="popup-line-dot" style="background:${color}"></span>
+                ${label}
+            </div>`;
+        }).join('');
 
         return `<div class="popup-inner">
             <div class="popup-name">${jpName || enName}</div>
             <div class="popup-name-en">${enName}</div>
-            <div class="popup-line">
-                <span class="popup-line-dot" style="background:${lineColor}"></span>
-                ${lineLabel}
-            </div>
+            ${lineBadges}
             <div class="popup-status ${collected ? 'stamped' : 'unstamped'}">
                 <span class="popup-status-icon">${collected ? '🔖' : '○'}</span>
                 ${collected ? 'Stamp collected' : 'Not yet collected'}
@@ -1103,22 +1107,32 @@
         </div>`;
     };
 
-    // Deduplication: one marker per physical station (same name + coords)
-    const placedMarkerKeys = new Set();
+    // Deduplication: one marker per physical station
+    // Key: name + 2-decimal lat/lon (~1 km grid) merges all platforms of an interchange
+    const dedupeMarkers = {};
 
     const createMarker = (station, map) => {
         const code = station.code;
         if (!code || !station.line_code) return;
 
-        const dedupeKey = `${station.name_kanji}|${station.lat.toFixed(3)}|${station.lon.toFixed(3)}`;
-        if (placedMarkerKeys.has(dedupeKey)) return;
-        placedMarkerKeys.add(dedupeKey);
+        const dedupeKey = `${station.name_kanji}|${station.lat.toFixed(2)}|${station.lon.toFixed(2)}`;
+
+        if (dedupeMarkers[dedupeKey]) {
+            // Station already placed — just add this line to its badge list
+            const existing = dedupeMarkers[dedupeKey];
+            if (!existing._lineCodes.includes(station.line_code)) {
+                existing._lineCodes.push(station.line_code);
+                existing.setPopupContent(buildPopupHtml(existing));
+            }
+            return;
+        }
 
         const collected = isCollected(code);
         const marker = L.circleMarker([station.lat, station.lon], circleStyle(collected, map.getZoom()));
 
         marker._stationData = station;
         marker._isCollected = collected;
+        marker._lineCodes = [station.line_code];
         marker.stationName = getDisplayName(station, code);
         marker.stationNameKanji = station.name_kanji || '';
         marker.stationNameEn = getEnName(code);
@@ -1126,7 +1140,7 @@
         marker.bindPopup(buildPopupHtml(marker), {
             offset: L.point(0, -4),
             closeButton: false,
-            maxWidth: 240
+            maxWidth: 260
         });
         marker.on('mouseover', () => marker.openPopup());
         marker.on('mouseout', () => marker.closePopup());
@@ -1144,6 +1158,7 @@
             );
         });
 
+        dedupeMarkers[dedupeKey] = marker;
         markers.push(marker);
         marker.addTo(map);
     };
