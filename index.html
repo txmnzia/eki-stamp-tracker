@@ -315,6 +315,20 @@
 
         .hidden { display: none !important; }
 
+        /* ── Line tooltip ─────────────────────────────────────────────────────── */
+        .line-tooltip {
+            background: var(--surface) !important;
+            border: 1px solid var(--border) !important;
+            border-radius: var(--radius) !important;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.5) !important;
+            padding: 0 !important;
+            pointer-events: none;
+        }
+        .line-tooltip::before { display: none !important; }
+        .line-tip { padding: 8px 12px; }
+        .line-tip b { display: block; font-family: var(--jp-font); font-size: 14px; font-weight: 700; color: var(--text); }
+        .line-tip span { font-size: 11px; color: var(--muted); letter-spacing: 0.04em; }
+
 
         /* ── Sync status ──────────────────────────────────────────────────────── */
         .sync-status {
@@ -959,13 +973,13 @@
 
     // ── Lines ─────────────────────────────────────────────────────────────────
     const lineColorMap = {};
+    const linesByName = {};   // lineName → [polyline, …]
+    const allLineSegs = [];   // flat list for bulk resets
+    let hoveredLineName = null;
+    let hoverTimer;
 
-    let highlightedLine = null;
-    const allPolylines = [];
-
-    const clearLineHighlight = () => {
-        if (highlightedLine) highlightedLine = null;
-        allPolylines.forEach(p => p.setStyle({ weight: 2.5, opacity: 0.75 }));
+    const resetAllLines = () => {
+        allLineSegs.forEach(p => p.setStyle({ weight: 2.5, opacity: 0.75 }));
     };
 
     const renderLines = (map, data) => {
@@ -983,34 +997,43 @@
                 const enName = getLineEn(name);
                 const polyline = L.polyline(
                     feature.geometry.coordinates.map(c => [c[1], c[0]]),
-                    { color, weight: 2.5, opacity: 0.75, renderer: canvasRenderer }
+                    { color, weight: 2.5, opacity: 0.75, renderer: canvasRenderer, interactive: true }
                 ).addTo(map);
-                const popupHtml = `<div class="popup-inner">
-                    <div class="popup-name">${name}</div>
-                    ${enName ? `<div class="popup-name-en">${enName}</div>` : ''}
-                </div>`;
-                polyline.bindPopup(popupHtml, { closeButton: false });
-                polyline.on('mouseover', function(e) {
-                    if (highlightedLine !== this) this.setStyle({ weight: 4, opacity: 1 });
-                    this.openPopup(e.latlng);
+
+                // Group by line name for whole-line highlighting
+                if (!linesByName[name]) linesByName[name] = [];
+                linesByName[name].push(polyline);
+                allLineSegs.push(polyline);
+
+                // Sticky tooltip showing full line name
+                polyline.bindTooltip(
+                    `<div class="line-tip"><b>${name}</b>${enName ? `<br><span>${enName}</span>` : ''}</div>`,
+                    { sticky: true, direction: 'top', offset: [0, -8], className: 'line-tooltip' }
+                );
+
+                polyline.on('mouseover', function() {
+                    clearTimeout(hoverTimer);
+                    if (hoveredLineName === name) return; // still on same line
+
+                    const prev = hoveredLineName;
+                    hoveredLineName = name;
+
+                    if (prev === null) {
+                        // First entry: one full pass to dim all, then highlight this line
+                        allLineSegs.forEach(p => p.setStyle({ opacity: 0.15, weight: 1.5 }));
+                    } else {
+                        // Moving between lines: only update the two affected groups
+                        linesByName[prev].forEach(p => p.setStyle({ opacity: 0.15, weight: 1.5 }));
+                    }
+                    linesByName[name].forEach(p => p.setStyle({ weight: 5, opacity: 1 }));
                 });
+
                 polyline.on('mouseout', function() {
-                    if (highlightedLine !== this) this.setStyle({ weight: 2.5, opacity: 0.75 });
-                    this.closePopup();
+                    hoverTimer = setTimeout(() => {
+                        hoveredLineName = null;
+                        resetAllLines();
+                    }, 60);
                 });
-                polyline.on('mousemove', function(e) { this.getPopup().setLatLng(e.latlng); });
-                polyline.on('click', function(e) {
-                    L.DomEvent.stopPropagation(e);
-                    if (highlightedLine === this) { clearLineHighlight(); return; }
-                    clearLineHighlight();
-                    highlightedLine = this;
-                    allPolylines.forEach(p => {
-                        if (p !== highlightedLine) p.setStyle({ opacity: 0.15, weight: 1.5 });
-                    });
-                    this.setStyle({ weight: 5, opacity: 1 });
-                    this.bringToFront();
-                });
-                allPolylines.push(polyline);
             }
             if (i < features.length) requestAnimationFrame(processBatch);
         };
@@ -1346,7 +1369,6 @@
         setupLanguageToggle(map);
         setupSessionPanel(map);
         setupNameModal(map);
-        map.on('click', () => clearLineHighlight());
 
         // Load stations first (markers appear quickly), then lines in background
         await fetchStations(map);
