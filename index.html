@@ -1044,11 +1044,14 @@
     let currentUser = localStorage.getItem('eki_current_user') || '';
     let currentLang = localStorage.getItem('eki_lang') || 'en';
 
+    // Module-level map reference (needed by bringStationsToFront event delegation)
+    let map_ref = null;
+
     // FIX 3: Touch device detection for larger marker hit targets
     const isTouchDevice = window.matchMedia('(pointer: coarse)').matches;
 
-    // FIX 21: Canvas renderers declared here, assigned after map panes are created
-    let lineCanvas, markerCanvas;
+    // Single canvas renderer — two separate pane canvases blocked cross-pane mouse events
+    let canvasRenderer;
 
     // ── Gist persistence ──────────────────────────────────────────────────────
     const GIST_TOKEN = ['ghp_yLW5QpYE7c','hJyzEri6mDDVxb0PUUy01DCXAA'].join('');
@@ -1190,15 +1193,9 @@
     const initializeMap = () => {
         const map = L.map('map', { zoomControl: true, preferCanvas: true }).setView([35.682839, 139.759455], 13);
 
-        // FIX 21: Separate panes so station markers always render above line polylines
-        map.createPane('linesPane');
-        map.getPane('linesPane').style.zIndex = 350;
-        map.createPane('stationsPane');
-        map.getPane('stationsPane').style.zIndex = 450;
-
-        // Assign module-level canvas renderers now that panes exist
-        lineCanvas    = L.canvas({ padding: 0.5, pane: 'linesPane' });
-        markerCanvas  = L.canvas({ padding: 0.5, pane: 'stationsPane' });
+        // Single canvas renderer — one canvas means all layers share pointer events correctly
+        // Station markers are brought to front after lines render (see bringStationsToFront)
+        canvasRenderer = L.canvas({ padding: 0.5 });
 
         L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
@@ -1242,7 +1239,7 @@
         allLineSegs.forEach(p => p.setStyle({ weight: 2.5, opacity: 0.75 }));
     };
 
-    const renderLines = (map, data) => {
+    const renderLines = (map, data, onComplete) => {
         const features = data.features;
         const BATCH = 150;
         let i = 0;
@@ -1255,10 +1252,10 @@
                 const color = getLineColor(name);
                 lineColorMap[name] = color;
                 const enName = getLineEn(name);
-                // FIX 21: use lineCanvas so lines stay beneath station markers
+                // single canvasRenderer — stations are repainted to front after lines complete
                 const polyline = L.polyline(
                     feature.geometry.coordinates.map(c => [c[1], c[0]]),
-                    { color, weight: 2.5, opacity: 0.75, renderer: lineCanvas, interactive: true }
+                    { color, weight: 2.5, opacity: 0.75, renderer: canvasRenderer, interactive: true }
                 ).addTo(map);
 
                 if (!linesByName[name]) linesByName[name] = [];
@@ -1287,7 +1284,11 @@
                     hoverTimer = setTimeout(() => { hoveredLineName = null; resetAllLines(); }, 60);
                 });
             }
-            if (i < features.length) requestAnimationFrame(processBatch);
+            if (i < features.length) {
+                requestAnimationFrame(processBatch);
+            } else if (onComplete) {
+                onComplete();  // all line batches done — caller can bring stations to front
+            }
         };
 
         requestAnimationFrame(processBatch);
@@ -1303,7 +1304,7 @@
         fetch('data/railroad-section.geojson')
             .then(r => r.json())
             .then(async data => {
-                renderLines(map, data);
+                renderLines(map, data, bringStationsToFront);
                 try { await cacheSet('eki_lines', { data, ts: Date.now() }); } catch(e) {}
             })
             .catch(err => console.error('Error loading train lines:', err));
@@ -1311,6 +1312,12 @@
 
     // ── Markers ───────────────────────────────────────────────────────────────
     const markers = [];
+    let currentPopupMarker = null; // tracks which marker has the open popup (for event delegation)
+
+    // After lines finish rendering, repaint station markers on top so they are visually above lines
+    const bringStationsToFront = () => {
+        markers.forEach(m => { m.removeFrom(map_ref); m.addTo(map_ref); });
+    };
 
     const getDisplayName = (station, code) => {
         if (currentLang === 'jp' && station.name_kanji) return station.name_kanji;
@@ -1329,9 +1336,9 @@
         const r = Math.max(minR, Math.round(4 * Math.pow(1.18, zoom - 12)));
         return collected
             ? { radius: r + 3, fillColor: '#f7c948', fillOpacity: 1,
-                color: 'rgba(247,201,72,0.4)', weight: 2, renderer: markerCanvas }
+                color: 'rgba(247,201,72,0.4)', weight: 2, renderer: canvasRenderer }
             : { radius: r, fillColor: '#3a3a48', fillOpacity: 1,
-                color: '#4a4a5a', weight: 1.5, renderer: markerCanvas };
+                color: '#4a4a5a', weight: 1.5, renderer: canvasRenderer };
     };
 
     // FIX 2 + FIX 19: Popup with explicit CTA button and consistent SVG bookmark icons
@@ -1381,7 +1388,7 @@
         }
 
         const collected = isCollected(code);
-        // FIX 21: use markerCanvas so stations render above line polylines
+        // single canvasRenderer
         const marker = L.circleMarker([station.lat, station.lon], circleStyle(collected, map.getZoom()));
 
         marker._stationData = station;
@@ -1391,32 +1398,16 @@
         marker.stationNameKanji = station.name_kanji || '';
         marker.stationNameEn = getEnName(code);
 
-        // FIX 2: Click opens sticky popup; collect action is a button inside
+        // FIX 2: Click opens sticky popup; collect button uses event delegation (reliable)
         marker.bindPopup(buildPopupHtml(marker), {
             offset: L.point(0, -4),
             closeButton: true,
             maxWidth: 260
         });
 
-        marker.on('click', () => marker.openPopup());
-
-        // Wire up the collect button each time the popup opens
-        marker.on('popupopen', () => {
-            const btn = marker.getPopup().getElement().querySelector('.popup-collect-btn');
-            if (!btn) return;
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const next = !marker._isCollected;
-                marker._isCollected = next;
-                setCollected(code, next);
-                marker.setStyle(circleStyle(next, map.getZoom()));
-                // Update button in-place (avoids re-wiring)
-                btn.className = 'popup-collect-btn' + (next ? ' collected' : '');
-                btn.setAttribute('aria-label', `${next ? 'Remove stamp' : 'Collect stamp'} for ${marker.stationNameKanji || marker.stationNameEn}`);
-                btn.innerHTML = next ? BOOKMARK_FILLED + ' Collected' : BOOKMARK_OUTLINE + ' Collect stamp';
-                updateStats();
-                showToast(next ? `${marker.stationName} — stamped!` : `${marker.stationName} — removed`);
-            });
+        marker.on('click', () => {
+            currentPopupMarker = marker;  // track for event delegation
+            marker.openPopup();
         });
 
         dedupeMarkers[dedupeKey] = marker;
@@ -1731,10 +1722,28 @@
     // ── Init ──────────────────────────────────────────────────────────────────
     document.addEventListener('DOMContentLoaded', async () => {
         const map = initializeMap();
+        map_ref = map; // module-level reference for event delegation
         setupSearch(map);
         setupLanguageToggle(map);
         setupSessionPanel(map);
         setupNameModal(map);
+
+        // Event delegation for popup collect button — reliable alternative to popupopen+getElement
+        document.addEventListener('click', (e) => {
+            const btn = e.target.closest('.popup-collect-btn');
+            if (!btn || !currentPopupMarker) return;
+            e.stopPropagation();
+            const marker = currentPopupMarker;
+            const next = !marker._isCollected;
+            marker._isCollected = next;
+            setCollected(marker._stationData.code, next);
+            marker.setStyle(circleStyle(next, map.getZoom()));
+            btn.className = 'popup-collect-btn' + (next ? ' collected' : '');
+            btn.setAttribute('aria-label', (next ? 'Remove stamp' : 'Collect stamp') + ' for ' + (marker.stationNameKanji || marker.stationNameEn));
+            btn.innerHTML = next ? BOOKMARK_FILLED + ' Collected' : BOOKMARK_OUTLINE + ' Collect stamp';
+            updateStats();
+            showToast(next ? marker.stationName + ' — stamped!' : marker.stationName + ' — removed');
+        });
 
         await fetchStations(map);
         setTimeout(() => addTrainLinesToMap(map), 100);
