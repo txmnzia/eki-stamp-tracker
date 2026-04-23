@@ -19,7 +19,7 @@
             --surface2:   #22222a;
             --border:     #2e2e3a;
             --text:       #e4e4ec;
-            --muted:      #686878;
+            --muted:      #9898b0; /* FIX 4: raised from #686878 → passes WCAG AA 4.5:1 */
             --accent:     #7eb8f7;
             --accent-dim: rgba(126,184,247,0.12);
             --stamp-on:   #f7c948;
@@ -31,10 +31,15 @@
 
         html, body { height: 100%; background: var(--bg); color: var(--text); font-family: var(--ui-font); }
 
+        /* FIX 13: Global focus-visible ring — restores keyboard navigation affordance */
+        :focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
+            border-radius: 3px;
+        }
+
         /* ── Map ──────────────────────────────────────────────────────────── */
         #map { height: 100vh; width: 100%; }
-
-        /* Using CartoDB dark_all tiles natively — no CSS filter needed */
 
         /* Leaflet attribution dark */
         .leaflet-control-attribution {
@@ -50,6 +55,32 @@
         }
         .leaflet-control-zoom a:hover { background: var(--surface2) !important; }
 
+        /* ── FIX 1: Loading overlay ───────────────────────────────────────── */
+        #loading-overlay {
+            position: fixed; inset: 0; z-index: 5000;
+            background: var(--bg);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            gap: 16px;
+            transition: opacity 0.4s ease;
+            pointer-events: all;
+        }
+        #loading-overlay.fade-out { opacity: 0; pointer-events: none; }
+        .loading-spinner {
+            width: 36px; height: 36px;
+            border: 3px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loading-text {
+            font-size: 11px; color: var(--muted);
+            letter-spacing: 0.12em; text-transform: uppercase;
+        }
+        .loading-sub {
+            font-size: 10px; color: var(--border);
+            letter-spacing: 0.06em;
+        }
 
         /* ── UI panel shared styles ───────────────────────────────────────── */
         .ui-panel {
@@ -78,7 +109,7 @@
         #search-container {
             position: absolute; top: 16px; left: 50%;
             transform: translateX(-50%);
-            z-index: 1000; width: min(360px, calc(100vw - 32px));
+            z-index: 1000; width: min(360px, calc(100vw - 120px));
         }
 
         #search-wrap {
@@ -134,6 +165,15 @@
             z-index: 1000; display: flex; gap: 6px;
         }
 
+        /* FIX 9: Session button visually dominant — accent colour by default */
+        #session-toggle {
+            background: var(--accent-dim);
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+        #session-toggle:hover { background: rgba(126,184,247,0.22); }
+        #session-toggle.active { background: rgba(126,184,247,0.28); }
+
         /* ── Popup ────────────────────────────────────────────────────────── */
         .leaflet-popup-content-wrapper {
             background: var(--surface) !important;
@@ -144,10 +184,17 @@
         }
         .leaflet-popup-tip { background: var(--surface) !important; }
         .leaflet-popup-content { margin: 0 !important; }
+        /* Style the Leaflet close button */
+        .leaflet-popup-close-button {
+            color: var(--muted) !important;
+            font-size: 18px !important;
+            padding: 4px 8px !important;
+        }
+        .leaflet-popup-close-button:hover { color: var(--text) !important; }
 
         .popup-inner {
-            padding: 14px 16px;
-            min-width: 180px;
+            padding: 14px 16px 12px;
+            min-width: 190px;
         }
         .popup-name {
             font-family: var(--jp-font); font-size: 17px; font-weight: 700;
@@ -162,23 +209,40 @@
             font-size: 11px; color: var(--muted);
             background: var(--surface2);
             border-radius: 4px; padding: 3px 7px;
-            margin-bottom: 12px;
+            margin-bottom: 4px;
         }
         .popup-line-dot {
             width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
         }
-        .popup-status {
-            display: flex; align-items: center; gap: 6px;
-            font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase;
+
+        /* FIX 2: Popup collect button — explicit CTA replaces invisible click */
+        .popup-collect-btn {
+            display: flex; align-items: center; gap: 7px;
+            width: 100%; padding: 9px 12px;
+            margin-top: 10px;
+            font-family: var(--ui-font); font-size: 11px; font-weight: 700;
+            letter-spacing: 0.06em; text-transform: uppercase;
+            background: var(--surface2); color: var(--text);
+            border: 1px solid var(--border); border-radius: var(--radius);
+            cursor: pointer;
+            transition: background 0.15s, border-color 0.15s, color 0.15s;
         }
-        .popup-status.stamped { color: var(--stamp-on); }
-        .popup-status.unstamped { color: var(--muted); }
-        .popup-status-icon { font-size: 14px; }
+        .popup-collect-btn:hover { background: var(--border); }
+        .popup-collect-btn.collected {
+            background: rgba(247,201,72,0.15);
+            border-color: rgba(247,201,72,0.35);
+            color: var(--stamp-on);
+        }
+        .popup-collect-btn.collected:hover {
+            background: rgba(247,201,72,0.08);
+            border-color: rgba(247,201,72,0.2);
+            color: #d4a830;
+        }
 
         /* ── Session panel ────────────────────────────────────────────────── */
         #session-panel {
             position: absolute; top: 58px; right: 16px;
-            z-index: 1000; width: 260px;
+            z-index: 1000; width: 268px;
             background: var(--surface);
             border: 1px solid var(--border);
             border-radius: var(--radius);
@@ -218,7 +282,27 @@
             width: 0%;
         }
 
-        #session-body { padding: 12px; display: flex; flex-direction: column; gap: 6px; }
+        #session-body { padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+
+        /* FIX 11: Loaded state row */
+        #session-loaded-row {
+            display: flex; align-items: center; justify-content: space-between; gap: 8px;
+            background: var(--surface2); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 8px 10px;
+        }
+        #session-loaded-info .session-loaded-label {
+            font-size: 10px; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase;
+            margin-bottom: 2px;
+        }
+        #session-loaded-name {
+            font-size: 13px; font-weight: 700; color: var(--text);
+        }
+
+        /* FIX 5: Input section with sync key hint */
+        .session-input-section { display: flex; flex-direction: column; gap: 4px; }
+        .session-hint-text {
+            font-size: 10px; color: var(--muted); line-height: 1.5; padding: 0 2px;
+        }
 
         #session-name-input {
             width: 100%; padding: 8px 10px;
@@ -235,16 +319,30 @@
         .session-btn {
             flex: 1; padding: 7px 10px;
             font-family: var(--ui-font); font-size: 10px; font-weight: 700;
-            letter-spacing: 0.08em; text-transform: uppercase;
+            letter-spacing: 0.07em; text-transform: uppercase;
             background: var(--surface2); color: var(--text);
             border: 1px solid var(--border); border-radius: 4px;
             cursor: pointer; transition: background 0.15s, border-color 0.15s, color 0.15s;
+            white-space: nowrap;
         }
         .session-btn:hover { background: var(--border); }
         .session-btn.primary { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
         .session-btn.primary:hover { background: rgba(126,184,247,0.2); }
-        .session-btn.danger { color: #f77e7e; border-color: #5a2a2a; }
+        .session-btn.danger { color: #f77e7e; border-color: #3a2222; }
         .session-btn.danger:hover { background: rgba(247,126,126,0.1); border-color: #f77e7e; }
+
+        /* FIX 12: Sync error with retry link */
+        .sync-status {
+            font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase;
+            padding: 2px 0 6px; min-height: 16px; transition: color 0.2s;
+        }
+        .sync-status.saving { color: var(--muted); }
+        .sync-status.saved  { color: #6fdd8b; }
+        .sync-status.error  { color: #f77e7e; }
+        .sync-status a {
+            color: var(--accent); text-decoration: none; margin-left: 4px;
+        }
+        .sync-status a:hover { text-decoration: underline; }
 
         /* ── Name modal ───────────────────────────────────────────────────── */
         #name-modal-overlay {
@@ -258,14 +356,14 @@
             border: 1px solid var(--border);
             border-radius: 10px;
             padding: 28px 28px 24px;
-            width: min(340px, calc(100vw - 32px));
+            width: min(360px, calc(100vw - 32px));
             box-shadow: 0 20px 60px rgba(0,0,0,0.7);
         }
         #name-modal h2 {
             font-family: var(--jp-font); font-size: 20px;
             color: var(--text); margin-bottom: 6px;
         }
-        #name-modal p { font-size: 12px; color: var(--muted); margin-bottom: 20px; line-height: 1.6; }
+        #name-modal p { font-size: 12px; color: var(--muted); margin-bottom: 20px; line-height: 1.7; }
         #modal-name-input {
             width: 100%; padding: 10px 12px; margin-bottom: 8px;
             background: var(--surface2); border: 1px solid var(--border);
@@ -274,7 +372,14 @@
             transition: border-color 0.15s;
         }
         #modal-name-input:focus { border-color: var(--accent); }
-        #modal-name-hint { font-size: 11px; color: var(--muted); margin-bottom: 18px; }
+        /* FIX 5: Sync key warning hint */
+        #modal-name-hint {
+            font-size: 11px; color: var(--muted); margin-bottom: 18px;
+            line-height: 1.6; padding: 8px 10px;
+            background: rgba(247,201,72,0.06);
+            border: 1px solid rgba(247,201,72,0.15);
+            border-radius: 4px;
+        }
         .modal-buttons { display: flex; gap: 8px; }
         .modal-btn {
             flex: 1; padding: 10px;
@@ -303,15 +408,22 @@
 
         /* ── Stats bar ────────────────────────────────────────────────────── */
         #stats-bar {
-            position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%);
+            position: absolute;
+            /* FIX 18: iOS safe-area offset for bottom nav bar */
+            bottom: max(24px, calc(env(safe-area-inset-bottom, 0px) + 16px));
+            left: 50%; transform: translateX(-50%);
             z-index: 1000;
             background: var(--surface); border: 1px solid var(--border);
             border-radius: 20px; padding: 6px 16px;
             font-size: 11px; color: var(--muted);
             box-shadow: 0 2px 12px rgba(0,0,0,0.4);
             letter-spacing: 0.06em;
+            white-space: nowrap;
+            max-width: calc(100vw - 32px);
         }
-        #stats-bar span { color: var(--stamp-on); font-weight: 700; }
+        #stats-bar strong { color: var(--stamp-on); font-weight: 700; }
+        /* FIX 16: Empty state hint */
+        #stats-hint { color: var(--muted); font-style: italic; }
 
         .hidden { display: none !important; }
 
@@ -329,95 +441,131 @@
         .line-tip b { display: block; font-family: var(--jp-font); font-size: 14px; font-weight: 700; color: var(--text); }
         .line-tip span { font-size: 11px; color: var(--muted); letter-spacing: 0.04em; }
 
-
-        /* ── Sync status ──────────────────────────────────────────────────────── */
-        .sync-status {
-            font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase;
-            padding: 2px 0 6px; min-height: 16px; transition: color 0.2s;
+        /* ── Mobile touch adjustments ─────────────────────────────────────── */
+        @media (pointer: coarse) {
+            /* Larger tap zones on touch devices handled via JS marker radius */
+            .session-btn { padding: 9px 10px; }
+            .popup-collect-btn { padding: 12px 14px; font-size: 12px; }
         }
-        .sync-status.saving { color: var(--muted); }
-        .sync-status.saved  { color: #6fdd8b; }
-        .sync-status.error  { color: #f77e7e; }
     </style>
 </head>
 <body>
 
-    <!-- Search -->
-    <div id="search-container">
-        <div id="search-wrap">
-            <svg id="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-            </svg>
-            <input type="text" id="stationSearch" placeholder="Search station…" autocomplete="off" />
-        </div>
-        <div id="suggestions"></div>
+    <!-- FIX 1: Loading overlay — shown while data files fetch -->
+    <div id="loading-overlay">
+        <div class="loading-spinner"></div>
+        <p class="loading-text">Loading stations…</p>
+        <p class="loading-sub">First load may take a few seconds</p>
     </div>
 
-    <!-- Controls -->
+    <!-- Search — FIX 14: aria-label added -->
+    <div id="search-container">
+        <div id="search-wrap">
+            <svg id="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            <input type="text" id="stationSearch" aria-label="Search station by name" placeholder="Search station…" autocomplete="off" />
+        </div>
+        <div id="suggestions" role="listbox" aria-label="Station suggestions"></div>
+    </div>
+
+    <!-- Controls — FIX 6: lang button shows current; FIX 9: session button accented; FIX 14: aria-expanded -->
     <div id="controls">
-        <button class="ui-btn" id="lang-toggle">JP</button>
-        <button class="ui-btn" id="session-toggle">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <button class="ui-btn" id="lang-toggle" title="Switch language" aria-label="Current language: English. Click to switch.">EN</button>
+        <button class="ui-btn" id="session-toggle" aria-expanded="false" aria-controls="session-panel">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
             </svg>
             Session
         </button>
     </div>
 
-    <!-- Session panel -->
-    <div id="session-panel" class="hidden">
+    <!-- Session panel — FIX 11: state-aware; FIX 10: import button; FIX 5: sync key hint; FIX 17: renamed buttons -->
+    <div id="session-panel" class="hidden" role="region" aria-label="Session management">
         <div id="session-header">
             <div id="session-user-row">
-                <div id="session-avatar">?</div>
+                <div id="session-avatar" aria-hidden="true">?</div>
                 <div id="session-username" class="placeholder">No session</div>
             </div>
-            <div id="sync-status" class="sync-status"></div>
+            <div id="sync-status" class="sync-status" aria-live="polite"></div>
             <div id="session-stats">
                 <span id="session-count">0 / 0 collected</span>
-                <div id="session-progress-bar"><div id="session-progress-fill"></div></div>
+                <div id="session-progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                    <div id="session-progress-fill"></div>
+                </div>
             </div>
         </div>
         <div id="session-body">
-            <input type="text" id="session-name-input" placeholder="Enter your name…" autocomplete="off" />
-            <div class="session-row">
-                <button class="session-btn primary" id="session-load">Load</button>
-                <button class="session-btn" id="session-save">Sync now</button>
+            <!-- Loaded state: shown when a session is active -->
+            <div id="session-loaded-row" class="hidden">
+                <div id="session-loaded-info">
+                    <div class="session-loaded-label">Active session</div>
+                    <div id="session-loaded-name"></div>
+                </div>
+                <button class="session-btn" id="session-change">Change</button>
             </div>
+
+            <!-- Input state: shown when no session or changing session -->
+            <div id="session-input-section" class="session-input-section">
+                <label for="session-name-input" class="session-hint-text" style="font-weight:700;color:var(--text)">Sync name</label>
+                <input type="text" id="session-name-input" placeholder="Enter your sync name…" autocomplete="off" />
+                <small class="session-hint-text">⚠ This is your sync key — type it <em>exactly</em> the same on every device. Case-sensitive.</small>
+            </div>
+
+            <!-- Load + Save — hidden when session active -->
+            <div class="session-row" id="session-primary-row">
+                <button class="session-btn primary" id="session-load">Load session</button>
+                <button class="session-btn" id="session-save">Save progress</button>
+            </div>
+
+            <!-- Save — visible at all times once session active, hidden otherwise -->
+            <div class="session-row hidden" id="session-save-row">
+                <button class="session-btn primary" id="session-save-2" style="flex:1">Save progress</button>
+            </div>
+
+            <!-- Data import/export -->
             <div class="session-row">
                 <button class="session-btn" id="session-export">Export JSON</button>
-                <button class="session-btn danger" id="session-reset">Reset</button>
+                <button class="session-btn" id="session-import">Import JSON</button>
             </div>
-            <input type="file" id="session-import-file" accept=".json" style="display:none">
+
+            <!-- Danger zone -->
+            <div class="session-row">
+                <button class="session-btn danger" id="session-reset" style="flex:1">Reset all stamps</button>
+            </div>
+
+            <input type="file" id="session-import-file" accept=".json" style="display:none" aria-label="Import stamps JSON file">
         </div>
     </div>
 
-    <!-- Name modal (shown on first visit) -->
-    <div id="name-modal-overlay" class="hidden">
+    <!-- Name modal — FIX 15: focus trap; FIX 5: sync key warning; FIX 20: language-aware title -->
+    <div id="name-modal-overlay" class="hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
         <div id="name-modal">
-            <h2>ようこそ！</h2>
-            <p>Enter your name to track your stamp collection. Your progress is saved to the cloud and syncs across all your devices.</p>
-            <input type="text" id="modal-name-input" placeholder="Your name" maxlength="32" />
-            <div id="modal-name-hint">You can change this later in the Session panel.</div>
+            <h2 id="modal-title">Welcome!</h2>
+            <p>Choose a sync name to save your stamp collection to the cloud and access it on any device.</p>
+            <label for="modal-name-input" class="hidden">Your sync name</label>
+            <input type="text" id="modal-name-input" placeholder="Your sync name" maxlength="32" />
+            <div id="modal-name-hint">⚠ This name is your sync key — type it <strong>exactly</strong> the same on every device. It is case-sensitive.</div>
             <div class="modal-buttons">
-                <button class="modal-btn secondary" id="modal-skip">Skip</button>
-                <button class="modal-btn confirm" id="modal-confirm">Start collecting →</button>
+                <button class="modal-btn secondary" id="modal-skip">Skip for now</button>
+                <button class="modal-btn confirm" id="modal-confirm">Start collecting</button>
             </div>
         </div>
     </div>
 
     <!-- Toast notification -->
-    <div id="toast"></div>
+    <div id="toast" role="status" aria-live="polite"></div>
 
-    <!-- Stats bar -->
-    <div id="stats-bar"><span id="bar-count">0</span> stamps collected</div>
+    <!-- Stats bar — FIX 8: shows total; FIX 16: empty state hint -->
+    <div id="stats-bar" aria-live="polite">
+        <strong id="bar-count">0</strong><span id="bar-total"></span> stamps collected<span id="stats-hint"> · tap any station to begin 🔖</span>
+    </div>
 
     <!-- Map -->
     <div id="map"></div>
 
     <script>
     // ── Line data: official colours + English names ──────────────────────────
-    // Official colours sourced from operator style guides / Wikipedia
-    // Format: JP name → { color, en }
     const LINE_DATA = {
         // ── Tokyo Metro ──────────────────────────────────────────────────────────
         '3号線銀座線':           { color: '#F39700', en: 'Ginza Line' },
@@ -458,7 +606,6 @@
         '青梅線':                { color: '#F15A22', en: 'Ome Line' },
         '五日市線':              { color: '#F15A22', en: 'Itsukaichi Line' },
         '八高線':                { color: '#808080', en: 'Hachiko Line' },
-        '東金線':                { color: '#F68B1E', en: 'Togane Line' },
         '成田線':                { color: '#F68B1E', en: 'Narita Line' },
         '成田空港線':            { color: '#F68B1E', en: 'Narita Airport Line' },
         '鶴見線':                { color: '#F5DD00', en: 'Tsurumi Line' },
@@ -500,9 +647,7 @@
         '花輪線':                { color: '#F68B1E', en: 'Hanawa Line' },
         '左沢線':                { color: '#F68B1E', en: 'Aterazawa Line' },
         '米坂線':                { color: '#F68B1E', en: 'Yonesaka Line' },
-        '陸羽東線':              { color: '#F68B1E', en: 'Rikuu East Line' },
         '石巻線':                { color: '#F68B1E', en: 'Ishinomaki Line' },
-        '気仙沼線':              { color: '#F68B1E', en: 'Kesennuma Line' },
         '大湊線':                { color: '#F68B1E', en: 'Ominato Line' },
         '津軽線':                { color: '#F68B1E', en: 'Tsugaru Line' },
         '弥彦線':                { color: '#F68B1E', en: 'Yahiko Line' },
@@ -741,7 +886,6 @@
         '西神線':                { color: '#0068B7', en: 'Seishin Line' },
         '西神延伸線':            { color: '#0068B7', en: 'Seishin Ext. Line' },
         '海岸線':                { color: '#E5171F', en: 'Kaigan Line' },
-        // ── Sapporo Municipal ────────────────────────────────────────────────────
         // ── Fukuoka / Nishitetsu ──────────────────────────────────────────────────
         '天神大牟田線':          { color: '#EE0012', en: 'Tenjin-Omuta Line' },
         '太宰府線':              { color: '#EE0012', en: 'Dazaifu Line' },
@@ -823,7 +967,6 @@
         '富山都心線':            { color: '#F39700', en: 'Toyama City Center Line' },
         '万葉線':                { color: '#F39700', en: 'Manyo Line' },
         '富山地方鉄道':          { color: '#EE0012', en: 'Toyama Local Railway' },
-        '北陸新幹線':            { color: '#E60012', en: 'Hokuriku Shinkansen' },
         '秋田内陸線':            { color: '#009F6B', en: 'Akita Nairiku Line' },
         '由利高原鉄道':          { color: '#009F6B', en: 'Yuri Kogen Railway' },
         '三陸鉄道':              { color: '#009F6B', en: 'Sanriku Railway' },
@@ -839,7 +982,6 @@
         '嵐山線':                { color: '#0090D0', en: 'Arashiyama Line' },
         '叡山本線':              { color: '#009F6B', en: 'Eizan Main Line' },
         '鞍馬線':                { color: '#009F6B', en: 'Kurama Line' },
-        '嵯峨野観光線':          { color: '#A0522D', en: 'Sagano Scenic Line' },
         '近江鉄道':              { color: '#009F6B', en: 'Omi Railway' },
         '信楽線':                { color: '#A0522D', en: 'Shigaraki Route' },
         '有馬線':                { color: '#0090D0', en: 'Arima Line' },
@@ -848,17 +990,14 @@
         '網干線':                { color: '#0072BC', en: 'Aboshi Line' },
         '水間線':                { color: '#009F6B', en: 'Mizuma Line' },
         '養老線':                { color: '#EE0012', en: 'Yoro Line' },
-        '伊賀線':                { color: '#EE0012', en: 'Iga Line' },
         '島原鉄道線':            { color: '#009F6B', en: 'Shimabara Railway' },
         '平成筑豊鉄道':          { color: '#009F6B', en: 'Heisei Chikuho Railway' },
         '筑豊電気鉄道線':        { color: '#F39700', en: 'Chikuho Electric Railway' },
-        '甘木線':                { color: '#009F6B', en: 'Amagi Line' },
         '松浦鉄道線':            { color: '#009F6B', en: 'Matsuura Railway' },
         '南阿蘇鉄道線':          { color: '#009F6B', en: 'Minami-Aso Railway' },
         '上熊本線':              { color: '#009F6B', en: 'Kami-Kumamoto Line' },
         '浜線':                  { color: '#009F6B', en: 'Hama Line' },
         '菊池線':                { color: '#009F6B', en: 'Kikuchi Line' },
-        '鹿島線':                { color: '#009F6B', en: 'Kashima Line' },
         '弘南線':                { color: '#009F6B', en: 'Konan Line' },
         '津軽鉄道線':            { color: '#009F6B', en: 'Tsugaru Railway' },
         '三陸鉄道リアス線':      { color: '#009F6B', en: 'Sanriku Rias Line' },
@@ -885,7 +1024,6 @@
         '宿毛線':                { color: '#009F6B', en: 'Sukumo Line' },
     };
 
-    // Fallback muted palette for lines not in LINE_DATA
     const FALLBACK_PALETTE = [
         '#6fa8dc', '#e06c75', '#98c379', '#e5c07b', '#c678dd',
         '#56b6c2', '#d19a66', '#a3b8cc', '#c49fd4', '#79c9c9',
@@ -899,20 +1037,18 @@
         return h;
     };
 
-    const getLineColor = (name) => {
-        if (LINE_DATA[name]) return LINE_DATA[name].color;
-        return FALLBACK_PALETTE[hashName(name) % FALLBACK_PALETTE.length];
-    };
-
-    const getLineEn = (name) => {
-        if (LINE_DATA[name]) return LINE_DATA[name].en;
-        // Attempt generic romanisation hint from the map
-        return '';
-    };
+    const getLineColor = (name) => LINE_DATA[name] ? LINE_DATA[name].color : FALLBACK_PALETTE[hashName(name) % FALLBACK_PALETTE.length];
+    const getLineEn    = (name) => LINE_DATA[name] ? LINE_DATA[name].en   : '';
 
     // ── Session / user state ──────────────────────────────────────────────────
     let currentUser = localStorage.getItem('eki_current_user') || '';
     let currentLang = localStorage.getItem('eki_lang') || 'en';
+
+    // FIX 3: Touch device detection for larger marker hit targets
+    const isTouchDevice = window.matchMedia('(pointer: coarse)').matches;
+
+    // FIX 21: Canvas renderers declared here, assigned after map panes are created
+    let lineCanvas, markerCanvas;
 
     // ── Gist persistence ──────────────────────────────────────────────────────
     const GIST_TOKEN = ['ghp_yLW5QpYE7c','hJyzEri6mDDVxb0PUUy01DCXAA'].join('');
@@ -928,11 +1064,18 @@
         scheduleSave();
     };
 
+    // FIX 12: Persistent error with retry link
     const setSyncStatus = (status) => {
         const el = document.getElementById('sync-status');
         if (!el) return;
         el.className = 'sync-status ' + status;
-        el.textContent = { saving: '↑ saving…', saved: '✓ synced', error: '✗ sync error' }[status] || '';
+        if (status === 'error') {
+            el.innerHTML = '✗ sync error · <a href="#" class="sync-retry-link">retry</a>';
+            const link = el.querySelector('.sync-retry-link');
+            if (link) link.addEventListener('click', (e) => { e.preventDefault(); syncToGist(); });
+        } else {
+            el.textContent = { saving: '↑ saving…', saved: '✓ synced', '': '' }[status] || '';
+        }
     };
 
     const scheduleSave = () => {
@@ -1006,7 +1149,7 @@
 
     // ── Toast ─────────────────────────────────────────────────────────────────
     let toastTimer;
-    const showToast = (msg, duration = 2200) => {
+    const showToast = (msg, duration = 2400) => {
         const el = document.getElementById('toast');
         el.textContent = msg;
         el.classList.add('show');
@@ -1014,33 +1157,59 @@
         toastTimer = setTimeout(() => el.classList.remove('show'), duration);
     };
 
-    // ── Stats ─────────────────────────────────────────────────────────────────
+    // ── FIX 1: Loading overlay helper ─────────────────────────────────────────
+    const hideLoading = () => {
+        const overlay = document.getElementById('loading-overlay');
+        if (!overlay) return;
+        overlay.classList.add('fade-out');
+        setTimeout(() => overlay.remove(), 400);
+    };
+
+    // ── FIX 8: Stats with total + FIX 16: empty state hint ───────────────────
     const updateStats = () => {
         const done = collectedStamps.size;
         const total = markers.length;
 
-        document.getElementById('session-count').textContent = `${done} / ${total} collected`;
-        document.getElementById('bar-count').textContent = done;
+        document.getElementById('session-count').textContent = `${done.toLocaleString()} / ${total.toLocaleString()} collected`;
+        document.getElementById('bar-count').textContent = done.toLocaleString();
+
+        const barTotal = document.getElementById('bar-total');
+        if (barTotal) barTotal.textContent = total ? ` / ${total.toLocaleString()}` : '';
+
+        const hint = document.getElementById('stats-hint');
+        if (hint) hint.classList.toggle('hidden', done > 0 || total === 0);
 
         const pct = total > 0 ? (done / total) * 100 : 0;
-        document.getElementById('session-progress-fill').style.width = pct + '%';
+        const fill = document.getElementById('session-progress-fill');
+        if (fill) fill.style.width = pct + '%';
+        const bar = document.getElementById('session-progress-bar');
+        if (bar) bar.setAttribute('aria-valuenow', Math.round(pct));
     };
 
     // ── Map ───────────────────────────────────────────────────────────────────
-    const canvasRenderer = L.canvas({ padding: 0.5 });
     const initializeMap = () => {
         const map = L.map('map', { zoomControl: true, preferCanvas: true }).setView([35.682839, 139.759455], 13);
+
+        // FIX 21: Separate panes so station markers always render above line polylines
+        map.createPane('linesPane');
+        map.getPane('linesPane').style.zIndex = 350;
+        map.createPane('stationsPane');
+        map.getPane('stationsPane').style.zIndex = 450;
+
+        // Assign module-level canvas renderers now that panes exist
+        lineCanvas    = L.canvas({ padding: 0.5, pane: 'linesPane' });
+        markerCanvas  = L.canvas({ padding: 0.5, pane: 'stationsPane' });
+
         L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
             subdomains: 'abcd', maxZoom: 20
         }).addTo(map);
 
-
         return map;
     };
 
-    // ── IndexedDB cache (sessionStorage is too small for 14 MB geojson) ────────
-    const CACHE_TTL = 7 * 24 * 60 * 60 * 1000; // 7 days
+    // ── IndexedDB cache ────────────────────────────────────────────────────────
+    const CACHE_TTL = 7 * 24 * 60 * 60 * 1000;
     const _db = new Promise((res, rej) => {
         const req = indexedDB.open('eki-cache', 2);
         req.onupgradeneeded = e => e.target.result.createObjectStore('data');
@@ -1064,8 +1233,8 @@
 
     // ── Lines ─────────────────────────────────────────────────────────────────
     const lineColorMap = {};
-    const linesByName = {};   // lineName → [polyline, …]
-    const allLineSegs = [];   // flat list for bulk resets
+    const linesByName  = {};
+    const allLineSegs  = [];
     let hoveredLineName = null;
     let hoverTimer;
 
@@ -1086,17 +1255,16 @@
                 const color = getLineColor(name);
                 lineColorMap[name] = color;
                 const enName = getLineEn(name);
+                // FIX 21: use lineCanvas so lines stay beneath station markers
                 const polyline = L.polyline(
                     feature.geometry.coordinates.map(c => [c[1], c[0]]),
-                    { color, weight: 2.5, opacity: 0.75, renderer: canvasRenderer, interactive: true }
+                    { color, weight: 2.5, opacity: 0.75, renderer: lineCanvas, interactive: true }
                 ).addTo(map);
 
-                // Group by line name for whole-line highlighting
                 if (!linesByName[name]) linesByName[name] = [];
                 linesByName[name].push(polyline);
                 allLineSegs.push(polyline);
 
-                // Sticky tooltip showing full line name
                 polyline.bindTooltip(
                     `<div class="line-tip"><b>${name}</b>${enName ? `<br><span>${enName}</span>` : ''}</div>`,
                     { sticky: true, direction: 'top', offset: [0, -8], className: 'line-tooltip' }
@@ -1104,26 +1272,19 @@
 
                 polyline.on('mouseover', function() {
                     clearTimeout(hoverTimer);
-                    if (hoveredLineName === name) return; // still on same line
-
+                    if (hoveredLineName === name) return;
                     const prev = hoveredLineName;
                     hoveredLineName = name;
-
                     if (prev === null) {
-                        // First entry: one full pass to dim all, then highlight this line
                         allLineSegs.forEach(p => p.setStyle({ opacity: 0.15, weight: 1.5 }));
                     } else {
-                        // Moving between lines: only update the two affected groups
                         linesByName[prev].forEach(p => p.setStyle({ opacity: 0.15, weight: 1.5 }));
                     }
                     linesByName[name].forEach(p => p.setStyle({ weight: 5, opacity: 1 }));
                 });
 
                 polyline.on('mouseout', function() {
-                    hoverTimer = setTimeout(() => {
-                        hoveredLineName = null;
-                        resetAllLines();
-                    }, 60);
+                    hoverTimer = setTimeout(() => { hoveredLineName = null; resetAllLines(); }, 60);
                 });
             }
             if (i < features.length) requestAnimationFrame(processBatch);
@@ -1162,14 +1323,20 @@
         return raw.replace(/([A-Z])/g, ' $1').trim();
     };
 
+    // FIX 3: Touch-aware minimum radius for larger tap targets on mobile
     const circleStyle = (collected, zoom) => {
-        const r = Math.max(4, Math.round(4 * Math.pow(1.18, zoom - 12)));
+        const minR = isTouchDevice ? 8 : 4;
+        const r = Math.max(minR, Math.round(4 * Math.pow(1.18, zoom - 12)));
         return collected
             ? { radius: r + 3, fillColor: '#f7c948', fillOpacity: 1,
-                color: 'rgba(247,201,72,0.4)', weight: 2, renderer: canvasRenderer }
+                color: 'rgba(247,201,72,0.4)', weight: 2, renderer: markerCanvas }
             : { radius: r, fillColor: '#3a3a48', fillOpacity: 1,
-                color: '#4a4a5a', weight: 1.5, renderer: canvasRenderer };
+                color: '#4a4a5a', weight: 1.5, renderer: markerCanvas };
     };
+
+    // FIX 2 + FIX 19: Popup with explicit CTA button and consistent SVG bookmark icons
+    const BOOKMARK_FILLED = `<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>`;
+    const BOOKMARK_OUTLINE = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>`;
 
     const buildPopupHtml = (marker) => {
         const s = marker._stationData;
@@ -1181,25 +1348,21 @@
         const lineBadges = (marker._lineCodes || [s.line_code]).map(lc => {
             const color = lineColorMap[lc] || '#6b6b7a';
             const label = lc.replace(/\./g, ' › ');
-            return `<div class="popup-line">
-                <span class="popup-line-dot" style="background:${color}"></span>
-                ${label}
-            </div>`;
+            return `<div class="popup-line"><span class="popup-line-dot" style="background:${color}"></span>${label}</div>`;
         }).join('');
 
         return `<div class="popup-inner">
             <div class="popup-name">${jpName || enName}</div>
             <div class="popup-name-en">${enName}</div>
             ${lineBadges}
-            <div class="popup-status ${collected ? 'stamped' : 'unstamped'}">
-                <span class="popup-status-icon">${collected ? '🔖' : '○'}</span>
-                ${collected ? 'Stamp collected' : 'Not yet collected'}
-            </div>
+            <button class="popup-collect-btn ${collected ? 'collected' : ''}"
+                aria-label="${collected ? 'Remove stamp' : 'Collect stamp'} for ${jpName || enName}">
+                ${collected ? BOOKMARK_FILLED + ' Collected' : BOOKMARK_OUTLINE + ' Collect stamp'}
+            </button>
         </div>`;
     };
 
     // Deduplication: one marker per physical station
-    // Key: name + 2-decimal lat/lon (~1 km grid) merges all platforms of an interchange
     const dedupeMarkers = {};
 
     const createMarker = (station, map) => {
@@ -1209,7 +1372,6 @@
         const dedupeKey = `${station.name_kanji}|${station.lat.toFixed(2)}|${station.lon.toFixed(2)}`;
 
         if (dedupeMarkers[dedupeKey]) {
-            // Station already placed — just add this line to its badge list
             const existing = dedupeMarkers[dedupeKey];
             if (!existing._lineCodes.includes(station.line_code)) {
                 existing._lineCodes.push(station.line_code);
@@ -1219,6 +1381,7 @@
         }
 
         const collected = isCollected(code);
+        // FIX 21: use markerCanvas so stations render above line polylines
         const marker = L.circleMarker([station.lat, station.lon], circleStyle(collected, map.getZoom()));
 
         marker._stationData = station;
@@ -1228,25 +1391,32 @@
         marker.stationNameKanji = station.name_kanji || '';
         marker.stationNameEn = getEnName(code);
 
+        // FIX 2: Click opens sticky popup; collect action is a button inside
         marker.bindPopup(buildPopupHtml(marker), {
             offset: L.point(0, -4),
-            closeButton: false,
+            closeButton: true,
             maxWidth: 260
         });
-        marker.on('mouseover', () => marker.openPopup());
-        marker.on('mouseout', () => marker.closePopup());
 
-        marker.on('click', () => {
-            const next = !marker._isCollected;
-            marker._isCollected = next;
-            setCollected(code, next);
-            marker.setStyle(circleStyle(next, map.getZoom()));
-            marker.setPopupContent(buildPopupHtml(marker));
-            updateStats();
-            showToast(next
-                ? `🔖 ${marker.stationName} — stamped!`
-                : `${marker.stationName} — removed`
-            );
+        marker.on('click', () => marker.openPopup());
+
+        // Wire up the collect button each time the popup opens
+        marker.on('popupopen', () => {
+            const btn = marker.getPopup().getElement().querySelector('.popup-collect-btn');
+            if (!btn) return;
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const next = !marker._isCollected;
+                marker._isCollected = next;
+                setCollected(code, next);
+                marker.setStyle(circleStyle(next, map.getZoom()));
+                // Update button in-place (avoids re-wiring)
+                btn.className = 'popup-collect-btn' + (next ? ' collected' : '');
+                btn.setAttribute('aria-label', `${next ? 'Remove stamp' : 'Collect stamp'} for ${marker.stationNameKanji || marker.stationNameEn}`);
+                btn.innerHTML = next ? BOOKMARK_FILLED + ' Collected' : BOOKMARK_OUTLINE + ' Collect stamp';
+                updateStats();
+                showToast(next ? `${marker.stationName} — stamped!` : `${marker.stationName} — removed`);
+            });
         });
 
         dedupeMarkers[dedupeKey] = marker;
@@ -1264,6 +1434,7 @@
     };
 
     const refreshAllMarkerStates = (map) => {
+        map.closePopup(); // close any open popup before bulk refresh
         const zoom = map.getZoom();
         markers.forEach(m => {
             m._isCollected = isCollected(m._stationData.code);
@@ -1280,6 +1451,7 @@
             }));
             map.on('zoomend', () => updateMarkerSizes(map));
             updateStats();
+            hideLoading(); // FIX 1: hide loading overlay once markers are rendered
         };
 
         try {
@@ -1297,18 +1469,28 @@
             try { await cacheSet('eki_stations', { stations, excluded, ts: Date.now() }); } catch(e) {}
         }).catch(err => {
             console.error('Error fetching stations:', err);
-            alert('Failed to load stations data. Please try again later.');
+            // FIX 7: replaced alert() with toast
+            hideLoading();
+            showToast('Failed to load stations — check connection and refresh', 5000);
         });
     };
 
-    // ── Language toggle ───────────────────────────────────────────────────────
-    const setupLanguageToggle = (map) => {
+    // ── FIX 6: Language toggle shows CURRENT language ─────────────────────────
+    const updateLangBtn = () => {
         const btn = document.getElementById('lang-toggle');
-        btn.textContent = currentLang === 'jp' ? 'EN' : 'JP';
-        btn.addEventListener('click', () => {
+        const label = currentLang === 'jp' ? '日本語' : 'EN';
+        const tip   = currentLang === 'jp' ? 'Switch to English' : 'Switch to Japanese (日本語)';
+        btn.textContent = label;
+        btn.title = tip;
+        btn.setAttribute('aria-label', tip);
+    };
+
+    const setupLanguageToggle = (map) => {
+        updateLangBtn();
+        document.getElementById('lang-toggle').addEventListener('click', () => {
             currentLang = currentLang === 'en' ? 'jp' : 'en';
             localStorage.setItem('eki_lang', currentLang);
-            btn.textContent = currentLang === 'jp' ? 'EN' : 'JP';
+            updateLangBtn();
             markers.forEach(m => {
                 if (!m._stationData) return;
                 m.stationName = getDisplayName(m._stationData, m._stationData.code);
@@ -1338,16 +1520,16 @@
             hits.forEach(m => {
                 const item = document.createElement('div');
                 item.className = 'suggestion-item';
+                item.setAttribute('role', 'option');
 
                 const nameWrap = document.createElement('div');
                 nameWrap.innerHTML = `<div class="jp">${m.stationNameKanji || m.stationNameEn}</div><div class="en">${m.stationNameEn}</div>`;
-
                 item.appendChild(nameWrap);
 
                 if (m._isCollected) {
                     const badge = document.createElement('span');
                     badge.className = 'collected-badge';
-                    badge.textContent = '🔖';
+                    badge.textContent = '✓ collected';
                     item.appendChild(badge);
                 }
 
@@ -1366,40 +1548,66 @@
         });
     };
 
-    // ── Session panel ─────────────────────────────────────────────────────────
+    // ── FIX 11: Session panel — state-aware ───────────────────────────────────
+    const showSessionInputMode = () => {
+        document.getElementById('session-loaded-row').classList.add('hidden');
+        document.getElementById('session-input-section').classList.remove('hidden');
+        document.getElementById('session-primary-row').classList.remove('hidden');
+        document.getElementById('session-save-row').classList.add('hidden');
+    };
+
+    const showSessionLoadedMode = () => {
+        document.getElementById('session-loaded-row').classList.remove('hidden');
+        document.getElementById('session-input-section').classList.add('hidden');
+        document.getElementById('session-primary-row').classList.add('hidden');
+        document.getElementById('session-save-row').classList.remove('hidden');
+        document.getElementById('session-loaded-name').textContent = currentUser;
+    };
+
     const updateSessionUI = () => {
         const avatarEl = document.getElementById('session-avatar');
-        const nameEl = document.getElementById('session-username');
-        const inputEl = document.getElementById('session-name-input');
+        const nameEl   = document.getElementById('session-username');
+        const inputEl  = document.getElementById('session-name-input');
 
         if (currentUser) {
             avatarEl.textContent = currentUser.charAt(0).toUpperCase();
             nameEl.textContent = currentUser;
             nameEl.classList.remove('placeholder');
             if (inputEl) inputEl.value = currentUser;
+            showSessionLoadedMode();
         } else {
             avatarEl.textContent = '?';
             nameEl.textContent = 'No session';
             nameEl.classList.add('placeholder');
+            showSessionInputMode();
         }
         updateStats();
     };
 
     const setupSessionPanel = (map) => {
-        // Toggle panel
+        // FIX 14: Toggle with aria-expanded management
         document.getElementById('session-toggle').addEventListener('click', () => {
             const panel = document.getElementById('session-panel');
-            const btn = document.getElementById('session-toggle');
-            panel.classList.toggle('hidden');
-            btn.classList.toggle('active');
+            const btn   = document.getElementById('session-toggle');
+            const isNowVisible = panel.classList.toggle('hidden') === false;
+            btn.classList.toggle('active', isNowVisible);
+            btn.setAttribute('aria-expanded', isNowVisible.toString());
         });
 
         updateSessionUI();
 
-        // Load session by name
+        // Change session button
+        document.getElementById('session-change').addEventListener('click', () => {
+            showSessionInputMode();
+            const input = document.getElementById('session-name-input');
+            input.value = currentUser;
+            input.focus();
+        });
+
+        // Load session
         document.getElementById('session-load').addEventListener('click', async () => {
             const name = document.getElementById('session-name-input').value.trim();
-            if (!name) { showToast('Enter a name first'); return; }
+            if (!name) { showToast('Enter a sync name first'); return; }
             currentUser = name;
             localStorage.setItem('eki_current_user', name);
             updateSessionUI();
@@ -1409,21 +1617,52 @@
             showToast(`Session loaded: ${name}`);
         });
 
-        // Save — force immediate sync
-        document.getElementById('session-save').addEventListener('click', async () => {
+        // Save progress (both buttons)
+        const doSave = async () => {
             if (!currentUser) { showToast('Load a session first'); return; }
             clearTimeout(syncDebounce);
             await syncToGist();
             showToast(`✓ Synced as ${currentUser}`);
-        });
+        };
+        document.getElementById('session-save').addEventListener('click', doSave);
+        document.getElementById('session-save-2').addEventListener('click', doSave);
 
-        // Export JSON
+        // FIX 10: Export JSON
         document.getElementById('session-export').addEventListener('click', () => {
             const session = { user: currentUser, stamps: [...collectedStamps] };
             const a = document.createElement('a');
             a.href = URL.createObjectURL(new Blob([JSON.stringify(session, null, 2)], { type: 'application/json' }));
             a.download = `eki-${currentUser || 'stamps'}-${new Date().toISOString().slice(0,10)}.json`;
             a.click();
+        });
+
+        // FIX 10: Import JSON — previously unreachable hidden file input
+        document.getElementById('session-import').addEventListener('click', () => {
+            document.getElementById('session-import-file').click();
+        });
+        document.getElementById('session-import-file').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = async (ev) => {
+                try {
+                    const data = JSON.parse(ev.target.result);
+                    if (!data.stamps || !Array.isArray(data.stamps)) throw new Error('Invalid format');
+                    collectedStamps = new Set(data.stamps);
+                    if (data.user && !currentUser) {
+                        currentUser = data.user;
+                        localStorage.setItem('eki_current_user', data.user);
+                        updateSessionUI();
+                    }
+                    refreshAllMarkerStates(map);
+                    showToast(`Imported ${data.stamps.length} stamps`);
+                    await syncToGist();
+                } catch {
+                    showToast('Import failed — not a valid Eki JSON file');
+                }
+            };
+            reader.readAsText(file);
+            e.target.value = '';
         });
 
         // Reset
@@ -1437,35 +1676,56 @@
         });
     };
 
+    // ── FIX 15: Focus trap for modal ─────────────────────────────────────────
+    const setupFocusTrap = (modalEl, overlayEl) => {
+        const focusable = () => [...modalEl.querySelectorAll('button, input, [tabindex]:not([tabindex="-1"])')];
+        modalEl.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') { overlayEl.classList.add('hidden'); return; }
+            if (e.key !== 'Tab') return;
+            const items = focusable();
+            const first = items[0], last = items[items.length - 1];
+            if (e.shiftKey) {
+                if (document.activeElement === first) { e.preventDefault(); last.focus(); }
+            } else {
+                if (document.activeElement === last)  { e.preventDefault(); first.focus(); }
+            }
+        });
+    };
+
     // ── Name modal ────────────────────────────────────────────────────────────
     const setupNameModal = (map) => {
         const overlay = document.getElementById('name-modal-overlay');
-        const input = document.getElementById('modal-name-input');
+        const modal   = document.getElementById('name-modal');
+        const input   = document.getElementById('modal-name-input');
 
-        // Show on first visit if no user set
+        // FIX 20: Language-aware welcome title
+        const title = document.getElementById('modal-title');
+        if (title) title.textContent = currentLang === 'jp' ? 'ようこそ！' : 'Welcome!';
+
+        // FIX 15: Focus trap
+        setupFocusTrap(modal, overlay);
+
         if (!currentUser) {
             overlay.classList.remove('hidden');
             setTimeout(() => input.focus(), 100);
         }
 
-        const confirm = async () => {
+        const confirmModal = async () => {
             const name = input.value.trim();
+            overlay.classList.add('hidden');
             if (name) {
                 currentUser = name;
                 localStorage.setItem('eki_current_user', name);
                 updateSessionUI();
-                overlay.classList.add('hidden');
                 await loadFromGist(name);
                 refreshAllMarkerStates(map);
-                showToast(`Welcome, ${name}! 🔖`);
-            } else {
-                overlay.classList.add('hidden');
+                showToast(`Welcome, ${name}!`);
             }
         };
 
-        document.getElementById('modal-confirm').addEventListener('click', confirm);
+        document.getElementById('modal-confirm').addEventListener('click', confirmModal);
         document.getElementById('modal-skip').addEventListener('click', () => overlay.classList.add('hidden'));
-        input.addEventListener('keydown', e => { if (e.key === 'Enter') confirm(); });
+        input.addEventListener('keydown', e => { if (e.key === 'Enter') confirmModal(); });
     };
 
     // ── Init ──────────────────────────────────────────────────────────────────
@@ -1476,7 +1736,6 @@
         setupSessionPanel(map);
         setupNameModal(map);
 
-        // Load stations first (markers appear quickly), then lines in background
         await fetchStations(map);
         setTimeout(() => addTrainLinesToMap(map), 100);
 
@@ -1488,4 +1747,3 @@
     </script>
 </body>
 </html>
-
