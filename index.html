@@ -1221,11 +1221,18 @@
      */
     const getDisplayName = (station, code) => {
         if (state.lang === 'jp' && station.name_kanji) return station.name_kanji;
+        // Use explicit English name if present (ekidata stations have this field)
+        if (station.name_en) return station.name_en;
+        // Legacy fallback: derive from dotted code (e.g. "JR.East.TokyoStation" → "Tokyo Station")
         const raw = (code ?? '').includes('.') ? code.split('.').pop() : (code ?? '');
         return raw.replace(/([A-Z])/g, ' $1').trim() || station.name_kanji || code || '?';
     };
 
-    const getEnName = (code) => {
+    // Returns the English name for a station. Accepts the full station object
+    // so it can use the explicit name_en field (ekidata) before falling back
+    // to the legacy code-parsing approach.
+    const getEnName = (station, code) => {
+        if (station?.name_en) return station.name_en;
         const raw = (code ?? '').includes('.') ? code.split('.').pop() : (code ?? '');
         return raw.replace(/([A-Z])/g, ' $1').trim();
     };
@@ -1250,7 +1257,7 @@
         const s    = marker._stationData;
         const code = s.code;
         const jp   = s.name_kanji || '';
-        const en   = getEnName(code);
+        const en   = getEnName(s, code);
 
         // Language-sensitive primary / secondary names
         const primary   = state.lang === 'jp' ? (jp || en) : (en || jp);
@@ -1306,7 +1313,7 @@
         marker._lineCodes    = [line_code];
         marker.stationName   = getDisplayName(station, code);
         marker.stationNameJP = station.name_kanji || '';
-        marker.stationNameEN = getEnName(code);
+        marker.stationNameEN = getEnName(station, code);
 
         marker.bindPopup(buildPopupHtml(marker), { offset: L.point(0, -4), closeButton: true, maxWidth: 260 });
 
