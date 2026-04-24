@@ -6,7 +6,6 @@
     <title>Eki Stamp Tracker</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;700&family=Space+Mono&display=swap" rel="stylesheet">
     <style>
@@ -19,7 +18,7 @@
             --surface2:   #22222a;
             --border:     #2e2e3a;
             --text:       #e4e4ec;
-            --muted:      #9898b0; /* FIX 4: raised from #686878 → passes WCAG AA 4.5:1 */
+            --muted:      #9898b0;
             --accent:     #7eb8f7;
             --accent-dim: rgba(126,184,247,0.12);
             --stamp-on:   #f7c948;
@@ -27,71 +26,45 @@
             --radius:     6px;
             --ui-font:    'Space Mono', monospace;
             --jp-font:    'Zen Kaku Gothic New', sans-serif;
+            /* Z-index scale — centralised so layers never conflict */
+            --z-map-ui:  1000;
+            --z-modal:   2000;
+            --z-toast:   3000;
+            --z-loading: 5000;
         }
 
         html, body { height: 100%; background: var(--bg); color: var(--text); font-family: var(--ui-font); }
 
-        /* FIX 13: Global focus-visible ring — restores keyboard navigation affordance */
-        :focus-visible {
-            outline: 2px solid var(--accent);
-            outline-offset: 2px;
-            border-radius: 3px;
-        }
+        :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 3px; }
 
         /* ── Map ──────────────────────────────────────────────────────────── */
         #map { height: 100vh; width: 100%; }
 
-        /* Leaflet attribution dark */
         .leaflet-control-attribution {
-            background: rgba(15,15,18,0.85) !important;
-            color: var(--muted) !important;
-            font-size: 10px;
+            background: rgba(15,15,18,0.85) !important; color: var(--muted) !important; font-size: 10px;
         }
         .leaflet-control-attribution a { color: var(--accent) !important; }
-        .leaflet-control-zoom a {
-            background: var(--surface) !important;
-            color: var(--text) !important;
-            border-color: var(--border) !important;
-        }
+        .leaflet-control-zoom a { background: var(--surface) !important; color: var(--text) !important; border-color: var(--border) !important; }
         .leaflet-control-zoom a:hover { background: var(--surface2) !important; }
 
-        /* ── FIX 1: Loading overlay ───────────────────────────────────────── */
+        /* ── Loading overlay ──────────────────────────────────────────────── */
         #loading-overlay {
-            position: fixed; inset: 0; z-index: 5000;
+            position: fixed; inset: 0; z-index: var(--z-loading);
             background: var(--bg);
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            gap: 16px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px;
             transition: opacity 0.4s ease;
-            pointer-events: all;
         }
         #loading-overlay.fade-out { opacity: 0; pointer-events: none; }
         .loading-spinner {
             width: 36px; height: 36px;
-            border: 3px solid var(--border);
-            border-top-color: var(--accent);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
+            border: 3px solid var(--border); border-top-color: var(--accent);
+            border-radius: 50%; animation: spin 0.8s linear infinite;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
-        .loading-text {
-            font-size: 11px; color: var(--muted);
-            letter-spacing: 0.12em; text-transform: uppercase;
-        }
-        .loading-sub {
-            font-size: 10px; color: var(--border);
-            letter-spacing: 0.06em;
-        }
+        .loading-text { font-size: 11px; color: var(--muted); letter-spacing: 0.12em; text-transform: uppercase; }
+        .loading-sub  { font-size: 10px; color: var(--border); letter-spacing: 0.06em; }
 
-        /* ── UI panel shared styles ───────────────────────────────────────── */
-        .ui-panel {
-            position: absolute;
-            z-index: 1000;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            box-shadow: 0 4px 24px rgba(0,0,0,0.5);
-        }
-
+        /* ── Shared UI button ─────────────────────────────────────────────── */
         .ui-btn {
             display: inline-flex; align-items: center; gap: 6px;
             padding: 8px 14px;
@@ -99,59 +72,44 @@
             letter-spacing: 0.08em; text-transform: uppercase;
             background: var(--surface); color: var(--text);
             border: 1px solid var(--border); border-radius: var(--radius);
-            cursor: pointer;
-            transition: background 0.15s, border-color 0.15s, color 0.15s;
+            cursor: pointer; transition: background 0.15s, border-color 0.15s, color 0.15s;
         }
-        .ui-btn:hover { background: var(--surface2); border-color: var(--accent); color: var(--accent); }
+        .ui-btn:hover  { background: var(--surface2); border-color: var(--accent); color: var(--accent); }
         .ui-btn.active { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
 
         /* ── Search ───────────────────────────────────────────────────────── */
         #search-container {
-            position: absolute; top: 16px; left: 50%;
-            transform: translateX(-50%);
-            z-index: 1000; width: min(360px, calc(100vw - 120px));
+            position: absolute; top: 16px; left: 50%; transform: translateX(-50%);
+            z-index: var(--z-map-ui); width: min(360px, calc(100vw - 120px));
         }
-
         #search-wrap {
             display: flex; align-items: center; gap: 8px;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 8px 12px;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.4);
-            transition: border-color 0.15s;
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 8px 12px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.4); transition: border-color 0.15s;
         }
         #search-wrap:focus-within { border-color: var(--accent); }
-
         #search-icon { color: var(--muted); flex-shrink: 0; }
-
         #stationSearch {
             flex: 1; background: none; border: none; outline: none;
             font-family: var(--ui-font); font-size: 13px; color: var(--text);
         }
         #stationSearch::placeholder { color: var(--muted); }
-
         #suggestions {
             position: absolute; top: calc(100% + 6px); left: 0; right: 0;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius); box-shadow: 0 8px 24px rgba(0,0,0,0.5);
             display: none; overflow: hidden;
         }
-
         .suggestion-item {
-            padding: 10px 14px;
-            cursor: pointer;
+            padding: 10px 14px; cursor: pointer;
             display: flex; justify-content: space-between; align-items: center;
-            font-size: 12px;
-            border-bottom: 1px solid var(--border);
-            transition: background 0.1s;
+            font-size: 12px; border-bottom: 1px solid var(--border); transition: background 0.1s;
         }
         .suggestion-item:last-child { border-bottom: none; }
         .suggestion-item:hover { background: var(--surface2); }
-        .suggestion-item .jp { font-family: var(--jp-font); font-size: 14px; }
-        .suggestion-item .en { color: var(--muted); font-size: 11px; }
+        .suggestion-item .sug-primary   { font-family: var(--jp-font); font-size: 14px; }
+        .suggestion-item .sug-secondary { color: var(--muted); font-size: 11px; margin-top: 1px; }
         .suggestion-item .collected-badge {
             font-size: 10px; padding: 2px 6px;
             background: rgba(247,201,72,0.15); color: var(--stamp-on);
@@ -159,226 +117,136 @@
             flex-shrink: 0; margin-left: 8px;
         }
 
-        /* ── Controls row ─────────────────────────────────────────────────── */
-        #controls {
-            position: absolute; top: 16px; right: 16px;
-            z-index: 1000; display: flex; gap: 6px;
-        }
-
-        /* FIX 9: Session button visually dominant — accent colour by default */
-        #session-toggle {
-            background: var(--accent-dim);
-            border-color: var(--accent);
-            color: var(--accent);
-        }
-        #session-toggle:hover { background: rgba(126,184,247,0.22); }
+        /* ── Controls ─────────────────────────────────────────────────────── */
+        #controls { position: absolute; top: 16px; right: 16px; z-index: var(--z-map-ui); display: flex; gap: 6px; }
+        #session-toggle { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
+        #session-toggle:hover  { background: rgba(126,184,247,0.22); }
         #session-toggle.active { background: rgba(126,184,247,0.28); }
 
         /* ── Popup ────────────────────────────────────────────────────────── */
         .leaflet-popup-content-wrapper {
-            background: var(--surface) !important;
-            border: 1px solid var(--border) !important;
-            border-radius: var(--radius) !important;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.5) !important;
-            padding: 0 !important;
+            background: var(--surface) !important; border: 1px solid var(--border) !important;
+            border-radius: var(--radius) !important; box-shadow: 0 8px 24px rgba(0,0,0,0.5) !important; padding: 0 !important;
         }
         .leaflet-popup-tip { background: var(--surface) !important; }
         .leaflet-popup-content { margin: 0 !important; }
-        /* Style the Leaflet close button */
-        .leaflet-popup-close-button {
-            color: var(--muted) !important;
-            font-size: 18px !important;
-            padding: 4px 8px !important;
-        }
+        .leaflet-popup-close-button { color: var(--muted) !important; font-size: 18px !important; padding: 4px 8px !important; }
         .leaflet-popup-close-button:hover { color: var(--text) !important; }
-
-        .popup-inner {
-            padding: 14px 16px 12px;
-            min-width: 190px;
-        }
-        .popup-name {
-            font-family: var(--jp-font); font-size: 17px; font-weight: 700;
-            color: var(--text); margin-bottom: 2px;
-        }
-        .popup-name-en {
-            font-size: 11px; color: var(--muted); letter-spacing: 0.06em;
-            margin-bottom: 10px;
-        }
+        .popup-inner { padding: 14px 16px 12px; min-width: 190px; }
+        .popup-name { font-family: var(--jp-font); font-size: 17px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+        .popup-name-secondary { font-size: 11px; color: var(--muted); letter-spacing: 0.06em; margin-bottom: 10px; }
         .popup-line {
             display: inline-flex; align-items: center; gap: 5px;
-            font-size: 11px; color: var(--muted);
-            background: var(--surface2);
-            border-radius: 4px; padding: 3px 7px;
-            margin-bottom: 4px;
+            font-size: 11px; color: var(--muted); background: var(--surface2);
+            border-radius: 4px; padding: 3px 7px; margin-bottom: 4px;
         }
-        .popup-line-dot {
-            width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
-        }
-
-        /* FIX 2: Popup collect button — explicit CTA replaces invisible click */
+        .popup-line-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
         .popup-collect-btn {
             display: flex; align-items: center; gap: 7px;
-            width: 100%; padding: 9px 12px;
-            margin-top: 10px;
+            width: 100%; padding: 9px 12px; margin-top: 10px;
             font-family: var(--ui-font); font-size: 11px; font-weight: 700;
             letter-spacing: 0.06em; text-transform: uppercase;
             background: var(--surface2); color: var(--text);
             border: 1px solid var(--border); border-radius: var(--radius);
-            cursor: pointer;
-            transition: background 0.15s, border-color 0.15s, color 0.15s;
+            cursor: pointer; transition: background 0.15s, border-color 0.15s, color 0.15s;
         }
         .popup-collect-btn:hover { background: var(--border); }
-        .popup-collect-btn.collected {
-            background: rgba(247,201,72,0.15);
-            border-color: rgba(247,201,72,0.35);
-            color: var(--stamp-on);
-        }
-        .popup-collect-btn.collected:hover {
-            background: rgba(247,201,72,0.08);
-            border-color: rgba(247,201,72,0.2);
-            color: #d4a830;
-        }
+        .popup-collect-btn.collected { background: rgba(247,201,72,0.15); border-color: rgba(247,201,72,0.35); color: var(--stamp-on); }
+        .popup-collect-btn.collected:hover { background: rgba(247,201,72,0.08); border-color: rgba(247,201,72,0.2); color: #d4a830; }
 
         /* ── Session panel ────────────────────────────────────────────────── */
         #session-panel {
             position: absolute; top: 58px; right: 16px;
-            z-index: 1000; width: 268px;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
-            overflow: hidden;
+            z-index: var(--z-map-ui); width: 268px;
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius); box-shadow: 0 8px 24px rgba(0,0,0,0.5); overflow: hidden;
         }
-
-        #session-header {
-            padding: 14px 16px 10px;
-            border-bottom: 1px solid var(--border);
-        }
-        #session-user-row {
-            display: flex; align-items: center; gap: 8px; margin-bottom: 4px;
-        }
+        #session-header { padding: 14px 16px 10px; border-bottom: 1px solid var(--border); }
+        #session-user-row { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
         #session-avatar {
             width: 28px; height: 28px; border-radius: 50%;
             background: var(--accent-dim); border: 1px solid var(--accent);
             display: flex; align-items: center; justify-content: center;
-            font-size: 12px; font-weight: 700; color: var(--accent);
-            flex-shrink: 0;
+            font-size: 12px; font-weight: 700; color: var(--accent); flex-shrink: 0;
         }
-        #session-username {
-            font-size: 13px; font-weight: 700; color: var(--text);
-        }
+        #session-username { font-size: 13px; font-weight: 700; color: var(--text); }
         #session-username.placeholder { color: var(--muted); font-weight: 400; font-style: italic; }
-
-        #session-stats {
-            font-size: 11px; color: var(--muted);
-            display: flex; align-items: center; gap: 8px;
-        }
-        #session-progress-bar {
-            flex: 1; height: 3px; background: var(--surface2); border-radius: 2px; overflow: hidden;
-        }
-        #session-progress-fill {
-            height: 100%; background: var(--stamp-on);
-            border-radius: 2px; transition: width 0.4s ease;
-            width: 0%;
-        }
-
+        #session-stats { font-size: 11px; color: var(--muted); display: flex; align-items: center; gap: 8px; }
+        #session-progress-bar { flex: 1; height: 3px; background: var(--surface2); border-radius: 2px; overflow: hidden; }
+        #session-progress-fill { height: 100%; background: var(--stamp-on); border-radius: 2px; transition: width 0.4s ease; width: 0%; }
+        .sync-status { font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; padding: 2px 0 6px; min-height: 16px; transition: color 0.2s; }
+        .sync-status.saving { color: var(--muted); }
+        .sync-status.saved  { color: #6fdd8b; }
+        .sync-status.error  { color: #f77e7e; }
+        .sync-status a { color: var(--accent); text-decoration: none; margin-left: 4px; }
+        .sync-status a:hover { text-decoration: underline; }
         #session-body { padding: 12px; display: flex; flex-direction: column; gap: 8px; }
-
-        /* FIX 11: Loaded state row */
+        /* Loaded state */
         #session-loaded-row {
             display: flex; align-items: center; justify-content: space-between; gap: 8px;
             background: var(--surface2); border: 1px solid var(--border);
             border-radius: var(--radius); padding: 8px 10px;
         }
-        #session-loaded-info .session-loaded-label {
-            font-size: 10px; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase;
-            margin-bottom: 2px;
-        }
-        #session-loaded-name {
-            font-size: 13px; font-weight: 700; color: var(--text);
-        }
-
-        /* FIX 5: Input section with sync key hint */
+        .session-loaded-label { font-size: 10px; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 2px; }
+        #session-loaded-name { font-size: 13px; font-weight: 700; color: var(--text); }
+        /* Input section */
         .session-input-section { display: flex; flex-direction: column; gap: 4px; }
-        .session-hint-text {
-            font-size: 10px; color: var(--muted); line-height: 1.5; padding: 0 2px;
-        }
-
+        .session-label-heading { font-size: 10px; font-weight: 700; color: var(--text); letter-spacing: 0.06em; text-transform: uppercase; }
+        .session-hint-text { font-size: 10px; color: var(--muted); line-height: 1.5; padding: 0 2px; }
         #session-name-input {
             width: 100%; padding: 8px 10px;
             background: var(--surface2); border: 1px solid var(--border);
             border-radius: 4px; color: var(--text);
-            font-family: var(--ui-font); font-size: 12px; outline: none;
-            transition: border-color 0.15s;
+            font-family: var(--ui-font); font-size: 12px; outline: none; transition: border-color 0.15s;
         }
         #session-name-input:focus { border-color: var(--accent); }
         #session-name-input::placeholder { color: var(--muted); }
-
+        /* Buttons */
         .session-row { display: flex; gap: 6px; }
-
         .session-btn {
             flex: 1; padding: 7px 10px;
             font-family: var(--ui-font); font-size: 10px; font-weight: 700;
             letter-spacing: 0.07em; text-transform: uppercase;
             background: var(--surface2); color: var(--text);
             border: 1px solid var(--border); border-radius: 4px;
-            cursor: pointer; transition: background 0.15s, border-color 0.15s, color 0.15s;
-            white-space: nowrap;
+            cursor: pointer; transition: background 0.15s, border-color 0.15s, color 0.15s; white-space: nowrap;
         }
         .session-btn:hover { background: var(--border); }
         .session-btn.primary { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
         .session-btn.primary:hover { background: rgba(126,184,247,0.2); }
         .session-btn.danger { color: #f77e7e; border-color: #3a2222; }
         .session-btn.danger:hover { background: rgba(247,126,126,0.1); border-color: #f77e7e; }
-
-        /* FIX 12: Sync error with retry link */
-        .sync-status {
-            font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase;
-            padding: 2px 0 6px; min-height: 16px; transition: color 0.2s;
+        /* Two-step confirm state for destructive actions */
+        .session-btn.confirm-pending {
+            background: rgba(247,126,126,0.15); border-color: #f77e7e; color: #f77e7e;
+            animation: pulse-warn 0.4s ease;
         }
-        .sync-status.saving { color: var(--muted); }
-        .sync-status.saved  { color: #6fdd8b; }
-        .sync-status.error  { color: #f77e7e; }
-        .sync-status a {
-            color: var(--accent); text-decoration: none; margin-left: 4px;
-        }
-        .sync-status a:hover { text-decoration: underline; }
+        @keyframes pulse-warn { 0%,100% { transform: scale(1); } 50% { transform: scale(1.02); } }
 
         /* ── Name modal ───────────────────────────────────────────────────── */
         #name-modal-overlay {
-            position: fixed; inset: 0; z-index: 2000;
+            position: fixed; inset: 0; z-index: var(--z-modal);
             background: rgba(0,0,0,0.7);
-            display: flex; align-items: center; justify-content: center;
-            backdrop-filter: blur(4px);
+            display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px);
         }
         #name-modal {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 28px 28px 24px;
-            width: min(360px, calc(100vw - 32px));
-            box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 10px; padding: 28px 28px 24px;
+            width: min(360px, calc(100vw - 32px)); box-shadow: 0 20px 60px rgba(0,0,0,0.7);
         }
-        #name-modal h2 {
-            font-family: var(--jp-font); font-size: 20px;
-            color: var(--text); margin-bottom: 6px;
-        }
-        #name-modal p { font-size: 12px; color: var(--muted); margin-bottom: 20px; line-height: 1.7; }
+        #name-modal h2 { font-family: var(--jp-font); font-size: 20px; color: var(--text); margin-bottom: 6px; }
+        #name-modal p  { font-size: 12px; color: var(--muted); margin-bottom: 20px; line-height: 1.7; }
         #modal-name-input {
             width: 100%; padding: 10px 12px; margin-bottom: 8px;
             background: var(--surface2); border: 1px solid var(--border);
             border-radius: 4px; color: var(--text);
-            font-family: var(--jp-font); font-size: 16px; outline: none;
-            transition: border-color 0.15s;
+            font-family: var(--jp-font); font-size: 16px; outline: none; transition: border-color 0.15s;
         }
         #modal-name-input:focus { border-color: var(--accent); }
-        /* FIX 5: Sync key warning hint */
         #modal-name-hint {
-            font-size: 11px; color: var(--muted); margin-bottom: 18px;
-            line-height: 1.6; padding: 8px 10px;
-            background: rgba(247,201,72,0.06);
-            border: 1px solid rgba(247,201,72,0.15);
-            border-radius: 4px;
+            font-size: 11px; color: var(--muted); margin-bottom: 18px; line-height: 1.6;
+            padding: 8px 10px; background: rgba(247,201,72,0.06);
+            border: 1px solid rgba(247,201,72,0.15); border-radius: 4px;
         }
         .modal-buttons { display: flex; gap: 8px; }
         .modal-btn {
@@ -396,7 +264,7 @@
         /* ── Toast ────────────────────────────────────────────────────────── */
         #toast {
             position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
-            z-index: 3000;
+            z-index: var(--z-toast);
             background: var(--surface2); border: 1px solid var(--border);
             border-radius: var(--radius); padding: 10px 18px;
             font-size: 12px; color: var(--text);
@@ -409,41 +277,28 @@
         /* ── Stats bar ────────────────────────────────────────────────────── */
         #stats-bar {
             position: absolute;
-            /* FIX 18: iOS safe-area offset for bottom nav bar */
             bottom: max(24px, calc(env(safe-area-inset-bottom, 0px) + 16px));
             left: 50%; transform: translateX(-50%);
-            z-index: 1000;
+            z-index: var(--z-map-ui);
             background: var(--surface); border: 1px solid var(--border);
             border-radius: 20px; padding: 6px 16px;
             font-size: 11px; color: var(--muted);
             box-shadow: 0 2px 12px rgba(0,0,0,0.4);
-            letter-spacing: 0.06em;
-            white-space: nowrap;
-            max-width: calc(100vw - 32px);
+            letter-spacing: 0.06em; white-space: nowrap; max-width: calc(100vw - 32px);
         }
         #stats-bar strong { color: var(--stamp-on); font-weight: 700; }
-        /* FIX 16: Empty state hint */
         #stats-hint { color: var(--muted); font-style: italic; }
+
+        /* ── Line tooltip ─────────────────────────────────────────────────── */
+        .line-tooltip { background: var(--surface) !important; border: 1px solid var(--border) !important; border-radius: var(--radius) !important; box-shadow: 0 4px 16px rgba(0,0,0,0.5) !important; padding: 0 !important; pointer-events: none; }
+        .line-tooltip::before { display: none !important; }
+        .line-tip { padding: 8px 12px; }
+        .line-tip b    { display: block; font-family: var(--jp-font); font-size: 14px; font-weight: 700; color: var(--text); }
+        .line-tip span { font-size: 11px; color: var(--muted); letter-spacing: 0.04em; }
 
         .hidden { display: none !important; }
 
-        /* ── Line tooltip ─────────────────────────────────────────────────────── */
-        .line-tooltip {
-            background: var(--surface) !important;
-            border: 1px solid var(--border) !important;
-            border-radius: var(--radius) !important;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.5) !important;
-            padding: 0 !important;
-            pointer-events: none;
-        }
-        .line-tooltip::before { display: none !important; }
-        .line-tip { padding: 8px 12px; }
-        .line-tip b { display: block; font-family: var(--jp-font); font-size: 14px; font-weight: 700; color: var(--text); }
-        .line-tip span { font-size: 11px; color: var(--muted); letter-spacing: 0.04em; }
-
-        /* ── Mobile touch adjustments ─────────────────────────────────────── */
         @media (pointer: coarse) {
-            /* Larger tap zones on touch devices handled via JS marker radius */
             .session-btn { padding: 9px 10px; }
             .popup-collect-btn { padding: 12px 14px; font-size: 12px; }
         }
@@ -451,14 +306,12 @@
 </head>
 <body>
 
-    <!-- FIX 1: Loading overlay — shown while data files fetch -->
     <div id="loading-overlay">
         <div class="loading-spinner"></div>
         <p class="loading-text">Loading stations…</p>
         <p class="loading-sub">First load may take a few seconds</p>
     </div>
 
-    <!-- Search — FIX 14: aria-label added -->
     <div id="search-container">
         <div id="search-wrap">
             <svg id="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -469,9 +322,8 @@
         <div id="suggestions" role="listbox" aria-label="Station suggestions"></div>
     </div>
 
-    <!-- Controls — FIX 6: lang button shows current; FIX 9: session button accented; FIX 14: aria-expanded -->
     <div id="controls">
-        <button class="ui-btn" id="lang-toggle" title="Switch language" aria-label="Current language: English. Click to switch.">EN</button>
+        <button class="ui-btn" id="lang-toggle">EN</button>
         <button class="ui-btn" id="session-toggle" aria-expanded="false" aria-controls="session-panel">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
@@ -480,7 +332,6 @@
         </button>
     </div>
 
-    <!-- Session panel — FIX 11: state-aware; FIX 10: import button; FIX 5: sync key hint; FIX 17: renamed buttons -->
     <div id="session-panel" class="hidden" role="region" aria-label="Session management">
         <div id="session-header">
             <div id="session-user-row">
@@ -496,56 +347,46 @@
             </div>
         </div>
         <div id="session-body">
-            <!-- Loaded state: shown when a session is active -->
+            <!-- Active session row (hidden until loaded) -->
             <div id="session-loaded-row" class="hidden">
-                <div id="session-loaded-info">
+                <div>
                     <div class="session-loaded-label">Active session</div>
                     <div id="session-loaded-name"></div>
                 </div>
                 <button class="session-btn" id="session-change">Change</button>
             </div>
-
-            <!-- Input state: shown when no session or changing session -->
+            <!-- Input row (shown when no session) -->
             <div id="session-input-section" class="session-input-section">
-                <label for="session-name-input" class="session-hint-text" style="font-weight:700;color:var(--text)">Sync name</label>
+                <label for="session-name-input" class="session-label-heading">Sync name</label>
                 <input type="text" id="session-name-input" placeholder="Enter your sync name…" autocomplete="off" />
-                <small class="session-hint-text">⚠ This is your sync key — type it <em>exactly</em> the same on every device. Case-sensitive.</small>
+                <small class="session-hint-text">⚠ Case-sensitive — type it exactly the same on every device.</small>
             </div>
-
-            <!-- Load + Save — hidden when session active -->
-            <div class="session-row" id="session-primary-row">
+            <!-- Load (only when no session) -->
+            <div class="session-row" id="session-load-row">
                 <button class="session-btn primary" id="session-load">Load session</button>
-                <button class="session-btn" id="session-save">Save progress</button>
             </div>
-
-            <!-- Save — visible at all times once session active, hidden otherwise -->
+            <!-- Save (only when session active) -->
             <div class="session-row hidden" id="session-save-row">
-                <button class="session-btn primary" id="session-save-2" style="flex:1">Save progress</button>
+                <button class="session-btn primary" id="session-save">Save progress</button>
             </div>
-
-            <!-- Data import/export -->
+            <!-- Data ops (always visible) -->
             <div class="session-row">
                 <button class="session-btn" id="session-export">Export JSON</button>
                 <button class="session-btn" id="session-import">Import JSON</button>
             </div>
-
             <!-- Danger zone -->
-            <div class="session-row">
-                <button class="session-btn danger" id="session-reset" style="flex:1">Reset all stamps</button>
-            </div>
-
+            <button class="session-btn danger" id="session-reset">Reset all stamps</button>
             <input type="file" id="session-import-file" accept=".json" style="display:none" aria-label="Import stamps JSON file">
         </div>
     </div>
 
-    <!-- Name modal — FIX 15: focus trap; FIX 5: sync key warning; FIX 20: language-aware title -->
     <div id="name-modal-overlay" class="hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
         <div id="name-modal">
             <h2 id="modal-title">Welcome!</h2>
-            <p>Choose a sync name to save your stamp collection to the cloud and access it on any device.</p>
+            <p>Choose a sync name to save your stamp collection and access it on any device.</p>
             <label for="modal-name-input" class="hidden">Your sync name</label>
             <input type="text" id="modal-name-input" placeholder="Your sync name" maxlength="32" />
-            <div id="modal-name-hint">⚠ This name is your sync key — type it <strong>exactly</strong> the same on every device. It is case-sensitive.</div>
+            <div id="modal-name-hint">⚠ This name is your sync key — type it <strong>exactly</strong> the same on every device. Case-sensitive.</div>
             <div class="modal-buttons">
                 <button class="modal-btn secondary" id="modal-skip">Skip for now</button>
                 <button class="modal-btn confirm" id="modal-confirm">Start collecting</button>
@@ -553,19 +394,36 @@
         </div>
     </div>
 
-    <!-- Toast notification -->
     <div id="toast" role="status" aria-live="polite"></div>
 
-    <!-- Stats bar — FIX 8: shows total; FIX 16: empty state hint -->
     <div id="stats-bar" aria-live="polite">
         <strong id="bar-count">0</strong><span id="bar-total"></span> stamps collected<span id="stats-hint"> · tap any station to begin 🔖</span>
     </div>
 
-    <!-- Map -->
     <div id="map"></div>
 
     <script>
-    // ── Line data: official colours + English names ──────────────────────────
+    /* ==========================================================================
+       EKI STAMP TRACKER
+       Sections:
+         1. Line data (official operator colours)
+         2. Constants
+         3. App state
+         4. Gist persistence
+         5. Toast / notifications
+         6. Map initialisation
+         7. Line rendering
+         8. Marker management
+         9. Popup
+        10. Search
+        11. Language
+        12. Stats
+        13. Session panel
+        14. Welcome modal
+        15. Init
+    ========================================================================== */
+
+    // ── 1. LINE DATA ──────────────────────────────────────────────────────────
     const LINE_DATA = {
         // ── Tokyo Metro ──────────────────────────────────────────────────────────
         '3号線銀座線':           { color: '#F39700', en: 'Ginza Line' },
@@ -1024,11 +882,12 @@
         '宿毛線':                { color: '#009F6B', en: 'Sukumo Line' },
     };
 
+
     const FALLBACK_PALETTE = [
-        '#6fa8dc', '#e06c75', '#98c379', '#e5c07b', '#c678dd',
-        '#56b6c2', '#d19a66', '#a3b8cc', '#c49fd4', '#79c9c9',
-        '#88b4e0', '#9ec475', '#b0a0e0', '#70c4b0', '#e0b870',
-        '#8ab8d0', '#d490a8', '#78d0a0', '#90a8d8', '#80c8b0'
+        '#6fa8dc','#e06c75','#98c379','#e5c07b','#c678dd',
+        '#56b6c2','#d19a66','#a3b8cc','#c49fd4','#79c9c9',
+        '#88b4e0','#9ec475','#b0a0e0','#70c4b0','#e0b870',
+        '#8ab8d0','#d490a8','#78d0a0','#90a8d8','#80c8b0'
     ];
 
     const hashName = (name) => {
@@ -1037,120 +896,160 @@
         return h;
     };
 
-    const getLineColor = (name) => LINE_DATA[name] ? LINE_DATA[name].color : FALLBACK_PALETTE[hashName(name) % FALLBACK_PALETTE.length];
-    const getLineEn    = (name) => LINE_DATA[name] ? LINE_DATA[name].en   : '';
+    const getLineColor = (name) => LINE_DATA[name]?.color ?? FALLBACK_PALETTE[hashName(name) % FALLBACK_PALETTE.length];
+    const getLineEn    = (name) => LINE_DATA[name]?.en ?? '';
 
-    // ── Session / user state ──────────────────────────────────────────────────
-    let currentUser = localStorage.getItem('eki_current_user') || '';
-    let currentLang = localStorage.getItem('eki_lang') || 'en';
+    // ── 2. CONSTANTS ──────────────────────────────────────────────────────────
+    const GIST_TOKEN        = ['ghp_yLW5QpYE7c','hJyzEri6mDDVxb0PUUy01DCXAA'].join('');
+    const GIST_PREFIX       = 'eki-stamp-tracker:';
+    const CACHE_TTL         = 7 * 24 * 60 * 60 * 1000;  // 7 days
+    const BATCH_SIZE        = 150;      // features per animation frame (line rendering)
+    const SYNC_DEBOUNCE_MS  = 2000;     // ms after last stamp change before auto-save
+    const HOVER_RESET_MS    = 60;       // ms debounce on line mouseout
+    const SEARCH_JUMP_MS    = 300;      // ms before popup opens after search jump
+    const FOCUS_DELAY_MS    = 100;      // ms before focusing modal input (after paint)
+    const MARKER_MIN_R      = 4;        // minimum circle radius on desktop
+    const MARKER_MIN_R_TOUCH = 8;       // minimum circle radius on touch devices
+    const MARKER_COLL_BONUS = 3;        // extra radius for collected markers
+    const MARKER_MAX_R      = 18;       // cap radius at high zoom to avoid clutter
+    const ZOOM_BASE         = 12;       // zoom at which radius = MARKER_MIN_R
+    const ZOOM_SCALE        = 1.18;     // radius multiplier per zoom step above ZOOM_BASE
+    const MAX_SUGGESTIONS   = 6;
+    const RESET_CONFIRM_MS  = 3000;     // window for second click on destructive action
+    const MAX_ZOOM          = 19;       // maximum tile zoom level
 
-    // Module-level map reference (needed by bringStationsToFront event delegation)
-    let map_ref = null;
-
-    // FIX 3: Touch device detection for larger marker hit targets
-    const isTouchDevice = window.matchMedia('(pointer: coarse)').matches;
-
-    // Single canvas renderer — two separate pane canvases blocked cross-pane mouse events
-    let canvasRenderer;
-
-    // ── Gist persistence ──────────────────────────────────────────────────────
-    const GIST_TOKEN = ['ghp_yLW5QpYE7c','hJyzEri6mDDVxb0PUUy01DCXAA'].join('');
-    const GIST_PREFIX = 'eki-stamp-tracker:';
-    let collectedStamps = new Set();
-    let currentGistId = null;
-    let syncDebounce = null;
-
-    const isCollected = (code) => collectedStamps.has(code);
-
-    const setCollected = (code, val) => {
-        if (val) collectedStamps.add(code); else collectedStamps.delete(code);
-        scheduleSave();
+    // ── 3. APP STATE ──────────────────────────────────────────────────────────
+    // All mutable app state lives here. Read via state.*, write via setState().
+    const state = {
+        lang:   localStorage.getItem('eki_lang')         || 'en',
+        user:   localStorage.getItem('eki_current_user') || '',
+        gistId: null,
+        stamps: new Set(),
     };
 
-    // FIX 12: Persistent error with retry link
-    const setSyncStatus = (status) => {
-        const el = document.getElementById('sync-status');
-        if (!el) return;
-        el.className = 'sync-status ' + status;
-        if (status === 'error') {
-            el.innerHTML = '✗ sync error · <a href="#" class="sync-retry-link">retry</a>';
-            const link = el.querySelector('.sync-retry-link');
-            if (link) link.addEventListener('click', (e) => { e.preventDefault(); syncToGist(); });
-        } else {
-            el.textContent = { saving: '↑ saving…', saved: '✓ synced', '': '' }[status] || '';
+    // Persist a state key and trigger any required side effects
+    const setState = (key, value) => {
+        state[key] = value;
+        if (key === 'lang')  localStorage.setItem('eki_lang',         value);
+        if (key === 'user')  localStorage.setItem('eki_current_user', value);
+    };
+
+    // ── Renderer + layer collections (assigned after map init) ───────────────
+    let canvasRenderer;
+    let mapInstance   = null;
+    let syncDebounce  = null;
+
+    // Markers
+    const markers       = [];
+    const dedupeMarkers = {};
+
+    // Lines
+    const lineColorMap  = {};  // lineName → hex colour (populated during renderLines)
+    const linesByName   = {};  // lineName → [polyline, ...]
+    const allLineSegs   = [];  // flat array for bulk opacity resets
+    let   hoveredLine   = null;
+    let   hoverTimer;
+    let   zoomDebounce;
+
+    // Popup tracking
+    let currentPopupMarker = null;
+
+    // Touch device detection
+    const IS_TOUCH = window.matchMedia('(pointer: coarse)').matches;
+
+    // SVG icon constants (used in popup button)
+    const ICON_BOOKMARK_FILLED  = '<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>';
+    const ICON_BOOKMARK_OUTLINE = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>';
+
+    // ── 4. GIST PERSISTENCE ───────────────────────────────────────────────────
+
+    /**
+     * Fetch with JSON response — validates HTTP status before parsing.
+     * @param {string} url
+     * @param {RequestInit} [options]
+     * @returns {Promise<any>} parsed JSON
+     * @throws {Error} on non-2xx response or network failure
+     */
+    const apiFetch = async (url, options = {}) => {
+        const resp = await fetch(url, {
+            ...options,
+            headers: { Authorization: `Bearer ${GIST_TOKEN}`, 'Content-Type': 'application/json', ...options.headers }
+        });
+        if (!resp.ok) {
+            const text = await resp.text().catch(() => '');
+            throw new Error(`GitHub API ${resp.status}: ${text.slice(0, 120)}`);
+        }
+        return resp.json();
+    };
+
+    /** Find the Gist ID for a username. Returns null if not found. */
+    const findGistId = async (username) => {
+        const cacheKey = `eki_gist:${username}`;
+        const cached = localStorage.getItem(cacheKey);
+        if (cached) return cached;
+        let page = 1;
+        while (true) {
+            const gists = await apiFetch(`https://api.github.com/gists?per_page=100&page=${page}`);
+            const found = gists.find(g => g.description === GIST_PREFIX + username);
+            if (found) { localStorage.setItem(cacheKey, found.id); return found.id; }
+            if (gists.length < 100) return null;
+            page++;
+        }
+    };
+
+    /** Load stamps from Gist for the given username. */
+    const loadFromGist = async (username) => {
+        setSyncStatus('saving');
+        try {
+            const gistId = await findGistId(username);
+            if (!gistId) { state.stamps = new Set(); state.gistId = null; setSyncStatus('saved'); return; }
+            state.gistId = gistId;
+            const gist = await apiFetch(`https://api.github.com/gists/${gistId}`);
+            const raw  = gist.files?.['stamps.json']?.content;
+            const data = raw ? JSON.parse(raw) : { stamps: [] };
+            state.stamps = new Set(Array.isArray(data.stamps) ? data.stamps : []);
+            setSyncStatus('saved');
+        } catch (err) {
+            console.error('loadFromGist:', err);
+            setSyncStatus('error');
+        }
+    };
+
+    /** Persist current stamps to Gist. */
+    const syncToGist = async () => {
+        if (!state.user) return;
+        setSyncStatus('saving');
+        const content = JSON.stringify({ stamps: [...state.stamps] });
+        try {
+            if (state.gistId) {
+                await apiFetch(`https://api.github.com/gists/${state.gistId}`, {
+                    method: 'PATCH',
+                    body: JSON.stringify({ files: { 'stamps.json': { content } } })
+                });
+            } else {
+                const gist = await apiFetch('https://api.github.com/gists', {
+                    method: 'POST',
+                    body: JSON.stringify({ description: GIST_PREFIX + state.user, public: true, files: { 'stamps.json': { content } } })
+                });
+                if (!gist.id) throw new Error('Gist response missing id');
+                state.gistId = gist.id;
+                localStorage.setItem(`eki_gist:${state.user}`, gist.id);
+            }
+            setSyncStatus('saved');
+        } catch (err) {
+            console.error('syncToGist:', err);
+            setSyncStatus('error');
         }
     };
 
     const scheduleSave = () => {
         clearTimeout(syncDebounce);
         setSyncStatus('saving');
-        syncDebounce = setTimeout(() => syncToGist(), 2000);
+        syncDebounce = setTimeout(syncToGist, SYNC_DEBOUNCE_MS);
     };
 
-    const findGistId = async (username) => {
-        const cached = localStorage.getItem(`eki_gist:${username}`);
-        if (cached) return cached;
-        let page = 1;
-        while (true) {
-            const resp = await fetch(`https://api.github.com/gists?per_page=100&page=${page}`, {
-                headers: { Authorization: `Bearer ${GIST_TOKEN}` }
-            });
-            if (!resp.ok) return null;
-            const gists = await resp.json();
-            const found = gists.find(g => g.description === GIST_PREFIX + username);
-            if (found) { localStorage.setItem(`eki_gist:${username}`, found.id); return found.id; }
-            if (gists.length < 100) return null;
-            page++;
-        }
-    };
+    // ── 5. NOTIFICATIONS ──────────────────────────────────────────────────────
 
-    const loadFromGist = async (username) => {
-        setSyncStatus('saving');
-        try {
-            const gistId = await findGistId(username);
-            if (!gistId) { collectedStamps = new Set(); currentGistId = null; setSyncStatus('saved'); return; }
-            currentGistId = gistId;
-            const resp = await fetch(`https://api.github.com/gists/${gistId}`, {
-                headers: { Authorization: `Bearer ${GIST_TOKEN}` }
-            });
-            const gist = await resp.json();
-            const content = gist.files['stamps.json']?.content;
-            const data = content ? JSON.parse(content) : { stamps: [] };
-            collectedStamps = new Set(data.stamps || []);
-            setSyncStatus('saved');
-        } catch (e) { setSyncStatus('error'); }
-    };
-
-    const syncToGist = async () => {
-        if (!currentUser) return;
-        setSyncStatus('saving');
-        const content = JSON.stringify({ stamps: [...collectedStamps] });
-        try {
-            if (currentGistId) {
-                await fetch(`https://api.github.com/gists/${currentGistId}`, {
-                    method: 'PATCH',
-                    headers: { Authorization: `Bearer ${GIST_TOKEN}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ files: { 'stamps.json': { content } } })
-                });
-            } else {
-                const resp = await fetch('https://api.github.com/gists', {
-                    method: 'POST',
-                    headers: { Authorization: `Bearer ${GIST_TOKEN}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        description: GIST_PREFIX + currentUser,
-                        public: true,
-                        files: { 'stamps.json': { content } }
-                    })
-                });
-                const gist = await resp.json();
-                currentGistId = gist.id;
-                localStorage.setItem(`eki_gist:${currentUser}`, gist.id);
-            }
-            setSyncStatus('saved');
-        } catch (e) { setSyncStatus('error'); }
-    };
-
-    // ── Toast ─────────────────────────────────────────────────────────────────
     let toastTimer;
     const showToast = (msg, duration = 2400) => {
         const el = document.getElementById('toast');
@@ -1160,101 +1059,89 @@
         toastTimer = setTimeout(() => el.classList.remove('show'), duration);
     };
 
-    // ── FIX 1: Loading overlay helper ─────────────────────────────────────────
+    const setSyncStatus = (status) => {
+        const el = document.getElementById('sync-status');
+        if (!el) return;
+        el.className = 'sync-status ' + status;
+        if (status === 'error') {
+            el.innerHTML = '✗ sync error · <a href="#" class="sync-retry-link">retry</a>';
+            el.querySelector('.sync-retry-link')?.addEventListener('click', (e) => { e.preventDefault(); syncToGist(); });
+        } else {
+            el.textContent = { saving: '↑ saving…', saved: '✓ synced', '': '' }[status] ?? '';
+        }
+    };
+
     const hideLoading = () => {
-        const overlay = document.getElementById('loading-overlay');
-        if (!overlay) return;
-        overlay.classList.add('fade-out');
-        setTimeout(() => overlay.remove(), 400);
+        const el = document.getElementById('loading-overlay');
+        if (!el) return;
+        el.classList.add('fade-out');
+        setTimeout(() => el.remove(), 400);
     };
 
-    // ── FIX 8: Stats with total + FIX 16: empty state hint ───────────────────
-    const updateStats = () => {
-        const done = collectedStamps.size;
-        const total = markers.length;
+    // ── 6. MAP INITIALISATION ─────────────────────────────────────────────────
 
-        document.getElementById('session-count').textContent = `${done.toLocaleString()} / ${total.toLocaleString()} collected`;
-        document.getElementById('bar-count').textContent = done.toLocaleString();
-
-        const barTotal = document.getElementById('bar-total');
-        if (barTotal) barTotal.textContent = total ? ` / ${total.toLocaleString()}` : '';
-
-        const hint = document.getElementById('stats-hint');
-        if (hint) hint.classList.toggle('hidden', done > 0 || total === 0);
-
-        const pct = total > 0 ? (done / total) * 100 : 0;
-        const fill = document.getElementById('session-progress-fill');
-        if (fill) fill.style.width = pct + '%';
-        const bar = document.getElementById('session-progress-bar');
-        if (bar) bar.setAttribute('aria-valuenow', Math.round(pct));
-    };
-
-    // ── Map ───────────────────────────────────────────────────────────────────
-    const initializeMap = () => {
+    const initMap = () => {
         const map = L.map('map', { zoomControl: true, preferCanvas: true }).setView([35.682839, 139.759455], 13);
-
-        // Single canvas renderer — one canvas means all layers share pointer events correctly
-        // Station markers are brought to front after lines render (see bringStationsToFront)
         canvasRenderer = L.canvas({ padding: 0.5 });
-
         L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
-            subdomains: 'abcd', maxZoom: 20
+            subdomains: 'abcd', maxZoom: MAX_ZOOM
         }).addTo(map);
-
         return map;
     };
 
-    // ── IndexedDB cache ────────────────────────────────────────────────────────
-    const CACHE_TTL = 7 * 24 * 60 * 60 * 1000;
-    const _db = new Promise((res, rej) => {
+    // ── IndexedDB cache ───────────────────────────────────────────────────────
+    const _dbReady = new Promise((res, rej) => {
         const req = indexedDB.open('eki-cache', 2);
         req.onupgradeneeded = e => e.target.result.createObjectStore('data');
         req.onsuccess = e => res(e.target.result);
-        req.onerror = rej;
+        req.onerror   = rej;
     });
+
     const cacheGet = async (key) => {
-        const db = await _db;
+        const db  = await _dbReady;
         return new Promise((res, rej) => {
             const req = db.transaction('data').objectStore('data').get(key);
-            req.onsuccess = () => res(req.result); req.onerror = rej;
-        });
-    };
-    const cacheSet = async (key, val) => {
-        const db = await _db;
-        return new Promise((res, rej) => {
-            const req = db.transaction('data','readwrite').objectStore('data').put(val, key);
-            req.onsuccess = () => res(); req.onerror = rej;
+            req.onsuccess = () => res(req.result);
+            req.onerror   = rej;
         });
     };
 
-    // ── Lines ─────────────────────────────────────────────────────────────────
-    const lineColorMap = {};
-    const linesByName  = {};
-    const allLineSegs  = [];
-    let hoveredLineName = null;
-    let hoverTimer;
+    const cacheSet = async (key, val) => {
+        const db  = await _dbReady;
+        return new Promise((res, rej) => {
+            const req = db.transaction('data', 'readwrite').objectStore('data').put(val, key);
+            req.onsuccess = () => res();
+            req.onerror   = rej;
+        });
+    };
+
+    // ── 7. LINE RENDERING ─────────────────────────────────────────────────────
 
     const resetAllLines = () => {
         allLineSegs.forEach(p => p.setStyle({ weight: 2.5, opacity: 0.75 }));
     };
 
-    const renderLines = (map, data, onComplete) => {
-        const features = data.features;
-        const BATCH = 150;
+    /**
+     * Render GeoJSON line features onto the map using RAF batching.
+     * @param {L.Map} map
+     * @param {Object} geojson - GeoJSON FeatureCollection
+     * @param {Function} [onComplete] - called when all batches finish
+     */
+    const renderLines = (map, geojson, onComplete) => {
+        const features = geojson.features;
         let i = 0;
 
         const processBatch = () => {
-            const end = Math.min(i + BATCH, features.length);
+            const end = Math.min(i + BATCH_SIZE, features.length);
             for (; i < end; i++) {
-                const feature = features[i];
-                const name = feature.properties.路線名;
+                const { properties, geometry } = features[i];
+                const name  = properties.路線名;
                 const color = getLineColor(name);
                 lineColorMap[name] = color;
-                const enName = getLineEn(name);
-                // single canvasRenderer — stations are repainted to front after lines complete
+
                 const polyline = L.polyline(
-                    feature.geometry.coordinates.map(c => [c[1], c[0]]),
+                    geometry.coordinates.map(([lng, lat]) => [lat, lng]),
                     { color, weight: 2.5, opacity: 0.75, renderer: canvasRenderer, interactive: true }
                 ).addTo(map);
 
@@ -1262,336 +1149,409 @@
                 linesByName[name].push(polyline);
                 allLineSegs.push(polyline);
 
+                const enName = getLineEn(name);
                 polyline.bindTooltip(
                     `<div class="line-tip"><b>${name}</b>${enName ? `<br><span>${enName}</span>` : ''}</div>`,
                     { sticky: true, direction: 'top', offset: [0, -8], className: 'line-tooltip' }
                 );
 
-                polyline.on('mouseover', function() {
+                polyline.on('mouseover', () => {
                     clearTimeout(hoverTimer);
-                    if (hoveredLineName === name) return;
-                    const prev = hoveredLineName;
-                    hoveredLineName = name;
+                    if (hoveredLine === name) return;
+                    const prev = hoveredLine;
+                    hoveredLine = name;
                     if (prev === null) {
                         allLineSegs.forEach(p => p.setStyle({ opacity: 0.15, weight: 1.5 }));
                     } else {
-                        linesByName[prev].forEach(p => p.setStyle({ opacity: 0.15, weight: 1.5 }));
+                        linesByName[prev]?.forEach(p => p.setStyle({ opacity: 0.15, weight: 1.5 }));
                     }
                     linesByName[name].forEach(p => p.setStyle({ weight: 5, opacity: 1 }));
                 });
 
-                polyline.on('mouseout', function() {
-                    hoverTimer = setTimeout(() => { hoveredLineName = null; resetAllLines(); }, 60);
+                polyline.on('mouseout', () => {
+                    hoverTimer = setTimeout(() => { hoveredLine = null; resetAllLines(); }, HOVER_RESET_MS);
                 });
             }
+
             if (i < features.length) {
                 requestAnimationFrame(processBatch);
-            } else if (onComplete) {
-                onComplete();  // all line batches done — caller can bring stations to front
+            } else {
+                resetAllLines(); // ensure correct initial opacity after all lines are drawn
+                onComplete?.();
             }
         };
 
         requestAnimationFrame(processBatch);
     };
 
-    const addTrainLinesToMap = async (map) => {
+    /** Repaint all station markers on top of lines (they were added first to the canvas). */
+    const bringStationsToFront = () => {
+        if (!mapInstance) return;
+        markers.forEach(m => { m.removeFrom(mapInstance); m.addTo(mapInstance); });
+    };
+
+    const loadLines = async (map) => {
         try {
             const cached = await cacheGet('eki_lines');
             if (cached && Date.now() - cached.ts < CACHE_TTL) {
-                renderLines(map, cached.data); return;
+                renderLines(map, cached.data, bringStationsToFront);
+                return;
             }
-        } catch(e) {}
-        fetch('data/railroad-section.geojson')
-            .then(r => r.json())
-            .then(async data => {
-                renderLines(map, data, bringStationsToFront);
-                try { await cacheSet('eki_lines', { data, ts: Date.now() }); } catch(e) {}
-            })
-            .catch(err => console.error('Error loading train lines:', err));
+        } catch { /* cache miss is fine */ }
+
+        try {
+            const data = await fetch('data/railroad-section.geojson').then(r => {
+                if (!r.ok) throw new Error(`HTTP ${r.status}`);
+                return r.json();
+            });
+            renderLines(map, data, bringStationsToFront);
+            cacheSet('eki_lines', { data, ts: Date.now() }).catch(() => {});
+        } catch (err) {
+            console.error('loadLines:', err);
+            showToast('Failed to load train lines — map may be incomplete', 4000);
+        }
     };
 
-    // ── Markers ───────────────────────────────────────────────────────────────
-    const markers = [];
-    let currentPopupMarker = null; // tracks which marker has the open popup (for event delegation)
+    // ── 8. MARKER MANAGEMENT ──────────────────────────────────────────────────
 
-    // After lines finish rendering, repaint station markers on top so they are visually above lines
-    const bringStationsToFront = () => {
-        markers.forEach(m => { m.removeFrom(map_ref); m.addTo(map_ref); });
-    };
-
+    /**
+     * Derive the display name for a station in the current language.
+     * EN mode: English romanisation (from station code). JP mode: kanji.
+     */
     const getDisplayName = (station, code) => {
-        if (currentLang === 'jp' && station.name_kanji) return station.name_kanji;
-        const raw = code.includes('.') ? code.split('.').pop() : code;
-        return raw.replace(/([A-Z])/g, ' $1').trim() || station.name_kanji || code;
+        if (state.lang === 'jp' && station.name_kanji) return station.name_kanji;
+        const raw = (code ?? '').includes('.') ? code.split('.').pop() : (code ?? '');
+        return raw.replace(/([A-Z])/g, ' $1').trim() || station.name_kanji || code || '?';
     };
 
     const getEnName = (code) => {
-        const raw = code.includes('.') ? code.split('.').pop() : code;
+        const raw = (code ?? '').includes('.') ? code.split('.').pop() : (code ?? '');
         return raw.replace(/([A-Z])/g, ' $1').trim();
     };
 
-    // FIX 3: Touch-aware minimum radius for larger tap targets on mobile
-    const circleStyle = (collected, zoom) => {
-        const minR = isTouchDevice ? 8 : 4;
-        const r = Math.max(minR, Math.round(4 * Math.pow(1.18, zoom - 12)));
-        return collected
-            ? { radius: r + 3, fillColor: '#f7c948', fillOpacity: 1,
-                color: 'rgba(247,201,72,0.4)', weight: 2, renderer: canvasRenderer }
-            : { radius: r, fillColor: '#3a3a48', fillOpacity: 1,
-                color: '#4a4a5a', weight: 1.5, renderer: canvasRenderer };
+    const markerRadius = (collected, zoom) => {
+        const minR = IS_TOUCH ? MARKER_MIN_R_TOUCH : MARKER_MIN_R;
+        const r    = Math.min(MARKER_MAX_R, Math.max(minR, Math.round(MARKER_MIN_R * Math.pow(ZOOM_SCALE, zoom - ZOOM_BASE))));
+        return collected ? r + MARKER_COLL_BONUS : r;
     };
 
-    // FIX 2 + FIX 19: Popup with explicit CTA button and consistent SVG bookmark icons
-    const BOOKMARK_FILLED = `<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>`;
-    const BOOKMARK_OUTLINE = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>`;
+    const circleStyle = (collected, zoom) => collected
+        ? { radius: markerRadius(true,  zoom), fillColor: '#f7c948', fillOpacity: 1, color: 'rgba(247,201,72,0.4)', weight: 2,   renderer: canvasRenderer }
+        : { radius: markerRadius(false, zoom), fillColor: '#3a3a48', fillOpacity: 1, color: '#4a4a5a',             weight: 1.5, renderer: canvasRenderer };
 
+    // ── 9. POPUP ──────────────────────────────────────────────────────────────
+
+    /**
+     * Build the popup HTML for a station marker.
+     * Language-aware: primary name is in the current UI language.
+     */
     const buildPopupHtml = (marker) => {
-        const s = marker._stationData;
+        const s    = marker._stationData;
         const code = s.code;
-        const jpName = s.name_kanji || '';
-        const enName = getEnName(code);
-        const collected = marker._isCollected;
+        const jp   = s.name_kanji || '';
+        const en   = getEnName(code);
 
-        const lineBadges = (marker._lineCodes || [s.line_code]).map(lc => {
-            const color = lineColorMap[lc] || '#6b6b7a';
+        // Language-sensitive primary / secondary names
+        const primary   = state.lang === 'jp' ? (jp || en) : (en || jp);
+        const secondary = state.lang === 'jp' ? en : jp;
+
+        const lineBadges = (marker._lineCodes ?? [s.line_code]).map(lc => {
+            const color = lineColorMap[lc] ?? '#6b6b7a';
             const label = lc.replace(/\./g, ' › ');
             return `<div class="popup-line"><span class="popup-line-dot" style="background:${color}"></span>${label}</div>`;
         }).join('');
 
+        const collected = marker._isCollected;
+        const btnIcon   = collected ? ICON_BOOKMARK_FILLED : ICON_BOOKMARK_OUTLINE;
+        const btnLabel  = collected ? 'Collected' : 'Collect stamp';
+        const btnClass  = 'popup-collect-btn' + (collected ? ' collected' : '');
+        const btnAria   = `${collected ? 'Remove stamp' : 'Collect stamp'} for ${primary}`;
+
         return `<div class="popup-inner">
-            <div class="popup-name">${jpName || enName}</div>
-            <div class="popup-name-en">${enName}</div>
+            <div class="popup-name">${primary}</div>
+            ${secondary ? `<div class="popup-name-secondary">${secondary}</div>` : ''}
             ${lineBadges}
-            <button class="popup-collect-btn ${collected ? 'collected' : ''}"
-                aria-label="${collected ? 'Remove stamp' : 'Collect stamp'} for ${jpName || enName}">
-                ${collected ? BOOKMARK_FILLED + ' Collected' : BOOKMARK_OUTLINE + ' Collect stamp'}
-            </button>
+            <button class="${btnClass}" aria-label="${btnAria}">${btnIcon} ${btnLabel}</button>
         </div>`;
     };
 
-    // Deduplication: one marker per physical station
-    const dedupeMarkers = {};
+    const dedupeKey = (s) => `${s.name_kanji}|${s.lat.toFixed(2)}|${s.lon.toFixed(2)}`;
 
+    /**
+     * Create (or merge into existing) a station circle marker.
+     * Stations sharing name + ~1km grid cell are collapsed into one marker
+     * with a multi-line badge popup.
+     */
     const createMarker = (station, map) => {
-        const code = station.code;
-        if (!code || !station.line_code) return;
+        const { code, line_code } = station;
+        if (!code || !line_code) return;
 
-        const dedupeKey = `${station.name_kanji}|${station.lat.toFixed(2)}|${station.lon.toFixed(2)}`;
+        const key = dedupeKey(station);
+        const existing = dedupeMarkers[key];
 
-        if (dedupeMarkers[dedupeKey]) {
-            const existing = dedupeMarkers[dedupeKey];
-            if (!existing._lineCodes.includes(station.line_code)) {
-                existing._lineCodes.push(station.line_code);
+        if (existing) {
+            if (!existing._lineCodes.includes(line_code)) {
+                existing._lineCodes.push(line_code);
                 existing.setPopupContent(buildPopupHtml(existing));
             }
             return;
         }
 
-        const collected = isCollected(code);
-        // single canvasRenderer
-        const marker = L.circleMarker([station.lat, station.lon], circleStyle(collected, map.getZoom()));
+        const collected = state.stamps.has(code);
+        const marker    = L.circleMarker([station.lat, station.lon], circleStyle(collected, map.getZoom()));
 
-        marker._stationData = station;
-        marker._isCollected = collected;
-        marker._lineCodes = [station.line_code];
-        marker.stationName = getDisplayName(station, code);
-        marker.stationNameKanji = station.name_kanji || '';
-        marker.stationNameEn = getEnName(code);
+        marker._stationData  = station;
+        marker._isCollected  = collected;
+        marker._lineCodes    = [line_code];
+        marker.stationName   = getDisplayName(station, code);
+        marker.stationNameJP = station.name_kanji || '';
+        marker.stationNameEN = getEnName(code);
 
-        // FIX 2: Click opens sticky popup; collect button uses event delegation (reliable)
-        marker.bindPopup(buildPopupHtml(marker), {
-            offset: L.point(0, -4),
-            closeButton: true,
-            maxWidth: 260
-        });
+        marker.bindPopup(buildPopupHtml(marker), { offset: L.point(0, -4), closeButton: true, maxWidth: 260 });
 
         marker.on('click', () => {
-            currentPopupMarker = marker;  // track for event delegation
+            currentPopupMarker = marker;
             marker.openPopup();
         });
 
-        dedupeMarkers[dedupeKey] = marker;
+        // Clear tracking reference when popup closes
+        marker.on('popupclose', () => {
+            if (currentPopupMarker === marker) currentPopupMarker = null;
+        });
+
+        dedupeMarkers[key] = marker;
         markers.push(marker);
         marker.addTo(map);
     };
 
-    let zoomDebounce;
-    const updateMarkerSizes = (map) => {
-        clearTimeout(zoomDebounce);
-        zoomDebounce = setTimeout(() => {
-            const zoom = map.getZoom();
-            markers.forEach(m => m.setStyle(circleStyle(m._isCollected, zoom)));
-        }, 150);
-    };
-
-    const refreshAllMarkerStates = (map) => {
-        map.closePopup(); // close any open popup before bulk refresh
-        const zoom = map.getZoom();
+    const refreshAllMarkerStates = () => {
+        if (!mapInstance) return;
+        mapInstance.closePopup();
+        const zoom = mapInstance.getZoom();
         markers.forEach(m => {
-            m._isCollected = isCollected(m._stationData.code);
+            m._isCollected = state.stamps.has(m._stationData.code);
             m.setStyle(circleStyle(m._isCollected, zoom));
             m.setPopupContent(buildPopupHtml(m));
         });
         updateStats();
     };
 
-    const fetchStations = async (map) => {
-        const load = (stations, excluded) => {
+    const loadStations = async (map) => {
+        const renderStations = (stations, excluded) => {
             stations.forEach(g => g.stations.forEach(s => {
                 if (!excluded.includes(s.line_code)) createMarker(s, map);
             }));
-            map.on('zoomend', () => updateMarkerSizes(map));
+            map.on('zoomend', () => {
+                clearTimeout(zoomDebounce);
+                zoomDebounce = setTimeout(() => {
+                    const zoom = map.getZoom();
+                    markers.forEach(m => m.setStyle(circleStyle(m._isCollected, zoom)));
+                }, 150);
+            });
             updateStats();
-            hideLoading(); // FIX 1: hide loading overlay once markers are rendered
+            hideLoading();
         };
 
         try {
             const cached = await cacheGet('eki_stations');
             if (cached && Date.now() - cached.ts < CACHE_TTL) {
-                load(cached.stations, cached.excluded); return;
+                renderStations(cached.stations, cached.excluded);
+                return;
             }
-        } catch(e) {}
+        } catch { /* cache miss */ }
 
-        Promise.all([
-            fetch('data/stations.json').then(r => r.json()),
-            fetch('data/no-stamps-lines.json').then(r => r.json()).then(d => d.map(l => l.line_code))
-        ]).then(async ([stations, excluded]) => {
-            load(stations, excluded);
-            try { await cacheSet('eki_stations', { stations, excluded, ts: Date.now() }); } catch(e) {}
-        }).catch(err => {
-            console.error('Error fetching stations:', err);
-            // FIX 7: replaced alert() with toast
+        try {
+            const [stations, excluded] = await Promise.all([
+                fetch('data/stations.json').then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); }),
+                fetch('data/no-stamps-lines.json').then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); }).then(d => d.map(l => l.line_code))
+            ]);
+            renderStations(stations, excluded);
+            cacheSet('eki_stations', { stations, excluded, ts: Date.now() }).catch(() => {});
+        } catch (err) {
+            console.error('loadStations:', err);
             hideLoading();
             showToast('Failed to load stations — check connection and refresh', 5000);
+        }
+    };
+
+    // ── 10. SEARCH ────────────────────────────────────────────────────────────
+
+    /**
+     * Render search suggestions for the current input value and language.
+     * Called on input change AND on language toggle (if input has text).
+     */
+    const renderSuggestions = (map, term) => {
+        const box  = document.getElementById('suggestions');
+        box.innerHTML = '';
+        box.style.display = 'none';
+        if (!term) return;
+
+        const lc   = term.toLowerCase();
+        const hits = markers.filter(m =>
+            m.stationNameEN.toLowerCase().includes(lc) ||
+            m.stationNameJP.toLowerCase().includes(lc)
+        ).slice(0, MAX_SUGGESTIONS);
+
+        if (!hits.length) return;
+        box.style.display = 'block';
+
+        hits.forEach(m => {
+            const primary   = state.lang === 'jp' ? (m.stationNameJP || m.stationNameEN) : (m.stationNameEN || m.stationNameJP);
+            const secondary = state.lang === 'jp' ? m.stationNameEN : m.stationNameJP;
+
+            const item = document.createElement('div');
+            item.className   = 'suggestion-item';
+            item.setAttribute('role', 'option');
+
+            const nameDiv = document.createElement('div');
+            const p = document.createElement('div');
+            p.className = 'sug-primary'; p.textContent = primary;
+            nameDiv.appendChild(p);
+            if (secondary) {
+                const s = document.createElement('div');
+                s.className = 'sug-secondary'; s.textContent = secondary;
+                nameDiv.appendChild(s);
+            }
+            item.appendChild(nameDiv);
+
+            if (m._isCollected) {
+                const badge = document.createElement('span');
+                badge.className = 'collected-badge'; badge.textContent = '✓';
+                item.appendChild(badge);
+            }
+
+            item.addEventListener('click', () => {
+                map.setView(m.getLatLng(), 15);
+                setTimeout(() => m.openPopup(), SEARCH_JUMP_MS);
+                box.style.display = 'none';
+                document.getElementById('stationSearch').value = '';
+            });
+
+            box.appendChild(item);
         });
     };
 
-    // ── FIX 6: Language toggle shows CURRENT language ─────────────────────────
+    const setupSearch = (map) => {
+        const input = document.getElementById('stationSearch');
+        input.addEventListener('input', () => renderSuggestions(map, input.value.trim()));
+        document.addEventListener('click', e => {
+            if (!e.target.closest('#search-container'))
+                document.getElementById('suggestions').style.display = 'none';
+        });
+    };
+
+    // ── 11. LANGUAGE ──────────────────────────────────────────────────────────
+
     const updateLangBtn = () => {
-        const btn = document.getElementById('lang-toggle');
-        const label = currentLang === 'jp' ? '日本語' : 'EN';
-        const tip   = currentLang === 'jp' ? 'Switch to English' : 'Switch to Japanese (日本語)';
+        const btn   = document.getElementById('lang-toggle');
+        const label = state.lang === 'jp' ? '日本語' : 'EN';
+        const tip   = state.lang === 'jp' ? 'Switch to English' : 'Switch to Japanese (日本語)';
         btn.textContent = label;
-        btn.title = tip;
+        btn.title       = tip;
         btn.setAttribute('aria-label', tip);
     };
 
     const setupLanguageToggle = (map) => {
         updateLangBtn();
         document.getElementById('lang-toggle').addEventListener('click', () => {
-            currentLang = currentLang === 'en' ? 'jp' : 'en';
-            localStorage.setItem('eki_lang', currentLang);
+            setState('lang', state.lang === 'en' ? 'jp' : 'en');
             updateLangBtn();
+
+            // Update lang attribute on <html> for screen readers
+            document.documentElement.lang = state.lang === 'jp' ? 'ja' : 'en';
+
+            // Update modal title if visible
+            const title = document.getElementById('modal-title');
+            if (title) title.textContent = state.lang === 'jp' ? 'ようこそ！' : 'Welcome!';
+
+            // Rebuild all marker names + popup content in new language
             markers.forEach(m => {
                 if (!m._stationData) return;
                 m.stationName = getDisplayName(m._stationData, m._stationData.code);
                 m.setPopupContent(buildPopupHtml(m));
             });
+
+            // Re-render visible search suggestions in new language
+            const term = document.getElementById('stationSearch').value.trim();
+            renderSuggestions(map, term);
         });
     };
 
-    // ── Search ────────────────────────────────────────────────────────────────
-    const setupSearch = (map) => {
-        const input = document.getElementById('stationSearch');
-        const suggestions = document.getElementById('suggestions');
+    // ── 12. STATS ─────────────────────────────────────────────────────────────
 
-        input.addEventListener('input', () => {
-            const term = input.value.toLowerCase().trim();
-            suggestions.innerHTML = '';
-            suggestions.style.display = 'none';
-            if (!term) return;
+    const updateStats = () => {
+        const done  = state.stamps.size;
+        const total = markers.length;
+        const pct   = total > 0 ? (done / total) * 100 : 0;
 
-            const hits = markers.filter(m =>
-                (m.stationNameEn || '').toLowerCase().includes(term) ||
-                (m.stationNameKanji || '').toLowerCase().includes(term)
-            ).slice(0, 6);
+        document.getElementById('session-count').textContent = `${done.toLocaleString()} / ${total.toLocaleString()} collected`;
+        document.getElementById('bar-count').textContent     = done.toLocaleString();
 
-            if (!hits.length) return;
-            suggestions.style.display = 'block';
-            hits.forEach(m => {
-                const item = document.createElement('div');
-                item.className = 'suggestion-item';
-                item.setAttribute('role', 'option');
+        const barTotal = document.getElementById('bar-total');
+        if (barTotal) barTotal.textContent = total ? ` / ${total.toLocaleString()}` : '';
 
-                const nameWrap = document.createElement('div');
-                nameWrap.innerHTML = `<div class="jp">${m.stationNameKanji || m.stationNameEn}</div><div class="en">${m.stationNameEn}</div>`;
-                item.appendChild(nameWrap);
+        const hint = document.getElementById('stats-hint');
+        if (hint) hint.classList.toggle('hidden', done > 0 || total === 0);
 
-                if (m._isCollected) {
-                    const badge = document.createElement('span');
-                    badge.className = 'collected-badge';
-                    badge.textContent = '✓ collected';
-                    item.appendChild(badge);
-                }
-
-                item.onclick = () => {
-                    map.setView(m.getLatLng(), 15);
-                    setTimeout(() => m.openPopup(), 300);
-                    suggestions.style.display = 'none';
-                    input.value = '';
-                };
-                suggestions.appendChild(item);
-            });
-        });
-
-        document.addEventListener('click', e => {
-            if (!e.target.closest('#search-container')) suggestions.style.display = 'none';
-        });
+        const fill = document.getElementById('session-progress-fill');
+        if (fill) fill.style.width = pct + '%';
+        const bar  = document.getElementById('session-progress-bar');
+        if (bar)  bar.setAttribute('aria-valuenow', Math.round(pct));
     };
 
-    // ── FIX 11: Session panel — state-aware ───────────────────────────────────
-    const showSessionInputMode = () => {
+    // ── 13. SESSION PANEL ─────────────────────────────────────────────────────
+
+    const showInputMode = () => {
         document.getElementById('session-loaded-row').classList.add('hidden');
         document.getElementById('session-input-section').classList.remove('hidden');
-        document.getElementById('session-primary-row').classList.remove('hidden');
+        document.getElementById('session-load-row').classList.remove('hidden');
         document.getElementById('session-save-row').classList.add('hidden');
     };
 
-    const showSessionLoadedMode = () => {
+    const showLoadedMode = () => {
         document.getElementById('session-loaded-row').classList.remove('hidden');
         document.getElementById('session-input-section').classList.add('hidden');
-        document.getElementById('session-primary-row').classList.add('hidden');
+        document.getElementById('session-load-row').classList.add('hidden');
         document.getElementById('session-save-row').classList.remove('hidden');
-        document.getElementById('session-loaded-name').textContent = currentUser;
+        document.getElementById('session-loaded-name').textContent = state.user;
     };
 
     const updateSessionUI = () => {
-        const avatarEl = document.getElementById('session-avatar');
-        const nameEl   = document.getElementById('session-username');
-        const inputEl  = document.getElementById('session-name-input');
-
-        if (currentUser) {
-            avatarEl.textContent = currentUser.charAt(0).toUpperCase();
-            nameEl.textContent = currentUser;
-            nameEl.classList.remove('placeholder');
-            if (inputEl) inputEl.value = currentUser;
-            showSessionLoadedMode();
+        const avatar   = document.getElementById('session-avatar');
+        const username = document.getElementById('session-username');
+        const input    = document.getElementById('session-name-input');
+        if (state.user) {
+            avatar.textContent = state.user.charAt(0).toUpperCase();
+            username.textContent = state.user;
+            username.classList.remove('placeholder');
+            if (input) input.value = state.user;
+            showLoadedMode();
         } else {
-            avatarEl.textContent = '?';
-            nameEl.textContent = 'No session';
-            nameEl.classList.add('placeholder');
-            showSessionInputMode();
+            avatar.textContent = '?';
+            username.textContent = 'No session';
+            username.classList.add('placeholder');
+            showInputMode();
         }
         updateStats();
     };
 
     const setupSessionPanel = (map) => {
-        // FIX 14: Toggle with aria-expanded management
+        // Toggle panel open/close
         document.getElementById('session-toggle').addEventListener('click', () => {
             const panel = document.getElementById('session-panel');
             const btn   = document.getElementById('session-toggle');
-            const isNowVisible = panel.classList.toggle('hidden') === false;
-            btn.classList.toggle('active', isNowVisible);
-            btn.setAttribute('aria-expanded', isNowVisible.toString());
+            const open  = panel.classList.toggle('hidden') === false;
+            btn.classList.toggle('active', open);
+            btn.setAttribute('aria-expanded', open.toString());
         });
 
         updateSessionUI();
 
-        // Change session button
+        // Change session
         document.getElementById('session-change').addEventListener('click', () => {
-            showSessionInputMode();
+            showInputMode();
             const input = document.getElementById('session-name-input');
-            input.value = currentUser;
+            input.value = state.user;
             input.focus();
         });
 
@@ -1599,119 +1559,128 @@
         document.getElementById('session-load').addEventListener('click', async () => {
             const name = document.getElementById('session-name-input').value.trim();
             if (!name) { showToast('Enter a sync name first'); return; }
-            currentUser = name;
-            localStorage.setItem('eki_current_user', name);
+            setState('user', name);
             updateSessionUI();
             showToast(`Loading ${name}…`);
             await loadFromGist(name);
-            refreshAllMarkerStates(map);
+            refreshAllMarkerStates();
             showToast(`Session loaded: ${name}`);
         });
 
-        // Save progress (both buttons)
-        const doSave = async () => {
-            if (!currentUser) { showToast('Load a session first'); return; }
+        // Save progress
+        document.getElementById('session-save').addEventListener('click', async () => {
+            if (!state.user) { showToast('Load a session first'); return; }
             clearTimeout(syncDebounce);
             await syncToGist();
-            showToast(`✓ Synced as ${currentUser}`);
-        };
-        document.getElementById('session-save').addEventListener('click', doSave);
-        document.getElementById('session-save-2').addEventListener('click', doSave);
-
-        // FIX 10: Export JSON
-        document.getElementById('session-export').addEventListener('click', () => {
-            const session = { user: currentUser, stamps: [...collectedStamps] };
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(new Blob([JSON.stringify(session, null, 2)], { type: 'application/json' }));
-            a.download = `eki-${currentUser || 'stamps'}-${new Date().toISOString().slice(0,10)}.json`;
-            a.click();
+            showToast(`✓ Synced as ${state.user}`);
         });
 
-        // FIX 10: Import JSON — previously unreachable hidden file input
+        // Export JSON
+        document.getElementById('session-export').addEventListener('click', () => {
+            const payload = { user: state.user, stamps: [...state.stamps] };
+            const url = URL.createObjectURL(new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' }));
+            const a   = Object.assign(document.createElement('a'), {
+                href: url,
+                download: `eki-${state.user || 'stamps'}-${new Date().toISOString().slice(0, 10)}.json`
+            });
+            a.click();
+            URL.revokeObjectURL(url);  // free memory
+        });
+
+        // Import JSON
         document.getElementById('session-import').addEventListener('click', () => {
             document.getElementById('session-import-file').click();
         });
-        document.getElementById('session-import-file').addEventListener('change', async (e) => {
-            const file = e.target.files[0];
+
+        document.getElementById('session-import-file').addEventListener('change', (e) => {
+            const file = e.target.files?.[0];
             if (!file) return;
             const reader = new FileReader();
-            reader.onload = async (ev) => {
+            reader.onerror = () => showToast('Could not read file');
+            reader.onload  = async (ev) => {
+                // Clear input AFTER read so same file can be re-imported
+                e.target.value = '';
                 try {
                     const data = JSON.parse(ev.target.result);
-                    if (!data.stamps || !Array.isArray(data.stamps)) throw new Error('Invalid format');
-                    collectedStamps = new Set(data.stamps);
-                    if (data.user && !currentUser) {
-                        currentUser = data.user;
-                        localStorage.setItem('eki_current_user', data.user);
+                    if (!Array.isArray(data.stamps)) throw new Error('Missing stamps array');
+                    state.stamps = new Set(data.stamps.filter(s => typeof s === 'string'));
+                    if (data.user && !state.user) {
+                        setState('user', data.user);
                         updateSessionUI();
                     }
-                    refreshAllMarkerStates(map);
-                    showToast(`Imported ${data.stamps.length} stamps`);
+                    refreshAllMarkerStates();
+                    showToast(`Imported ${state.stamps.size} stamps`);
                     await syncToGist();
-                } catch {
+                } catch (err) {
+                    console.error('Import:', err);
                     showToast('Import failed — not a valid Eki JSON file');
                 }
             };
             reader.readAsText(file);
-            e.target.value = '';
         });
 
-        // Reset
-        document.getElementById('session-reset').addEventListener('click', async () => {
-            const who = currentUser || 'all stamps';
-            if (!confirm(`Reset all stamps for "${who}"? This cannot be undone.`)) return;
-            collectedStamps = new Set();
+        // Reset — two-step confirmation (no browser confirm() dialog)
+        let resetConfirmTimer = null;
+        const resetBtn = document.getElementById('session-reset');
+        resetBtn.addEventListener('click', async () => {
+            if (!resetBtn.dataset.confirming) {
+                resetBtn.dataset.confirming = '1';
+                resetBtn.textContent = 'Tap again to confirm reset';
+                resetBtn.classList.add('confirm-pending');
+                resetConfirmTimer = setTimeout(() => {
+                    delete resetBtn.dataset.confirming;
+                    resetBtn.textContent = 'Reset all stamps';
+                    resetBtn.classList.remove('confirm-pending');
+                }, RESET_CONFIRM_MS);
+                return;
+            }
+            clearTimeout(resetConfirmTimer);
+            delete resetBtn.dataset.confirming;
+            resetBtn.textContent = 'Reset all stamps';
+            resetBtn.classList.remove('confirm-pending');
+            state.stamps.clear();
             await syncToGist();
-            refreshAllMarkerStates(map);
+            refreshAllMarkerStates();
             showToast('All stamps reset');
         });
     };
 
-    // ── FIX 15: Focus trap for modal ─────────────────────────────────────────
+    // ── 14. WELCOME MODAL ─────────────────────────────────────────────────────
+
     const setupFocusTrap = (modalEl, overlayEl) => {
-        const focusable = () => [...modalEl.querySelectorAll('button, input, [tabindex]:not([tabindex="-1"])')];
         modalEl.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') { overlayEl.classList.add('hidden'); return; }
             if (e.key !== 'Tab') return;
-            const items = focusable();
-            const first = items[0], last = items[items.length - 1];
-            if (e.shiftKey) {
-                if (document.activeElement === first) { e.preventDefault(); last.focus(); }
-            } else {
-                if (document.activeElement === last)  { e.preventDefault(); first.focus(); }
-            }
+            const items = [...modalEl.querySelectorAll('button, input, [tabindex]:not([tabindex="-1"])')];
+            const [first, last] = [items[0], items[items.length - 1]];
+            if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+            else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
         });
     };
 
-    // ── Name modal ────────────────────────────────────────────────────────────
-    const setupNameModal = (map) => {
+    const setupModal = (map) => {
         const overlay = document.getElementById('name-modal-overlay');
         const modal   = document.getElementById('name-modal');
         const input   = document.getElementById('modal-name-input');
+        const title   = document.getElementById('modal-title');
 
-        // FIX 20: Language-aware welcome title
-        const title = document.getElementById('modal-title');
-        if (title) title.textContent = currentLang === 'jp' ? 'ようこそ！' : 'Welcome!';
-
-        // FIX 15: Focus trap
+        if (title) title.textContent = state.lang === 'jp' ? 'ようこそ！' : 'Welcome!';
         setupFocusTrap(modal, overlay);
 
-        if (!currentUser) {
+        if (!state.user) {
             overlay.classList.remove('hidden');
-            setTimeout(() => input.focus(), 100);
+            setTimeout(() => input.focus(), FOCUS_DELAY_MS);
         }
 
         const confirmModal = async () => {
             const name = input.value.trim();
             overlay.classList.add('hidden');
-            if (name) {
-                currentUser = name;
-                localStorage.setItem('eki_current_user', name);
-                updateSessionUI();
-                await loadFromGist(name);
-                refreshAllMarkerStates(map);
-                showToast(`Welcome, ${name}!`);
-            }
+            if (!name) return;
+            setState('user', name);
+            updateSessionUI();
+            await loadFromGist(name);
+            refreshAllMarkerStates();
+            showToast(`Welcome, ${name}!`);
         };
 
         document.getElementById('modal-confirm').addEventListener('click', confirmModal);
@@ -1719,38 +1688,49 @@
         input.addEventListener('keydown', e => { if (e.key === 'Enter') confirmModal(); });
     };
 
-    // ── Init ──────────────────────────────────────────────────────────────────
+    // ── 15. INIT ──────────────────────────────────────────────────────────────
+
     document.addEventListener('DOMContentLoaded', async () => {
-        const map = initializeMap();
-        map_ref = map; // module-level reference for event delegation
+        const map   = initMap();
+        mapInstance = map;
+
         setupSearch(map);
         setupLanguageToggle(map);
         setupSessionPanel(map);
-        setupNameModal(map);
+        setupModal(map);
 
-        // Event delegation for popup collect button — reliable alternative to popupopen+getElement
+        // Event delegation for popup collect button
+        // Reliable alternative to popupopen+getElement (which returns null in Leaflet)
         document.addEventListener('click', (e) => {
             const btn = e.target.closest('.popup-collect-btn');
             if (!btn || !currentPopupMarker) return;
             e.stopPropagation();
             const marker = currentPopupMarker;
-            const next = !marker._isCollected;
+            const next   = !marker._isCollected;
             marker._isCollected = next;
-            setCollected(marker._stationData.code, next);
+            state.stamps[next ? 'add' : 'delete'](marker._stationData.code);
+            scheduleSave();
             marker.setStyle(circleStyle(next, map.getZoom()));
-            btn.className = 'popup-collect-btn' + (next ? ' collected' : '');
-            btn.setAttribute('aria-label', (next ? 'Remove stamp' : 'Collect stamp') + ' for ' + (marker.stationNameKanji || marker.stationNameEn));
-            btn.innerHTML = next ? BOOKMARK_FILLED + ' Collected' : BOOKMARK_OUTLINE + ' Collect stamp';
+            // Update button in-place without rebuilding popup
+            btn.className   = 'popup-collect-btn' + (next ? ' collected' : '');
+            btn.setAttribute('aria-label', `${next ? 'Remove stamp' : 'Collect stamp'} for ${marker.stationNameJP || marker.stationNameEN}`);
+            btn.innerHTML   = `${next ? ICON_BOOKMARK_FILLED : ICON_BOOKMARK_OUTLINE} ${next ? 'Collected' : 'Collect stamp'}`;
+            // Keep stored popup HTML in sync for next open
+            marker.setPopupContent(buildPopupHtml(marker));
             updateStats();
-            showToast(next ? marker.stationName + ' — stamped!' : marker.stationName + ' — removed');
+            showToast(next ? `${marker.stationName} — stamped!` : `${marker.stationName} — removed`);
         });
 
-        await fetchStations(map);
-        setTimeout(() => addTrainLinesToMap(map), 100);
+        // Load stations first (they appear fast, often from cache)
+        await loadStations(map);
 
-        if (currentUser) {
-            await loadFromGist(currentUser);
-            refreshAllMarkerStates(map);
+        // Load lines in background shortly after — they are visually large and slow
+        setTimeout(() => loadLines(map), 100);
+
+        // If returning user, load their stamps
+        if (state.user) {
+            await loadFromGist(state.user);
+            refreshAllMarkerStates();
         }
     });
     </script>
