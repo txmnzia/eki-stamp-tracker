@@ -958,8 +958,9 @@
     const IS_TOUCH = window.matchMedia('(pointer: coarse)').matches;
 
     // SVG icon constants (used in popup button)
-    const ICON_BOOKMARK_FILLED  = '<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>';
-    const ICON_BOOKMARK_OUTLINE = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>';
+    // Rubber stamp shape: handle (top rect) + wide body + base line.
+    const ICON_STAMP_FILLED  = '<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="9" y="2" width="6" height="6" rx="1"/><rect x="3" y="8" width="18" height="10" rx="2"/><rect x="2" y="20" width="20" height="3" rx="1"/></svg>';
+    const ICON_STAMP_OUTLINE = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="2" width="6" height="6" rx="1"/><rect x="3" y="8" width="18" height="10" rx="2"/><line x1="2" y1="21.5" x2="22" y2="21.5"/></svg>';
 
     // ── 4. GIST PERSISTENCE ───────────────────────────────────────────────────
 
@@ -1262,7 +1263,7 @@
         }).join('');
 
         const collected = marker._isCollected;
-        const btnIcon   = collected ? ICON_BOOKMARK_FILLED : ICON_BOOKMARK_OUTLINE;
+        const btnIcon   = collected ? ICON_STAMP_FILLED : ICON_STAMP_OUTLINE;
         const btnLabel  = collected ? 'Collected' : 'Collect stamp';
         const btnClass  = 'popup-collect-btn' + (collected ? ' collected' : '');
         const btnAria   = `${collected ? 'Remove stamp' : 'Collect stamp'} for ${primary}`;
@@ -1313,6 +1314,15 @@
             currentPopupMarker = marker;
             marker.openPopup();
         });
+
+        // On desktop, hovering a station opens its popup immediately.
+        // Touch devices have no hover — click remains the only trigger.
+        if (!IS_TOUCH) {
+            marker.on('mouseover', () => {
+                currentPopupMarker = marker;
+                marker.openPopup();
+            });
+        }
 
         // Clear tracking reference when popup closes
         marker.on('popupclose', () => {
@@ -1422,6 +1432,9 @@
 
             item.addEventListener('click', () => {
                 map.setView(m.getLatLng(), 15);
+                // Set currentPopupMarker BEFORE openPopup so the collect
+                // button's event-delegation handler can find the marker.
+                currentPopupMarker = m;
                 setTimeout(() => m.openPopup(), SEARCH_JUMP_MS);
                 box.style.display = 'none';
                 document.getElementById('stationSearch').value = '';
@@ -1714,7 +1727,7 @@
             // Update button in-place without rebuilding popup
             btn.className   = 'popup-collect-btn' + (next ? ' collected' : '');
             btn.setAttribute('aria-label', `${next ? 'Remove stamp' : 'Collect stamp'} for ${marker.stationNameJP || marker.stationNameEN}`);
-            btn.innerHTML   = `${next ? ICON_BOOKMARK_FILLED : ICON_BOOKMARK_OUTLINE} ${next ? 'Collected' : 'Collect stamp'}`;
+            btn.innerHTML   = `${next ? ICON_STAMP_FILLED : ICON_STAMP_OUTLINE} ${next ? 'Collected' : 'Collect stamp'}`;
             // Keep stored popup HTML in sync for next open
             marker.setPopupContent(buildPopupHtml(marker));
             updateStats();
