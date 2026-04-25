@@ -136,11 +136,14 @@
         .popup-name { font-family: var(--jp-font); font-size: 17px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
         .popup-name-secondary { font-size: 11px; color: var(--muted); letter-spacing: 0.06em; margin-bottom: 10px; }
         .popup-line {
-            display: inline-flex; align-items: center; gap: 5px;
+            display: inline-flex; align-items: flex-start; gap: 5px;
             font-size: 11px; color: var(--muted); background: var(--surface2);
             border-radius: 4px; padding: 3px 7px; margin-bottom: 4px;
         }
-        .popup-line-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+        .popup-line-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 2px; }
+        .popup-line-label { display: flex; flex-direction: column; gap: 1px; line-height: 1.3; }
+        .popup-line-jp { color: var(--text); }
+        .popup-line-en { font-size: 9.5px; opacity: 0.65; letter-spacing: 0.03em; }
         .popup-collect-btn {
             display: flex; align-items: center; gap: 7px;
             width: 100%; padding: 9px 12px; margin-top: 10px;
@@ -945,6 +948,7 @@
 
     // Lines
     const lineColorMap  = {};  // lineName → hex colour (populated during renderLines)
+    const lineEnMap     = {};  // lineName (kanji) → English romaji name (populated during loadStations)
     const linesByName   = {};  // lineName → [polyline, ...]
     const allLineSegs   = [];  // flat array for bulk opacity resets
     let   hoveredLine   = null;
@@ -1158,6 +1162,11 @@
 
                 polyline.on('mouseover', () => {
                     clearTimeout(hoverTimer);
+                    // Dismiss any open station popup so it doesn't obscure the line tooltip
+                    if (currentPopupMarker) {
+                        map.closePopup();
+                        currentPopupMarker = null;
+                    }
                     if (hoveredLine === name) return;
                     const prev = hoveredLine;
                     hoveredLine = name;
@@ -1265,7 +1274,10 @@
 
         const lineBadges = (marker._lineCodes ?? [s.line_code]).map(lc => {
             const color = lineColorMap[lc] ?? '#6b6b7a';
-            const label = lc.replace(/\./g, ' › ');
+            const en    = lineEnMap[lc] || getLineEn(lc);
+            const label = en
+                ? `<span class="popup-line-label"><span class="popup-line-jp">${lc}</span><span class="popup-line-en">${en}</span></span>`
+                : `<span class="popup-line-jp">${lc}</span>`;
             return `<div class="popup-line"><span class="popup-line-dot" style="background:${color}"></span>${label}</div>`;
         }).join('');
 
@@ -1355,9 +1367,12 @@
 
     const loadStations = async (map) => {
         const renderStations = (stations, excluded) => {
-            stations.forEach(g => g.stations.forEach(s => {
-                if (!excluded.includes(s.line_code)) createMarker(s, map);
-            }));
+            stations.forEach(g => {
+                if (g.line_name_en) lineEnMap[g.line_name] = g.line_name_en;
+                g.stations.forEach(s => {
+                    if (!excluded.includes(s.line_code)) createMarker(s, map);
+                });
+            });
             map.on('zoomend', () => {
                 clearTimeout(zoomDebounce);
                 zoomDebounce = setTimeout(() => {
