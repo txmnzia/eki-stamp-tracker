@@ -909,6 +909,7 @@
     const BATCH_SIZE        = 150;      // features per animation frame (line rendering)
     const SYNC_DEBOUNCE_MS  = 2000;     // ms after last stamp change before auto-save
     const HOVER_RESET_MS    = 60;       // ms debounce on line mouseout
+    const POPUP_GRACE_MS    = 250;      // ms grace period before hover-opened popup auto-closes
     const SEARCH_JUMP_MS    = 300;      // ms before popup opens after search jump
     const FOCUS_DELAY_MS    = 100;      // ms before focusing modal input (after paint)
     const MARKER_MIN_R      = 4;        // minimum circle radius on desktop
@@ -1162,11 +1163,9 @@
 
                 polyline.on('mouseover', () => {
                     clearTimeout(hoverTimer);
-                    // Dismiss any open station popup so it doesn't obscure the line tooltip
-                    if (currentPopupMarker) {
-                        map.closePopup();
-                        currentPopupMarker = null;
-                    }
+                    // Immediately close any open station popup — the line tooltip takes over.
+                    map.closePopup();
+                    currentPopupMarker = null;
                     if (hoveredLine === name) return;
                     const prev = hoveredLine;
                     hoveredLine = name;
@@ -1329,7 +1328,10 @@
 
         marker.bindPopup(buildPopupHtml(marker), { offset: L.point(0, -4), closeButton: true, maxWidth: 260 });
 
+        // Click opens popup permanently (no auto-close on mouseout).
         marker.on('click', () => {
+            clearTimeout(marker._popupTimer);
+            marker._hoverOpened = false;
             currentPopupMarker = marker;
             marker.openPopup();
         });
@@ -1338,13 +1340,49 @@
         // Touch devices have no hover — click remains the only trigger.
         if (!IS_TOUCH) {
             marker.on('mouseover', () => {
+                clearTimeout(marker._popupTimer);
+                marker._hoverOpened = true;
                 currentPopupMarker = marker;
                 marker.openPopup();
             });
+
+            // When the cursor leaves the marker, schedule the popup to close.
+            // If the user moves into the popup HTML (to click Collect), the
+            // popup's mouseenter cancels the timer so it stays open.
+            marker.on('mouseout', () => {
+                if (!marker._hoverOpened) return;
+                marker._popupTimer = setTimeout(() => {
+                    if (marker._hoverOpened && currentPopupMarker === marker) {
+                        marker._hoverOpened = false;
+                        currentPopupMarker = null;
+                        marker.closePopup();
+                    }
+                }, POPUP_GRACE_MS);
+            });
+
+            // Attach grace-period handlers to the popup DOM element once it opens.
+            // onmouseenter = property assignment avoids accumulating listeners.
+            marker.on('popupopen', () => {
+                const el = marker.getPopup()?.getElement();
+                if (!el) return;
+                el.onmouseenter = () => clearTimeout(marker._popupTimer);
+                el.onmouseleave = () => {
+                    if (!marker._hoverOpened) return;
+                    marker._popupTimer = setTimeout(() => {
+                        if (marker._hoverOpened && currentPopupMarker === marker) {
+                            marker._hoverOpened = false;
+                            currentPopupMarker = null;
+                            marker.closePopup();
+                        }
+                    }, POPUP_GRACE_MS);
+                };
+            });
         }
 
-        // Clear tracking reference when popup closes
+        // Clear tracking state when popup closes for any reason.
         marker.on('popupclose', () => {
+            clearTimeout(marker._popupTimer);
+            marker._hoverOpened = false;
             if (currentPopupMarker === marker) currentPopupMarker = null;
         });
 
