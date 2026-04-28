@@ -1252,8 +1252,8 @@
     };
 
     const circleStyle = (collected, zoom) => collected
-        ? { radius: markerRadius(true,  zoom), fillColor: '#f7c948', fillOpacity: 1, color: 'rgba(247,201,72,0.4)', weight: 2,   renderer: canvasRenderer }
-        : { radius: markerRadius(false, zoom), fillColor: '#3a3a48', fillOpacity: 1, color: '#4a4a5a',             weight: 1.5, renderer: canvasRenderer };
+        ? { radius: markerRadius(true,  zoom), fillColor: '#f7c948', fillOpacity: 1,   color: '#ffffff', weight: 2.5, renderer: canvasRenderer }
+        : { radius: markerRadius(false, zoom), fillColor: '#2e2e3a', fillOpacity: 0.75, color: '#3d3d50', weight: 1,   renderer: canvasRenderer };
 
     // ── 9. POPUP ──────────────────────────────────────────────────────────────
 
@@ -1328,60 +1328,52 @@
 
         marker.bindPopup(buildPopupHtml(marker), { offset: L.point(0, -4), closeButton: true, maxWidth: 260 });
 
-        // Click opens popup permanently (no auto-close on mouseout).
-        marker.on('click', () => {
-            clearTimeout(marker._popupTimer);
+        // Single click: open popup permanently (won't auto-close on mouseout).
+        // stopPropagation prevents the map 'click' from firing and closing the popup.
+        marker.on('click', (e) => {
+            L.DomEvent.stopPropagation(e);
             marker._hoverOpened = false;
             currentPopupMarker = marker;
             marker.openPopup();
         });
 
+        // Double-click: toggle collected state without navigating away.
+        // stopPropagation prevents the native dblclick from bubbling to the map
+        // and triggering the default zoom-in behaviour.
+        marker.on('dblclick', (e) => {
+            L.DomEvent.stop(e.originalEvent);
+            const next = !marker._isCollected;
+            marker._isCollected = next;
+            state.stamps[next ? 'add' : 'delete'](marker._stationData.code);
+            scheduleSave();
+            marker.setStyle(circleStyle(next, map.getZoom()));
+            marker.setPopupContent(buildPopupHtml(marker));
+            if (marker.isPopupOpen()) {
+                const btn = marker.getPopup()?.getElement()?.querySelector('.popup-collect-btn');
+                if (btn) {
+                    btn.className = 'popup-collect-btn' + (next ? ' collected' : '');
+                    btn.setAttribute('aria-label', `${next ? 'Remove stamp' : 'Collect stamp'} for ${marker.stationNameJP || marker.stationNameEN}`);
+                    btn.innerHTML = `${next ? ICON_STAMP_FILLED : ICON_STAMP_OUTLINE} ${next ? 'Collected' : 'Collect stamp'}`;
+                }
+            }
+            updateStats();
+            showToast(next ? `${marker.stationName} — stamped!` : `${marker.stationName} — removed`);
+        });
+
         // On desktop, hovering a station opens its popup immediately.
-        // Touch devices have no hover — click remains the only trigger.
+        // The popup stays open (no mouseout auto-close) so the user can move
+        // the cursor freely into the popup to click Collect without racing a timer.
+        // It closes when the user hovers another station or clicks the map background.
         if (!IS_TOUCH) {
             marker.on('mouseover', () => {
-                clearTimeout(marker._popupTimer);
                 marker._hoverOpened = true;
                 currentPopupMarker = marker;
                 marker.openPopup();
-            });
-
-            // When the cursor leaves the marker, schedule the popup to close.
-            // If the user moves into the popup HTML (to click Collect), the
-            // popup's mouseenter cancels the timer so it stays open.
-            marker.on('mouseout', () => {
-                if (!marker._hoverOpened) return;
-                marker._popupTimer = setTimeout(() => {
-                    if (marker._hoverOpened && currentPopupMarker === marker) {
-                        marker._hoverOpened = false;
-                        currentPopupMarker = null;
-                        marker.closePopup();
-                    }
-                }, POPUP_GRACE_MS);
-            });
-
-            // Attach grace-period handlers to the popup DOM element once it opens.
-            // onmouseenter = property assignment avoids accumulating listeners.
-            marker.on('popupopen', () => {
-                const el = marker.getPopup()?.getElement();
-                if (!el) return;
-                el.onmouseenter = () => clearTimeout(marker._popupTimer);
-                el.onmouseleave = () => {
-                    if (!marker._hoverOpened) return;
-                    marker._popupTimer = setTimeout(() => {
-                        if (marker._hoverOpened && currentPopupMarker === marker) {
-                            marker._hoverOpened = false;
-                            currentPopupMarker = null;
-                            marker.closePopup();
-                        }
-                    }, POPUP_GRACE_MS);
-                };
             });
         }
 
         // Clear tracking state when popup closes for any reason.
         marker.on('popupclose', () => {
-            clearTimeout(marker._popupTimer);
             marker._hoverOpened = false;
             if (currentPopupMarker === marker) currentPopupMarker = null;
         });
@@ -1771,6 +1763,15 @@
         setupLanguageToggle(map);
         setupSessionPanel(map);
         setupModal(map);
+
+        // Close hover-opened popup when the user clicks empty map space.
+        // Marker clicks stop propagation so they don't trigger this.
+        map.on('click', () => {
+            if (currentPopupMarker?._hoverOpened) {
+                currentPopupMarker._hoverOpened = false;
+                currentPopupMarker.closePopup();
+            }
+        });
 
         // Event delegation for popup collect button
         // Reliable alternative to popupopen+getElement (which returns null in Leaflet)
