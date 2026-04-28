@@ -940,6 +940,7 @@
 
     // ── Renderer + layer collections (assigned after map init) ───────────────
     let canvasRenderer;
+    let collectedRenderer;   // separate pane so collected markers always render above uncollected
     let mapInstance   = null;
     let syncDebounce  = null;
 
@@ -1089,6 +1090,10 @@
     const initMap = () => {
         const map = L.map('map', { zoomControl: true, preferCanvas: true }).setView([35.682839, 139.759455], 13);
         canvasRenderer = L.canvas({ padding: 0.5 });
+        // Pane z-index 401 sits just above the default overlayPane (400), so collected
+        // markers are always painted on top of uncollected ones when zoomed out.
+        map.createPane('collectedPane').style.zIndex = 401;
+        collectedRenderer = L.canvas({ padding: 0.5, pane: 'collectedPane' });
         L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
             subdomains: 'abcd', maxZoom: MAX_ZOOM
@@ -1252,8 +1257,15 @@
     };
 
     const circleStyle = (collected, zoom) => collected
-        ? { radius: markerRadius(true,  zoom), fillColor: '#f7c948', fillOpacity: 1,   color: '#ffffff', weight: 2.5, renderer: canvasRenderer }
+        ? { radius: markerRadius(true,  zoom), fillColor: '#f7c948', fillOpacity: 1,    color: '#ffffff', weight: 2.5, renderer: collectedRenderer }
         : { radius: markerRadius(false, zoom), fillColor: '#2e2e3a', fillOpacity: 0.75, color: '#3d3d50', weight: 1,   renderer: canvasRenderer };
+
+    // Re-add a marker to the map so Leaflet moves it to the pane matching its new
+    // collected state. setStyle alone doesn't migrate a layer between renderers.
+    const repaneMarker = (marker, map) => {
+        marker.remove();
+        marker.addTo(map);
+    };
 
     // ── 9. POPUP ──────────────────────────────────────────────────────────────
 
@@ -1347,6 +1359,7 @@
             state.stamps[next ? 'add' : 'delete'](marker._stationData.code);
             scheduleSave();
             marker.setStyle(circleStyle(next, map.getZoom()));
+            repaneMarker(marker, map);
             marker.setPopupContent(buildPopupHtml(marker));
             if (marker.isPopupOpen()) {
                 const btn = marker.getPopup()?.getElement()?.querySelector('.popup-collect-btn');
@@ -1388,8 +1401,10 @@
         mapInstance.closePopup();
         const zoom = mapInstance.getZoom();
         markers.forEach(m => {
+            const wasCollected = m._isCollected;
             m._isCollected = state.stamps.has(m._stationData.code);
             m.setStyle(circleStyle(m._isCollected, zoom));
+            if (wasCollected !== m._isCollected) repaneMarker(m, mapInstance);
             m.setPopupContent(buildPopupHtml(m));
         });
         updateStats();
@@ -1785,6 +1800,7 @@
             state.stamps[next ? 'add' : 'delete'](marker._stationData.code);
             scheduleSave();
             marker.setStyle(circleStyle(next, map.getZoom()));
+            repaneMarker(marker, map);
             // Update button in-place without rebuilding popup
             btn.className   = 'popup-collect-btn' + (next ? ' collected' : '');
             btn.setAttribute('aria-label', `${next ? 'Remove stamp' : 'Collect stamp'} for ${marker.stationNameJP || marker.stationNameEN}`);
