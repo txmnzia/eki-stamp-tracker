@@ -239,17 +239,23 @@
         }
         #name-modal h2 { font-family: var(--jp-font); font-size: 20px; color: var(--text); margin-bottom: 6px; }
         #name-modal p  { font-size: 12px; color: var(--muted); margin-bottom: 20px; line-height: 1.7; }
-        #modal-name-input {
+        #modal-name-input, #modal-token-input {
             width: 100%; padding: 10px 12px; margin-bottom: 8px;
             background: var(--surface2); border: 1px solid var(--border);
             border-radius: 4px; color: var(--text);
             font-family: var(--jp-font); font-size: 16px; outline: none; transition: border-color 0.15s;
         }
-        #modal-name-input:focus { border-color: var(--accent); }
-        #modal-name-hint {
+        #modal-name-input:focus, #modal-token-input:focus { border-color: var(--accent); }
+        #modal-name-hint, #modal-token-hint {
             font-size: 11px; color: var(--muted); margin-bottom: 18px; line-height: 1.6;
             padding: 8px 10px; background: rgba(247,201,72,0.06);
             border: 1px solid rgba(247,201,72,0.15); border-radius: 4px;
+        }
+        #modal-name-hint { margin-bottom: 8px; }
+        #modal-name-hint a, #modal-token-hint a { color: var(--accent); }
+        .session-input-section input.needs-token,
+        #session-token-input.needs-token {
+            border-color: #f7c948; box-shadow: 0 0 0 2px rgba(247,201,72,0.25);
         }
         .modal-buttons { display: flex; gap: 8px; }
         .modal-btn {
@@ -363,6 +369,11 @@
                 <label for="session-name-input" class="session-label-heading">Sync name</label>
                 <input type="text" id="session-name-input" placeholder="Enter your sync name…" autocomplete="off" />
                 <small class="session-hint-text">⚠ Case-sensitive — type it exactly the same on every device.</small>
+                <label for="session-token-input" class="session-label-heading" style="margin-top:12px;">GitHub token</label>
+                <input type="password" id="session-token-input" placeholder="ghp_… (saved on this device only)" autocomplete="off" />
+                <small class="session-hint-text">🔒 Kept only in this browser — never committed.
+                    <a href="https://github.com/settings/tokens/new?scopes=gist&description=eki-stamp-tracker" target="_blank" rel="noopener">Create one</a>
+                    and tick the <strong>gist</strong> scope. Paste it once per device.</small>
             </div>
             <!-- Load (only when no session) -->
             <div class="session-row" id="session-load-row">
@@ -390,6 +401,10 @@
             <label for="modal-name-input" class="hidden">Your sync name</label>
             <input type="text" id="modal-name-input" placeholder="Your sync name" maxlength="32" />
             <div id="modal-name-hint">⚠ This name is your sync key — type it <strong>exactly</strong> the same on every device. Case-sensitive.</div>
+            <input type="password" id="modal-token-input" placeholder="GitHub token (ghp_…)" autocomplete="off" />
+            <div id="modal-token-hint">🔒 Saved only on this device, never committed.
+                <a href="https://github.com/settings/tokens/new?scopes=gist&description=eki-stamp-tracker" target="_blank" rel="noopener">Create one</a>
+                with the <strong>gist</strong> scope.</div>
             <div class="modal-buttons">
                 <button class="modal-btn secondary" id="modal-skip">Skip for now</button>
                 <button class="modal-btn confirm" id="modal-confirm">Start collecting</button>
@@ -903,7 +918,17 @@
     const getLineEn    = (name) => LINE_DATA[name]?.en ?? '';
 
     // ── 2. CONSTANTS ──────────────────────────────────────────────────────────
-    const GIST_TOKEN        = ['ghp_yLW5QpYE7c','hJyzEri6mDDVxb0PUUy01DCXAA'].join('');
+    // Personal-access token used to read/write Gists. It is NEVER stored in this
+    // file or the repo — that would let GitHub's secret scanner auto-revoke it
+    // (which is exactly what kept happening). Instead each device keeps its own
+    // token in localStorage, entered once. Nothing secret is committed.
+    const TOKEN_KEY         = 'eki_gh_token';
+    const getToken          = () => (localStorage.getItem(TOKEN_KEY) || '').trim();
+    const setToken          = (t) => {
+        const v = (t || '').trim();
+        if (v) localStorage.setItem(TOKEN_KEY, v);
+        else   localStorage.removeItem(TOKEN_KEY);
+    };
     const GIST_PREFIX       = 'eki-stamp-tracker:';
     const CACHE_TTL         = 7 * 24 * 60 * 60 * 1000;  // 7 days
     const BATCH_SIZE        = 150;      // features per animation frame (line rendering)
@@ -977,15 +1002,37 @@
      * @throws {Error} on non-2xx response or network failure
      */
     const apiFetch = async (url, options = {}) => {
+        const token = getToken();
+        if (!token) { const e = new Error('NO_TOKEN'); e.code = 'NO_TOKEN'; throw e; }
         const resp = await fetch(url, {
             ...options,
-            headers: { Authorization: `Bearer ${GIST_TOKEN}`, 'Content-Type': 'application/json', ...options.headers }
+            headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json', ...options.headers }
         });
+        if (resp.status === 401) {
+            // Token is invalid/expired/revoked — drop it so the user re-enters a fresh one.
+            setToken('');
+            const e = new Error('BAD_TOKEN'); e.code = 'BAD_TOKEN'; throw e;
+        }
         if (!resp.ok) {
             const text = await resp.text().catch(() => '');
             throw new Error(`GitHub API ${resp.status}: ${text.slice(0, 120)}`);
         }
         return resp.json();
+    };
+
+    /**
+     * Ensure a token is present before a sync. If missing/invalid, surface the
+     * token field and guide the user. Returns true when a token is available.
+     */
+    const ensureToken = (reason) => {
+        if (getToken()) return true;
+        const panel = document.getElementById('session-panel');
+        if (panel) panel.classList.remove('hidden');
+        if (typeof showInputMode === 'function') showInputMode();
+        const input = document.getElementById('session-token-input');
+        if (input) { input.classList.add('needs-token'); input.focus(); }
+        showToast(reason || 'Paste your GitHub token (gist scope) to sync');
+        return false;
     };
 
     /** Find the Gist ID for a username. Returns null if not found. */
@@ -1016,6 +1063,8 @@
             state.stamps = new Set(Array.isArray(data.stamps) ? data.stamps : []);
             setSyncStatus('saved');
         } catch (err) {
+            if (err.code === 'NO_TOKEN')  { setSyncStatus('saved'); ensureToken('Paste your GitHub token to load this collection'); return; }
+            if (err.code === 'BAD_TOKEN') { setSyncStatus('error'); ensureToken('That token was rejected — paste a fresh one'); return; }
             console.error('loadFromGist:', err);
             setSyncStatus('error');
         }
@@ -1024,6 +1073,7 @@
     /** Persist current stamps to Gist. */
     const syncToGist = async () => {
         if (!state.user) return;
+        if (!ensureToken()) { setSyncStatus('error'); return; }
         setSyncStatus('saving');
         const content = JSON.stringify({ stamps: [...state.stamps] });
         try {
@@ -1043,6 +1093,7 @@
             }
             setSyncStatus('saved');
         } catch (err) {
+            if (err.code === 'BAD_TOKEN') { ensureToken('That token was rejected — paste a fresh one'); return; }
             console.error('syncToGist:', err);
             setSyncStatus('error');
         }
@@ -1593,6 +1644,8 @@
         const avatar   = document.getElementById('session-avatar');
         const username = document.getElementById('session-username');
         const input    = document.getElementById('session-name-input');
+        const tokenIn  = document.getElementById('session-token-input');
+        if (tokenIn && getToken()) tokenIn.value = getToken();
         if (state.user) {
             avatar.textContent = state.user.charAt(0).toUpperCase();
             username.textContent = state.user;
@@ -1620,6 +1673,15 @@
 
         updateSessionUI();
 
+        // Persist the GitHub token (this device only) as it's typed
+        const tokenInput = document.getElementById('session-token-input');
+        if (tokenInput) {
+            tokenInput.addEventListener('input', () => {
+                setToken(tokenInput.value);
+                tokenInput.classList.remove('needs-token');
+            });
+        }
+
         // Change session
         document.getElementById('session-change').addEventListener('click', () => {
             showInputMode();
@@ -1632,6 +1694,8 @@
         document.getElementById('session-load').addEventListener('click', async () => {
             const name = document.getElementById('session-name-input').value.trim();
             if (!name) { showToast('Enter a sync name first'); return; }
+            setToken(document.getElementById('session-token-input').value);
+            if (!ensureToken('Paste your GitHub token to load your stamps')) return;
             setState('user', name);
             updateSessionUI();
             showToast(`Loading ${name}…`);
@@ -1747,6 +1811,8 @@
 
         const confirmModal = async () => {
             const name = input.value.trim();
+            const tokenEl = document.getElementById('modal-token-input');
+            if (tokenEl) setToken(tokenEl.value);
             overlay.classList.add('hidden');
             if (!name) return;
             setState('user', name);
