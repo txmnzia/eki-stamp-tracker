@@ -1054,7 +1054,7 @@
             } else {
                 const gist = await apiFetch('https://api.github.com/gists', {
                     method: 'POST',
-                    body: JSON.stringify({ description: GIST_PREFIX + state.user, public: true, files: { 'stamps.json': { content } } })
+                    body: JSON.stringify({ description: GIST_PREFIX + state.user, public: false, files: { 'stamps.json': { content } } })
                 });
                 if (!gist.id) throw new Error('Gist response missing id');
                 state.gistId = gist.id;
