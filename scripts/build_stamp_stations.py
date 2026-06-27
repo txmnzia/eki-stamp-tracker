@@ -50,9 +50,23 @@ eki_by_kanji = defaultdict(list)
 for g in eki:
     for s in g["stations"]:
         rec = {"code":s["code"],"name_kanji":s["name_kanji"],"lat":s["lat"],
-               "lon":s["lon"],"line_code":g["line_name"]}
+               "lon":s["lon"],"line_code":g["line_name"],
+               "line_en":(g.get("line_name_en") or "").lower()}
         grid[(round(s["lat"]/0.01), round(s["lon"]/0.01))].append(rec)
         eki_by_kanji[normk(s["name_kanji"])].append(rec)
+
+def pick_by_line(cands, line_en):
+    """Disambiguate same-kanji candidates by line-name token overlap."""
+    if len(cands) == 1:
+        return cands[0]
+    toks = set(re.findall(r"[a-z]+", (line_en or "").lower())) - \
+           {"jr","line","main","railway","電鉄","express"}
+    best, bestscore = cands[0], -1
+    for c in cands:
+        score = len(toks & set(re.findall(r"[a-z]+", c["line_en"])))
+        if score > bestscore:
+            best, bestscore = c, score
+    return best
 
 def haversine(a, b, c, d):
     R=6371000; p=math.pi/180
@@ -86,15 +100,29 @@ for line in raw["lines"]:
         if st["name_full"].startswith("JNR") or line["line_slug"].startswith("jnr-"):
             a["is_jnr"]=True
 
-stations=[]; n_eki=0; n_only=0; n_nodata=0
+stations=[]; by_code={}; n_eki=0; n_only=0; n_nodata=0
 for slug, a in sorted(agg.items()):
     meta = jp.get(slug) or {}
     kcore = clean_kanji(meta.get("kanji"))
     lat, lon = meta.get("lat"), meta.get("lon")
-    m = coord_match(lat, lon, kcore)
-    if not m and kcore:                      # fallback: exact kanji match
-        c = eki_by_kanji.get(normk(kcore))
-        m = c[0] if len(c)==1 else None
+    line_en = sorted(a["lines_en"])[0] if a["lines_en"] else ""
+    if lat is not None and lon is not None:
+        # Has coordinates: trust location only. No nearby ekidata station means
+        # it's genuinely absent from ekidata (keep as funakiya-only at its own
+        # coords) — never kanji-fallback to a same-name station elsewhere.
+        m = coord_match(lat, lon, kcore)
+    elif kcore:
+        # Coordless (simple-template, minor/private rail): match by kanji,
+        # stripping the operator prefix via longest trailing substring
+        # (阿武隈急行保原 -> 保原); disambiguate collisions by line.
+        nk = normk(kcore)
+        m = None
+        for L in range(len(nk)-1):
+            c = eki_by_kanji.get(nk[L:])
+            if c:
+                m = pick_by_line(c, line_en); break
+    else:
+        m = None
     rec = {
         "slug": slug,
         "name_kanji": (m["name_kanji"] if m else kcore),
@@ -111,12 +139,20 @@ for slug, a in sorted(agg.items()):
     rec["code"] = m["code"] if m else f"fk_{slug}"
     if m: n_eki+=1
     else: n_only+=1
-    stations.append(rec)
+    # merge interchange stations that resolve to the same ekidata code
+    prev = by_code.get(rec["code"])
+    if prev:
+        prev["lines"] = sorted(set(prev["lines"]) | set(rec["lines"]))
+        prev["slug"] = prev["slug"] + "," + slug
+    else:
+        by_code[rec["code"]] = rec
+        stations.append(rec)
 
 out={"source":"stamp.funakiya.com","count":len(stations),"stations":stations}
 json.dump(out, open("data/stamp-stations.json","w",encoding="utf-8"),
           ensure_ascii=False, indent=1)
-print(f"total stamp stations: {len(stations)}")
-print(f"  matched to ekidata : {n_eki}")
-print(f"  funakiya-only      : {n_only}")
+matched = sum(1 for s in stations if s["eki_code"])
+print(f"total stamp stations (deduped): {len(stations)}")
+print(f"  matched to ekidata : {matched}")
+print(f"  funakiya-only      : {len(stations)-matched}")
 print(f"  dropped (no coords/kanji): {n_nodata}")

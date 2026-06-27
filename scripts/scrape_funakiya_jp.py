@@ -34,13 +34,18 @@ def fetch(slug):
 
 def parse(slug,h):
     if not h: return None
-    # 駅名称：<kanji>（[operator]）（<yomi>）  -- yomi is the LAST parenthetical
+    kanji=None; yomi=None
+    # detailed template: 駅名称：<kanji>（[operator]）（<yomi>）  yomi = last paren
     m=re.search(r'駅名称：([^（(<]+?駅)((?:[（(][^）)]*[）)])+)',h)
-    kanji=m.group(1).strip() if m else None
-    yomi=None
     if m:
+        kanji=m.group(1).strip()
         parens=re.findall(r'[（(]([^）)]*)[）)]',m.group(2))
         if parens: yomi=parens[-1].strip()
+    else:
+        # simple template (minor/private rail): kanji only in og:title
+        # e.g. <meta property="og:title" content="阿武隈急行保原駅のスタンプ"/>
+        o=re.search(r'<meta property="og:title" content="([^"]+?駅)(?:[（(][^"]*)?のスタンプ"',h)
+        if o: kanji=o.group(1).strip()
     geo=re.search(r'Geo URI[：:]\s*([0-9]+\.[0-9]+)[^0-9]+([0-9]+\.[0-9]+)',h)
     lat=float(geo.group(1)) if geo else None
     lon=float(geo.group(2)) if geo else None

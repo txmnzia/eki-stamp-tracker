@@ -1423,11 +1423,18 @@
     };
 
     const loadStations = async (map) => {
-        const renderStations = (stations, excluded) => {
+        // `stampNames` maps an ekidata station code -> the curated English name
+        // from Funakiya. Only stations present in this map have a real eki stamp
+        // and are rendered; their English names override ekidata's (which is
+        // auto-romanised and often wrong, e.g. 米原 Maibara -> "Yonehara").
+        const renderStations = (stations, stampNames) => {
             stations.forEach(g => {
                 if (g.line_name_en) lineEnMap[g.line_name] = g.line_name_en;
                 g.stations.forEach(s => {
-                    if (!excluded.includes(s.line_code)) createMarker(s, map);
+                    const en = stampNames[s.code];
+                    if (en === undefined) return;          // no stamp here
+                    if (en) s.name_en = en;                // prefer curated name
+                    createMarker(s, map);
                 });
             });
             map.on('zoomend', () => {
@@ -1442,20 +1449,22 @@
         };
 
         try {
-            const cached = await cacheGet('eki_stations');
+            const cached = await cacheGet('eki_stamp_stations');
             if (cached && Date.now() - cached.ts < CACHE_TTL) {
-                renderStations(cached.stations, cached.excluded);
+                renderStations(cached.stations, cached.stampNames);
                 return;
             }
         } catch { /* cache miss */ }
 
         try {
-            const [stations, excluded] = await Promise.all([
+            const [stations, stamps] = await Promise.all([
                 fetch('data/stations.json').then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); }),
-                fetch('data/no-stamps-lines.json').then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); }).then(d => d.map(l => l.line_code))
+                fetch('data/stamp-stations.json').then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); }).then(d => d.stations)
             ]);
-            renderStations(stations, excluded);
-            cacheSet('eki_stations', { stations, excluded, ts: Date.now() }).catch(() => {});
+            const stampNames = {};
+            stamps.forEach(s => { if (s.eki_code) stampNames[s.eki_code] = s.name_en || ''; });
+            renderStations(stations, stampNames);
+            cacheSet('eki_stamp_stations', { stations, stampNames, ts: Date.now() }).catch(() => {});
         } catch (err) {
             console.error('loadStations:', err);
             hideLoading();
