@@ -1055,7 +1055,7 @@
     // App version — shown discreetly on the welcome modal. Bump on every merge
     // to main. It is also part of the station-cache key, so each release
     // invalidates the 7-day IndexedDB cache and users immediately get fresh data.
-    const APP_VERSION       = 'v1.1.1';
+    const APP_VERSION       = 'v1.1.2';
     const CACHE_TTL         = 7 * 24 * 60 * 60 * 1000;  // 7 days
     const BATCH_SIZE        = 150;      // features per animation frame (line rendering)
     const SYNC_DEBOUNCE_MS  = 2000;     // ms after last stamp change before auto-save
@@ -1079,11 +1079,17 @@
     const LINE_DIM      = { weight: 1.2, opacity: 0.10 };  // other lines while one is focused
     const LINE_FOCUS    = { weight: 4,   opacity: 0.85 };  // hovered/tapped line
     const RIDE_OVERLAY  = { weight: 4.5, opacity: 0.95 };  // ridden-stretch overlay (full colour)
-    const RIDE_SNAP_M   = 60;           // max metres a station may sit from the line to belong to it
+    const RIDE_SNAP_M   = 60;           // station must sit this close to the line to *score* a group
+    const RIDE_INCLUDE_M = 220;         // once the line is chosen, include its OWN stations this far
+                                        // out (tolerates rapid/local alignment offsets; safe because
+                                        // only the chosen line's stations are ever considered)
     const RIDE_BBOX_PAD = 0.01;         // ~1.1km bbox padding when gathering candidate stations
-    const RIDE_BRIDGE_M = 6000;         // bridge data gaps up to 6km within one corridor; drop
+    const RIDE_BRIDGE_M = 6000;         // keep chains within 6km of the clicked corridor; drop
                                         // far-away segments that merely SHARE the line name (e.g.
                                         // the Tokyo vs Osaka 山手線). Keeps the clicked corridor only.
+    const RIDE_STITCH_M = 850;          // join the line's OWN fragmented chains across data gaps up
+                                        // to this size (central-Tokyo track is often labelled under
+                                        // another line name, leaving ~500m holes in a continuous line).
 
     // ── 3. APP STATE ──────────────────────────────────────────────────────────
     // All mutable app state lives here. Read via state.*, write via setState().
@@ -1571,6 +1577,37 @@
     // 1° cache bucket so the Tokyo and Osaka 山手線 don't share a cache entry.
     const seedBucket = (seed) => seed ? Math.round(seed.lat) + '_' + Math.round(seed.lng) : 'all';
 
+    const ptDist = (a, b) => { const [sx, sy] = mPerDeg((a[0] + b[0]) / 2); return Math.hypot((a[1] - b[1]) * sx, (a[0] - b[0]) * sy); };
+
+    // Join a line's OWN fragmented chains across small data gaps (≤ maxGap), so a
+    // continuous line that the source data split into pieces becomes one path. Only
+    // ever connects ends that are already within maxGap — it does NOT bridge the
+    // far same-name regions (those are 100s of km apart and dropped by the corridor
+    // filter anyway). Greedily merges the globally-nearest endpoint pair each round.
+    const bridgeChains = (chains, maxGap) => {
+        chains = chains.map(c => c.slice());
+        for (let merging = true; merging && chains.length > 1; ) {
+            merging = false;
+            let bi = -1, bj = -1, mode = '', bd = maxGap;
+            for (let i = 0; i < chains.length; i++) {
+                for (let j = i + 1; j < chains.length; j++) {
+                    const A = chains[i], B = chains[j];
+                    const cand = [['th', ptDist(A[A.length - 1], B[0])], ['ht', ptDist(A[0], B[B.length - 1])],
+                                  ['tt', ptDist(A[A.length - 1], B[B.length - 1])], ['hh', ptDist(A[0], B[0])]];
+                    for (const [m, d] of cand) if (d < bd) { bd = d; bi = i; bj = j; mode = m; }
+                }
+            }
+            if (bi < 0) break;
+            const A = chains[bi], B = chains[bj];
+            const merged = mode === 'th' ? A.concat(B)
+                         : mode === 'ht' ? B.concat(A)
+                         : mode === 'tt' ? A.concat(B.slice().reverse())
+                         :                 A.slice().reverse().concat(B);   // hh
+            chains.splice(bj, 1); chains.splice(bi, 1, merged); merging = true;
+        }
+        return chains;
+    };
+
     // Build a chain descriptor (coords + cumulative arc + scale + bbox).
     const describeChain = (coords) => {
         const mid = coords[Math.floor(coords.length / 2)];
@@ -1616,7 +1653,9 @@
 
         const polys = linesByName[name] || [];
         const segs  = polys.map(pl => pl.getLatLngs().map(ll => [ll.lat, ll.lng]));
-        let all = stitchChains(segs).filter(c => c.length >= 2).map(describeChain);
+        let raw = stitchChains(segs).filter(c => c.length >= 2);
+        raw = bridgeChains(raw, RIDE_STITCH_M);                  // close small gaps in a continuous line
+        let all = raw.map(describeChain);
         all.sort((a, b) => b.coords.length - a.coords.length);
 
         // Keep only the corridor connected to the seed: start from the chain nearest
@@ -1648,10 +1687,11 @@
         });
 
         const snapMax2 = RIDE_SNAP_M ** 2;
+        const incMax2  = RIDE_INCLUDE_M ** 2;
         const inBox = (lat, lon) => lat >= minLat - RIDE_BBOX_PAD && lat <= maxLat + RIDE_BBOX_PAD &&
                                     lon >= minLng - RIDE_BBOX_PAD && lon <= maxLng + RIDE_BBOX_PAD;
 
-        // Snap a coordinate onto the nearest kept chain; null if farther than RIDE_SNAP_M.
+        // Snap a coordinate onto the nearest kept chain (returns the projection + d²).
         const snap = (lat, lon) => {
             const p = [lat, lon];
             let bd2 = Infinity, bc = -1, bseg = 0, bt = 0;
@@ -1662,36 +1702,43 @@
                     if (d2 < bd2) { bd2 = d2; bc = ci; bseg = i - 1; bt = t; }
                 }
             }
-            if (bd2 > snapMax2) return null;
+            if (bc < 0) return null;
             const ch = chains[bc];
             return { chainIdx: bc, segIdx: bseg, t: bt, pos: ch.arc[bseg] + bt * (ch.arc[bseg + 1] - ch.arc[bseg]), d2: bd2 };
         };
 
         // STATION LIST comes from ekidata's authoritative per-line ordered groups, NOT
         // from blind proximity — so we get this line's real stations, in order, with no
-        // foreign/parallel-line stations or duplicates. Pick the ekidata group whose
-        // stations best lie along the clicked corridor, keep its on-corridor run in order.
-        let bestSeq = [];
+        // foreign/parallel-line stations or duplicates. Step 1: pick the group whose
+        // stations sit ON the clicked corridor (tight RIDE_SNAP_M). Step 2: take that
+        // group's full ordered run, including its own stations a bit farther out
+        // (RIDE_INCLUDE_M) so rapid/local alignment offsets don't drop real stops.
+        let bestGroup = null, bestScore = 0;
         for (const g of lineGroups) {
-            const seq = [];
+            let score = 0;
             for (const s of g.stations) {
                 if (!inBox(s.lat, s.lon)) continue;
                 const sn = snap(s.lat, s.lon);
-                if (sn) seq.push({ code: s.code, name_kanji: s.name_kanji, name_en: s.name_en, lat: s.lat, lon: s.lon, ...sn });
+                if (sn && sn.d2 <= snapMax2) score++;
             }
-            if (seq.length > bestSeq.length) bestSeq = seq;
+            if (score > bestScore) { bestScore = score; bestGroup = g; }
         }
 
         let stations;
-        if (bestSeq.length >= 2) {
-            stations = bestSeq.map((s, i) => (s.idx = i, s));   // ekidata order preserved
+        if (bestGroup && bestScore >= 2) {
+            const seq = [];
+            for (const s of bestGroup.stations) {
+                const sn = snap(s.lat, s.lon);
+                if (sn && sn.d2 <= incMax2) seq.push({ code: s.code, name_kanji: s.name_kanji, name_en: s.name_en, lat: s.lat, lon: s.lon, ...sn });
+            }
+            stations = seq.map((s, i) => (s.idx = i, s));   // ekidata order preserved
         } else {
             // Fallback (line not in ekidata groups): proximity snap, deduped by name.
             const best = {};
             for (const st of allStations) {
                 if (!inBox(st.lat, st.lon)) continue;
                 const sn = snap(st.lat, st.lon);
-                if (!sn) continue;
+                if (!sn || sn.d2 > snapMax2) continue;
                 const dkey = (st.name_kanji || st.code) + '|' + st.lat.toFixed(2) + '|' + st.lon.toFixed(2);
                 if (!best[dkey] || sn.d2 < best[dkey].d2) best[dkey] = { ...st, ...sn };
             }
@@ -2142,12 +2189,22 @@
 
             // Retain a flat list of every ekidata station with coordinates — the
             // pool the ride picker snaps onto a clicked line's geometry.
+            // Funakiya's curated English names (keyed by physical location) override
+            // ekidata's auto-romaji (e.g. 四ツ谷 "Shitsutani" → "Yotsuya") for the ride
+            // picker, the same way station markers already get them.
+            const curatedEn = {};
+            stations.forEach(g => g.stations.forEach(s => {
+                const en = stampNames[s.code];
+                if (en && s.lat && s.lon) { const k = dedupeKey(s); if (!(k in curatedEn)) curatedEn[k] = en; }
+            }));
+
             allStations.length = 0; lineGroups.length = 0;
             stations.forEach(g => {
                 const ordered = [];
                 g.stations.forEach(s => {
                     if (s.lat && s.lon) {
-                        const rec = { code: s.code, name_kanji: s.name_kanji, name_en: s.name_en, lat: s.lat, lon: s.lon };
+                        const en = curatedEn[dedupeKey(s)] || s.name_en;
+                        const rec = { code: s.code, name_kanji: s.name_kanji, name_en: en, lat: s.lat, lon: s.lon };
                         allStations.push(rec);
                         stationByCode[s.code] = rec;
                         ordered.push(rec);
