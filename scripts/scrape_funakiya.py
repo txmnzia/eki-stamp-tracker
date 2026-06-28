@@ -35,13 +35,36 @@ def get(url, cache_key=None):
                 return ""
             time.sleep(2**attempt)
 
+RAILY = re.compile(r'jr|tetsu|line|subway|metro|toei|railway|mintetsu|dentetsu|'
+                   r'kotsu|monorail|express|shinkansen|liner|rinkai|yurikamome|'
+                   r'cablecar|ropeway')
+
 def enumerate_line_pages():
-    slugs = set()
-    for r in REGIONS:
-        html = get(f"{BASE}/en/pref/train-{r}.html", f"region-{r}.html")
-        for m in re.findall(r'href="https://stamp\.funakiya\.com/en/([a-z0-9-]+-line)\.html"', html):
-            slugs.add(m)
-    return sorted(slugs)
+    """BFS over the English railway index pages to collect every line page.
+
+    Line pages are linked through several index levels: regional summaries
+    (train-<region>.html) -> per-operator sub-indexes (kanto-jr.html ->
+    tokyo-jr.html) -> the actual <line>-line.html pages. A single-level crawl
+    misses the big Tokyo lines (Yamanote, Chuo, Keihin-Tohoku, ...), so we
+    follow railway-related index pages a few levels deep.
+    """
+    seeds = ["/en/", "/en/train.html"] + [f"/en/pref/train-{r}.html" for r in REGIONS]
+    visited, lines, indexes = set(), set(), set()
+    frontier = list(seeds)
+    for _ in range(4):
+        nxt = []
+        for p in frontier:
+            if p in visited:
+                continue
+            visited.add(p)
+            html = get(f"{BASE}{p}")
+            for sl in re.findall(r'/en/([a-z0-9-]+)\.html', html):
+                if sl.endswith("-line"):
+                    lines.add(sl)
+                elif sl not in indexes and RAILY.search(sl):
+                    indexes.add(sl); nxt.append(f"/en/{sl}.html")
+        frontier = nxt
+    return sorted(lines)
 
 def parse_line(slug):
     html = get(f"{BASE}/en/{slug}.html", f"line-{slug}.html")
