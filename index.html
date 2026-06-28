@@ -953,7 +953,7 @@
     // App version — shown discreetly on the welcome modal. Bump on every merge
     // to main. It is also part of the station-cache key, so each release
     // invalidates the 7-day IndexedDB cache and users immediately get fresh data.
-    const APP_VERSION       = 'v1.0.4';
+    const APP_VERSION       = 'v1.0.5';
     const CACHE_TTL         = 7 * 24 * 60 * 60 * 1000;  // 7 days
     const BATCH_SIZE        = 150;      // features per animation frame (line rendering)
     const SYNC_DEBOUNCE_MS  = 2000;     // ms after last stamp change before auto-save
@@ -1149,7 +1149,10 @@
 
     const initMap = () => {
         const map = L.map('map', { zoomControl: true, preferCanvas: true }).setView([35.682839, 139.759455], 13);
-        canvasRenderer = L.canvas({ padding: 0.5 });
+        // `tolerance` extends the clickable area around thin lines (and markers)
+        // so they're easy to hit — the 2.5px lines were nearly impossible to tap,
+        // especially on touch. Single shared renderer (see PR #8) so events work.
+        canvasRenderer = L.canvas({ padding: 0.5, tolerance: IS_TOUCH ? 12 : 6 });
         L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
             subdomains: 'abcd', maxZoom: MAX_ZOOM
@@ -1189,6 +1192,22 @@
         allLineSegs.forEach(p => p.setStyle({ weight: 2.5, opacity: 0.75 }));
     };
 
+    // Highlight every segment of a line (dim the rest). Shared by hover (desktop)
+    // and tap (touch) so lines are usable without a mouse.
+    const highlightLine = (name, map) => {
+        clearTimeout(hoverTimer);
+        if (map) { map.closePopup(); currentPopupMarker = null; }
+        if (hoveredLine === name) return;
+        const prev = hoveredLine;
+        hoveredLine = name;
+        if (prev === null) {
+            allLineSegs.forEach(p => p.setStyle({ opacity: 0.15, weight: 1.5 }));
+        } else {
+            linesByName[prev]?.forEach(p => p.setStyle({ opacity: 0.15, weight: 1.5 }));
+        }
+        linesByName[name]?.forEach(p => p.setStyle({ weight: 5, opacity: 1 }));
+    };
+
     /**
      * Render GeoJSON line features onto the map using RAF batching.
      * @param {L.Map} map
@@ -1226,24 +1245,23 @@
                     { sticky: true, direction: 'top', offset: [0, -8], className: 'line-tooltip' }
                 );
 
-                polyline.on('mouseover', () => {
-                    clearTimeout(hoverTimer);
-                    // Immediately close any open station popup — the line tooltip takes over.
-                    map.closePopup();
-                    currentPopupMarker = null;
-                    if (hoveredLine === name) return;
-                    const prev = hoveredLine;
-                    hoveredLine = name;
-                    if (prev === null) {
-                        allLineSegs.forEach(p => p.setStyle({ opacity: 0.15, weight: 1.5 }));
-                    } else {
-                        linesByName[prev]?.forEach(p => p.setStyle({ opacity: 0.15, weight: 1.5 }));
-                    }
-                    linesByName[name].forEach(p => p.setStyle({ weight: 5, opacity: 1 }));
-                });
+                polyline.on('mouseover', () => highlightLine(name, map));
 
                 polyline.on('mouseout', () => {
                     hoverTimer = setTimeout(() => { hoveredLine = null; resetAllLines(); }, HOVER_RESET_MS);
+                });
+
+                // Tap (touch) / click: highlight the line and show its name, then
+                // self-clear after a few seconds. Without this, lines are
+                // uninteractive on touch (no hover event fires).
+                polyline.on('click', (e) => {
+                    L.DomEvent.stopPropagation(e);
+                    highlightLine(name, map);
+                    polyline.openTooltip(e.latlng);
+                    clearTimeout(hoverTimer);
+                    hoverTimer = setTimeout(() => {
+                        hoveredLine = null; resetAllLines(); polyline.closeTooltip();
+                    }, 4000);
                 });
             }
 
