@@ -34,6 +34,15 @@ def jp_line_kanji(slug):
     m=re.search(r'<meta property="og:title" content="([^"]+?線)(?:[（(][^"]*)?のスタンプ"',h)
     return m.group(1).strip() if m else None
 
+def en_line_name(slug):
+    """English line name from the EN line-page title (even for all-None lines
+    such as Tokyo Metro / Toei that carry no stamps)."""
+    h=get(f"{BASE}/en/{slug}.html", f"line-{slug}.html")
+    m=re.search(r'<title>([^<]*)</title>',h)
+    if not m: return None
+    t=re.sub(r'\s*-\s*Funakiya.*$','',m.group(1)).replace(' Stamps','').strip()
+    return t or None
+
 def enumerate_jp_lines():
     seeds=['/','/train.html','/pref/']+[f'/pref/train-{r}.html' for r in
       ['hokkaido','tohoku','kanto','koshinetsu','hokuriku','tokai','kinki','chugoku','shikoku','kyushu']]
@@ -66,12 +75,12 @@ def main():
     print(f"fetching kanji names for {len(all_slugs)} line pages ...")
     out={}; done=[0]
     def work(sl):
-        k=jp_line_kanji(sl); done[0]+=1
+        k=jp_line_kanji(sl); e=en_line_name(sl) or en_names.get(sl); done[0]+=1
         if done[0]%100==0: print(f"  {done[0]}/{len(all_slugs)}")
-        return sl,k
+        return sl,k,e
     with ThreadPoolExecutor(max_workers=6) as ex:
-        for sl,k in ex.map(work, all_slugs):
-            out[sl]={"name_en": en_names.get(sl), "name_kanji": k}
+        for sl,k,e in ex.map(work, all_slugs):
+            out[sl]={"name_en": e, "name_kanji": k}
     json.dump(out, open("data/funakiya-lines.json","w",encoding="utf-8"),
               ensure_ascii=False, indent=1)
     miss=[s for s,v in out.items() if not v["name_kanji"]]

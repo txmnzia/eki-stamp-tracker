@@ -188,8 +188,30 @@ for slug, a in sorted(agg.items()):
         stations.append(rec)
 
 # Map each ekidata line (the kanji line_code used by the app) to Funakiya's
-# properly spaced English line name, by majority vote across its stamp stations.
-# ekidata's own line_name_en is run-together (e.g. "Jrtokaidohonsen(Tokyo~Atami)").
+# properly spaced English line name. ekidata's own line_name_en is run-together
+# (e.g. "Jrtokaidohonsen(Tokyo~Atami)").
+#
+# Source 1 (authoritative): the line registry, matching ekidata's kanji
+# line_code to the Funakiya kanji line name. This is exact per-line and avoids
+# the cross-contamination that coordinate matching can introduce at multi-line
+# stations (e.g. a Marunouchi row picking up a JR station's vote).
+def normln(k):
+    return re.sub(r"[ 　]", "", k.replace("地下鉄", "")) if k else k
+line_names = {}
+try:
+    reg = json.load(open("data/funakiya-lines.json", encoding="utf-8"))
+    k2en = {normln(v["name_kanji"]): demacron(v["name_en"])
+            for v in reg.values() if v.get("name_kanji") and v.get("name_en")}
+    for g in eki:
+        ln = g["line_name"]
+        if normln(ln) in k2en:
+            line_names[ln] = k2en[normln(ln)]
+except FileNotFoundError:
+    k2en = {}
+
+# Source 2 (fallback): majority vote across a line's stamp stations. Fills
+# segmented ekidata lines whose kanji has a (range) suffix the registry lacks,
+# e.g. "JR東海道本線(東京～熱海)" -> "JR Tokaido Main Line(Tokyo - Atami)".
 line_votes = defaultdict(Counter)
 for line in raw["lines"]:
     en = demacron(line["line_name_en"] or "").strip()
@@ -198,7 +220,9 @@ for line in raw["lines"]:
         if st["status"] != "Found": continue
         ek = slug2ekiline.get(st["jp_slug"])
         if ek: line_votes[ek][en] += 1
-line_names = {ek: cnt.most_common(1)[0][0] for ek, cnt in line_votes.items()}
+for ek, cnt in line_votes.items():
+    if ek not in line_names:
+        line_names[ek] = cnt.most_common(1)[0][0]
 
 out={"source":"stamp.funakiya.com","count":len(stations),
      "line_names":line_names,"stations":stations}
