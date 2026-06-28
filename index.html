@@ -1830,7 +1830,9 @@
             marker.setStyle(circleStyle(next, map.getZoom()));
             // Update button in-place without rebuilding popup
             btn.className   = 'popup-collect-btn' + (next ? ' collected' : '');
-            btn.setAttribute('aria-label', `${next ? 'Remove stamp' : 'Collect stamp'} for ${marker.stationNameJP || marker.stationNameEN}`);
+            const ariaName = state.lang === 'jp' ? (marker.stationNameJP || marker.stationNameEN)
+                                                  : (marker.stationNameEN || marker.stationNameJP);
+            btn.setAttribute('aria-label', `${next ? 'Remove stamp' : 'Collect stamp'} for ${ariaName}`);
             btn.innerHTML   = `${next ? ICON_STAMP_FILLED : ICON_STAMP_OUTLINE} ${next ? 'Collected' : 'Collect stamp'}`;
             // Keep stored popup HTML in sync for next open
             marker.setPopupContent(buildPopupHtml(marker));
