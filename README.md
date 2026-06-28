@@ -156,16 +156,17 @@ Two different sources are combined, each used for what it's actually good at:
    regions (the Tokyo *and* Osaka 山手線 share the name, 420 km apart). Starting
    from the chain nearest the click `seed`, we transitively keep chains within
    `RIDE_BRIDGE_M` (6 km) and **drop far same-name regions**.
-3. **Pick the station list from ekidata, not from proximity.** For each ekidata
-   line group, take its stations that snap onto the corridor (within
-   `RIDE_SNAP_M`, 60 m) **in ekidata order**, and choose the group with the best
-   fit. This yields *this* line's real stations, correctly ordered, with **no
-   parallel-line/interchange stations and no duplicates** — which blind proximity
-   snapping cannot do in dense areas. (Falls back to proximity only for lines
-   absent from ekidata.)
-   The chosen group's stations are included a bit farther out (`RIDE_INCLUDE_M`)
-   so parallel rapid/local alignment offsets don't drop real stops — safe, because
-   only *this line's own* stations are ever considered.
+3. **Build the station list from ekidata's ordered groups, not from proximity** —
+   and **merge the corridor's lines**. One geojson line is usually served by
+   several ekidata lines (rapid + local + through); any single group skips the
+   others' stops (e.g. `中央本線` jumps Shinjuku→Kichijoji, skipping Nakano/Kōenji).
+   So we take the richest on-corridor group as a **backbone** (its stations in
+   ekidata order, `RIDE_INCLUDE_M` tolerance), then **insert every other corridor
+   line's extra stops** (tight `RIDE_SNAP_M` snap, ≥3 hits so perpendicular
+   crossings are ignored) into the backbone edge each best fits (least detour).
+   The result is the *complete* line, correctly ordered, with **no foreign/parallel
+   stations and no duplicates** — which blind proximity can't do in dense areas.
+   (Falls back to plain proximity only for lines absent from ekidata.)
 4. **Join the line's own fragmented chains** (`bridgeChains`, ≤ `RIDE_STITCH_M`):
    the source data often splits one continuous line into pieces (central-Tokyo
    track is frequently labelled under a different line name, leaving ~500 m holes).

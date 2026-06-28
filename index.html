@@ -1055,7 +1055,7 @@
     // App version — shown discreetly on the welcome modal. Bump on every merge
     // to main. It is also part of the station-cache key, so each release
     // invalidates the 7-day IndexedDB cache and users immediately get fresh data.
-    const APP_VERSION       = 'v1.1.2';
+    const APP_VERSION       = 'v1.1.3';
     const CACHE_TTL         = 7 * 24 * 60 * 60 * 1000;  // 7 days
     const BATCH_SIZE        = 150;      // features per animation frame (line rendering)
     const SYNC_DEBOUNCE_MS  = 2000;     // ms after last stamp change before auto-save
@@ -1707,31 +1707,81 @@
             return { chainIdx: bc, segIdx: bseg, t: bt, pos: ch.arc[bseg] + bt * (ch.arc[bseg + 1] - ch.arc[bseg]), d2: bd2 };
         };
 
-        // STATION LIST comes from ekidata's authoritative per-line ordered groups, NOT
-        // from blind proximity — so we get this line's real stations, in order, with no
-        // foreign/parallel-line stations or duplicates. Step 1: pick the group whose
-        // stations sit ON the clicked corridor (tight RIDE_SNAP_M). Step 2: take that
-        // group's full ordered run, including its own stations a bit farther out
-        // (RIDE_INCLUDE_M) so rapid/local alignment offsets don't drop real stops.
-        let bestGroup = null, bestScore = 0;
-        for (const g of lineGroups) {
-            let score = 0;
-            for (const s of g.stations) {
-                if (!inBox(s.lat, s.lon)) continue;
+        // STATION LIST: ekidata's ordered per-line groups are the source of truth for
+        // which stations & their order. But one geojson line is often served by several
+        // ekidata lines (rapid + local + through), and any single group skips the
+        // others' stops — e.g. 中央本線 jumps Shinjuku→Kichijoji, skipping Nakano/
+        // Kōenji/…. So: take the richest on-corridor group as a BACKBONE, then merge in
+        // every other corridor line's extra stops, each inserted into the backbone edge
+        // it best fits. Result = the COMPLETE line, correctly ordered, no foreign stops.
+        const md   = (a, b) => { const [sx, sy] = mPerDeg((a.lat + b.lat) / 2); return Math.hypot((a.lon - b.lon) * sx, (a.lat - b.lat) * sy); };
+        // Dedupe key: normalised name + ~5km grid (ヶ/ケ variants and the small
+        // platform-coordinate differences between a station's rapid & local rows
+        // collapse to one entry).
+        const dkey = (s) => (s.name_kanji || s.code).replace(/ヶ/g, 'ケ') + '|' + Math.round(s.lat * 20) + '|' + Math.round(s.lon * 20);
+
+        // Score every group by how many of its stations sit ON this corridor.
+        const scored = lineGroups.map(g => {
+            let hits = 0;
+            const snaps = g.stations.map(s => {
+                if (!inBox(s.lat, s.lon)) return null;
                 const sn = snap(s.lat, s.lon);
-                if (sn && sn.d2 <= snapMax2) score++;
-            }
-            if (score > bestScore) { bestScore = score; bestGroup = g; }
-        }
+                if (!sn) return null;
+                if (sn.d2 <= snapMax2) hits++;
+                return sn.d2 <= incMax2 ? sn : null;
+            });
+            return { g, hits, snaps };
+        }).filter(x => x.hits > 0).sort((a, b) => b.hits - a.hits);
 
         let stations;
-        if (bestGroup && bestScore >= 2) {
-            const seq = [];
-            for (const s of bestGroup.stations) {
-                const sn = snap(s.lat, s.lon);
-                if (sn && sn.d2 <= incMax2) seq.push({ code: s.code, name_kanji: s.name_kanji, name_en: s.name_en, lat: s.lat, lon: s.lon, ...sn });
+        if (scored.length && scored[0].hits >= 2) {
+            const mk = (s, sn) => ({ code: s.code, name_kanji: s.name_kanji, name_en: s.name_en, lat: s.lat, lon: s.lon, ...sn });
+
+            // Backbone = richest group's on-corridor run, in ekidata order.
+            const backbone = [];
+            scored[0].g.stations.forEach((s, k) => { if (scored[0].snaps[k]) backbone.push(mk(s, scored[0].snaps[k])); });
+            const present = new Set(backbone.map(dkey));
+
+            // Extra stops from the other corridor lines (need a tight on-corridor snap
+            // and a real presence, so perpendicular crossings aren't pulled in).
+            const extras = [];
+            for (let i = 1; i < scored.length; i++) {
+                if (scored[i].hits < 3) continue;
+                scored[i].g.stations.forEach((s, k) => {
+                    const sn = scored[i].snaps[k];
+                    if (!sn || sn.d2 > snapMax2) return;
+                    const rec = mk(s, sn), key = dkey(rec);
+                    if (present.has(key)) return;
+                    present.add(key);
+                    extras.push(rec);
+                });
             }
-            stations = seq.map((s, i) => (s.idx = i, s));   // ekidata order preserved
+
+            // Place each extra into the backbone edge with the least detour.
+            const byEdge = {};
+            for (const X of extras) {
+                let best = Infinity, edge = backbone.length;
+                for (let j = 0; j < backbone.length - 1; j++) {
+                    const detour = md(backbone[j], X) + md(X, backbone[j + 1]) - md(backbone[j], backbone[j + 1]);
+                    if (detour < best) { best = detour; edge = j + 1; }
+                }
+                const front = md(X, backbone[0]), back = md(X, backbone[backbone.length - 1]);
+                if (front < best && front <= back) { edge = 0; }
+                else if (back < best) { edge = backbone.length; }
+                (byEdge[edge] = byEdge[edge] || []).push(X);
+            }
+            const merged = [];
+            for (let j = 0; j <= backbone.length; j++) {
+                if (byEdge[j]) {
+                    // Stops before the first backbone station are ordered farthest-first;
+                    // every other edge is ordered by distance from its start station.
+                    if (j === 0) byEdge[j].sort((a, b) => md(backbone[0], b) - md(backbone[0], a));
+                    else { const ref = backbone[j - 1]; byEdge[j].sort((a, b) => md(ref, a) - md(ref, b)); }
+                    merged.push(...byEdge[j]);
+                }
+                if (j < backbone.length) merged.push(backbone[j]);
+            }
+            stations = merged.map((s, i) => (s.idx = i, s));
         } else {
             // Fallback (line not in ekidata groups): proximity snap, deduped by name.
             const best = {};
@@ -1739,8 +1789,8 @@
                 if (!inBox(st.lat, st.lon)) continue;
                 const sn = snap(st.lat, st.lon);
                 if (!sn || sn.d2 > snapMax2) continue;
-                const dkey = (st.name_kanji || st.code) + '|' + st.lat.toFixed(2) + '|' + st.lon.toFixed(2);
-                if (!best[dkey] || sn.d2 < best[dkey].d2) best[dkey] = { ...st, ...sn };
+                const key = dkey(st);
+                if (!best[key] || sn.d2 < best[key].d2) best[key] = { ...st, ...sn };
             }
             stations = Object.values(best)
                 .sort((a, b) => a.chainIdx - b.chainIdx || a.pos - b.pos)
