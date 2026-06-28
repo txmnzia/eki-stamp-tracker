@@ -1443,9 +1443,12 @@
         // from Funakiya. Only stations present in this map have a real eki stamp
         // and are rendered; their English names override ekidata's (which is
         // auto-romanised and often wrong, e.g. 米原 Maibara -> "Yonehara").
-        const renderStations = (stations, stampNames) => {
+        const renderStations = (stations, stampNames, lineNames) => {
+            // Funakiya's properly spaced English line names take precedence over
+            // ekidata's run-together romaji (e.g. "Jrtokaidohonsen(Tokyo~Atami)").
+            Object.assign(lineEnMap, lineNames || {});
             stations.forEach(g => {
-                if (g.line_name_en) lineEnMap[g.line_name] = g.line_name_en;
+                if (g.line_name_en && !lineEnMap[g.line_name]) lineEnMap[g.line_name] = g.line_name_en;
                 g.stations.forEach(s => {
                     const en = stampNames[s.code];
                     if (en === undefined) return;          // no stamp here
@@ -1467,20 +1470,21 @@
         try {
             const cached = await cacheGet('eki_stamp_stations');
             if (cached && Date.now() - cached.ts < CACHE_TTL) {
-                renderStations(cached.stations, cached.stampNames);
+                renderStations(cached.stations, cached.stampNames, cached.lineNames);
                 return;
             }
         } catch { /* cache miss */ }
 
         try {
-            const [stations, stamps] = await Promise.all([
+            const [stations, stampData] = await Promise.all([
                 fetch('data/stations.json').then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); }),
-                fetch('data/stamp-stations.json').then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); }).then(d => d.stations)
+                fetch('data/stamp-stations.json').then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
             ]);
             const stampNames = {};
-            stamps.forEach(s => { if (s.eki_code) stampNames[s.eki_code] = s.name_en || ''; });
-            renderStations(stations, stampNames);
-            cacheSet('eki_stamp_stations', { stations, stampNames, ts: Date.now() }).catch(() => {});
+            stampData.stations.forEach(s => { if (s.eki_code) stampNames[s.eki_code] = s.name_en || ''; });
+            const lineNames = stampData.line_names || {};
+            renderStations(stations, stampNames, lineNames);
+            cacheSet('eki_stamp_stations', { stations, stampNames, lineNames, ts: Date.now() }).catch(() => {});
         } catch (err) {
             console.error('loadStations:', err);
             hideLoading();
