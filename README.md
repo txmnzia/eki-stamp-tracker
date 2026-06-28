@@ -163,22 +163,30 @@ Two different sources are combined, each used for what it's actually good at:
    parallel-line/interchange stations and no duplicates** — which blind proximity
    snapping cannot do in dense areas. (Falls back to proximity only for lines
    absent from ekidata.)
-4. **Colour only existing geometry** (`renderRideOverlays` → `trackBetween`):
+   The chosen group's stations are included a bit farther out (`RIDE_INCLUDE_M`)
+   so parallel rapid/local alignment offsets don't drop real stops — safe, because
+   only *this line's own* stations are ever considered.
+4. **Join the line's own fragmented chains** (`bridgeChains`, ≤ `RIDE_STITCH_M`):
+   the source data often splits one continuous line into pieces (central-Tokyo
+   track is frequently labelled under a different line name, leaving ~500 m holes).
+   We connect a chain's ends across these small gaps so the line is continuous.
+5. **Colour only existing geometry** (`renderRideOverlays` → `trackBetween`):
    between two adjacent ridden stations, slice the **exact existing track
-   vertices** between their snapped positions. If the two land on different chains
-   (a data gap), the pair is **skipped — never bridged with an invented line**.
+   vertices** between their snapped positions. If the two still land on different
+   chains (a *large* gap), the pair is **skipped — never bridged with an invented
+   line across the map**.
 
-The overlay is therefore always a slice of the already-drawn geometry; nothing is
-synthesized.
+The overlay is therefore always a slice of the already-drawn geometry (plus the
+sub-`RIDE_STITCH_M` joins that close holes in one continuous line); nothing is
+synthesized across real distances.
 
 **Known limitations (acceptable for now):**
 - Where a `路線名` has parallel rapid/local alignments, the best-fit group is one
-  of them; the other's stations may not all snap. The handover documents this as a
-  genuinely hard case.
-- At chain gaps within a corridor, the stretch across the gap isn't coloured
-  (we won't draw a synthetic connector).
-- Station English names here come straight from ekidata's auto-romaji, which is
-  sometimes wrong (e.g. 四ツ谷 → "Shitsutani"); the kanji is always correct.
+  of them; a few stops on the other alignment may not snap (e.g. the central
+  Tōkyō Chūō stations Tokyo/Kanda/Ochanomizu sit on relabelled track and don't
+  appear). The handover documents this as a genuinely hard case.
+- At *large* chain gaps within a corridor, the stretch isn't coloured (we won't
+  draw a synthetic connector — only sub-`RIDE_STITCH_M` holes are joined).
 - A national track-accurate version (`data/rail-graph.json` + Dijkstra) is
   documented in `docs/HANDOVER-line-highlight.md` as a future option.
 
@@ -225,3 +233,10 @@ IndexedDB cache key, so bumping it forces every client to pick up fresh data.
 - **Touch-first.** Everything must work without a mouse (no hover-only actions).
 - **Language-aware.** Any user-facing name should respect `state.lang` and rebuild
   on toggle.
+- **Always use the curated names, never ekidata's raw romaji.** Funakiya's curated
+  English station names and the curated line names (`stamp-stations.json`,
+  `funakiya-lines.json`, surfaced via `lineEnMap` and the per-location curated
+  lookup) are the source of truth for display. ekidata's auto-romaji is frequently
+  wrong (e.g. 米原 → "Yonehara", 四ツ谷 → "Shitsutani") and must only ever be a
+  last-resort fallback when no curated name exists. Any new UI that shows a station
+  or line name must prefer the curated name.
