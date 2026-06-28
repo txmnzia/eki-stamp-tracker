@@ -1877,6 +1877,12 @@
   "lat": null,
   "lon": null
  },
+ "jr-abiko": {
+  "kanji": "JR我孫子駅",
+  "yomi": null,
+  "lat": 35.872444,
+  "lon": 140.010833
+ },
  "jr-abikocho": {
   "kanji": "JR我孫子町駅",
   "yomi": null,
@@ -1924,6 +1930,18 @@
   "yomi": null,
   "lat": 35.784067,
   "lon": 137.693281
+ },
+ "jr-ageo": {
+  "kanji": "JR上尾駅",
+  "yomi": null,
+  "lat": 35.973533,
+  "lon": 139.58845
+ },
+ "jr-aihara": {
+  "kanji": "JR相原駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
  },
  "jr-aino": {
   "kanji": "JR愛野駅",
@@ -1985,6 +2003,18 @@
   "lat": null,
   "lon": null
  },
+ "jr-ajiki": {
+  "kanji": "JR安食駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
+ "jr-akabane": {
+  "kanji": "JR赤羽駅",
+  "yomi": null,
+  "lat": 35.778028,
+  "lon": 139.720833
+ },
  "jr-akabira": {
   "kanji": "JR赤平駅",
   "yomi": null,
@@ -2015,11 +2045,29 @@
   "lat": null,
   "lon": null
  },
+ "jr-akigawa": {
+  "kanji": "JR秋川駅",
+  "yomi": null,
+  "lat": 35.728056,
+  "lon": 139.286667
+ },
+ "jr-akihabara": {
+  "kanji": "JR秋葉原駅",
+  "yomi": null,
+  "lat": 35.698333,
+  "lon": 139.773056
+ },
  "jr-akinagatsuka": {
   "kanji": "JR安芸長束駅",
   "yomi": null,
   "lat": null,
   "lon": null
+ },
+ "jr-akishima": {
+  "kanji": "JR昭島駅",
+  "yomi": null,
+  "lat": 35.713556,
+  "lon": 139.360917
  },
  "jr-akita": {
   "kanji": "JR秋田駅",
@@ -2087,11 +2135,23 @@
   "lat": null,
   "lon": null
  },
+ "jr-anegasaki": {
+  "kanji": "JR姉ケ崎駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
  "jr-anjo": {
   "kanji": "JR安城駅",
   "yomi": null,
   "lat": null,
   "lon": null
+ },
+ "jr-annaka": {
+  "kanji": "JR安中駅",
+  "yomi": null,
+  "lat": 36.331814,
+  "lon": 138.913669
  },
  "jr-annakaharuna": {
   "kanji": "JR安中榛名駅",
@@ -2110,6 +2170,12 @@
   "yomi": null,
   "lat": 38.26075,
   "lon": 140.878444
+ },
+ "jr-aohori": {
+  "kanji": "JR青堀駅",
+  "yomi": null,
+  "lat": 35.330278,
+  "lon": 139.858333
  },
  "jr-aomori": {
   "kanji": "JR青森駅",
@@ -2137,6 +2203,12 @@
  },
  "jr-arakawaoki": {
   "kanji": "JR荒川沖駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
+ "jr-araki": {
+  "kanji": "JR新木駅",
   "yomi": null,
   "lat": null,
   "lon": null
@@ -2177,8 +2249,20 @@
   "lat": 34.053278,
   "lon": 131.159806
  },
+ "jr-asagaya": {
+  "kanji": "JR阿佐ケ谷駅",
+  "yomi": null,
+  "lat": 35.704778,
+  "lon": 139.635278
+ },
  "jr-asagiri": {
   "kanji": "JR朝霧駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
+ "jr-asahi": {
+  "kanji": "JR旭駅",
   "yomi": null,
   "lat": null,
   "lon": null
@@ -2207,6 +2291,12 @@
   "lat": null,
   "lon": null
  },
+ "jr-asakusabashi": {
+  "kanji": "JR浅草橋駅",
+  "yomi": null,
+  "lat": 35.697361,
+  "lon": 139.784833
+ },
  "jr-asamushionsen": {
   "kanji": "JR浅虫温泉駅",
   "yomi": null,
@@ -2224,6 +2314,12 @@
   "yomi": null,
   "lat": 34.659206,
   "lon": 135.4889
+ },
+ "jr-ashikaga": {
+  "kanji": "JR足利駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
  },
  "jr-ashisawa": {
   "kanji": "JR芦沢駅",
@@ -2291,6 +2387,18 @@
   "lat": null,
   "lon": null
  },
+ "jr-awakamogawa": {
+  "kanji": "JR安房鴨川駅",
+  "yomi": null,
+  "lat": 35.107583,
+  "lon": 140.103806
+ },
+ "jr-awakominato": {
+  "kanji": "JR安房小湊駅",
+  "yomi": null,
+  "lat": 35.128611,
+  "lon": 140.190333
+ },
  "jr-awaraonsen": {
   "kanji": "JR芦原温泉駅",
   "yomi": null,
@@ -2326,6 +2434,12 @@
   "yomi": null,
   "lat": null,
   "lon": null
+ },
+ "jr-bakurocho": {
+  "kanji": "JR馬喰町駅",
+  "yomi": null,
+  "lat": 35.693361,
+  "lon": 139.782389
  },
  "jr-bandaiatami": {
   "kanji": "JR磐梯熱海駅",
@@ -2441,6 +2555,18 @@
   "lat": null,
   "lon": null
  },
+ "jr-chiba": {
+  "kanji": "JR千葉駅",
+  "yomi": null,
+  "lat": 35.613056,
+  "lon": 140.113889
+ },
+ "jr-chibaminato": {
+  "kanji": "JR千葉みなと駅",
+  "yomi": null,
+  "lat": 35.607167,
+  "lon": 140.102417
+ },
  "jr-chigasaki": {
   "kanji": "JR茅ヶ崎駅",
   "yomi": null,
@@ -2458,6 +2584,12 @@
   "yomi": null,
   "lat": null,
   "lon": null
+ },
+ "jr-chikura": {
+  "kanji": "JR千倉駅",
+  "yomi": null,
+  "lat": 34.976694,
+  "lon": 139.954667
  },
  "jr-chikusa": {
   "kanji": "JR千種駅",
@@ -2506,6 +2638,12 @@
   "yomi": null,
   "lat": 33.613467,
   "lon": 130.477822
+ },
+ "jr-choshi": {
+  "kanji": "JR銚子駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
  },
  "jr-chuden": {
   "kanji": "JR中田駅",
@@ -2560,6 +2698,18 @@
   "yomi": null,
   "lat": 34.695439,
   "lon": 135.473275
+ },
+ "jr-ebina": {
+  "kanji": "JR海老名駅",
+  "yomi": null,
+  "lat": 35.454306,
+  "lon": 139.389306
+ },
+ "jr-ebisu": {
+  "kanji": "JR恵比寿駅",
+  "yomi": null,
+  "lat": 35.646667,
+  "lon": 139.710139
  },
  "jr-ebitsu": {
   "kanji": "JR海老津駅",
@@ -2669,11 +2819,29 @@
   "lat": null,
   "lon": null
  },
+ "jr-etchujima": {
+  "kanji": "JR越中島駅",
+  "yomi": null,
+  "lat": 35.667944,
+  "lon": 139.792694
+ },
  "jr-etchuyatsuo": {
   "kanji": "JR越中八尾駅",
   "yomi": null,
   "lat": 36.591364,
   "lon": 137.138456
+ },
+ "jr-fuchinobe": {
+  "kanji": "JR淵野辺駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
+ "jr-fuchuhonmachi": {
+  "kanji": "JR府中本町駅",
+  "yomi": null,
+  "lat": 35.666194,
+  "lon": 139.477194
  },
  "jr-fujieda": {
   "kanji": "JR藤枝駅",
@@ -2741,6 +2909,18 @@
   "lat": 43.721111,
   "lon": 142.041667
  },
+ "jr-fukaya": {
+  "kanji": "JR深谷駅",
+  "yomi": null,
+  "lat": 36.191503,
+  "lon": 139.281011
+ },
+ "jr-fukiage": {
+  "kanji": "JR吹上駅",
+  "yomi": null,
+  "lat": 36.103236,
+  "lon": 139.453169
+ },
  "jr-fukuchiyama": {
   "kanji": "JR福知山駅",
   "yomi": null,
@@ -2807,6 +2987,18 @@
   "lat": null,
   "lon": null
  },
+ "jr-funabashi": {
+  "kanji": "JR船橋駅",
+  "yomi": null,
+  "lat": 35.701667,
+  "lon": 139.985278
+ },
+ "jr-funabashihoten": {
+  "kanji": "JR船橋法典駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
  "jr-funagata": {
   "kanji": "JR舟形駅",
   "yomi": null,
@@ -2849,11 +3041,29 @@
   "lat": null,
   "lon": null
  },
+ "jr-fusa": {
+  "kanji": "JR布佐駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
  "jr-fushiki": {
   "kanji": "JR伏木駅",
   "yomi": null,
   "lat": 36.791953,
   "lon": 137.057939
+ },
+ "jr-fussa": {
+  "kanji": "JR福生駅",
+  "yomi": null,
+  "lat": 35.742361,
+  "lon": 139.327944
+ },
+ "jr-futamatashimmachi": {
+  "kanji": "JR二俣新町駅",
+  "yomi": null,
+  "lat": 35.691472,
+  "lon": 139.959611
  },
  "jr-futsukaichi": {
   "kanji": "JR二日市駅",
@@ -2903,6 +3113,12 @@
   "lat": null,
   "lon": null
  },
+ "jr-goi": {
+  "kanji": "JR五井駅",
+  "yomi": null,
+  "lat": 35.513333,
+  "lon": 140.089639
+ },
  "jr-goido": {
   "kanji": "JR五位堂駅",
   "yomi": null,
@@ -2945,6 +3161,12 @@
   "lat": 40.809111,
   "lon": 140.447694
  },
+ "jr-gotanda": {
+  "kanji": "JR五反田駅",
+  "yomi": null,
+  "lat": 35.626389,
+  "lon": 139.723472
+ },
  "jr-gotemba": {
   "kanji": "JR御殿場駅",
   "yomi": null,
@@ -2956,6 +3178,30 @@
   "yomi": null,
   "lat": 35.012786,
   "lon": 132.223208
+ },
+ "jr-gummafujioka": {
+  "kanji": "JR群馬藤岡駅",
+  "yomi": null,
+  "lat": 36.250183,
+  "lon": 139.083317
+ },
+ "jr-gummasoja": {
+  "kanji": "JR群馬総社駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
+ "jr-gummayawata": {
+  "kanji": "JR群馬八幡駅",
+  "yomi": null,
+  "lat": 36.337833,
+  "lon": 138.957461
+ },
+ "jr-gyoda": {
+  "kanji": "JR行田駅",
+  "yomi": null,
+  "lat": 36.113864,
+  "lon": 139.432264
  },
  "jr-hachihommatsu": {
   "kanji": "JR八本松駅",
@@ -2975,6 +3221,18 @@
   "lat": 40.509444,
   "lon": 141.430833
  },
+ "jr-hachioji": {
+  "kanji": "JR八王子駅",
+  "yomi": null,
+  "lat": 35.655556,
+  "lon": 139.338889
+ },
+ "jr-hachioji-minamino": {
+  "kanji": "JR八王子みなみ野駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
  "jr-hachirogata": {
   "kanji": "JR八郎潟駅",
   "yomi": null,
@@ -2992,6 +3250,12 @@
   "yomi": null,
   "lat": null,
   "lon": null
+ },
+ "jr-haijima": {
+  "kanji": "JR拝島駅",
+  "yomi": null,
+  "lat": 35.721111,
+  "lon": 139.343639
  },
  "jr-haiki": {
   "kanji": "JR早岐駅",
@@ -3023,6 +3287,12 @@
   "lat": 41.773753,
   "lon": 140.726317
  },
+ "jr-hakonegasaki": {
+  "kanji": "JR箱根ヶ崎駅",
+  "yomi": null,
+  "lat": 35.771389,
+  "lon": 139.346722
+ },
  "jr-hakuba": {
   "kanji": "JR白馬駅",
   "yomi": null,
@@ -3053,11 +3323,23 @@
   "lat": 34.902611,
   "lon": 132.088861
  },
+ "jr-hamakanaya": {
+  "kanji": "JR浜金谷駅",
+  "yomi": null,
+  "lat": 35.168111,
+  "lon": 139.822389
+ },
  "jr-hamamatsu": {
   "kanji": "JR浜松駅",
   "yomi": null,
   "lat": null,
   "lon": null
+ },
+ "jr-hamamatucho": {
+  "kanji": "JR浜松町駅",
+  "yomi": null,
+  "lat": 35.655,
+  "lon": 139.756944
  },
  "jr-hamasaka": {
   "kanji": "JR浜坂駅",
@@ -3070,6 +3352,12 @@
   "yomi": null,
   "lat": 45.124639,
   "lon": 142.361111
+ },
+ "jr-hamura": {
+  "kanji": "JR羽村駅",
+  "yomi": null,
+  "lat": 35.758417,
+  "lon": 139.315944
  },
  "jr-hanamaki": {
   "kanji": "JR花巻駅",
@@ -3088,6 +3376,12 @@
   "yomi": null,
   "lat": null,
   "lon": null
+ },
+ "jr-harajuku": {
+  "kanji": "JR原宿駅",
+  "yomi": null,
+  "lat": 35.670222,
+  "lon": 139.702667
  },
  "jr-haranomachi": {
   "kanji": "JR原ノ町駅",
@@ -3113,11 +3407,29 @@
   "lat": 33.451111,
   "lon": 130.5394
  },
+ "jr-hashimoto": {
+  "kanji": "JR橋本駅",
+  "yomi": null,
+  "lat": 35.594861,
+  "lon": 139.345
+ },
+ "jr-hasuda": {
+  "kanji": "JR蓮田駅",
+  "yomi": null,
+  "lat": 35.981361,
+  "lon": 139.652903
+ },
  "jr-hatakeda": {
   "kanji": "JR畠田駅",
   "yomi": null,
   "lat": null,
   "lon": null
+ },
+ "jr-hatchobori": {
+  "kanji": "JR八丁堀駅",
+  "yomi": null,
+  "lat": 35.674583,
+  "lon": 139.777778
  },
  "jr-hatsukaichi": {
   "kanji": "JR廿日市駅",
@@ -3173,6 +3485,18 @@
   "lat": 35.070461,
   "lon": 135.878267
  },
+ "jr-higashiakiru": {
+  "kanji": "JR東秋留駅",
+  "yomi": null,
+  "lat": 35.725889,
+  "lon": 139.310917
+ },
+ "jr-higashifunabashi": {
+  "kanji": "JR東船橋駅",
+  "yomi": null,
+  "lat": 35.699722,
+  "lon": 140.004167
+ },
  "jr-higashihagi": {
   "kanji": "JR東萩駅",
   "yomi": null,
@@ -3190,6 +3514,12 @@
   "yomi": null,
   "lat": null,
   "lon": null
+ },
+ "jr-higashihanno": {
+  "kanji": "JR東飯能駅",
+  "yomi": null,
+  "lat": 35.852722,
+  "lon": 139.326083
  },
  "jr-higashihimeji": {
   "kanji": "JR東姫路駅",
@@ -3209,6 +3539,12 @@
   "lat": null,
   "lon": null
  },
+ "jr-higashijujo": {
+  "kanji": "JR東十条駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
  "jr-higashikaizuka": {
   "kanji": "JR東貝塚駅",
   "yomi": null,
@@ -3221,8 +3557,20 @@
   "lat": null,
   "lon": null
  },
+ "jr-higashikanagawa": {
+  "kanji": "JR東神奈川駅",
+  "yomi": null,
+  "lat": 35.477917,
+  "lon": 139.633333
+ },
  "jr-higashikanazawa": {
   "kanji": "JR東金沢駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
+ "jr-higashikawaguchi": {
+  "kanji": "JR東川口駅",
   "yomi": null,
   "lat": null,
   "lon": null
@@ -3233,8 +3581,20 @@
   "lat": 34.448722,
   "lon": 135.385147
  },
+ "jr-higashikoganei": {
+  "kanji": "JR東小金井駅",
+  "yomi": null,
+  "lat": 35.70175,
+  "lon": 139.524833
+ },
  "jr-higashimaizuru": {
   "kanji": "JR東舞鶴駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
+ "jr-higashimatsudo": {
+  "kanji": "JR東松戸駅",
   "yomi": null,
   "lat": null,
   "lon": null
@@ -3244,6 +3604,18 @@
   "yomi": null,
   "lat": 42.348825,
   "lon": 141.025433
+ },
+ "jr-higashinagami": {
+  "kanji": "JR東中神駅",
+  "yomi": null,
+  "lat": 35.706389,
+  "lon": 139.384167
+ },
+ "jr-higashinakano": {
+  "kanji": "JR東中野駅",
+  "yomi": null,
+  "lat": 35.706222,
+  "lon": 139.685833
  },
  "jr-higashinoshiro": {
   "kanji": "JR東能代駅",
@@ -3262,6 +3634,18 @@
   "yomi": null,
   "lat": 34.685639,
   "lon": 133.988103
+ },
+ "jr-higashiome": {
+  "kanji": "JR東青梅駅",
+  "yomi": null,
+  "lat": 35.789889,
+  "lon": 139.272306
+ },
+ "jr-higashiomiya": {
+  "kanji": "JR東大宮駅",
+  "yomi": null,
+  "lat": 35.94875,
+  "lon": 139.640278
  },
  "jr-higashisanjo": {
   "kanji": "JR東三条駅",
@@ -3293,11 +3677,35 @@
   "lat": 34.984639,
   "lon": 138.413694
  },
+ "jr-higashitokorozawa": {
+  "kanji": "JR東所沢駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
+ "jr-higashitotsuka": {
+  "kanji": "JR東戸塚駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
  "jr-higashitoyama": {
   "kanji": "JR東富山駅",
   "yomi": null,
   "lat": 36.74155,
   "lon": 137.248967
+ },
+ "jr-higashiurawa": {
+  "kanji": "JR東浦和駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
+ "jr-higashiwashinomiya": {
+  "kanji": "JR東鷲宮駅",
+  "yomi": null,
+  "lat": 36.089444,
+  "lon": 139.679306
  },
  "jr-higashiyodogawa": {
   "kanji": "JR東淀川駅",
@@ -3353,6 +3761,12 @@
   "lat": null,
   "lon": null
  },
+ "jr-hino": {
+  "kanji": "JR日野駅",
+  "yomi": null,
+  "lat": 35.679247,
+  "lon": 139.393997
+ },
  "jr-hinoharu": {
   "kanji": "JR日野春駅",
   "yomi": null,
@@ -3371,11 +3785,23 @@
   "lat": 33.362717,
   "lon": 129.582733
  },
+ "jr-hirai": {
+  "kanji": "JR平井駅",
+  "yomi": null,
+  "lat": 35.706444,
+  "lon": 139.8425
+ },
  "jr-hiraizumi": {
   "kanji": "JR平泉駅",
   "yomi": null,
   "lat": 38.988092,
   "lon": 141.117536
+ },
+ "jr-hirama": {
+  "kanji": "JR平間駅",
+  "yomi": null,
+  "lat": 35.561028,
+  "lon": 139.671028
  },
  "jr-hirano": {
   "kanji": "JR平野駅",
@@ -3455,6 +3881,12 @@
   "lat": null,
   "lon": null
  },
+ "jr-hitachiota": {
+  "kanji": "JR常陸太田駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
  "jr-hitoichiba": {
   "kanji": "JR一日市場駅",
   "yomi": null,
@@ -3497,6 +3929,12 @@
   "lat": 34.784544,
   "lon": 134.812431
  },
+ "jr-hodogaya": {
+  "kanji": "JR保土ヶ谷駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
  "jr-hofu": {
   "kanji": "JR防府駅",
   "yomi": null,
@@ -3515,11 +3953,23 @@
   "lat": 43.125894,
   "lon": 143.613511
  },
+ "jr-hongodai": {
+  "kanji": "JR本郷台駅",
+  "yomi": null,
+  "lat": 35.367417,
+  "lon": 139.550278
+ },
  "jr-honhachinohe": {
   "kanji": "JR本八戸駅",
   "yomi": null,
   "lat": 40.5163,
   "lon": 141.488961
+ },
+ "jr-honjo": {
+  "kanji": "JR本庄駅",
+  "yomi": null,
+  "lat": 36.236333,
+  "lon": 139.188631
  },
  "jr-honnagashino": {
   "kanji": "JR本長篠駅",
@@ -3563,6 +4013,12 @@
   "lat": 43.132317,
   "lon": 141.210881
  },
+ "jr-hota": {
+  "kanji": "JR保田駅",
+  "yomi": null,
+  "lat": 35.141028,
+  "lon": 139.838333
+ },
  "jr-hotaka": {
   "kanji": "JR穂高駅",
   "yomi": null,
@@ -3581,6 +4037,12 @@
   "lat": null,
   "lon": null
  },
+ "jr-housyakuji": {
+  "kanji": "JR宝積寺駅",
+  "yomi": null,
+  "lat": 36.631489,
+  "lon": 139.979519
+ },
  "jr-huistenbosch": {
   "kanji": "JRハウステンボス駅",
   "yomi": null,
@@ -3589,6 +4051,12 @@
  },
  "jr-hyogo": {
   "kanji": "JR兵庫駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
+ "jr-hyuga": {
+  "kanji": "JR日向駅",
   "yomi": null,
   "lat": null,
   "lon": null
@@ -3611,11 +4079,35 @@
   "lat": 31.237358,
   "lon": 130.642661
  },
+ "jr-ichigaya": {
+  "kanji": "JR市ケ谷駅",
+  "yomi": null,
+  "lat": 35.691,
+  "lon": 139.735583
+ },
+ "jr-ichikawa": {
+  "kanji": "JR市川駅",
+  "yomi": null,
+  "lat": 35.729167,
+  "lon": 139.907778
+ },
  "jr-ichikawadaimon": {
   "kanji": "JR市川大門駅",
   "yomi": null,
   "lat": null,
   "lon": null
+ },
+ "jr-ichikawaono": {
+  "kanji": "JR市川大野駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
+ "jr-ichikawashiohama": {
+  "kanji": "JR市川塩浜駅",
+  "yomi": null,
+  "lat": 35.666667,
+  "lon": 139.923556
  },
  "jr-ichinohe": {
   "kanji": "JR一戸駅",
@@ -3647,6 +4139,18 @@
   "lat": 35.519603,
   "lon": 137.821197
  },
+ "jr-iidabashi": {
+  "kanji": "JR飯田橋駅",
+  "yomi": null,
+  "lat": 35.702056,
+  "lon": 139.745
+ },
+ "jr-iioka": {
+  "kanji": "JR飯岡駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
  "jr-iiyama": {
   "kanji": "JR飯山駅",
   "yomi": null,
@@ -3658,6 +4162,12 @@
   "yomi": null,
   "lat": null,
   "lon": null
+ },
+ "jr-ikebukuro": {
+  "kanji": "JR池袋駅",
+  "yomi": null,
+  "lat": 35.729722,
+  "lon": 139.710861
  },
  "jr-ikeda": {
   "kanji": "JR池田駅",
@@ -3683,6 +4193,12 @@
   "lat": 34.064167,
   "lon": 132.993639
  },
+ "jr-imaichi": {
+  "kanji": "JR今市駅",
+  "yomi": null,
+  "lat": 36.720833,
+  "lon": 139.686917
+ },
  "jr-imaizumi": {
   "kanji": "JR今泉駅",
   "yomi": null,
@@ -3707,6 +4223,12 @@
   "lat": 34.738769,
   "lon": 134.160575
  },
+ "jr-inadazutsumi": {
+  "kanji": "JR稲田堤駅",
+  "yomi": null,
+  "lat": 35.633639,
+  "lon": 139.535278
+ },
  "jr-inadera": {
   "kanji": "JR猪名寺駅",
   "yomi": null,
@@ -3718,6 +4240,24 @@
   "yomi": null,
   "lat": null,
   "lon": null
+ },
+ "jr-inage": {
+  "kanji": "JR稲毛駅",
+  "yomi": null,
+  "lat": 35.637222,
+  "lon": 140.0925
+ },
+ "jr-inagekaigan": {
+  "kanji": "JR稲毛海岸駅",
+  "yomi": null,
+  "lat": 35.6295,
+  "lon": 140.073889
+ },
+ "jr-inaginaganuma": {
+  "kanji": "JR稲城長沼駅",
+  "yomi": null,
+  "lat": 35.644278,
+  "lon": 139.50275
  },
  "jr-inahara": {
   "kanji": "JR稲原駅",
@@ -3745,6 +4285,12 @@
  },
  "jr-innai": {
   "kanji": "JR院内駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
+ "jr-ino": {
+  "kanji": "JR井野駅",
   "yomi": null,
   "lat": null,
   "lon": null
@@ -3779,11 +4325,23 @@
   "lat": null,
   "lon": null
  },
+ "jr-isesaki": {
+  "kanji": "JR伊勢崎駅",
+  "yomi": null,
+  "lat": 36.326681,
+  "lon": 139.193825
+ },
  "jr-iseyachi": {
   "kanji": "JR伊勢八知駅",
   "yomi": null,
   "lat": null,
   "lon": null
+ },
+ "jr-ishibashi": {
+  "kanji": "JR石橋駅",
+  "yomi": null,
+  "lat": 36.436481,
+  "lon": 139.866567
  },
  "jr-ishibe": {
   "kanji": "JR石部駅",
@@ -3809,6 +4367,12 @@
   "lat": null,
   "lon": null
  },
+ "jr-ishikawacho": {
+  "kanji": "JR石川町駅",
+  "yomi": null,
+  "lat": 35.43825,
+  "lon": 139.643139
+ },
  "jr-ishinomaki": {
   "kanji": "JR石巻駅",
   "yomi": null,
@@ -3827,6 +4391,18 @@
   "lat": 34.979939,
   "lon": 135.900247
  },
+ "jr-isobe": {
+  "kanji": "JR磯部駅",
+  "yomi": null,
+  "lat": 36.298489,
+  "lon": 138.849464
+ },
+ "jr-isogo": {
+  "kanji": "JR磯子駅",
+  "yomi": null,
+  "lat": 35.399861,
+  "lon": 139.617917
+ },
  "jr-isohara": {
   "kanji": "JR磯原駅",
   "yomi": null,
@@ -3841,6 +4417,18 @@
  },
  "jr-isurugi": {
   "kanji": "JR石動駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
+ "jr-itabashi": {
+  "kanji": "JR板橋駅",
+  "yomi": null,
+  "lat": 35.746028,
+  "lon": 139.719528
+ },
+ "jr-itako": {
+  "kanji": "JR潮来駅",
   "yomi": null,
   "lat": null,
   "lon": null
@@ -3875,11 +4463,23 @@
   "lat": 34.254861,
   "lon": 135.321067
  },
+ "jr-iwai": {
+  "kanji": "JR岩井駅",
+  "yomi": null,
+  "lat": 35.092583,
+  "lon": 139.849639
+ },
  "jr-iwaizumi": {
   "kanji": "JR岩泉駅",
   "yomi": null,
   "lat": 39.845114,
   "lon": 141.786394
+ },
+ "jr-iwajuku": {
+  "kanji": "JR岩宿駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
  },
  "jr-iwaki": {
   "kanji": "JRいわき駅",
@@ -3923,8 +4523,20 @@
   "lat": null,
   "lon": null
  },
+ "jr-iwane": {
+  "kanji": "JR巌根駅",
+  "yomi": null,
+  "lat": 35.414278,
+  "lon": 139.933333
+ },
  "jr-iwanuma": {
   "kanji": "JR岩沼駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
+ "jr-iwase": {
+  "kanji": "JR岩瀬駅",
   "yomi": null,
   "lat": null,
   "lon": null
@@ -4013,6 +4625,18 @@
   "lat": 35.360697,
   "lon": 132.756517
  },
+ "jr-jichiidai": {
+  "kanji": "JR自治医大駅",
+  "yomi": null,
+  "lat": 36.395211,
+  "lon": 139.854497
+ },
+ "jr-jimbohara": {
+  "kanji": "JR神保原駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
  "jr-joetsumyoko": {
   "kanji": "JR上越妙高駅",
   "yomi": null,
@@ -4049,6 +4673,12 @@
   "lat": null,
   "lon": null
  },
+ "jr-jujo": {
+  "kanji": "JR十条駅",
+  "yomi": null,
+  "lat": 35.760278,
+  "lon": 139.722222
+ },
  "jr-jumonji": {
   "kanji": "JR十文字駅",
   "yomi": null,
@@ -4066,6 +4696,12 @@
   "yomi": null,
   "lat": null,
   "lon": null
+ },
+ "jr-kabe": {
+  "kanji": "JR河辺駅",
+  "yomi": null,
+  "lat": 35.784556,
+  "lon": 139.284778
  },
  "jr-kado": {
   "kanji": "JR鹿渡駅",
@@ -4085,6 +4721,12 @@
   "lat": 36.320206,
   "lon": 136.350792
  },
+ "jr-kagohara": {
+  "kanji": "JR籠原駅",
+  "yomi": null,
+  "lat": 36.174675,
+  "lon": 139.330517
+ },
  "jr-kagoshima": {
   "kanji": "JR鹿児島駅",
   "yomi": null,
@@ -4102,6 +4744,12 @@
   "yomi": "兵庫県",
   "lat": 35.127244,
   "lon": 135.0773
+ },
+ "jr-kaihinmakuhari": {
+  "kanji": "JR海浜幕張駅",
+  "yomi": null,
+  "lat": 35.648333,
+  "lon": 140.041861
  },
  "jr-kainan": {
   "kanji": "JR海南駅",
@@ -4157,6 +4805,30 @@
   "lat": 39.272917,
   "lon": 141.872722
  },
+ "jr-kamakura": {
+  "kanji": "JR鎌倉駅",
+  "yomi": null,
+  "lat": 35.319028,
+  "lon": 139.550417
+ },
+ "jr-kamasusaka": {
+  "kanji": "JR蒲須坂駅",
+  "yomi": null,
+  "lat": 36.721206,
+  "lon": 139.950392
+ },
+ "jr-kamata": {
+  "kanji": "JR蒲田駅",
+  "yomi": null,
+  "lat": 35.562472,
+  "lon": 139.716056
+ },
+ "jr-kameari": {
+  "kanji": "JR亀有駅",
+  "yomi": null,
+  "lat": 35.766667,
+  "lon": 139.847778
+ },
  "jr-kameda": {
   "kanji": "JR亀田駅",
   "yomi": null,
@@ -4174,6 +4846,12 @@
   "yomi": null,
   "lat": 33.331456,
   "lon": 131.493022
+ },
+ "jr-kameido": {
+  "kanji": "JR亀戸駅",
+  "yomi": null,
+  "lat": 35.697306,
+  "lon": 139.826583
  },
  "jr-kamenoko": {
   "kanji": "JR亀甲駅",
@@ -4235,6 +4913,12 @@
   "lat": null,
   "lon": null
  },
+ "jr-kaminakazato": {
+  "kanji": "JR上中里駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
  "jr-kaminoyamaonsen": {
   "kanji": "JRかみのやま温泉駅",
   "yomi": null,
@@ -4277,6 +4961,12 @@
   "lat": 37.658917,
   "lon": 139.049306
  },
+ "jr-kamoi": {
+  "kanji": "JR鴨居駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
  "jr-kamojima": {
   "kanji": "JR鴨島駅",
   "yomi": null,
@@ -4295,6 +4985,12 @@
   "lat": null,
   "lon": null
  },
+ "jr-kanamachi": {
+  "kanji": "JR金町駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
  "jr-kanaya": {
   "kanji": "JR金谷駅",
   "yomi": null,
@@ -4306,6 +5002,18 @@
   "yomi": null,
   "lat": 36.578044,
   "lon": 136.648175
+ },
+ "jr-kanda": {
+  "kanji": "JR神田駅",
+  "yomi": null,
+  "lat": 35.691667,
+  "lon": 139.770833
+ },
+ "jr-kaneko": {
+  "kanji": "JR金子駅",
+  "yomi": null,
+  "lat": 35.811042,
+  "lon": 139.328653
  },
  "jr-kanie": {
   "kanji": "JR蟹江駅",
@@ -4319,6 +5027,12 @@
   "lat": null,
   "lon": null
  },
+ "jr-kannai": {
+  "kanji": "JR関内駅",
+  "yomi": null,
+  "lat": 35.44325,
+  "lon": 139.637111
+ },
  "jr-kanonji": {
   "kanji": "JR観音寺駅",
   "yomi": null,
@@ -4330,6 +5044,12 @@
   "yomi": null,
   "lat": null,
   "lon": null
+ },
+ "jr-kanuma": {
+  "kanji": "JR鹿沼駅",
+  "yomi": null,
+  "lat": 36.570861,
+  "lon": 139.762972
  },
  "jr-kanzaki": {
   "kanji": "JR神埼駅",
@@ -4367,6 +5087,24 @@
   "lat": 34.759086,
   "lon": 135.934289
  },
+ "jr-kasahata": {
+  "kanji": "JR笠幡駅",
+  "yomi": null,
+  "lat": 35.907561,
+  "lon": 139.406464
+ },
+ "jr-kasairinkaikoen": {
+  "kanji": "JR葛西臨海公園駅",
+  "yomi": null,
+  "lat": 35.644389,
+  "lon": 139.861583
+ },
+ "jr-kasama": {
+  "kanji": "JR笠間駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
  "jr-kasaoka": {
   "kanji": "JR笠岡駅",
   "yomi": null,
@@ -4397,6 +5135,30 @@
   "lat": null,
   "lon": null
  },
+ "jr-kashimada": {
+  "kanji": "JR鹿島田駅",
+  "yomi": null,
+  "lat": 35.551333,
+  "lon": 139.675139
+ },
+ "jr-kashimajingu": {
+  "kanji": "JR鹿島神宮駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
+ "jr-kashimasoccerstadium": {
+  "kanji": "JR鹿島サッカースタジアム駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
+ "jr-kashiwa": {
+  "kanji": "JR柏駅",
+  "yomi": null,
+  "lat": 35.862222,
+  "lon": 139.971056
+ },
  "jr-kashiwara": {
   "kanji": "JR柏原駅",
   "yomi": null,
@@ -4426,6 +5188,18 @@
   "yomi": null,
   "lat": 35.117986,
   "lon": 138.819428
+ },
+ "jr-katakura": {
+  "kanji": "JR片倉駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
+ "jr-kataoka": {
+  "kanji": "JR片岡駅",
+  "yomi": null,
+  "lat": 36.754308,
+  "lon": 139.945972
  },
  "jr-katata": {
   "kanji": "JR堅田駅",
@@ -4463,6 +5237,12 @@
   "lat": 36.394481,
   "lon": 140.524397
  },
+ "jr-katsuura": {
+  "kanji": "JR勝浦駅",
+  "yomi": null,
+  "lat": 35.153056,
+  "lon": 140.312917
+ },
  "jr-kawachieiwa": {
   "kanji": "JR河内永和駅",
   "yomi": null,
@@ -4474,6 +5254,18 @@
   "yomi": null,
   "lat": null,
   "lon": null
+ },
+ "jr-kawagoe": {
+  "kanji": "JR川越駅",
+  "yomi": null,
+  "lat": 35.907111,
+  "lon": 139.483056
+ },
+ "jr-kawaguchi": {
+  "kanji": "JR川口駅",
+  "yomi": null,
+  "lat": 35.801944,
+  "lon": 139.7175
  },
  "jr-kawake": {
   "kanji": "JR河毛駅",
@@ -4529,11 +5321,35 @@
   "lat": 40.1895,
   "lon": 140.78575
  },
+ "jr-kazusaichinomiya": {
+  "kanji": "JR上総一ノ宮駅",
+  "yomi": null,
+  "lat": 35.373667,
+  "lon": 140.365
+ },
+ "jr-kazusaminato": {
+  "kanji": "JR上総湊駅",
+  "yomi": null,
+  "lat": 35.222222,
+  "lon": 139.871111
+ },
+ "jr-kazusaokitsu": {
+  "kanji": "JR上総興津駅",
+  "yomi": null,
+  "lat": 35.137222,
+  "lon": 140.250917
+ },
  "jr-keisen": {
   "kanji": "JR桂川駅",
   "yomi": null,
   "lat": 33.584814,
   "lon": 130.6623
+ },
+ "jr-kemigawahama": {
+  "kanji": "JR検見川浜駅",
+  "yomi": null,
+  "lat": 35.637028,
+  "lon": 140.059167
  },
  "jr-kesennuma": {
   "kanji": "JR気仙沼駅",
@@ -4546,6 +5362,12 @@
   "yomi": null,
   "lat": 34.952106,
   "lon": 136.153933
+ },
+ "jr-kichijoji": {
+  "kanji": "JR吉祥寺駅",
+  "yomi": null,
+  "lat": 35.703056,
+  "lon": 139.58
  },
  "jr-kidonanzoinmae": {
   "kanji": "JR城戸南蔵院前駅",
@@ -4589,11 +5411,23 @@
   "lat": 34.761506,
   "lon": 138.085325
  },
+ "jr-kikuna": {
+  "kanji": "JR菊名駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
  "jr-kimiidera": {
   "kanji": "JR紀三井寺駅",
   "yomi": null,
   "lat": null,
   "lon": null
+ },
+ "jr-kimitsu": {
+  "kanji": "JR君津駅",
+  "yomi": null,
+  "lat": 35.333583,
+  "lon": 139.895028
  },
  "jr-kinomoto": {
   "kanji": "JR木ノ本駅",
@@ -4607,8 +5441,26 @@
   "lat": 35.623764,
   "lon": 134.813436
  },
+ "jr-kinshicho": {
+  "kanji": "JR錦糸町駅",
+  "yomi": null,
+  "lat": 35.696667,
+  "lon": 139.813889
+ },
  "jr-kintaichionsen": {
   "kanji": "JR金田一温泉駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
+ "jr-kioroshi": {
+  "kanji": "JR木下駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
+ "jr-kiryu": {
+  "kanji": "JR桐生駅",
   "yomi": null,
   "lat": null,
   "lon": null
@@ -4618,6 +5470,12 @@
   "yomi": null,
   "lat": 39.207167,
   "lon": 139.902056
+ },
+ "jr-kisarazu": {
+  "kanji": "JR木更津駅",
+  "yomi": null,
+  "lat": 35.381611,
+  "lon": 139.926222
  },
  "jr-kishibe": {
   "kanji": "JR岸辺駅",
@@ -4637,6 +5495,36 @@
   "lat": 35.29465,
   "lon": 132.90195
  },
+ "jr-kitaageo": {
+  "kanji": "JR北上尾駅",
+  "yomi": null,
+  "lat": 35.985633,
+  "lon": 139.577225
+ },
+ "jr-kitaakabane": {
+  "kanji": "JR北赤羽駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
+ "jr-kitaasaka": {
+  "kanji": "JR北朝霞駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
+ "jr-kitafuchu": {
+  "kanji": "JR北府中駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
+ "jr-kitahachioji": {
+  "kanji": "JR北八王子駅",
+  "yomi": null,
+  "lat": 35.669333,
+  "lon": 139.363389
+ },
  "jr-kitahiroshima": {
   "kanji": "JR北広島駅",
   "yomi": null,
@@ -4649,11 +5537,23 @@
   "lat": null,
   "lon": null
  },
+ "jr-kitakamakura": {
+  "kanji": "JR北鎌倉駅",
+  "yomi": null,
+  "lat": 35.337222,
+  "lon": 139.545139
+ },
  "jr-kitakami": {
   "kanji": "JR北上駅",
   "yomi": null,
   "lat": 39.281833,
   "lon": 141.122228
+ },
+ "jr-kitakashiwa": {
+  "kanji": "JR北柏駅",
+  "yomi": null,
+  "lat": 35.875611,
+  "lon": 139.988056
  },
  "jr-kitakata": {
   "kanji": "JR喜多方駅",
@@ -4661,11 +5561,41 @@
   "lat": 37.644053,
   "lon": 139.867967
  },
+ "jr-kitakogane": {
+  "kanji": "JR北小金駅",
+  "yomi": null,
+  "lat": 35.833417,
+  "lon": 139.931306
+ },
+ "jr-kitakonosu": {
+  "kanji": "JR北鴻巣駅",
+  "yomi": null,
+  "lat": 36.085572,
+  "lon": 139.477042
+ },
+ "jr-kitamatsudo": {
+  "kanji": "JR北松戸駅",
+  "yomi": null,
+  "lat": 35.800583,
+  "lon": 139.911778
+ },
  "jr-kitami": {
   "kanji": "JR北見駅",
   "yomi": null,
   "lat": 43.805167,
   "lon": 143.897306
+ },
+ "jr-kitamoto": {
+  "kanji": "JR北本駅",
+  "yomi": null,
+  "lat": 36.031619,
+  "lon": 139.533994
+ },
+ "jr-kitasenju": {
+  "kanji": "JR北千住駅",
+  "yomi": null,
+  "lat": 35.749517,
+  "lon": 139.804828
  },
  "jr-kitashinchi": {
   "kanji": "JR北新地駅",
@@ -4679,14 +5609,38 @@
   "lat": null,
   "lon": null
  },
+ "jr-kitatakasaki": {
+  "kanji": "JR北高崎駅",
+  "yomi": null,
+  "lat": 36.338714,
+  "lon": 139.0013
+ },
+ "jr-kitatoda": {
+  "kanji": "JR北戸田駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
  "jr-kitatokiwa": {
   "kanji": "JR北常盤駅",
   "yomi": null,
   "lat": null,
   "lon": null
  },
+ "jr-kitaurawa": {
+  "kanji": "JR北浦和駅",
+  "yomi": null,
+  "lat": 35.872156,
+  "lon": 139.646197
+ },
  "jr-kitayama": {
   "kanji": "JR北山駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
+ "jr-kitayono": {
+  "kanji": "JR北与野駅",
   "yomi": null,
   "lat": null,
   "lon": null
@@ -4733,17 +5687,41 @@
   "lat": null,
   "lon": null
  },
+ "jr-kobayashi": {
+  "kanji": "JR小林駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
  "jr-kobe": {
   "kanji": "JR神戸駅",
   "yomi": null,
   "lat": 34.679528,
   "lon": 135.178025
  },
+ "jr-kobuchi": {
+  "kanji": "JR古淵駅",
+  "yomi": null,
+  "lat": 35.555972,
+  "lon": 139.419306
+ },
  "jr-kobuchizawa": {
   "kanji": "JR小淵沢駅",
   "yomi": null,
   "lat": 35.863556,
   "lon": 138.316944
+ },
+ "jr-koga": {
+  "kanji": "JR古河駅",
+  "yomi": null,
+  "lat": 36.194733,
+  "lon": 139.709542
+ },
+ "jr-koganei": {
+  "kanji": "JR小金井駅",
+  "yomi": null,
+  "lat": 36.374264,
+  "lon": 139.842128
  },
  "jr-koge": {
   "kanji": "JR郡家駅",
@@ -4763,11 +5741,23 @@
   "lat": null,
   "lon": null
  },
+ "jr-kohoku": {
+  "kanji": "JR湖北駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
  "jr-koide": {
   "kanji": "JR小出駅",
   "yomi": null,
   "lat": null,
   "lon": null
+ },
+ "jr-koiwa": {
+  "kanji": "JR小岩駅",
+  "yomi": null,
+  "lat": 35.732972,
+  "lon": 139.881667
  },
  "jr-koiwai": {
   "kanji": "JR小岩井駅",
@@ -4793,6 +5783,12 @@
   "lat": 31.743586,
   "lon": 130.763439
  },
+ "jr-kokubunji": {
+  "kanji": "JR国分寺駅",
+  "yomi": null,
+  "lat": 35.70025,
+  "lon": 139.48025
+ },
  "jr-kokufutagajo": {
   "kanji": "JR国府多賀城駅",
   "yomi": null,
@@ -4811,17 +5807,47 @@
   "lat": null,
   "lon": null
  },
+ "jr-komagata": {
+  "kanji": "JR駒形駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
+ "jr-komagawa": {
+  "kanji": "JR高麗川駅",
+  "yomi": null,
+  "lat": 35.896281,
+  "lon": 139.33795
+ },
+ "jr-komagome": {
+  "kanji": "JR駒込駅",
+  "yomi": null,
+  "lat": 35.736472,
+  "lon": 139.746861
+ },
  "jr-komatsu": {
   "kanji": "JR小松駅",
   "yomi": null,
   "lat": 36.402239,
   "lon": 136.453192
  },
+ "jr-komiya": {
+  "kanji": "JR小宮駅",
+  "yomi": null,
+  "lat": 35.685472,
+  "lon": 139.368806
+ },
  "jr-komoro": {
   "kanji": "JR小諸駅",
   "yomi": null,
   "lat": 36.326903,
   "lon": 138.421828
+ },
+ "jr-konandai": {
+  "kanji": "JR港南台駅",
+  "yomi": null,
+  "lat": 35.375278,
+  "lon": 139.576667
  },
  "jr-konoha": {
   "kanji": "JR木葉駅",
@@ -4834,6 +5860,12 @@
   "yomi": null,
   "lat": 34.698817,
   "lon": 135.597778
+ },
+ "jr-konosu": {
+  "kanji": "JR鴻巣駅",
+  "yomi": null,
+  "lat": 36.059225,
+  "lon": 139.509647
  },
  "jr-koori": {
   "kanji": "JR桑折駅",
@@ -4858,6 +5890,12 @@
   "yomi": null,
   "lat": 34.738953,
   "lon": 135.374703
+ },
+ "jr-koshigayalaketown": {
+  "kanji": "JR越谷レイクタウン駅",
+  "yomi": null,
+  "lat": 35.876353,
+  "lon": 139.822178
  },
  "jr-kosugi": {
   "kanji": "JR小杉駅",
@@ -4889,6 +5927,12 @@
   "lat": 33.567153,
   "lon": 133.543661
  },
+ "jr-kouenji": {
+  "kanji": "JR高円寺駅",
+  "yomi": null,
+  "lat": 35.705389,
+  "lon": 139.649861
+ },
  "jr-koufu": {
   "kanji": "JR甲府駅",
   "yomi": null,
@@ -4913,6 +5957,12 @@
   "lat": 35.280833,
   "lon": 139.212917
  },
+ "jr-kozukue": {
+  "kanji": "JR小机駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
  "jr-kozurushinden": {
   "kanji": "JR小鶴新田駅",
   "yomi": null,
@@ -4924,6 +5974,30 @@
   "yomi": null,
   "lat": 33.212422,
   "lon": 133.137178
+ },
+ "jr-kugeta": {
+  "kanji": "JR久下田駅",
+  "yomi": null,
+  "lat": 36.375836,
+  "lon": 139.971489
+ },
+ "jr-kuji": {
+  "kanji": "JR久地駅",
+  "yomi": null,
+  "lat": 35.610556,
+  "lon": 139.592528
+ },
+ "jr-kuki": {
+  "kanji": "JR久喜駅",
+  "yomi": null,
+  "lat": 36.065747,
+  "lon": 139.677317
+ },
+ "jr-kumagaya": {
+  "kanji": "JR熊谷駅",
+  "yomi": null,
+  "lat": 36.139694,
+  "lon": 139.389917
  },
  "jr-kumamoto": {
   "kanji": "JR熊本駅",
@@ -4943,11 +6017,29 @@
   "lat": null,
   "lon": null
  },
+ "jr-kunisada": {
+  "kanji": "JR国定駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
+ "jr-kunitachi": {
+  "kanji": "JR国立駅",
+  "yomi": null,
+  "lat": 35.699,
+  "lon": 139.446389
+ },
  "jr-kunnui": {
   "kanji": "JR国縫駅",
   "yomi": null,
   "lat": 42.439333,
   "lon": 140.320889
+ },
+ "jr-kuragano": {
+  "kanji": "JR倉賀野駅",
+  "yomi": null,
+  "lat": 36.300281,
+  "lon": 139.049169
  },
  "jr-kurashiki": {
   "kanji": "JR倉敷駅",
@@ -4972,6 +6064,18 @@
   "yomi": null,
   "lat": null,
   "lon": null
+ },
+ "jr-kurihama": {
+  "kanji": "JR久里浜駅",
+  "yomi": null,
+  "lat": 35.233056,
+  "lon": 139.701278
+ },
+ "jr-kurihashi": {
+  "kanji": "JR栗橋駅",
+  "yomi": null,
+  "lat": 36.136864,
+  "lon": 139.694225
  },
  "jr-kurikomakogen": {
   "kanji": "JRくりこま高原駅",
@@ -5039,6 +6143,12 @@
   "lat": 33.320389,
   "lon": 130.501306
  },
+ "jr-kururi": {
+  "kanji": "JR久留里駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
  "jr-kusanagi": {
   "kanji": "JR草薙駅",
   "yomi": null,
@@ -5099,11 +6209,41 @@
   "lat": null,
   "lon": null
  },
+ "jr-mabashi": {
+  "kanji": "JR馬橋駅",
+  "yomi": null,
+  "lat": 35.811611,
+  "lon": 139.917306
+ },
+ "jr-machida": {
+  "kanji": "JR町田駅",
+  "yomi": null,
+  "lat": 35.541944,
+  "lon": 139.445556
+ },
+ "jr-maebashi": {
+  "kanji": "JR前橋駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
+ "jr-maebashioshima": {
+  "kanji": "JR前橋大島駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
  "jr-maibara": {
   "kanji": "JR米原駅",
   "yomi": "JR西日本",
   "lat": 35.314722,
   "lon": 136.29
+ },
+ "jr-maihama": {
+  "kanji": "JR舞浜駅",
+  "yomi": null,
+  "lat": 35.636306,
+  "lon": 139.883333
  },
  "jr-maiko": {
   "kanji": "JR舞子駅",
@@ -5141,6 +6281,30 @@
   "lat": 42.907844,
   "lon": 143.359197
  },
+ "jr-makuhari": {
+  "kanji": "JR幕張駅",
+  "yomi": null,
+  "lat": 35.659444,
+  "lon": 140.057917
+ },
+ "jr-makuharihongo": {
+  "kanji": "JR幕張本郷駅",
+  "yomi": null,
+  "lat": 35.672778,
+  "lon": 140.042222
+ },
+ "jr-makuharitoyosuna": {
+  "kanji": "JR幕張豊砂駅",
+  "yomi": null,
+  "lat": 35.6579,
+  "lon": 140.0272
+ },
+ "jr-mamada": {
+  "kanji": "JR間々田駅",
+  "yomi": null,
+  "lat": 36.257833,
+  "lon": 139.761
+ },
  "jr-mamurogawa": {
   "kanji": "JR真室川駅",
   "yomi": null,
@@ -5177,6 +6341,12 @@
   "lat": 43.48735,
   "lon": 144.464047
  },
+ "jr-matoba": {
+  "kanji": "JR的場駅",
+  "yomi": null,
+  "lat": 35.917642,
+  "lon": 139.436072
+ },
  "jr-matsubase": {
   "kanji": "JR松橋駅",
   "yomi": null,
@@ -5189,8 +6359,20 @@
   "lat": null,
   "lon": null
  },
+ "jr-matsudo": {
+  "kanji": "JR松戸駅",
+  "yomi": null,
+  "lat": 35.784333,
+  "lon": 139.900639
+ },
  "jr-matsue": {
   "kanji": "JR松江駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
+ "jr-matsugishi": {
+  "kanji": "JR松岸駅",
   "yomi": null,
   "lat": null,
   "lon": null
@@ -5236,6 +6418,12 @@
   "yomi": null,
   "lat": 35.485733,
   "lon": 135.451
+ },
+ "jr-matsuo": {
+  "kanji": "JR松尾駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
  },
  "jr-matsusaka": {
   "kanji": "JR松阪駅",
@@ -5285,6 +6473,18 @@
   "lat": 42.902439,
   "lon": 141.574522
  },
+ "jr-meguro": {
+  "kanji": "JR目黒駅",
+  "yomi": null,
+  "lat": 35.634028,
+  "lon": 139.715833
+ },
+ "jr-mejiro": {
+  "kanji": "JR目白駅",
+  "yomi": null,
+  "lat": 35.721194,
+  "lon": 139.706583
+ },
  "jr-miemachi": {
   "kanji": "JR三重町駅",
   "yomi": null,
@@ -5317,6 +6517,12 @@
  },
  "jr-mikawaanjo": {
   "kanji": "JR三河安城駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
+ "jr-mikawashima": {
+  "kanji": "JR三河島駅",
   "yomi": null,
   "lat": null,
   "lon": null
@@ -5369,11 +6575,35 @@
   "lat": 42.808272,
   "lon": 141.675186
  },
+ "jr-minamifunabashi": {
+  "kanji": "JR南船橋駅",
+  "yomi": null,
+  "lat": 35.681583,
+  "lon": 139.996611
+ },
+ "jr-minamifuruya": {
+  "kanji": "JR南古谷駅",
+  "yomi": null,
+  "lat": 35.903228,
+  "lon": 139.519419
+ },
+ "jr-minamihashimoto": {
+  "kanji": "JR南橋本駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
  "jr-minamihikone": {
   "kanji": "JR南彦根駅",
   "yomi": null,
   "lat": 35.246144,
   "lon": 136.247947
+ },
+ "jr-minamikashiwa": {
+  "kanji": "JR南柏駅",
+  "yomi": null,
+  "lat": 35.844611,
+  "lon": 139.954139
  },
  "jr-minamikofu": {
   "kanji": "JR南甲府駅",
@@ -5387,6 +6617,12 @@
   "lat": 33.870361,
   "lon": 130.864517
  },
+ "jr-minamikoshigaya": {
+  "kanji": "JR南越谷駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
  "jr-minamikusatsu": {
   "kanji": "JR南草津駅",
   "yomi": null,
@@ -5398,6 +6634,12 @@
   "yomi": null,
   "lat": 31.895036,
   "lon": 131.422344
+ },
+ "jr-minaminagareyama": {
+  "kanji": "JR南流山駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
  },
  "jr-minamioita": {
   "kanji": "JR南大分駅",
@@ -5417,11 +6659,23 @@
   "lat": null,
   "lon": null
  },
+ "jr-minamisenju": {
+  "kanji": "JR南千住駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
  "jr-minamisuita": {
   "kanji": "JR南吹田駅",
   "yomi": null,
   "lat": null,
   "lon": null
+ },
+ "jr-minamitama": {
+  "kanji": "JR南多摩駅",
+  "yomi": null,
+  "lat": 35.649083,
+  "lon": 139.489278
  },
  "jr-minamitanabe": {
   "kanji": "JR南田辺駅",
@@ -5435,11 +6689,23 @@
   "lat": null,
   "lon": null
  },
+ "jr-minamiurawa": {
+  "kanji": "JR南浦和駅",
+  "yomi": null,
+  "lat": 35.847681,
+  "lon": 139.66915
+ },
  "jr-minamiwakkanai": {
   "kanji": "JR南稚内駅",
   "yomi": null,
   "lat": 45.398194,
   "lon": 141.683
+ },
+ "jr-minamiyono": {
+  "kanji": "JR南与野駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
  },
  "jr-mineyoshikawa": {
   "kanji": "JR峰吉川駅",
@@ -5465,6 +6731,12 @@
   "lat": null,
   "lon": null
  },
+ "jr-misato": {
+  "kanji": "JR三郷駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
  "jr-misawa": {
   "kanji": "JR三沢駅",
   "yomi": null,
@@ -5476,6 +6748,12 @@
   "yomi": null,
   "lat": null,
   "lon": null
+ },
+ "jr-mitaka": {
+  "kanji": "JR三鷹駅",
+  "yomi": null,
+  "lat": 35.702694,
+  "lon": 139.560833
  },
  "jr-mitejima": {
   "kanji": "JR御幣島駅",
@@ -5500,6 +6778,12 @@
   "yomi": null,
   "lat": null,
   "lon": null
+ },
+ "jr-miyahara": {
+  "kanji": "JR宮原駅",
+  "yomi": null,
+  "lat": 35.940264,
+  "lon": 139.609558
  },
  "jr-miyaji": {
   "kanji": "JR宮地駅",
@@ -5591,6 +6875,12 @@
   "lat": null,
   "lon": null
  },
+ "jr-mobara": {
+  "kanji": "JR茂原駅",
+  "yomi": null,
+  "lat": 35.426917,
+  "lon": 140.303972
+ },
  "jr-mochimune": {
   "kanji": "JR用宗駅",
   "yomi": null,
@@ -5639,6 +6929,12 @@
   "lat": null,
   "lon": null
  },
+ "jr-monoi": {
+  "kanji": "JR物井駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
  "jr-mori": {
   "kanji": "JR森駅",
   "yomi": null,
@@ -5681,6 +6977,12 @@
   "lat": 35.050419,
   "lon": 135.995678
  },
+ "jr-motegi": {
+  "kanji": "JR茂木駅",
+  "yomi": null,
+  "lat": 36.530714,
+  "lon": 140.18155
+ },
  "jr-motomachi": {
   "kanji": "JR元町駅",
   "yomi": null,
@@ -5692,6 +6994,12 @@
   "yomi": null,
   "lat": null,
   "lon": null
+ },
+ "jr-motoyawata": {
+  "kanji": "JR本八幡駅",
+  "yomi": null,
+  "lat": 35.720833,
+  "lon": 139.927361
  },
  "jr-mozu": {
   "kanji": "JR百舌鳥駅",
@@ -5710,6 +7018,12 @@
   "yomi": null,
   "lat": null,
   "lon": null
+ },
+ "jr-mukaigawara": {
+  "kanji": "JR向河原駅",
+  "yomi": null,
+  "lat": 35.572889,
+  "lon": 139.667222
  },
  "jr-mukainada": {
   "kanji": "JR向洋駅",
@@ -5752,6 +7066,72 @@
   "yomi": null,
   "lat": 36.753133,
   "lon": 138.246986
+ },
+ "jr-musashihikida": {
+  "kanji": "JR武蔵引田駅",
+  "yomi": null,
+  "lat": 35.729833,
+  "lon": 139.270194
+ },
+ "jr-musashiitsukaichi": {
+  "kanji": "JR武蔵五日市駅",
+  "yomi": null,
+  "lat": 35.732222,
+  "lon": 139.228056
+ },
+ "jr-musashikoganei": {
+  "kanji": "JR武蔵小金井駅",
+  "yomi": null,
+  "lat": 35.701333,
+  "lon": 139.506444
+ },
+ "jr-musashikosugi": {
+  "kanji": "JR武蔵小杉駅",
+  "yomi": null,
+  "lat": 35.576667,
+  "lon": 139.659444
+ },
+ "jr-musashimasuko": {
+  "kanji": "JR武蔵増戸駅",
+  "yomi": null,
+  "lat": 35.730861,
+  "lon": 139.255889
+ },
+ "jr-musashimizonokuchi": {
+  "kanji": "JR武蔵溝ノ口駅",
+  "yomi": null,
+  "lat": 35.599056,
+  "lon": 139.611222
+ },
+ "jr-musashinakahara": {
+  "kanji": "JR武蔵中原駅",
+  "yomi": null,
+  "lat": 35.581139,
+  "lon": 139.641472
+ },
+ "jr-musashisakai": {
+  "kanji": "JR武蔵境駅",
+  "yomi": null,
+  "lat": 35.702278,
+  "lon": 139.544889
+ },
+ "jr-musashishinjo": {
+  "kanji": "JR武蔵新城駅",
+  "yomi": null,
+  "lat": 35.587222,
+  "lon": 139.629722
+ },
+ "jr-musashitakahagi": {
+  "kanji": "JR武蔵高萩駅",
+  "yomi": null,
+  "lat": 35.901764,
+  "lon": 139.371456
+ },
+ "jr-musashiurawa": {
+  "kanji": "JR武蔵浦和駅",
+  "yomi": null,
+  "lat": 35.846114,
+  "lon": 139.647967
  },
  "jr-musota": {
   "kanji": "JR六十谷駅",
@@ -5813,6 +7193,12 @@
   "lat": 36.643083,
   "lon": 138.188705
  },
+ "jr-naganoharakusatsuguchi": {
+  "kanji": "JR長野原草津口駅",
+  "yomi": null,
+  "lat": 36.546539,
+  "lon": 138.649328
+ },
  "jr-nagao": {
   "kanji": "JR長尾駅",
   "yomi": null,
@@ -5849,6 +7235,12 @@
   "lat": null,
   "lon": null
  },
+ "jr-nagatsuta": {
+  "kanji": "JR長津田駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
  "jr-nagayama": {
   "kanji": "JR永山駅",
   "yomi": null,
@@ -5878,6 +7270,12 @@
   "yomi": null,
   "lat": 33.346267,
   "lon": 130.440289
+ },
+ "jr-nakagami": {
+  "kanji": "JR中神駅",
+  "yomi": null,
+  "lat": 35.709056,
+  "lon": 139.375806
  },
  "jr-nakagaya": {
   "kanji": "JR中萱駅",
@@ -5909,6 +7307,24 @@
   "lat": null,
   "lon": null
  },
+ "jr-nakano": {
+  "kanji": "JR中野駅",
+  "yomi": null,
+  "lat": 35.705833,
+  "lon": 139.665556
+ },
+ "jr-nakanojo": {
+  "kanji": "JR中之条駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
+ "jr-nakanoshima": {
+  "kanji": "JR中野島駅",
+  "yomi": null,
+  "lat": 35.630139,
+  "lon": 139.550083
+ },
  "jr-nakashibetsu": {
   "kanji": "JR中標津駅",
   "yomi": null,
@@ -5939,6 +7355,18 @@
   "lat": 35.5005,
   "lon": 137.503139
  },
+ "jr-nakaurawa": {
+  "kanji": "JR中浦和駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
+ "jr-nakayama": {
+  "kanji": "JR中山駅",
+  "yomi": null,
+  "lat": 35.514722,
+  "lon": 139.539444
+ },
  "jr-nakayamadera": {
   "kanji": "JR中山寺駅",
   "yomi": null,
@@ -5968,6 +7396,12 @@
   "yomi": null,
   "lat": 34.666417,
   "lon": 135.495333
+ },
+ "jr-namegawa": {
+  "kanji": "JR滑河駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
  },
  "jr-namerikawa": {
   "kanji": "JR滑川駅",
@@ -6041,6 +7475,24 @@
   "lat": null,
   "lon": null
  },
+ "jr-narita": {
+  "kanji": "JR成田駅",
+  "yomi": null,
+  "lat": 35.777833,
+  "lon": 140.314083
+ },
+ "jr-naritaairport": {
+  "kanji": "JR成田空港駅",
+  "yomi": null,
+  "lat": 35.763972,
+  "lon": 140.384639
+ },
+ "jr-naritaairport2": {
+  "kanji": "JR空港第2ビル駅",
+  "yomi": null,
+  "lat": 35.772967,
+  "lon": 140.387639
+ },
  "jr-naruko": {
   "kanji": "JR鳴子温泉駅",
   "yomi": null,
@@ -6049,6 +7501,18 @@
  },
  "jr-narukogotenyu": {
   "kanji": "JR鳴子御殿湯駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
+ "jr-naruse": {
+  "kanji": "JR成瀬駅",
+  "yomi": null,
+  "lat": 35.5355,
+  "lon": 139.472917
+ },
+ "jr-naruto": {
+  "kanji": "JR成東駅",
   "yomi": null,
   "lat": null,
   "lon": null
@@ -6070,6 +7534,12 @@
   "yomi": null,
   "lat": 44.349444,
   "lon": 142.465278
+ },
+ "jr-negishi": {
+  "kanji": "JR根岸駅",
+  "yomi": null,
+  "lat": 35.415778,
+  "lon": 139.635056
  },
  "jr-nemuro": {
   "kanji": "JR根室駅",
@@ -6149,6 +7619,12 @@
   "lat": 37.800028,
   "lon": 139.121194
  },
+ "jr-niiza": {
+  "kanji": "JR新座駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
  "jr-niizaki": {
   "kanji": "JR新崎駅",
   "yomi": null,
@@ -6161,6 +7637,12 @@
   "lat": 35.010975,
   "lon": 135.741694
  },
+ "jr-nikko": {
+  "kanji": "JR日光駅",
+  "yomi": null,
+  "lat": 36.747222,
+  "lon": 139.622222
+ },
  "jr-ninohe": {
   "kanji": "JR二戸駅",
   "yomi": null,
@@ -6172,6 +7654,12 @@
   "yomi": null,
   "lat": 35.298778,
   "lon": 139.257778
+ },
+ "jr-nippori": {
+  "kanji": "JR日暮里駅",
+  "yomi": null,
+  "lat": 35.727778,
+  "lon": 139.770972
  },
  "jr-nirasaki": {
   "kanji": "JR韮崎駅",
@@ -6197,11 +7685,29 @@
   "lat": 31.241214,
   "lon": 130.491808
  },
+ "jr-nishifu": {
+  "kanji": "JR西府駅",
+  "yomi": null,
+  "lat": 35.670972,
+  "lon": 139.457389
+ },
  "jr-nishifujinomiya": {
   "kanji": "JR西富士宮駅",
   "yomi": null,
   "lat": 35.225833,
   "lon": 138.6025
+ },
+ "jr-nishifunabashi": {
+  "kanji": "JR西船橋駅",
+  "yomi": null,
+  "lat": 35.707417,
+  "lon": 139.959083
+ },
+ "jr-nishihachioji": {
+  "kanji": "JR西八王子駅",
+  "yomi": null,
+  "lat": 35.656778,
+  "lon": 139.3125
  },
  "jr-nishihiroshima": {
   "kanji": "JR西広島駅",
@@ -6221,6 +7727,24 @@
   "lat": null,
   "lon": null
  },
+ "jr-nishikawagoe": {
+  "kanji": "JR西川越駅",
+  "yomi": null,
+  "lat": 35.919167,
+  "lon": 139.459489
+ },
+ "jr-nishikawaguchi": {
+  "kanji": "JR西川口駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
+ "jr-nishikokubunji": {
+  "kanji": "JR西国分寺駅",
+  "yomi": null,
+  "lat": 35.699778,
+  "lon": 139.465722
+ },
  "jr-nishikokura": {
   "kanji": "JR西小倉駅",
   "yomi": null,
@@ -6232,6 +7756,12 @@
   "yomi": null,
   "lat": 34.682664,
   "lon": 135.466789
+ },
+ "jr-nishikunitachi": {
+  "kanji": "JR西国立駅",
+  "yomi": null,
+  "lat": 35.693472,
+  "lon": 139.424222
  },
  "jr-nishimaizuru": {
   "kanji": "JR西舞鶴駅",
@@ -6245,6 +7775,18 @@
   "lat": 31.723356,
   "lon": 131.05705
  },
+ "jr-nishinasuno": {
+  "kanji": "JR西那須野駅",
+  "yomi": null,
+  "lat": 36.884167,
+  "lon": 139.986389
+ },
+ "jr-nishinippori": {
+  "kanji": "JR西日暮里駅",
+  "yomi": null,
+  "lat": 35.732083,
+  "lon": 139.766667
+ },
  "jr-nishinomiya": {
   "kanji": "JR西宮駅",
   "yomi": null,
@@ -6257,17 +7799,41 @@
   "lat": null,
   "lon": null
  },
+ "jr-nishiogikubo": {
+  "kanji": "JR西荻窪駅",
+  "yomi": null,
+  "lat": 35.703833,
+  "lon": 139.599361
+ },
  "jr-nishioji": {
   "kanji": "JR西大路駅",
   "yomi": null,
   "lat": null,
   "lon": null
  },
+ "jr-nishiomiya": {
+  "kanji": "JR西大宮駅",
+  "yomi": null,
+  "lat": 35.922297,
+  "lon": 139.57985
+ },
+ "jr-nishiooi": {
+  "kanji": "JR西大井駅",
+  "yomi": null,
+  "lat": 35.601806,
+  "lon": 139.721806
+ },
  "jr-nishisakawa": {
   "kanji": "JR西佐川駅",
   "yomi": null,
   "lat": null,
   "lon": null
+ },
+ "jr-nishitachikawa": {
+  "kanji": "JR西立川駅",
+  "yomi": null,
+  "lat": 35.703528,
+  "lon": 139.393639
  },
  "jr-nishitakaoka": {
   "kanji": "JR西高岡駅",
@@ -6277,6 +7843,12 @@
  },
  "jr-nishitakaya": {
   "kanji": "JR西高屋駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
+ "jr-nishiurawa": {
+  "kanji": "JR西浦和駅",
   "yomi": null,
   "lat": null,
   "lon": null
@@ -6298,6 +7870,12 @@
   "yomi": null,
   "lat": null,
   "lon": null
+ },
+ "jr-nissin": {
+  "kanji": "JR日進駅",
+  "yomi": null,
+  "lat": 35.9315,
+  "lon": 139.606222
  },
  "jr-no": {
   "kanji": "JR能生駅",
@@ -6322,6 +7900,12 @@
   "yomi": null,
   "lat": 42.452083,
   "lon": 141.180444
+ },
+ "jr-noborito": {
+  "kanji": "JR登戸駅",
+  "yomi": null,
+  "lat": 35.620833,
+  "lon": 139.57
  },
  "jr-nochi": {
   "kanji": "JR野馳駅",
@@ -6352,6 +7936,12 @@
   "yomi": null,
   "lat": 33.748122,
   "lon": 130.725003
+ },
+ "jr-nogi": {
+  "kanji": "JR野木駅",
+  "yomi": null,
+  "lat": 36.230367,
+  "lon": 139.735028
  },
  "jr-noheji": {
   "kanji": "JR野辺地駅",
@@ -6389,8 +7979,20 @@
   "lat": null,
   "lon": null
  },
+ "jr-nozaki": {
+  "kanji": "JR野崎駅",
+  "yomi": null,
+  "lat": 36.843889,
+  "lon": 139.958056
+ },
  "jr-nozawa": {
   "kanji": "JR野沢駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
+ "jr-numata": {
+  "kanji": "JR沼田駅",
   "yomi": null,
   "lat": null,
   "lon": null
@@ -6412,6 +8014,12 @@
   "yomi": null,
   "lat": 36.941389,
   "lon": 137.499444
+ },
+ "jr-oami": {
+  "kanji": "JR大網駅",
+  "yomi": null,
+  "lat": 35.522778,
+  "lon": 140.310806
  },
  "jr-obaku": {
   "kanji": "JR黄檗駅",
@@ -6460,6 +8068,12 @@
   "yomi": null,
   "lat": 35.008626,
   "lon": 136.962146
+ },
+ "jr-ochanomizu": {
+  "kanji": "JR御茶ノ水駅",
+  "yomi": null,
+  "lat": 35.699861,
+  "lon": 139.763889
  },
  "jr-oda": {
   "kanji": "JR網田駅",
@@ -6521,11 +8135,23 @@
   "lat": null,
   "lon": null
  },
+ "jr-ogikubo": {
+  "kanji": "JR荻窪駅",
+  "yomi": null,
+  "lat": 35.704639,
+  "lon": 139.62
+ },
  "jr-ogotoonsen": {
   "kanji": "JRおごと温泉駅",
   "yomi": null,
   "lat": 35.097136,
   "lon": 135.894922
+ },
+ "jr-oguchi": {
+  "kanji": "JR大口駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
  },
  "jr-oguni": {
   "kanji": "JR小国駅",
@@ -6538,6 +8164,18 @@
   "yomi": null,
   "lat": 33.063714,
   "lon": 129.834417
+ },
+ "jr-ohara": {
+  "kanji": "JR大原駅",
+  "yomi": null,
+  "lat": 35.250972,
+  "lon": 140.390861
+ },
+ "jr-oimachi": {
+  "kanji": "JR大井町駅",
+  "yomi": null,
+  "lat": 35.606222,
+  "lon": 139.734861
  },
  "jr-oishida": {
   "kanji": "JR大石田駅",
@@ -6563,11 +8201,35 @@
   "lat": 39.80995,
   "lon": 140.057744
  },
+ "jr-oji": {
+  "kanji": "JR王子駅",
+  "yomi": null,
+  "lat": 35.7525,
+  "lon": 139.738111
+ },
  "jr-ojiya": {
   "kanji": "JR小千谷駅",
   "yomi": null,
   "lat": null,
   "lon": null
+ },
+ "jr-okabe": {
+  "kanji": "JR岡部駅",
+  "yomi": null,
+  "lat": 36.205869,
+  "lon": 139.237639
+ },
+ "jr-okachimachi": {
+  "kanji": "JR御徒町駅",
+  "yomi": null,
+  "lat": 35.707417,
+  "lon": 139.774639
+ },
+ "jr-okamoto": {
+  "kanji": "JR岡本駅",
+  "yomi": null,
+  "lat": 36.598236,
+  "lon": 139.944503
  },
  "jr-okawara": {
   "kanji": "JR大河原駅",
@@ -6587,6 +8249,12 @@
   "lat": 34.666369,
   "lon": 133.918589
  },
+ "jr-okegawa": {
+  "kanji": "JR桶川駅",
+  "yomi": null,
+  "lat": 35.998814,
+  "lon": 139.564014
+ },
  "jr-okitsu": {
   "kanji": "JR興津駅",
   "yomi": null,
@@ -6605,6 +8273,24 @@
   "lat": 44.469139,
   "lon": 143.116806
  },
+ "jr-oku": {
+  "kanji": "JR尾久駅",
+  "yomi": null,
+  "lat": 35.746778,
+  "lon": 139.754639
+ },
+ "jr-okubo": {
+  "kanji": "JR大久保駅",
+  "yomi": null,
+  "lat": 35.700722,
+  "lon": 139.697361
+ },
+ "jr-okutama": {
+  "kanji": "JR奥多摩駅",
+  "yomi": null,
+  "lat": 35.809222,
+  "lon": 139.096667
+ },
  "jr-okutsugaruimabetsu": {
   "kanji": "JR奥津軽いまべつ駅",
   "yomi": null,
@@ -6619,6 +8305,12 @@
  },
  "jr-omagari": {
   "kanji": "JR大曲駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
+ "jr-omigawa": {
+  "kanji": "JR小見川駅",
   "yomi": null,
   "lat": null,
   "lon": null
@@ -6653,6 +8345,12 @@
   "lat": 35.906278,
   "lon": 139.623833
  },
+ "jr-omori": {
+  "kanji": "JR大森駅",
+  "yomi": null,
+  "lat": 35.588444,
+  "lon": 139.727917
+ },
  "jr-omoto": {
   "kanji": "JR大元駅",
   "yomi": null,
@@ -6677,6 +8375,12 @@
   "lat": null,
   "lon": null
  },
+ "jr-onjuku": {
+  "kanji": "JR御宿駅",
+  "yomi": null,
+  "lat": 35.188056,
+  "lon": 140.351944
+ },
  "jr-onoda": {
   "kanji": "JR小野田駅",
   "yomi": null,
@@ -6700,6 +8404,12 @@
   "yomi": null,
   "lat": null,
   "lon": null
+ },
+ "jr-onuki": {
+  "kanji": "JR大貫駅",
+  "yomi": null,
+  "lat": 35.291028,
+  "lon": 139.855694
  },
  "jr-onuma": {
   "kanji": "JR大沼駅",
@@ -6754,6 +8464,12 @@
   "yomi": null,
   "lat": 34.697406,
   "lon": 135.513442
+ },
+ "jr-osaki": {
+  "kanji": "JR大崎駅",
+  "yomi": null,
+  "lat": 35.619722,
+  "lon": 139.728556
  },
  "jr-oshamanbe": {
   "kanji": "JR長万部駅",
@@ -6815,6 +8531,12 @@
   "lat": 35.002972,
   "lon": 135.864897
  },
+ "jr-otsuka": {
+  "kanji": "JR大塚駅",
+  "yomi": null,
+  "lat": 35.731833,
+  "lon": 139.728056
+ },
  "jr-otsuki": {
   "kanji": "JR大月駅",
   "yomi": null,
@@ -6833,6 +8555,12 @@
   "lat": 35.024128,
   "lon": 135.856992
  },
+ "jr-oume": {
+  "kanji": "JR青梅駅",
+  "yomi": null,
+  "lat": 35.790278,
+  "lon": 139.258389
+ },
  "jr-owanionsen": {
   "kanji": "JR大鰐温泉駅",
   "yomi": null,
@@ -6844,6 +8572,12 @@
   "yomi": null,
   "lat": 36.313608,
   "lon": 139.806539
+ },
+ "jr-ozaku": {
+  "kanji": "JR小作駅",
+  "yomi": null,
+  "lat": 35.776306,
+  "lon": 139.301944
  },
  "jr-ozore": {
   "kanji": "JR大嵐駅",
@@ -6917,6 +8651,12 @@
   "lat": 43.942689,
   "lon": 141.652136
  },
+ "jr-ryougoku": {
+  "kanji": "JR両国駅",
+  "yomi": null,
+  "lat": 35.696111,
+  "lon": 139.7925
+ },
  "jr-ryuo": {
   "kanji": "JR竜王駅",
   "yomi": null,
@@ -6959,6 +8699,12 @@
   "lat": 38.371794,
   "lon": 140.275153
  },
+ "jr-sagamihara": {
+  "kanji": "JR相模原駅",
+  "yomi": null,
+  "lat": 35.581528,
+  "lon": 139.370583
+ },
  "jr-sagamiko": {
   "kanji": "JR相模湖駅",
   "yomi": null,
@@ -6994,6 +8740,12 @@
   "yomi": null,
   "lat": 32.972553,
   "lon": 131.902022
+ },
+ "jr-saitamashintoshin": {
+  "kanji": "JRさいたま新都心駅",
+  "yomi": null,
+  "lat": 35.893925,
+  "lon": 139.633558
  },
  "jr-saitozaki": {
   "kanji": "JR西戸崎駅",
@@ -7073,6 +8825,18 @@
   "lat": null,
   "lon": null
  },
+ "jr-sakura": {
+  "kanji": "JR佐倉駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
+ "jr-sakuragicho": {
+  "kanji": "JR桜木町駅",
+  "yomi": null,
+  "lat": 35.450917,
+  "lon": 139.631056
+ },
  "jr-sakurai": {
   "kanji": "JR桜井駅",
   "yomi": null,
@@ -7121,6 +8885,12 @@
   "lat": 40.530289,
   "lon": 141.555158
  },
+ "jr-samukawa": {
+  "kanji": "JR寒川駅",
+  "yomi": null,
+  "lat": 35.367611,
+  "lon": 139.387417
+ },
  "jr-sanagu": {
   "kanji": "JR佐那具駅",
   "yomi": null,
@@ -7157,6 +8927,12 @@
   "lat": 34.694839,
   "lon": 135.194942
  },
+ "jr-sano": {
+  "kanji": "JR佐野駅",
+  "yomi": null,
+  "lat": 36.316669,
+  "lon": 139.579017
+ },
  "jr-sansai": {
   "kanji": "JR三才駅",
   "yomi": null,
@@ -7168,6 +8944,12 @@
   "yomi": null,
   "lat": 35.930083,
   "lon": 140.13825
+ },
+ "jr-sanukimachi": {
+  "kanji": "JR佐貫町駅",
+  "yomi": null,
+  "lat": 35.260583,
+  "lon": 139.876056
  },
  "jr-sapporo": {
   "kanji": "JR札幌駅",
@@ -7199,11 +8981,23 @@
   "lat": 33.163861,
   "lon": 129.725731
  },
+ "jr-sashiougi": {
+  "kanji": "JR指扇駅",
+  "yomi": null,
+  "lat": 35.917019,
+  "lon": 139.565097
+ },
  "jr-satsumaokuchi": {
   "kanji": "JR薩摩大口駅",
   "yomi": null,
   "lat": 32.060972,
   "lon": 130.609028
+ },
+ "jr-sawara": {
+  "kanji": "JR佐原駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
  },
  "jr-sayo": {
   "kanji": "JR佐用駅",
@@ -7228,6 +9022,12 @@
   "yomi": null,
   "lat": null,
   "lon": null
+ },
+ "jr-sendagaya": {
+  "kanji": "JR千駄ケ谷駅",
+  "yomi": null,
+  "lat": 35.681167,
+  "lon": 139.711444
  },
  "jr-sendai": {
   "kanji": "JR仙台駅",
@@ -7301,11 +9101,23 @@
   "lat": 44.1725,
   "lon": 142.388278
  },
+ "jr-shibukawa": {
+  "kanji": "JR渋川駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
  "jr-shibushi": {
   "kanji": "JR志布志駅",
   "yomi": null,
   "lat": null,
   "lon": null
+ },
+ "jr-shibuya": {
+  "kanji": "JR渋谷駅",
+  "yomi": null,
+  "lat": 35.658611,
+  "lon": 139.701111
  },
  "jr-shichinohetowada": {
   "kanji": "JR七戸十和田駅",
@@ -7379,8 +9191,20 @@
   "lat": 35.023367,
   "lon": 138.489067
  },
+ "jr-shimmachi": {
+  "kanji": "JR新町駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
  "jr-shimoda": {
   "kanji": "JR下田駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
+ "jr-shimodate": {
+  "kanji": "JR下館駅",
   "yomi": null,
   "lat": null,
   "lon": null
@@ -7415,6 +9239,18 @@
   "lat": null,
   "lon": null
  },
+ "jr-shimosakozaki": {
+  "kanji": "JR下総神崎駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
+ "jr-shimosamanzaki": {
+  "kanji": "JR下総松崎駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
  "jr-shimosoga": {
   "kanji": "JR下曽我駅",
   "yomi": null,
@@ -7439,6 +9275,18 @@
   "lat": null,
   "lon": null
  },
+ "jr-shimotsukeosawa": {
+  "kanji": "JR下野大沢駅",
+  "yomi": null,
+  "lat": 36.686503,
+  "lon": 139.732489
+ },
+ "jr-shimousanakayama": {
+  "kanji": "JR下総中山駅",
+  "yomi": null,
+  "lat": 35.714167,
+  "lon": 139.943333
+ },
  "jr-shimukappu": {
   "kanji": "JR占冠駅",
   "yomi": null,
@@ -7453,6 +9301,12 @@
  },
  "jr-shinainuma": {
   "kanji": "JR品井沼駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
+ "jr-shinakitsu": {
+  "kanji": "JR新秋津駅",
   "yomi": null,
   "lat": null,
   "lon": null
@@ -7474,6 +9328,12 @@
   "yomi": null,
   "lat": null,
   "lon": null
+ },
+ "jr-shinanomachi": {
+  "kanji": "JR信濃町駅",
+  "yomi": null,
+  "lat": 35.680083,
+  "lon": 139.72025
  },
  "jr-shinanomatsukawa": {
   "kanji": "JR信濃松川駅",
@@ -7595,6 +9455,12 @@
   "lat": null,
   "lon": null
  },
+ "jr-shinjuku": {
+  "kanji": "JR新宿駅",
+  "yomi": null,
+  "lat": 35.690833,
+  "lon": 139.700278
+ },
  "jr-shinkami": {
   "kanji": "JR新加美駅",
   "yomi": null,
@@ -7607,11 +9473,41 @@
   "lat": null,
   "lon": null
  },
+ "jr-shinkawasaki": {
+  "kanji": "JR新川崎駅",
+  "yomi": null,
+  "lat": 35.551389,
+  "lon": 139.671722
+ },
+ "jr-shinkemigawa": {
+  "kanji": "JR新検見川駅",
+  "yomi": null,
+  "lat": 35.651806,
+  "lon": 140.073056
+ },
+ "jr-shinkiba": {
+  "kanji": "JR新木場駅",
+  "yomi": null,
+  "lat": 35.646111,
+  "lon": 139.827361
+ },
  "jr-shinkobe": {
   "kanji": "JR新神戸駅",
   "yomi": null,
   "lat": 34.706722,
   "lon": 135.196222
+ },
+ "jr-shinkodaira": {
+  "kanji": "JR新小平駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
+ "jr-shinkoiwa": {
+  "kanji": "JR新小岩駅",
+  "yomi": null,
+  "lat": 35.716806,
+  "lon": 139.858278
  },
  "jr-shinkotoni": {
   "kanji": "JR新琴似駅",
@@ -7619,11 +9515,29 @@
   "lat": 43.113083,
   "lon": 141.33525
  },
+ "jr-shinkoyasu": {
+  "kanji": "JR新子安駅",
+  "yomi": null,
+  "lat": 35.487083,
+  "lon": 139.654778
+ },
  "jr-shinkurashiki": {
   "kanji": "JR新倉敷駅",
   "yomi": null,
   "lat": null,
   "lon": null
+ },
+ "jr-shinmaebashi": {
+  "kanji": "JR新前橋駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
+ "jr-shinmatsudo": {
+  "kanji": "JR新松戸駅",
+  "yomi": null,
+  "lat": 35.825417,
+  "lon": 139.921111
  },
  "jr-shinminamata": {
   "kanji": "JR新水俣駅",
@@ -7631,11 +9545,29 @@
   "lat": 32.211,
   "lon": 130.429333
  },
+ "jr-shinmisato": {
+  "kanji": "JR新三郷駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
  "jr-shinnagata": {
   "kanji": "JR新長田駅",
   "yomi": null,
   "lat": null,
   "lon": null
+ },
+ "jr-shinnarashino": {
+  "kanji": "JR新習志野駅",
+  "yomi": null,
+  "lat": 35.667417,
+  "lon": 140.013
+ },
+ "jr-shinnihonbashi": {
+  "kanji": "JR新日本橋駅",
+  "yomi": null,
+  "lat": 35.688667,
+  "lon": 139.773222
  },
  "jr-shinobugaoka": {
   "kanji": "JR忍ケ丘駅",
@@ -7654,6 +9586,12 @@
   "yomi": null,
   "lat": null,
   "lon": null
+ },
+ "jr-shinokubo": {
+  "kanji": "JR新大久保駅",
+  "yomi": null,
+  "lat": 35.701306,
+  "lon": 139.700056
  },
  "jr-shinomura": {
   "kanji": "JR新大村駅",
@@ -7715,11 +9653,23 @@
   "lat": null,
   "lon": null
  },
+ "jr-shinshiraoka": {
+  "kanji": "JR新白岡駅",
+  "yomi": null,
+  "lat": 36.038736,
+  "lon": 139.672103
+ },
  "jr-shinshiro": {
   "kanji": "JR新城駅",
   "yomi": null,
   "lat": 34.901061,
   "lon": 137.493175
+ },
+ "jr-shinsugita": {
+  "kanji": "JR新杉田駅",
+  "yomi": null,
+  "lat": 35.386944,
+  "lon": 139.619444
  },
  "jr-shinsuizenji": {
   "kanji": "JR新水前寺駅",
@@ -7757,8 +9707,26 @@
   "lat": 43.545725,
   "lon": 141.874178
  },
+ "jr-shinurayasu": {
+  "kanji": "JR新浦安駅",
+  "yomi": null,
+  "lat": 35.649444,
+  "lon": 139.912389
+ },
+ "jr-shinyahashira": {
+  "kanji": "JR新八柱駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
  "jr-shinyamaguchi": {
   "kanji": "JR新山口駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
+ "jr-shinyokohama": {
+  "kanji": "JR新横浜駅",
   "yomi": null,
   "lat": null,
   "lon": null
@@ -7780,6 +9748,12 @@
   "yomi": null,
   "lat": 43.967639,
   "lon": 142.454722
+ },
+ "jr-shiomi": {
+  "kanji": "JR潮見駅",
+  "yomi": null,
+  "lat": 35.658722,
+  "lon": 139.817333
  },
  "jr-shiotsu": {
   "kanji": "JR四方津駅",
@@ -7829,6 +9803,12 @@
   "lat": 42.554708,
   "lon": 141.360125
  },
+ "jr-shiraoka": {
+  "kanji": "JR白岡駅",
+  "yomi": null,
+  "lat": 36.017447,
+  "lon": 139.666814
+ },
  "jr-shiretokosyari": {
   "kanji": "JR知床斜里駅",
   "yomi": null,
@@ -7849,6 +9829,12 @@
  },
  "jr-shirokitakoendori": {
   "kanji": "JR城北公園通駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
+ "jr-shisui": {
+  "kanji": "JR酒々井駅",
   "yomi": null,
   "lat": null,
   "lon": null
@@ -7901,6 +9887,12 @@
   "lat": null,
   "lon": null
  },
+ "jr-shukugawara": {
+  "kanji": "JR宿河原駅",
+  "yomi": null,
+  "lat": 35.615278,
+  "lon": 139.579444
+ },
  "jr-shumarinai": {
   "kanji": "JR朱鞠内駅",
   "yomi": null,
@@ -7913,11 +9905,29 @@
   "lat": null,
   "lon": null
  },
+ "jr-sitte": {
+  "kanji": "JR尻手駅",
+  "yomi": null,
+  "lat": 35.531056,
+  "lon": 139.684389
+ },
+ "jr-sodegaura": {
+  "kanji": "JR袖ケ浦駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
  "jr-soen": {
   "kanji": "JR桑園駅",
   "yomi": null,
   "lat": 43.070981,
   "lon": 141.331358
+ },
+ "jr-soga": {
+  "kanji": "JR蘇我駅",
+  "yomi": null,
+  "lat": 35.581472,
+  "lon": 140.131139
  },
  "jr-soja": {
   "kanji": "JR総社駅",
@@ -7967,11 +9977,23 @@
   "lat": null,
   "lon": null
  },
+ "jr-sugamo": {
+  "kanji": "JR巣鴨駅",
+  "yomi": null,
+  "lat": 35.733472,
+  "lon": 139.739333
+ },
  "jr-sugimotocho": {
   "kanji": "JR杉本町駅",
   "yomi": null,
   "lat": null,
   "lon": null
+ },
+ "jr-suidobashi": {
+  "kanji": "JR水道橋駅",
+  "yomi": null,
+  "lat": 35.702,
+  "lon": 139.753611
  },
  "jr-suita": {
   "kanji": "JR吹田駅",
@@ -8045,11 +10067,29 @@
   "lat": null,
   "lon": null
  },
+ "jr-suzumenomiya": {
+  "kanji": "JR雀宮駅",
+  "yomi": null,
+  "lat": 36.493853,
+  "lon": 139.876836
+ },
+ "jr-tabata": {
+  "kanji": "JR田端駅",
+  "yomi": null,
+  "lat": 35.738056,
+  "lon": 139.760833
+ },
  "jr-tachibana": {
   "kanji": "JR立花駅",
   "yomi": null,
   "lat": 34.737961,
   "lon": 135.399122
+ },
+ "jr-tachikawa": {
+  "kanji": "JR立川駅",
+  "yomi": null,
+  "lat": 35.697889,
+  "lon": 139.413944
  },
  "jr-tadami": {
   "kanji": "JR只見駅",
@@ -8093,6 +10133,12 @@
   "lat": 37.115136,
   "lon": 138.242158
  },
+ "jr-takadanobaba": {
+  "kanji": "JR高田馬場駅",
+  "yomi": null,
+  "lat": 35.712222,
+  "lon": 139.70375
+ },
  "jr-takahagi": {
   "kanji": "JR高萩駅",
   "yomi": null,
@@ -8123,6 +10169,12 @@
   "lat": null,
   "lon": null
  },
+ "jr-takanawagateway": {
+  "kanji": "JR高輪ゲートウェイ駅",
+  "yomi": null,
+  "lat": 35.6355,
+  "lon": 139.7407
+ },
  "jr-takanosu": {
   "kanji": "JR鷹ノ巣駅",
   "yomi": null,
@@ -8152,6 +10204,12 @@
   "yomi": null,
   "lat": 36.322472,
   "lon": 139.012778
+ },
+ "jr-takasakitonyamachi": {
+  "kanji": "JR高崎問屋町駅",
+  "yomi": null,
+  "lat": 36.346086,
+  "lon": 139.017114
  },
  "jr-takashima": {
   "kanji": "JR高島駅",
@@ -8243,6 +10301,12 @@
   "lat": 34.220825,
   "lon": 133.692736
  },
+ "jr-tamachi": {
+  "kanji": "JR田町駅",
+  "yomi": null,
+  "lat": 35.645722,
+  "lon": 139.747583
+ },
  "jr-tamagawamura": {
   "kanji": "JR玉川村駅",
   "yomi": null,
@@ -8327,6 +10391,12 @@
   "lat": 35.168056,
   "lon": 138.645833
  },
+ "jr-tateyama": {
+  "kanji": "JR館山駅",
+  "yomi": null,
+  "lat": 34.995833,
+  "lon": 139.862028
+ },
  "jr-tatsuta": {
   "kanji": "JR竜田駅",
   "yomi": null,
@@ -8374,6 +10444,12 @@
   "yomi": null,
   "lat": 34.389944,
   "lon": 132.498319
+ },
+ "jr-tennodai": {
+  "kanji": "JR天王台駅",
+  "yomi": null,
+  "lat": 35.872528,
+  "lon": 140.040917
  },
  "jr-tennoji": {
   "kanji": "JR天王寺駅",
@@ -8441,8 +10517,32 @@
   "lat": null,
   "lon": null
  },
+ "jr-tochigi": {
+  "kanji": "JR栃木駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
+ "jr-toda": {
+  "kanji": "JR戸田駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
+ "jr-todakoen": {
+  "kanji": "JR戸田公園駅",
+  "yomi": null,
+  "lat": 35.808036,
+  "lon": 139.678042
+ },
  "jr-tofukuji": {
   "kanji": "JR東福寺駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
+ "jr-togane": {
+  "kanji": "JR東金駅",
   "yomi": null,
   "lat": null,
   "lon": null
@@ -8485,6 +10585,12 @@
  },
  "jr-tokai": {
   "kanji": "JR東海駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
+ "jr-tokaichiba": {
+  "kanji": "JR十日市場駅",
   "yomi": null,
   "lat": null,
   "lon": null
@@ -8537,6 +10643,12 @@
   "lat": 36.951958,
   "lon": 137.555758
  },
+ "jr-tomiura": {
+  "kanji": "JR富浦駅",
+  "yomi": null,
+  "lat": 35.045306,
+  "lon": 139.837778
+ },
  "jr-tomobe": {
   "kanji": "JR友部駅",
   "yomi": null,
@@ -8578,6 +10690,12 @@
   "yomi": null,
   "lat": 35.89575,
   "lon": 140.062972
+ },
+ "jr-toro": {
+  "kanji": "JR土呂駅",
+  "yomi": null,
+  "lat": 35.931806,
+  "lon": 139.632056
  },
  "jr-tosataisho": {
   "kanji": "JR土佐大正駅",
@@ -8632,6 +10750,12 @@
   "yomi": null,
   "lat": 36.701222,
   "lon": 137.213167
+ },
+ "jr-toyoda": {
+  "kanji": "JR豊田駅",
+  "yomi": null,
+  "lat": 35.6595,
+  "lon": 139.381472
  },
  "jr-toyodacho": {
   "kanji": "JR豊田町駅",
@@ -8723,6 +10847,24 @@
   "lat": null,
   "lon": null
  },
+ "jr-tsudanuma": {
+  "kanji": "JR津田沼駅",
+  "yomi": null,
+  "lat": 35.691111,
+  "lon": 140.020556
+ },
+ "jr-tsudayama": {
+  "kanji": "JR津田山駅",
+  "yomi": null,
+  "lat": 35.603861,
+  "lon": 139.6005
+ },
+ "jr-tsuga": {
+  "kanji": "JR都賀駅",
+  "yomi": null,
+  "lat": 35.636083,
+  "lon": 140.149194
+ },
  "jr-tsuge": {
   "kanji": "JR柘植駅",
   "yomi": null,
@@ -8795,6 +10937,12 @@
   "lat": 34.665247,
   "lon": 135.529925
  },
+ "jr-tsurumi": {
+  "kanji": "JR鶴見駅",
+  "yomi": null,
+  "lat": 35.508556,
+  "lon": 139.676
+ },
  "jr-tsuruoka": {
   "kanji": "JR鶴岡駅",
   "yomi": null,
@@ -8806,6 +10954,12 @@
   "yomi": null,
   "lat": 33.242617,
   "lon": 131.687369
+ },
+ "jr-tsuruta": {
+  "kanji": "JR鶴田駅",
+  "yomi": null,
+  "lat": 36.538253,
+  "lon": 139.857825
  },
  "jr-tsuwano": {
   "kanji": "JR津和野駅",
@@ -8897,14 +11051,32 @@
   "lat": 39.386611,
   "lon": 140.057222
  },
+ "jr-uguisudani": {
+  "kanji": "JR鶯谷駅",
+  "yomi": null,
+  "lat": 35.7213,
+  "lon": 139.7783
+ },
  "jr-uji": {
   "kanji": "JR宇治駅",
   "yomi": null,
   "lat": null,
   "lon": null
  },
+ "jr-ujiie": {
+  "kanji": "JR氏家駅",
+  "yomi": null,
+  "lat": 36.681528,
+  "lon": 139.962286
+ },
  "jr-ukawa": {
   "kanji": "JR鵜川駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
+ "jr-ukimafunado": {
+  "kanji": "JR浮間舟渡駅",
   "yomi": null,
   "lat": null,
   "lon": null
@@ -8999,6 +11171,12 @@
   "lat": null,
   "lon": null
  },
+ "jr-urawa": {
+  "kanji": "JR浦和駅",
+  "yomi": null,
+  "lat": 35.858492,
+  "lon": 139.657453
+ },
  "jr-ureshinoonsen": {
   "kanji": "JR嬉野温泉駅",
   "yomi": null,
@@ -9016,6 +11194,12 @@
   "yomi": null,
   "lat": 33.532183,
   "lon": 131.411928
+ },
+ "jr-ushihama": {
+  "kanji": "JR牛浜駅",
+  "yomi": null,
+  "lat": 35.734556,
+  "lon": 139.333667
  },
  "jr-ushiku": {
   "kanji": "JR牛久駅",
@@ -9173,6 +11357,12 @@
   "lat": 35.162064,
   "lon": 135.922158
  },
+ "jr-warabi": {
+  "kanji": "JR蕨駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
  "jr-watari": {
   "kanji": "JR亘理駅",
   "yomi": null,
@@ -9181,6 +11371,12 @@
  },
  "jr-wespatsubakiyama": {
   "kanji": "JRウェスパ椿山駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
+ "jr-yabe": {
+  "kanji": "JR矢部駅",
   "yomi": null,
   "lat": null,
   "lon": null
@@ -9209,6 +11405,24 @@
   "lat": 36.133478,
   "lon": 138.477367
  },
+ "jr-yachimata": {
+  "kanji": "JR八街駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
+ "jr-yagawa": {
+  "kanji": "JR矢川駅",
+  "yomi": null,
+  "lat": 35.684972,
+  "lon": 139.432111
+ },
+ "jr-yagihara": {
+  "kanji": "JR八木原駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
  "jr-yahata": {
   "kanji": "JR八幡駅",
   "yomi": null,
@@ -9221,11 +11435,29 @@
   "lat": 37.699256,
   "lon": 138.831831
  },
+ "jr-yaho": {
+  "kanji": "JR谷保駅",
+  "yomi": null,
+  "lat": 35.681417,
+  "lon": 139.446583
+ },
+ "jr-yaita": {
+  "kanji": "JR矢板駅",
+  "yomi": null,
+  "lat": 36.806828,
+  "lon": 139.932969
+ },
  "jr-yaizu": {
   "kanji": "JR焼津駅",
   "yomi": null,
   "lat": 34.872206,
   "lon": 138.318247
+ },
+ "jr-yako": {
+  "kanji": "JR矢向駅",
+  "yomi": null,
+  "lat": 35.538917,
+  "lon": 139.680417
  },
  "jr-yakujin": {
   "kanji": "JR厄神駅",
@@ -9299,6 +11531,12 @@
   "lat": null,
   "lon": null
  },
+ "jr-yamate": {
+  "kanji": "JR山手駅",
+  "yomi": null,
+  "lat": 35.427222,
+  "lon": 139.646194
+ },
  "jr-yamatokoizumi": {
   "kanji": "JR大和小泉駅",
   "yomi": null,
@@ -9340,6 +11578,12 @@
   "yomi": null,
   "lat": null,
   "lon": null
+ },
+ "jr-yanoguchi": {
+  "kanji": "JR矢野口駅",
+  "yomi": null,
+  "lat": 35.641667,
+  "lon": 139.520444
  },
  "jr-yao": {
   "kanji": "JR八尾駅",
@@ -9407,11 +11651,23 @@
   "lat": 43.18645,
   "lon": 140.794675
  },
+ "jr-yokaichiba": {
+  "kanji": "JR八日市場駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
  "jr-yokkaichi": {
   "kanji": "JR四日市駅",
   "yomi": null,
   "lat": null,
   "lon": null
+ },
+ "jr-yokodai": {
+  "kanji": "JR洋光台駅",
+  "yomi": null,
+  "lat": 35.378694,
+  "lon": 139.5965
  },
  "jr-yokogawa": {
   "kanji": "JR横川駅",
@@ -9431,6 +11687,18 @@
   "lat": 36.336089,
   "lon": 138.736928
  },
+ "jr-yokoshiba": {
+  "kanji": "JR横芝駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
+ "jr-yokosuka": {
+  "kanji": "JR横須賀駅",
+  "yomi": null,
+  "lat": 35.284111,
+  "lon": 139.655889
+ },
  "jr-yokote": {
   "kanji": "JR横手駅",
   "yomi": null,
@@ -9449,8 +11717,32 @@
   "lat": 37.909636,
   "lon": 140.128208
  },
+ "jr-yono": {
+  "kanji": "JR与野駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
+ "jr-yonohoncho": {
+  "kanji": "JR与野本町駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
  "jr-yoshida": {
   "kanji": "JR吉田駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
+ "jr-yoshikawa": {
+  "kanji": "JR吉川駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
+ "jr-yoshikawaminami": {
+  "kanji": "JR吉川美南駅",
   "yomi": null,
   "lat": null,
   "lon": null
@@ -9473,11 +11765,29 @@
   "lat": 33.607161,
   "lon": 130.423906
  },
+ "jr-yotsukaido": {
+  "kanji": "JR四街道駅",
+  "yomi": null,
+  "lat": 35.663,
+  "lon": 140.165583
+ },
  "jr-yotsukura": {
   "kanji": "JR四ツ倉駅",
   "yomi": null,
   "lat": null,
   "lon": null
+ },
+ "jr-yotsuya": {
+  "kanji": "JR四ツ谷駅",
+  "yomi": null,
+  "lat": 35.686,
+  "lon": 139.730667
+ },
+ "jr-yoyogi": {
+  "kanji": "JR代々木駅",
+  "yomi": null,
+  "lat": 35.683056,
+  "lon": 139.702083
  },
  "jr-yudaonsen": {
   "kanji": "JR湯田温泉駅",
@@ -9503,6 +11813,12 @@
   "lat": null,
   "lon": null
  },
+ "jr-yuki": {
+  "kanji": "JR結城駅",
+  "yomi": null,
+  "lat": 36.298219,
+  "lon": 139.872283
+ },
  "jr-yukuhashi": {
   "kanji": "JR行橋駅",
   "yomi": null,
@@ -9514,6 +11830,12 @@
   "yomi": null,
   "lat": null,
   "lon": null
+ },
+ "jr-yurakucho": {
+  "kanji": "JR有楽町駅",
+  "yomi": null,
+  "lat": 35.675056,
+  "lon": 139.763333
  },
  "jr-yuza": {
   "kanji": "JR遊佐駅",
@@ -9544,6 +11866,12 @@
   "yomi": null,
   "lat": 34.999419,
   "lon": 135.881042
+ },
+ "jr-zushi": {
+  "kanji": "JR逗子駅",
+  "yomi": null,
+  "lat": 35.2975,
+  "lon": 139.579444
  },
  "jre-kuji": {
   "kanji": "JR久慈駅",
@@ -10354,6 +12682,30 @@
   "yomi": null,
   "lat": null,
   "lon": null
+ },
+ "nankai-kishinosatotamade": {
+  "kanji": "南海電鉄岸里玉出駅",
+  "yomi": null,
+  "lat": 34.629194,
+  "lon": 135.494639
+ },
+ "nankai-namba": {
+  "kanji": "南海電鉄難波駅",
+  "yomi": null,
+  "lat": 34.663411,
+  "lon": 135.501911
+ },
+ "nankai-shinimamiya": {
+  "kanji": "南海電鉄新今宮駅",
+  "yomi": null,
+  "lat": 34.650208,
+  "lon": 135.500258
+ },
+ "nankai-tengachaya": {
+  "kanji": "南海電鉄天下茶屋駅",
+  "yomi": null,
+  "lat": 34.637194,
+  "lon": 135.49675
  },
  "ngr-gujohachiman": {
   "kanji": "長良川鉄道郡上八幡駅",
@@ -11443,6 +13795,60 @@
  },
  "tlr-jogawara": {
   "kanji": "富山ライトレール城川原駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
+ "tobu-fujinoushijima": {
+  "kanji": "東武鉄道藤の牛島駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
+ "tobu-funabashi": {
+  "kanji": "東武鉄道船橋駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
+ "tobu-iwatsuki": {
+  "kanji": "東武鉄道岩槻駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
+ "tobu-kashiwa": {
+  "kanji": "東武鉄道柏駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
+ "tobu-kasukabe": {
+  "kanji": "東武鉄道春日部駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
+ "tobu-nagareyamaotakanomori": {
+  "kanji": "東武鉄道流山おおたかの森駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
+ "tobu-nodashi": {
+  "kanji": "東武鉄道野田市駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
+ "tobu-omiya": {
+  "kanji": "東武鉄道大宮駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null
+ },
+ "tobu-toyoshiki": {
+  "kanji": "東武鉄道豊四季駅",
   "yomi": null,
   "lat": null,
   "lon": null

@@ -3341,6 +3341,72 @@
    ]
   },
   {
+   "line_slug": "jr-agatsuma-line",
+   "line_name_en": "JR Agatsuma Line",
+   "stations": [
+    {
+     "jp_slug": "jr-shibukawa",
+     "name_full": "JR Shibukawa Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-onogami",
+     "name_full": "JR Onogami Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-onogamionsen",
+     "name_full": "JR Onogami-Onsen Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-nakanojo",
+     "name_full": "JR Nakanojō Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-gummaharamachi",
+     "name_full": "JR Gumma-Haramachi Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-kawarayuonsen",
+     "name_full": "JR Kawarayu-Onsen Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-naganoharakusatsuguchi",
+     "name_full": "JR Naganoharakusatsuguchi Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-naganoharakusatsuguchi",
+     "name_full": "JR Gumma-Ōtsu Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-haneo",
+     "name_full": "JR Haneo Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-fukurogura",
+     "name_full": "JR Fukurogura Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-manzakazawaguchi",
+     "name_full": "JR Manza·Kazawaguchi Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-omae",
+     "name_full": "JR Ōmae Station",
+     "status": "None"
+    }
+   ]
+  },
+  {
    "line_slug": "jr-akitashinkansen-line",
    "line_name_en": "JR Akita Shinkansen",
    "stations": [
@@ -3984,6 +4050,172 @@
     {
      "jp_slug": "jr-shinchitose",
      "name_full": "JR New Chitose Airport Station",
+     "status": "Found"
+    }
+   ]
+  },
+  {
+   "line_slug": "jr-chuo-line",
+   "line_name_en": "JR Chūō Main Line(Tōkyō - Takao)",
+   "stations": [
+    {
+     "jp_slug": "jr-tokyo",
+     "name_full": "JR Tōkyō Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-kanda",
+     "name_full": "JR Kanda Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-ochanomizu",
+     "name_full": "JR Ochanomizu Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-suidobashi",
+     "name_full": "JR Suidōbashi Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-iidabashi",
+     "name_full": "JR Iidabashi Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-ichigaya",
+     "name_full": "JR Ichigaya Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-yotsuya",
+     "name_full": "JR Yotsuya Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-shinanomachi",
+     "name_full": "JR Shinanomachi Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-sendagaya",
+     "name_full": "JR Sendagaya Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-yoyogi",
+     "name_full": "JR Yoyogi Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-shinjuku",
+     "name_full": "JR Shinjuku Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-okubo",
+     "name_full": "JR Ōkubo Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-higashinakano",
+     "name_full": "JR Higashi-Nakano Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-nakano",
+     "name_full": "JR Nakano Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-kouenji",
+     "name_full": "JR Kōenji Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-asagaya",
+     "name_full": "JR Asagaya Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-ogikubo",
+     "name_full": "JR Ogikubo Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-nishiogikubo",
+     "name_full": "JR Nishi-Ogikubo Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-kichijoji",
+     "name_full": "JR Kichijōji Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-mitaka",
+     "name_full": "JR Mitaka Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-musashisakai",
+     "name_full": "JR Musashi-Sakai Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-higashikoganei",
+     "name_full": "JR Higashi-Koganei Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-musashikoganei",
+     "name_full": "JR Musashi-Koganei Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-kokubunji",
+     "name_full": "JR Kokubunji Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-nishikokubunji",
+     "name_full": "JR Nishi-Kokubunji Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-kunitachi",
+     "name_full": "JR Kunitachi Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-tachikawa",
+     "name_full": "JR Tachikawa Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-hino",
+     "name_full": "JR Hino Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-toyoda",
+     "name_full": "JR Toyoda Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-hachioji",
+     "name_full": "JR Hachiōji Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-nishihachioji",
+     "name_full": "JR Nishi-Hachiōji Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-takao",
+     "name_full": "JR Takao Station",
      "status": "Found"
     }
    ]
@@ -5041,6 +5273,107 @@
     {
      "jp_slug": "jr-tagawagotoji",
      "name_full": "JR Tagawagotōji Station",
+     "status": "Found"
+    }
+   ]
+  },
+  {
+   "line_slug": "jr-hachiko-line",
+   "line_name_en": "JR Hachikō Line",
+   "stations": [
+    {
+     "jp_slug": "jr-hachioji",
+     "name_full": "JR Hachiōji Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-kitahachioji",
+     "name_full": "JR Kita-Hachiōji Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-komiya",
+     "name_full": "JR Komiya Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-haijima",
+     "name_full": "JR Haijima Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-higashifussa",
+     "name_full": "JR Higashi-Fussa Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-hakonegasaki",
+     "name_full": "JR Hakonegasaki Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-kaneko",
+     "name_full": "JR Kaneko Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-higashihanno",
+     "name_full": "JR Higashi-Hannō Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-komagawa",
+     "name_full": "JR Komagawa Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-moro",
+     "name_full": "JR Moro Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-ogose",
+     "name_full": "JR Ogose Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-myokaku",
+     "name_full": "JR Myōkaku Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-ogawamachi",
+     "name_full": "JR Ogawamachi Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-takezawa",
+     "name_full": "JR Takezawa Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-yorii",
+     "name_full": "JR Yorii Station",
+     "status": "Another station"
+    },
+    {
+     "jp_slug": "jr-kodama",
+     "name_full": "JR Kodama Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-tansho",
+     "name_full": "JR Tanshō Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-gummafujioka",
+     "name_full": "JR Gumma-Fujioka Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-kuragano",
+     "name_full": "JR Kuragano Station",
      "status": "Found"
     }
    ]
@@ -7075,6 +7408,47 @@
    ]
   },
   {
+   "line_slug": "jr-itsukaichi-line",
+   "line_name_en": "JR Itsukaichi Line",
+   "stations": [
+    {
+     "jp_slug": "jr-haijima",
+     "name_full": "JR Haijima Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-kumagawa",
+     "name_full": "JR Kumagawa Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-higashiakiru",
+     "name_full": "JR Higashi-Akiru Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-akigawa",
+     "name_full": "JR Akigawa Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-musashihikida",
+     "name_full": "JR Musashi-Hikida Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-musashimasuko",
+     "name_full": "JR Musashi-Masuko Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-musashiitsukaichi",
+     "name_full": "JR Musashi-Itsukaichi Station",
+     "status": "Found"
+    }
+   ]
+  },
+  {
    "line_slug": "jr-iwaizumi-line",
    "line_name_en": "JR Iwaizumi Line",
    "stations": [
@@ -7419,6 +7793,204 @@
     {
      "jp_slug": "jr-iwanuma",
      "name_full": "JR Iwanuma Station",
+     "status": "Found"
+    }
+   ]
+  },
+  {
+   "line_slug": "jr-jobankaisoku-line",
+   "line_name_en": "JR Jōban Line(Rapid)",
+   "stations": [
+    {
+     "jp_slug": "jr-nippori",
+     "name_full": "JR Nippori Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-mikawashima",
+     "name_full": "JR Mikawashima Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-minamisenju",
+     "name_full": "JR Minami-Senju Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-kitasenju",
+     "name_full": "JR Kita-Senju Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-matsudo",
+     "name_full": "JR Matsudo Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-kashiwa",
+     "name_full": "JR Kashiwa Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-abiko",
+     "name_full": "JR Abiko Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-tennodai",
+     "name_full": "JR Tennōdai Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-toride",
+     "name_full": "JR Toride Station",
+     "status": "Found"
+    }
+   ]
+  },
+  {
+   "line_slug": "jr-jobankanko-line",
+   "line_name_en": "JR Jōban Line(Kita-Senju - Toride)",
+   "stations": [
+    {
+     "jp_slug": "jr-kitasenju",
+     "name_full": "JR Kita-Senju Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "metro-ayase",
+     "name_full": "JR Ayase Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-kameari",
+     "name_full": "JR Kameari Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-kanamachi",
+     "name_full": "JR Kanamachi Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-matsudo",
+     "name_full": "JR Matsudo Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-kitamatsudo",
+     "name_full": "JR Kita-Matsudo Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-mabashi",
+     "name_full": "JR Mabashi Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-shinmatsudo",
+     "name_full": "JR Shim-Matsudo Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-kitakogane",
+     "name_full": "JR Kita-Kogane Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-minamikashiwa",
+     "name_full": "JR Minami-Kashiwa Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-kashiwa",
+     "name_full": "JR Kashiwa Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-kitakashiwa",
+     "name_full": "JR Kita-Kashiwa Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-abiko",
+     "name_full": "JR Abiko Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-tennodai",
+     "name_full": "JR Tennōdai Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-toride",
+     "name_full": "JR Toride Station",
+     "status": "Found"
+    }
+   ]
+  },
+  {
+   "line_slug": "jr-joetsu-kanto-line",
+   "line_name_en": "JR Jōetsu Line(Takasaki - Minakami)",
+   "stations": [
+    {
+     "jp_slug": "jr-takasaki",
+     "name_full": "JR Takasaki Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-takasakitonyamachi",
+     "name_full": "JR Takasakitonyamachi Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-ino",
+     "name_full": "JR Ino Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-shinmaebashi",
+     "name_full": "JR Shim-Maebashi Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-gummasoja",
+     "name_full": "JR Gumma-Sōja Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-yagihara",
+     "name_full": "JR Yagihara Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-shibukawa",
+     "name_full": "JR Shibukawa Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-shikishima",
+     "name_full": "JR Shikishima Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-iwamoto",
+     "name_full": "JR Iwamoto Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-numata",
+     "name_full": "JR Numata Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-gokan",
+     "name_full": "JR Gokan Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-minakami",
+     "name_full": "JR Minakami Station",
      "status": "Found"
     }
    ]
@@ -8354,6 +8926,52 @@
    ]
   },
   {
+   "line_slug": "jr-karasuyama-line",
+   "line_name_en": "JR Karasuyama Line",
+   "stations": [
+    {
+     "jp_slug": "jr-housyakuji",
+     "name_full": "JR Hōshakuji Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-shimotsukehanaoka",
+     "name_full": "JR Shimotsuke-Hanaoka Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-niida",
+     "name_full": "JR Niita Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-konoyama",
+     "name_full": "JR Kōnoyama Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-oogane",
+     "name_full": "JR Ōgane Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-kobana",
+     "name_full": "JR Kobana Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jre-taki",
+     "name_full": "JR Taki Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-karasuyama",
+     "name_full": "JR Karasuyama Station",
+     "status": "None"
+    }
+   ]
+  },
+  {
    "line_slug": "jr-karatsu-line",
    "line_name_en": "JR Karatsu Line",
    "stations": [
@@ -8471,6 +9089,27 @@
    ]
   },
   {
+   "line_slug": "jr-kashima-line",
+   "line_name_en": "JR Kashima Line",
+   "stations": [
+    {
+     "jp_slug": "jr-itako",
+     "name_full": "JR Itako Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-kashimajingu",
+     "name_full": "JR Kashimajingū Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-kashimasoccerstadium",
+     "name_full": "JR Kashima-Soccer Stadium Station",
+     "status": "Found"
+    }
+   ]
+  },
+  {
    "line_slug": "jr-katamachi-line",
    "line_name_en": "JR Gakkentoshi Line(Katamachi Line)",
    "stations": [
@@ -8583,6 +9222,354 @@
      "jp_slug": "jrw-katamachi",
      "name_full": "JR Katamachi Station",
      "status": "None"
+    }
+   ]
+  },
+  {
+   "line_slug": "jr-kawagoe-line",
+   "line_name_en": "JR Kawagoe Line",
+   "stations": [
+    {
+     "jp_slug": "jr-omiya",
+     "name_full": "JR Ōmiya Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-nissin",
+     "name_full": "JR Nisshin Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-nishiomiya",
+     "name_full": "JR Nishi-Ōmiya Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-sashiougi",
+     "name_full": "JR Sashiōgi Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-minamifuruya",
+     "name_full": "JR Minami-Furuya Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-kawagoe",
+     "name_full": "JR Kawagoe Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-nishikawagoe",
+     "name_full": "JR Nishi-Kawagoe Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-matoba",
+     "name_full": "JR Matoba Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-kasahata",
+     "name_full": "JR Kasahata Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-musashitakahagi",
+     "name_full": "JR Musashi-Takahagi Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-komagawa",
+     "name_full": "JR Komagawa Station",
+     "status": "Found"
+    }
+   ]
+  },
+  {
+   "line_slug": "jr-keihintohoku-line",
+   "line_name_en": "JR Keihin–Tōhoku Line",
+   "stations": [
+    {
+     "jp_slug": "jr-omiya",
+     "name_full": "JR Ōmiya Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-saitamashintoshin",
+     "name_full": "JR Saitama-Shintoshin Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-yono",
+     "name_full": "JR Yono Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-kitaurawa",
+     "name_full": "JR Kita-Urawa Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-urawa",
+     "name_full": "JR Urawa Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-minamiurawa",
+     "name_full": "JR Minami-Urawa Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-warabi",
+     "name_full": "JR Warabi Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-nishikawaguchi",
+     "name_full": "JR Nishi-Kawaguchi Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-kawaguchi",
+     "name_full": "JR Kawaguchi Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-akabane",
+     "name_full": "JR Akabane Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-higashijujo",
+     "name_full": "JR Higashi-Jūjō Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-oji",
+     "name_full": "JR Ōji Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-kaminakazato",
+     "name_full": "JR Kami-Nakazato Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-tabata",
+     "name_full": "JR Tabata Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-nishinippori",
+     "name_full": "JR Nishi-Nippori Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-nippori",
+     "name_full": "JR Nippori Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-uguisudani",
+     "name_full": "JR Uguisudani Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-ueno",
+     "name_full": "JR Ueno Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-okachimachi",
+     "name_full": "JR Okachimachi Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-akihabara",
+     "name_full": "JR Akihabara Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-kanda",
+     "name_full": "JR Kanda Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-tokyo",
+     "name_full": "JR Tōkyō Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-yurakucho",
+     "name_full": "JR Yūrakuchō Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-shinbashi",
+     "name_full": "JR Shimbashi Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-hamamatucho",
+     "name_full": "JR Hamamatsuchō Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-tamachi",
+     "name_full": "JR Tamachi Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-takanawagateway",
+     "name_full": "JR Takanawa Gateway Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-shinagawa",
+     "name_full": "JR Shinagawa Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-oimachi",
+     "name_full": "JR Ōimachi Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-omori",
+     "name_full": "JR Ōmori Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-kamata",
+     "name_full": "JR Kamata Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-kawasaki",
+     "name_full": "JR Kawasaki Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-tsurumi",
+     "name_full": "JR Tsurumi Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-shinkoyasu",
+     "name_full": "JR Shin-Koyasu Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-higashikanagawa",
+     "name_full": "JR Higashi-Kanagawa Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-yokohama",
+     "name_full": "JR Yokohama Station",
+     "status": "Found"
+    }
+   ]
+  },
+  {
+   "line_slug": "jr-keiyo-line",
+   "line_name_en": "JR Keiyō Line",
+   "stations": [
+    {
+     "jp_slug": "jr-tokyo",
+     "name_full": "JR Tōkyō Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-hatchobori",
+     "name_full": "JR Hatchōbori Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-etchujima",
+     "name_full": "JR Etchūjima Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-shiomi",
+     "name_full": "JR Shiomi Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-shinkiba",
+     "name_full": "JR Shin-Kiba Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-kasairinkaikoen",
+     "name_full": "JR Kasai-Rinkai Park Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-maihama",
+     "name_full": "JR Maihama Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-shinurayasu",
+     "name_full": "JR Shin-Urayasu Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-ichikawashiohama",
+     "name_full": "JR Ichikawashiohama Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-futamatashimmachi",
+     "name_full": "JR Futamatashimmachi Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-minamifunabashi",
+     "name_full": "JR Minami-Funabashi Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-shinnarashino",
+     "name_full": "JR Shin-Narashino Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-makuharitoyosuna",
+     "name_full": "JR Makuharitoyosuna Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-kaihinmakuhari",
+     "name_full": "JR Kaihimmakuhari Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-kemigawahama",
+     "name_full": "JR Kemigawahama Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-inagekaigan",
+     "name_full": "JR Inagekaigan Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-chibaminato",
+     "name_full": "JR Chibaminato Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-soga",
+     "name_full": "JR Soga Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-nishifunabashi",
+     "name_full": "JR Nishi-Funabashi Station",
+     "status": "Found"
     }
    ]
   },
@@ -9788,6 +10775,37 @@
    ]
   },
   {
+   "line_slug": "jr-kururi-line",
+   "line_name_en": "JR Kururi Line",
+   "stations": [
+    {
+     "jp_slug": "jr-kisarazu",
+     "name_full": "JR Kisarazu Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-yokota",
+     "name_full": "JR Yokota Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-makuta",
+     "name_full": "JR Makuta Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-kururi",
+     "name_full": "JR Kururi Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-kazusakameyama",
+     "name_full": "JR Kazusa-Kameyama Station",
+     "status": "None"
+    }
+   ]
+  },
+  {
    "line_slug": "jr-kusatsu-line",
    "line_name_en": "JR Kusatsu Line",
    "stations": [
@@ -10416,6 +11434,67 @@
    ]
   },
   {
+   "line_slug": "jr-mito-line",
+   "line_name_en": "JR Mito Line",
+   "stations": [
+    {
+     "jp_slug": "jr-oyama",
+     "name_full": "JR Oyama Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-yuki",
+     "name_full": "JR Yūki Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-kawashima",
+     "name_full": "JR Kawashima Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-shimodate",
+     "name_full": "JR Shimodate Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-niihari",
+     "name_full": "JR Niihari Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-iwase",
+     "name_full": "JR Iwase Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-fukuhara",
+     "name_full": "JR Fukuhara Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-inada",
+     "name_full": "JR Inada Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-kasama",
+     "name_full": "JR Kasama Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-shishido",
+     "name_full": "JR Shishido Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-tomobe",
+     "name_full": "JR Tomobe Station",
+     "status": "Found"
+    }
+   ]
+  },
+  {
    "line_slug": "jr-miyazu-line",
    "line_name_en": "JR Miyazu Line",
    "stations": [
@@ -10452,6 +11531,27 @@
     {
      "jp_slug": "jr-toyooka",
      "name_full": "JR Toyooka Station",
+     "status": "Found"
+    }
+   ]
+  },
+  {
+   "line_slug": "jr-mooka-line",
+   "line_name_en": "JR Mōka Line",
+   "stations": [
+    {
+     "jp_slug": "jr-shimodate",
+     "name_full": "JR Shimodate Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-kugeta",
+     "name_full": "JR Kugeta Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-motegi",
+     "name_full": "JR Motegi Station",
      "status": "Found"
     }
    ]
@@ -10661,6 +11761,142 @@
    ]
   },
   {
+   "line_slug": "jr-musashino-line",
+   "line_name_en": "JR Musashino Line",
+   "stations": [
+    {
+     "jp_slug": "jr-fuchuhonmachi",
+     "name_full": "JR Fuchūhommachi Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-kitafuchu",
+     "name_full": "JR Kita-Fuchū Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-nishikokubunji",
+     "name_full": "JR Nishi-Kokubunji Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-shinkodaira",
+     "name_full": "JR Shin-Kodaira Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-shinakitsu",
+     "name_full": "JR Shin-Akitsu Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-higashitokorozawa",
+     "name_full": "JR Higashi-Tokorozawa Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-niiza",
+     "name_full": "JR Niiza Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-kitaasaka",
+     "name_full": "JR Kita-Asaka Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-nishiurawa",
+     "name_full": "JR Nishi-Urawa Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-musashiurawa",
+     "name_full": "JR Musashi-Urawa Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-minamiurawa",
+     "name_full": "JR Minami-Urawa Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-higashiurawa",
+     "name_full": "JR Higashi-Urawa Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-higashikawaguchi",
+     "name_full": "JR Higashi-Kawaguchi Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-minamikoshigaya",
+     "name_full": "JR Minami-Koshigaya Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-koshigayalaketown",
+     "name_full": "JR Koshigaya-Laketown Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-yoshikawa",
+     "name_full": "JR Yoshikawa Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-yoshikawaminami",
+     "name_full": "JR Yoshikawaminami Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-shinmisato",
+     "name_full": "JR Shim-Misato Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-misato",
+     "name_full": "JR Misato Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-minaminagareyama",
+     "name_full": "JR Minami-Nagareyama Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-shinmatsudo",
+     "name_full": "JR Shim-Matsudo Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-shinyahashira",
+     "name_full": "JR Shin-Yahashira Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-higashimatsudo",
+     "name_full": "JR Higashi-Matsudo Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-ichikawaono",
+     "name_full": "JR Ichikawaōno Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-funabashihoten",
+     "name_full": "JR Funabashihōten Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-nishifunabashi",
+     "name_full": "JR Nishi-Funabashi Station",
+     "status": "Found"
+    }
+   ]
+  },
+  {
    "line_slug": "jr-nagasaki-line",
    "line_name_en": "JR Nagasaki Main Line",
    "stations": [
@@ -10780,6 +12016,142 @@
      "jp_slug": "jr-nakamura",
      "name_full": "JR Nakamura Station",
      "status": "Found"
+    }
+   ]
+  },
+  {
+   "line_slug": "jr-nambu-line",
+   "line_name_en": "JR Nambu Line",
+   "stations": [
+    {
+     "jp_slug": "jr-tachikawa",
+     "name_full": "JR Tachikawa Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-nishikunitachi",
+     "name_full": "JR Nishi-Kunitachi Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-yagawa",
+     "name_full": "JR Yagawa Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-yaho",
+     "name_full": "JR Yaho Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-nishifu",
+     "name_full": "JR Nishifu Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-fuchuhonmachi",
+     "name_full": "JR Fuchūhommachi Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-minamitama",
+     "name_full": "JR Minami-Tama Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-inaginaganuma",
+     "name_full": "JR Inaginaganuma Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-yanoguchi",
+     "name_full": "JR Yanokuchi Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-inadazutsumi",
+     "name_full": "JR Inadazutsumi Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-nakanoshima",
+     "name_full": "JR Nakanoshima Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-noborito",
+     "name_full": "JR Noborito Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-shukugawara",
+     "name_full": "JR Shukugawara Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-kuji",
+     "name_full": "JR Kuji Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-tsudayama",
+     "name_full": "JR Tsudayama Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-musashimizonokuchi",
+     "name_full": "JR Musashi-Mizonokuchi Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-musashishinjo",
+     "name_full": "JR Musashi-Shinjō Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-musashinakahara",
+     "name_full": "JR Musashi-Nakahara Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-musashikosugi",
+     "name_full": "JR Musashi-Kosugi Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-mukaigawara",
+     "name_full": "JR Mukaigawara Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-hirama",
+     "name_full": "JR Hirama Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-kashimada",
+     "name_full": "JR Kashimada Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-yako",
+     "name_full": "JR Yakō Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-sitte",
+     "name_full": "JR Shitte Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-kawasaki",
+     "name_full": "JR Kawasaki Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-hamakawasaki",
+     "name_full": "JR Hama-Kawasaki Station",
+     "status": "None"
     }
    ]
   },
@@ -10972,6 +12344,128 @@
    ]
   },
   {
+   "line_slug": "jr-narita-abiko-line",
+   "line_name_en": "JR Narita Line(Abiko Branch Line)",
+   "stations": [
+    {
+     "jp_slug": "jr-abiko",
+     "name_full": "JR Abiko Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-kohoku",
+     "name_full": "JR Kohoku Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-araki",
+     "name_full": "JR Araki Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-fusa",
+     "name_full": "JR Fusa Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-kioroshi",
+     "name_full": "JR Kioroshi Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-kobayashi",
+     "name_full": "JR Kobayashi Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-ajiki",
+     "name_full": "JR Ajiki Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-shimosamanzaki",
+     "name_full": "JR Shimōsa-Manzaki Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-narita",
+     "name_full": "JR Narita Station",
+     "status": "Found"
+    }
+   ]
+  },
+  {
+   "line_slug": "jr-narita-line",
+   "line_name_en": "JR Narita Line",
+   "stations": [
+    {
+     "jp_slug": "jr-sakura",
+     "name_full": "JR Sakura Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-shisui",
+     "name_full": "JR Shisui Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-narita",
+     "name_full": "JR Narita Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-namegawa",
+     "name_full": "JR Namegawa Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-shimosakozaki",
+     "name_full": "JR Shimōsa-Kōzaki Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-sawara",
+     "name_full": "JR Sawara Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-omigawa",
+     "name_full": "JR Omigawa Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-sasagawa",
+     "name_full": "JR Sasagawa Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-shimosatachibana",
+     "name_full": "JR Shimōsa-Tachibana Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-shimosatoyosato",
+     "name_full": "JR Shimōsa-Toyosato Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-matsugishi",
+     "name_full": "JR Matsugishi Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-naritaairport2",
+     "name_full": "JR Narita Airport Terminal 2･3 Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-naritaairport",
+     "name_full": "JR Narita Airport Terminal 1 Station",
+     "status": "Found"
+    }
+   ]
+  },
+  {
    "line_slug": "jr-naruto-line",
    "line_name_en": "JR Naruto Line",
    "stations": [
@@ -11045,6 +12539,72 @@
      "jp_slug": "jr-yubetsu",
      "name_full": "JR Yūbetsu Station",
      "status": "None"
+    }
+   ]
+  },
+  {
+   "line_slug": "jr-negishi-line",
+   "line_name_en": "JR Negishi Line",
+   "stations": [
+    {
+     "jp_slug": "jr-yokohama",
+     "name_full": "JR Yokohama Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-sakuragicho",
+     "name_full": "JR Sakuragichō Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-kannai",
+     "name_full": "JR Kannai Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-ishikawacho",
+     "name_full": "JR Ishikawachō Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-yamate",
+     "name_full": "JR Yamate Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-negishi",
+     "name_full": "JR Negishi Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-isogo",
+     "name_full": "JR Isogo Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-shinsugita",
+     "name_full": "JR Shin-Sugita Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-yokodai",
+     "name_full": "JR Yōkōdai Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-konandai",
+     "name_full": "JR Kōnandai Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-hongodai",
+     "name_full": "JR Hongōdai Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-ofuna",
+     "name_full": "JR Ōfuna Station",
+     "status": "Found"
     }
    ]
   },
@@ -11283,6 +12843,42 @@
     {
      "jp_slug": "jr-miyazakiairport",
      "name_full": "JR Miyazaki Airport Station",
+     "status": "Found"
+    }
+   ]
+  },
+  {
+   "line_slug": "jr-nikko-line",
+   "line_name_en": "JR Nikkō Line",
+   "stations": [
+    {
+     "jp_slug": "jr-utsunomiya",
+     "name_full": "JR Utsunomiya Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-tsuruta",
+     "name_full": "JR Tsuruta Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-kanuma",
+     "name_full": "JR Kanuma Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-shimotsukeosawa",
+     "name_full": "JR Shimotsuke-Ōsawa Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-imaichi",
+     "name_full": "JR Imaichi Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-nikko",
+     "name_full": "JR Nikkō Station",
      "status": "Found"
     }
    ]
@@ -12018,6 +13614,132 @@
    ]
   },
   {
+   "line_slug": "jr-ome-line",
+   "line_name_en": "JR Ōme Line",
+   "stations": [
+    {
+     "jp_slug": "jr-tachikawa",
+     "name_full": "JR Tachikawa Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-nishitachikawa",
+     "name_full": "JR Nishi-Tachikawa Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-higashinagami",
+     "name_full": "JR Higashi-Nakagami Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-nakagami",
+     "name_full": "JR Nakagami Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-akishima",
+     "name_full": "JR Akishima Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-haijima",
+     "name_full": "JR Haijima Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-ushihama",
+     "name_full": "JR Ushihama Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-fussa",
+     "name_full": "JR Fussa Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-hamura",
+     "name_full": "JR Hamura Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-ozaku",
+     "name_full": "JR Ozaku Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-kabe",
+     "name_full": "JR Kabe Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-higashiome",
+     "name_full": "JR Higashi-Ōme Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-oume",
+     "name_full": "JR Ōme Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-miyanohira",
+     "name_full": "JR Miyanohira Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-hinatawada",
+     "name_full": "JR Hinatawada Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-ishigamimae",
+     "name_full": "JR Ishigamimae Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-futamatao",
+     "name_full": "JR Futamatao Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-ikusabata",
+     "name_full": "JR Ikusabata Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-sawai",
+     "name_full": "JR Sawai Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-mitake",
+     "name_full": "JR Mitake Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-kori",
+     "name_full": "JR Kori Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-hatonosu",
+     "name_full": "JR Hatonosu Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-shiromaru",
+     "name_full": "JR Shiromaru Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-okutama",
+     "name_full": "JR Oku-Tama Station",
+     "status": "Found"
+    }
+   ]
+  },
+  {
    "line_slug": "jr-ominato-line",
    "line_name_en": "JR Ōminato Line",
    "stations": [
@@ -12714,6 +14436,133 @@
    ]
   },
   {
+   "line_slug": "jr-ryomo-line",
+   "line_name_en": "JR Ryōmō Line",
+   "stations": [
+    {
+     "jp_slug": "jr-oyama",
+     "name_full": "JR Oyama Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-tochigi",
+     "name_full": "JR Tochigi Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-iwafune",
+     "name_full": "JR Iwafune Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-sano",
+     "name_full": "JR Sano Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-tomita",
+     "name_full": "JR Tomita Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-ashikagaflowerpark",
+     "name_full": "JR Ashikaga Flower Park Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-ashikaga",
+     "name_full": "JR Ashikaga Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-yamamae",
+     "name_full": "JR Yamamae Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-kiryu",
+     "name_full": "JR Kiryū Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-iwajuku",
+     "name_full": "JR Iwajuku Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-kunisada",
+     "name_full": "JR Kunisada Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-isesaki",
+     "name_full": "JR Isesaki Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-komagata",
+     "name_full": "JR Komagata Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-maebashioshima",
+     "name_full": "JR Maebashiōshima Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-maebashi",
+     "name_full": "JR Maebashi Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-shinmaebashi",
+     "name_full": "JR Shim-Maebashi Station",
+     "status": "Found"
+    }
+   ]
+  },
+  {
+   "line_slug": "jr-sagami-line",
+   "line_name_en": "JR Sagami Line",
+   "stations": [
+    {
+     "jp_slug": "jr-hashimoto",
+     "name_full": "JR Hashimoto Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-minamihashimoto",
+     "name_full": "JR Minami-Hashimoto Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-iriya",
+     "name_full": "JR Iriya Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-ebina",
+     "name_full": "JR Ebina Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-miyayama",
+     "name_full": "JR Miyayama Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-samukawa",
+     "name_full": "JR Samukawa Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-chigasaki",
+     "name_full": "JR Chigasaki Station",
+     "status": "Found"
+    }
+   ]
+  },
+  {
    "line_slug": "jr-sagano-line",
    "line_name_en": "JR Sagano Line(San'in Main Line)",
    "stations": [
@@ -12790,6 +14639,107 @@
     {
      "jp_slug": "jr-sonobe",
      "name_full": "JR Sonobe Station",
+     "status": "Found"
+    }
+   ]
+  },
+  {
+   "line_slug": "jr-saikyo-line",
+   "line_name_en": "JR Saikyō Line",
+   "stations": [
+    {
+     "jp_slug": "jr-osaki",
+     "name_full": "JR Ōsaki Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-ebisu",
+     "name_full": "JR Ebisu Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-shibuya",
+     "name_full": "JR Shibuya Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-shinjuku",
+     "name_full": "JR Shinjuku Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-ikebukuro",
+     "name_full": "JR Ikebukuro Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-itabashi",
+     "name_full": "JR Itabashi Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-jujo",
+     "name_full": "JR Jūjō Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-akabane",
+     "name_full": "JR Akabane Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-kitaakabane",
+     "name_full": "JR Kita-Akabane Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-ukimafunado",
+     "name_full": "JR Ukimafunado Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-todakoen",
+     "name_full": "JR Toda-Kōen Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-toda",
+     "name_full": "JR Toda Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-kitatoda",
+     "name_full": "JR Kita-Toda Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-musashiurawa",
+     "name_full": "JR Musashi-Urawa Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-nakaurawa",
+     "name_full": "JR Naka-Urawa Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-minamiyono",
+     "name_full": "JR Minami-Yono Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-yonohoncho",
+     "name_full": "JR Yono-Hommachi Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-kitayono",
+     "name_full": "JR Kita-Yono Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-omiya",
+     "name_full": "JR Ōmiya Station",
      "status": "Found"
     }
    ]
@@ -15062,6 +17012,52 @@
    ]
   },
   {
+   "line_slug": "jr-shinetsu-yokokawa-line",
+   "line_name_en": "JR Shin'etsu Main Line(Takasaki - Yokokawa)",
+   "stations": [
+    {
+     "jp_slug": "jr-takasaki",
+     "name_full": "JR Takasaki Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-kitatakasaki",
+     "name_full": "JR Kita-Takasaki Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-gummayawata",
+     "name_full": "JR Gumma-Yawata Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-annaka",
+     "name_full": "JR Annaka Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-isobe",
+     "name_full": "JR Isobe Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-matsuida",
+     "name_full": "JR Matsuida Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-nishimatsuida",
+     "name_full": "JR Nishi-Matsuida Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-yokokawa",
+     "name_full": "JR Yokokawa Station",
+     "status": "Found"
+    }
+   ]
+  },
+  {
    "line_slug": "jr-shinmei-line",
    "line_name_en": "JR Shinmei Line",
    "stations": [
@@ -15164,6 +17160,446 @@
     {
      "jp_slug": "jr-shinonoi",
      "name_full": "JR Shinonoi Station",
+     "status": "Found"
+    }
+   ]
+  },
+  {
+   "line_slug": "jr-shonanshinjuku-line",
+   "line_name_en": "JR Shōnan–Shinjuku Line",
+   "stations": [
+    {
+     "jp_slug": "jr-omiya",
+     "name_full": "JR Ōmiya Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-urawa",
+     "name_full": "JR Urawa Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-akabane",
+     "name_full": "JR Akabane Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-ikebukuro",
+     "name_full": "JR Ikebukuro Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-shinjuku",
+     "name_full": "JR Shinjuku Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-shibuya",
+     "name_full": "JR Shibuya Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-ebisu",
+     "name_full": "JR Ebisu Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-osaki",
+     "name_full": "JR Ōsaki Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-nishiooi",
+     "name_full": "JR Nishi-Ōi Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-musashikosugi",
+     "name_full": "JR Musashi-Kosugi Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-shinkawasaki",
+     "name_full": "JR Shin-Kawasaki Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-yokohama",
+     "name_full": "JR Yokohama Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-hodogaya",
+     "name_full": "JR Hodogaya Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-higashitotsuka",
+     "name_full": "JR Higashi-Totsuka Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-totsuka",
+     "name_full": "JR Totsuka Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-ofuna",
+     "name_full": "JR Ōfuna Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "sotetsu-hazawayokohamakokudai",
+     "name_full": "JR Hazawa yokohama-kokudai Station",
+     "status": "None"
+    }
+   ]
+  },
+  {
+   "line_slug": "jr-sobu-line",
+   "line_name_en": "JR Sōbu Main Line(Chiba - Chōshi)",
+   "stations": [
+    {
+     "jp_slug": "jr-chiba",
+     "name_full": "JR Chiba Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-tsuga",
+     "name_full": "JR Tsuga Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-yotsukaido",
+     "name_full": "JR Yotsukaidō Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-monoi",
+     "name_full": "JR Monoi Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-sakura",
+     "name_full": "JR Sakura Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-enokido",
+     "name_full": "JR Enokido Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-yachimata",
+     "name_full": "JR Yachimata Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-hyuga",
+     "name_full": "JR Hyūga Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-naruto",
+     "name_full": "JR Narutō Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-matsuo",
+     "name_full": "JR Matsuo Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-yokoshiba",
+     "name_full": "JR Yokoshiba Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-yokaichiba",
+     "name_full": "JR Yōkaichiba Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-higata",
+     "name_full": "JR Higata Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-asahi",
+     "name_full": "JR Asahi Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-iioka",
+     "name_full": "JR Iioka Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-matsugishi",
+     "name_full": "JR Matsugishi Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-choshi",
+     "name_full": "JR Chōshi Station",
+     "status": "Found"
+    }
+   ]
+  },
+  {
+   "line_slug": "jr-sobukaisoku-line",
+   "line_name_en": "JR Sōbu Main Line(Rapid)",
+   "stations": [
+    {
+     "jp_slug": "jr-tokyo",
+     "name_full": "JR Tōkyō Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-shinnihonbashi",
+     "name_full": "JR Shin-Nihombashi Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-bakurocho",
+     "name_full": "JR Bakurochō Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-kinshicho",
+     "name_full": "JR Kinshichō Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-shinkoiwa",
+     "name_full": "JR Shin-Koiwa Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-ichikawa",
+     "name_full": "JR Ichikawa Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-funabashi",
+     "name_full": "JR Funabashi Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-tsudanuma",
+     "name_full": "JR Tsudanuma Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-inage",
+     "name_full": "JR Inage Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-chiba",
+     "name_full": "JR Chiba Station",
+     "status": "Found"
+    }
+   ]
+  },
+  {
+   "line_slug": "jr-sobukanko-line",
+   "line_name_en": "JR Sōbu Main Line(Ochanomizu - Chiba)",
+   "stations": [
+    {
+     "jp_slug": "jr-ochanomizu",
+     "name_full": "JR Ochanomizu Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-akihabara",
+     "name_full": "JR Akihabara Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-asakusabashi",
+     "name_full": "JR Asakusabashi Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-ryougoku",
+     "name_full": "JR Ryōgoku Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-kinshicho",
+     "name_full": "JR Kinshichō Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-kameido",
+     "name_full": "JR Kameido Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-hirai",
+     "name_full": "JR Hirai Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-shinkoiwa",
+     "name_full": "JR Shin-Koiwa Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-koiwa",
+     "name_full": "JR Koiwa Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-ichikawa",
+     "name_full": "JR Ichikawa Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-motoyawata",
+     "name_full": "JR Moto-Yawata Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-shimousanakayama",
+     "name_full": "JR Shimōsa-Nakayama Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-nishifunabashi",
+     "name_full": "JR Nishi-Funabashi Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-funabashi",
+     "name_full": "JR Funabashi Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-higashifunabashi",
+     "name_full": "JR Higashi-Funabashi Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-tsudanuma",
+     "name_full": "JR Tsudanuma Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-makuharihongo",
+     "name_full": "JR Makuharihongō Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-makuhari",
+     "name_full": "JR Makuhari Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-shinkemigawa",
+     "name_full": "JR Shin-Kemigawa Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-inage",
+     "name_full": "JR Inage Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-nishichiba",
+     "name_full": "JR Nishi-Chiba Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-chiba",
+     "name_full": "JR Chiba Station",
+     "status": "Found"
+    }
+   ]
+  },
+  {
+   "line_slug": "jr-sotobo-line",
+   "line_name_en": "JR Sotobō Line",
+   "stations": [
+    {
+     "jp_slug": "jr-chiba",
+     "name_full": "JR Chiba Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-honchiba",
+     "name_full": "JR Hon-Chiba Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-soga",
+     "name_full": "JR Soga Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-oami",
+     "name_full": "JR Ōami Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-mobara",
+     "name_full": "JR Mobara Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-kazusaichinomiya",
+     "name_full": "JR Kazusa-Ichinomiya Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-chojamachi",
+     "name_full": "JR Chōjamachi Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-ohara",
+     "name_full": "JR Ōhara Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-onjuku",
+     "name_full": "JR Onjuku Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-katsuura",
+     "name_full": "JR Katsuura Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-ubara",
+     "name_full": "JR Ubara Station",
+     "status": "Another spot"
+    },
+    {
+     "jp_slug": "jr-kazusaokitsu",
+     "name_full": "JR Kazusa-Okitsu Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-namegawaisland",
+     "name_full": "JR Namegawa-Island Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-awakominato",
+     "name_full": "JR Awa-Kominato Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-awaamatsu",
+     "name_full": "JR Awa-Amatsu Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-awakamogawa",
+     "name_full": "JR Awa-Kamogawa Station",
      "status": "Found"
     }
    ]
@@ -15381,6 +17817,22 @@
    ]
   },
   {
+   "line_slug": "jr-suigun-ota-line",
+   "line_name_en": "JR Suigun Line(Hitachi-Ōta Branch Line)",
+   "stations": [
+    {
+     "jp_slug": "jr-kamisugaya",
+     "name_full": "JR Kami-Sugaya Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-hitachiota",
+     "name_full": "JR Hitachi-Ōta Station",
+     "status": "Found"
+    }
+   ]
+  },
+  {
    "line_slug": "jr-tadami-line",
    "line_name_en": "JR Tadami Line",
    "stations": [
@@ -15574,6 +18026,107 @@
     {
      "jp_slug": "jr-sasayamaguchi",
      "name_full": "JR Sasayamaguchi Station",
+     "status": "Found"
+    }
+   ]
+  },
+  {
+   "line_slug": "jr-takasaki-line",
+   "line_name_en": "JR Takasaki Line",
+   "stations": [
+    {
+     "jp_slug": "jr-omiya",
+     "name_full": "JR Ōmiya Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-miyahara",
+     "name_full": "JR Miyahara Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-ageo",
+     "name_full": "JR Ageo Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-kitaageo",
+     "name_full": "JR Kita-Ageo Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-okegawa",
+     "name_full": "JR Okegawa Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-kitamoto",
+     "name_full": "JR Kitamoto Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-konosu",
+     "name_full": "JR Kōnosu Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-kitakonosu",
+     "name_full": "JR Kita-Kōnosu Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-fukiage",
+     "name_full": "JR Fukiage Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-gyoda",
+     "name_full": "JR Gyōda Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-kumagaya",
+     "name_full": "JR Kumagaya Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-kagohara",
+     "name_full": "JR Kagohara Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-fukaya",
+     "name_full": "JR Fukaya Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-okabe",
+     "name_full": "JR Okabe Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-honjo",
+     "name_full": "JR Honjō Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-jimbohara",
+     "name_full": "JR Jimbohara Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-shimmachi",
+     "name_full": "JR Shimmachi Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-kuragano",
+     "name_full": "JR Kuragano Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-takasaki",
+     "name_full": "JR Takasaki Station",
      "status": "Found"
     }
    ]
@@ -15839,6 +18392,22 @@
     {
      "jp_slug": "jr-minamiwakkanai",
      "name_full": "JR Minami-Wakkanai Station",
+     "status": "Found"
+    }
+   ]
+  },
+  {
+   "line_slug": "jr-togane-line",
+   "line_name_en": "JR Tōgane Line",
+   "stations": [
+    {
+     "jp_slug": "jr-oami",
+     "name_full": "JR Ōami Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-togane",
+     "name_full": "JR Tōgane Station",
      "status": "Found"
     }
    ]
@@ -17158,6 +19727,67 @@
    ]
   },
   {
+   "line_slug": "jr-tsurumi-line",
+   "line_name_en": "JR Tsurumi Line",
+   "stations": [
+    {
+     "jp_slug": "jr-tsurumi",
+     "name_full": "JR Tsurumi Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-kokudo",
+     "name_full": "JR Kokudō Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-tsurumiono",
+     "name_full": "JR Tsurumiono Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-bentembashi",
+     "name_full": "JR Bentembashi Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-asano",
+     "name_full": "JR Asano Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-anzen",
+     "name_full": "JR Anzen Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-musashishiraishi",
+     "name_full": "JR Musashi-Shiraishi Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-hamakawasaki",
+     "name_full": "JR Hama-Kawasaki Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-showa",
+     "name_full": "JR Shōwa Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-ogimachi",
+     "name_full": "JR Ōgimachi Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-umishibaura",
+     "name_full": "JR Umi-Shibaura Station",
+     "status": "None"
+    }
+   ]
+  },
+  {
    "line_slug": "jr-tsuyama-line",
    "line_name_en": "JR Tsuyama Line",
    "stations": [
@@ -17240,6 +19870,142 @@
     {
      "jp_slug": "jr-ube",
      "name_full": "JR Ube Station",
+     "status": "Found"
+    }
+   ]
+  },
+  {
+   "line_slug": "jr-uchibo-line",
+   "line_name_en": "JR Uchibō Line",
+   "stations": [
+    {
+     "jp_slug": "jr-soga",
+     "name_full": "JR Soga Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-hamano",
+     "name_full": "JR Hamano Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-yawatajuku",
+     "name_full": "JR Yawatajuku Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-goi",
+     "name_full": "JR Goi Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-anegasaki",
+     "name_full": "JR Anegasaki Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-sodegaura",
+     "name_full": "JR Sodegaura Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-iwane",
+     "name_full": "JR Iwane Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-kisarazu",
+     "name_full": "JR Kisarazu Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-kimitsu",
+     "name_full": "JR Kimitsu Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-aohori",
+     "name_full": "JR Aohori Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-onuki",
+     "name_full": "JR Ōnuki Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-sanukimachi",
+     "name_full": "JR Sanukimachi Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-kazusaminato",
+     "name_full": "JR Kazusa-Minato Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-hamakanaya",
+     "name_full": "JR Hama-Kanaya Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-hota",
+     "name_full": "JR Hota Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-awakatsuyama",
+     "name_full": "JR Awa-Katsuyama Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-iwai",
+     "name_full": "JR Iwai Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-tomiura",
+     "name_full": "JR Tomiura Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-nakofunakata",
+     "name_full": "JR Nakofunakata Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-tateyama",
+     "name_full": "JR Tateyama Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-chikura",
+     "name_full": "JR Chikura Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-minamihara",
+     "name_full": "JR Minamihara Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-wadaura",
+     "name_full": "JR Wadaura Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-emi",
+     "name_full": "JR Emi Station",
+     "status": "Another spot"
+    },
+    {
+     "jp_slug": "jr-futomi",
+     "name_full": "JR Futomi Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-awakamogawa",
+     "name_full": "JR Awa-Kamogawa Station",
      "status": "Found"
     }
    ]
@@ -17481,6 +20247,182 @@
      "jp_slug": "jr-utashinai",
      "name_full": "JR Utashinai Station",
      "status": "None"
+    }
+   ]
+  },
+  {
+   "line_slug": "jr-utsunomiya-line",
+   "line_name_en": "JR Utsunomiya Line(Tōhoku Main Line)",
+   "stations": [
+    {
+     "jp_slug": "jr-tokyo",
+     "name_full": "JR Tōkyō Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-ueno",
+     "name_full": "JR Ueno Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-oku",
+     "name_full": "JR Oku Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-akabane",
+     "name_full": "JR Akabane Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-urawa",
+     "name_full": "JR Urawa Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-saitamashintoshin",
+     "name_full": "JR Saitama-Shintoshin Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-omiya",
+     "name_full": "JR Ōmiya Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-toro",
+     "name_full": "JR Toro Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-higashiomiya",
+     "name_full": "JR Higashi-Ōmiya Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-hasuda",
+     "name_full": "JR Hasuda Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-shiraoka",
+     "name_full": "JR Shiraoka Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-shinshiraoka",
+     "name_full": "JR Shin-Shiraoka Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-kuki",
+     "name_full": "JR Kuki Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-higashiwashinomiya",
+     "name_full": "JR Higashi-Washinomiya Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-kurihashi",
+     "name_full": "JR Kurihashi Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-koga",
+     "name_full": "JR Koga Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-nogi",
+     "name_full": "JR Nogi Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-mamada",
+     "name_full": "JR Mamada Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-oyama",
+     "name_full": "JR Oyama Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-koganei",
+     "name_full": "JR Koganei Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-jichiidai",
+     "name_full": "JR Jichi Medical University Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-ishibashi",
+     "name_full": "JR Ishibashi Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-suzumenomiya",
+     "name_full": "JR Suzumenomiya Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-utsunomiya",
+     "name_full": "JR Utsunomiya Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-okamoto",
+     "name_full": "JR Okamoto Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-housyakuji",
+     "name_full": "JR Hōshakuji Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-ujiie",
+     "name_full": "JR Ujiie Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-kamasusaka",
+     "name_full": "JR Kamasusaka Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-kataoka",
+     "name_full": "JR Kataoka Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-yaita",
+     "name_full": "JR Yaita Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-nozaki",
+     "name_full": "JR Nozaki Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-nishinasuno",
+     "name_full": "JR Nishi-Nasuno Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-nasushiobara",
+     "name_full": "JR Nasushiobara Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-kuroiso",
+     "name_full": "JR Kuroiso Station",
+     "status": "Found"
     }
    ]
   },
@@ -17993,6 +20935,162 @@
    ]
   },
   {
+   "line_slug": "jr-yamanote-line",
+   "line_name_en": "JR Yamanote Line",
+   "stations": [
+    {
+     "jp_slug": "jr-shinagawa",
+     "name_full": "JR Shinagawa Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-osaki",
+     "name_full": "JR Ōsaki Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-gotanda",
+     "name_full": "JR Gotanda Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-meguro",
+     "name_full": "JR Meguro Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-ebisu",
+     "name_full": "JR Ebisu Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-shibuya",
+     "name_full": "JR Shibuya Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-harajuku",
+     "name_full": "JR Harajuku Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-yoyogi",
+     "name_full": "JR Yoyogi Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-shinjuku",
+     "name_full": "JR Shinjuku Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-shinokubo",
+     "name_full": "JR Shin-Ōkubo Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-takadanobaba",
+     "name_full": "JR Takadanobaba Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-mejiro",
+     "name_full": "JR Mejiro Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-ikebukuro",
+     "name_full": "JR Ikebukuro Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-otsuka",
+     "name_full": "JR Ōtsuka Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-sugamo",
+     "name_full": "JR Sugamo Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-komagome",
+     "name_full": "JR Komagome Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-tabata",
+     "name_full": "JR Tabata Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-nishinippori",
+     "name_full": "JR Nishi-Nippori Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-nippori",
+     "name_full": "JR Nippori Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-uguisudani",
+     "name_full": "JR Uguisudani Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-ueno",
+     "name_full": "JR Ueno Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-okachimachi",
+     "name_full": "JR Okachimachi Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-akihabara",
+     "name_full": "JR Akihabara Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-kanda",
+     "name_full": "JR Kanda Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-tokyo",
+     "name_full": "JR Tōkyō Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-yurakucho",
+     "name_full": "JR Yūrakuchō Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-shinbashi",
+     "name_full": "JR Shimbashi Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-hamamatucho",
+     "name_full": "JR Hamamatsuchō Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-tamachi",
+     "name_full": "JR Tamachi Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-takanawagateway",
+     "name_full": "JR Takanawa Gateway Station",
+     "status": "Found"
+    }
+   ]
+  },
+  {
    "line_slug": "jr-yamatoji-line",
    "line_name_en": "JR Yamatoji Line(Kansai Main Line)",
    "stations": [
@@ -18141,6 +21239,208 @@
      "jp_slug": "jr-iyomiyanoshita",
      "name_full": "JR Iyo-Miyanoshita Station",
      "status": "None"
+    }
+   ]
+  },
+  {
+   "line_slug": "jr-yokohama-line",
+   "line_name_en": "JR Yokohama Line",
+   "stations": [
+    {
+     "jp_slug": "jr-higashikanagawa",
+     "name_full": "JR Higashi-Kanagawa Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-oguchi",
+     "name_full": "JR Ōguchi Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-kikuna",
+     "name_full": "JR Kikuna Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-shinyokohama",
+     "name_full": "JR Shin-Yokohama Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-kozukue",
+     "name_full": "JR Kozukue Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-kamoi",
+     "name_full": "JR Kamoi Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-nakayama",
+     "name_full": "JR Nakayama Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-tokaichiba",
+     "name_full": "JR Tōkaichiba Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-nagatsuta",
+     "name_full": "JR Nagatsuta Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-naruse",
+     "name_full": "JR Naruse Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-machida",
+     "name_full": "JR Machida Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-kobuchi",
+     "name_full": "JR Kobuchi Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-fuchinobe",
+     "name_full": "JR Fuchinobe Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-yabe",
+     "name_full": "JR Yabe Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-sagamihara",
+     "name_full": "JR Sagamihara Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-hashimoto",
+     "name_full": "JR Hashimoto Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-aihara",
+     "name_full": "JR Aihara Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-hachioji-minamino",
+     "name_full": "JR Hachiōjiminamino Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-katakura",
+     "name_full": "JR Katakura Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-hachioji",
+     "name_full": "JR Hachiōji Station",
+     "status": "Found"
+    }
+   ]
+  },
+  {
+   "line_slug": "jr-yokosuka-line",
+   "line_name_en": "JR Yokosuka Line",
+   "stations": [
+    {
+     "jp_slug": "jr-tokyo",
+     "name_full": "JR Tōkyō Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-shinbashi",
+     "name_full": "JR Shimbashi Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-shinagawa",
+     "name_full": "JR Shinagawa Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-nishiooi",
+     "name_full": "JR Nishi-Ōi Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-musashikosugi",
+     "name_full": "JR Musashi-Kosugi Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-shinkawasaki",
+     "name_full": "JR Shin-Kawasaki Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-yokohama",
+     "name_full": "JR Yokohama Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-hodogaya",
+     "name_full": "JR Hodogaya Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-higashitotsuka",
+     "name_full": "JR Higashi-Totsuka Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-totsuka",
+     "name_full": "JR Totsuka Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-ofuna",
+     "name_full": "JR Ōfuna Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-kitakamakura",
+     "name_full": "JR Kita-Kamakura Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-kamakura",
+     "name_full": "JR Kamakura Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-zushi",
+     "name_full": "JR Zushi Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-higashizushi",
+     "name_full": "JR Higashi-Zushi Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-yokosuka",
+     "name_full": "JR Yokosuka Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "jr-kinugasa",
+     "name_full": "JR Kinugasa Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-kurihama",
+     "name_full": "JR Kurihama Station",
+     "status": "Found"
     }
    ]
   },
@@ -19518,6 +22818,42 @@
      "jp_slug": "ngr-hokuno",
      "name_full": "Hokunō Station",
      "status": "Another spot"
+    }
+   ]
+  },
+  {
+   "line_slug": "nankai-main-line",
+   "line_name_en": "Nankai Main Line",
+   "stations": [
+    {
+     "jp_slug": "nankai-namba",
+     "name_full": "Namba Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "nankai-shinimamiya",
+     "name_full": "Shin-Imamiya Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "nankai-tengachaya",
+     "name_full": "Tengachaya Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "nankai-kishinosatotamade",
+     "name_full": "Kishinosato-Tamade Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "nankai-hagoromo",
+     "name_full": "Hagoromo Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "nankai-wakayamashi",
+     "name_full": "Wakayamashi Station",
+     "status": "None"
     }
    ]
   },
@@ -21412,6 +24748,228 @@
      "jp_slug": "tenhama-shinjohara",
      "name_full": "Shinjohara Station",
      "status": "Found"
+    }
+   ]
+  },
+  {
+   "line_slug": "tobu-noda-line",
+   "line_name_en": "Tōbu Urban Park Line(Noda Line)",
+   "stations": [
+    {
+     "jp_slug": "tobu-omiya",
+     "name_full": "Tōbu Omiya Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "tobu-omiyakoen",
+     "name_full": "Tōbu Omiya-koen Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "tobu-iwatsuki",
+     "name_full": "Tōbu Iwatsuki Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "tobu-kasukabe",
+     "name_full": "Tōbu Kasukabe Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "tobu-fujinoushijima",
+     "name_full": "Tōbu Fujino-ushijima Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "tobu-shimuzukoen",
+     "name_full": "Tōbu Shimizu-koen Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "tobu-nodashi",
+     "name_full": "Tōbu Nodashi Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "tobu-nagareyamaotakanomori",
+     "name_full": "Tōbu Nagareyama-otakanomori Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "tobu-toyoshiki",
+     "name_full": "Tōbu Toyoshiki Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "tobu-kashiwa",
+     "name_full": "Tōbu Kashiwa Station",
+     "status": "Found"
+    },
+    {
+     "jp_slug": "tobu-takayanagi",
+     "name_full": "Tōbu Takayanagi Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "tobu-shinkamagaya",
+     "name_full": "Tōbu Shin-kamagaya Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "tobu-magomezawa",
+     "name_full": "Tōbu Magomezawa Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "tobu-tsukada",
+     "name_full": "Tōbu Tsukada Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "tobu-shinfunabashi",
+     "name_full": "Tōbu Shin-funabashi Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "tobu-funabashi",
+     "name_full": "Tōbu Funabashi Station",
+     "status": "Found"
+    }
+   ]
+  },
+  {
+   "line_slug": "toei-todenarakawa-line",
+   "line_name_en": "Toden Arakawa Line",
+   "stations": [
+    {
+     "jp_slug": "toden-minowabashi",
+     "name_full": "Minowabashi Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "toden-arakawakuyakushomae",
+     "name_full": "Arakawa-kuyakushomae Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "toden-arakawanichome",
+     "name_full": "Arakawa-nichome Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "toden-arakawananachome",
+     "name_full": "Arakawa-nanachome Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "toden-machiyaekimae",
+     "name_full": "Machiya-ekimae Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "toden-machiyanichome",
+     "name_full": "Machiya-nichome Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "toden-higashiogusanchome",
+     "name_full": "Higashi-ogu-sanchome Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "toden-miyanomae",
+     "name_full": "Miyanomae Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "toden-odai",
+     "name_full": "Odai Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "toden-arakawayuenchimae",
+     "name_full": "Arakawa-yuenchimae Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "toden-kajiwara",
+     "name_full": "Kajiwara Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "toden-sakaecho",
+     "name_full": "Sakaecho Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "toden-ojiekimae",
+     "name_full": "Oji-ekimae Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "toden-asukayama",
+     "name_full": "Asukayama Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "toden-takinogawaitchome",
+     "name_full": "Takinogawa-itchome Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "toden-nishigahara4chome",
+     "name_full": "Nishigahara-yonchome Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "toden-shinkoshinzuka",
+     "name_full": "Shin-koshinzuka Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "toden-koshinzuka",
+     "name_full": "Koshinzuka Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "toden-otsukaekimae",
+     "name_full": "Otsuka-ekimae Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "toden-mukohara",
+     "name_full": "Mukohara Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "toden-higashiikebukuroyonchome",
+     "name_full": "Higashi-ikebukuro-yonchome Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "toden-zoshigaya",
+     "name_full": "Toden-zoshigaya Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "toden-kishibojimmae",
+     "name_full": "Kishibojimmae Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "toden-gakushuinshita",
+     "name_full": "Gakushuinshita Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "toden-omokagebashi",
+     "name_full": "Omokagebashi Station",
+     "status": "None"
+    },
+    {
+     "jp_slug": "toden-waseda",
+     "name_full": "Waseda Station",
+     "status": "None"
     }
    ]
   },

@@ -973,6 +973,18 @@
     const allLineSegs   = [];  // flat array for bulk opacity resets
     let   hoveredLine   = null;
     let   hoverTimer;
+
+    /**
+     * Order a line's kanji + English names by the current UI language.
+     * EN mode → English primary, kanji secondary; JP mode → the reverse.
+     * Mirrors the station-name primary/secondary behaviour.
+     */
+    const orderLineNames = (kanji) => {
+        const en        = lineEnMap[kanji] || getLineEn(kanji);
+        const primary   = state.lang === 'jp' ? kanji : (en || kanji);
+        const secondary = state.lang === 'jp' ? en : kanji;
+        return { primary, secondary: (secondary && secondary !== primary) ? secondary : '' };
+    };
     let   zoomDebounce;
 
     // Popup tracking
@@ -1174,9 +1186,13 @@
                 linesByName[name].push(polyline);
                 allLineSegs.push(polyline);
 
-                const enName = getLineEn(name);
+                // Function content so the tooltip follows the current UI language
+                // (it is bound once but the language can toggle afterwards).
                 polyline.bindTooltip(
-                    `<div class="line-tip"><b>${name}</b>${enName ? `<br><span>${enName}</span>` : ''}</div>`,
+                    () => {
+                        const { primary, secondary } = orderLineNames(name);
+                        return `<div class="line-tip"><b>${primary}</b>${secondary ? `<br><span>${secondary}</span>` : ''}</div>`;
+                    },
                     { sticky: true, direction: 'top', offset: [0, -8], className: 'line-tooltip' }
                 );
 
@@ -1292,10 +1308,10 @@
 
         const lineBadges = (marker._lineCodes ?? [s.line_code]).map(lc => {
             const color = lineColorMap[lc] ?? '#6b6b7a';
-            const en    = lineEnMap[lc] || getLineEn(lc);
-            const label = en
-                ? `<span class="popup-line-label"><span class="popup-line-jp">${lc}</span><span class="popup-line-en">${en}</span></span>`
-                : `<span class="popup-line-jp">${lc}</span>`;
+            const { primary, secondary } = orderLineNames(lc);
+            const label = secondary
+                ? `<span class="popup-line-label"><span class="popup-line-jp">${primary}</span><span class="popup-line-en">${secondary}</span></span>`
+                : `<span class="popup-line-jp">${primary}</span>`;
             return `<div class="popup-line"><span class="popup-line-dot" style="background:${color}"></span>${label}</div>`;
         }).join('');
 

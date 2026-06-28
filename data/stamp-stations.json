@@ -1,6 +1,6 @@
 {
  "source": "stamp.funakiya.com",
- "count": 1768,
+ "count": 2147,
  "stations": [
   {
    "slug": "abukyu-fukushima,iizaka-fukushima",
@@ -595,7 +595,7 @@
    "code": "eki_1122703"
   },
   {
-   "slug": "chibamonorail-chiba",
+   "slug": "chibamonorail-chiba,jr-chiba",
    "name_kanji": "千葉",
    "name_en": "Chiba",
    "yomi": null,
@@ -603,7 +603,11 @@
    "lon": 140.112837,
    "lines": [
     "Chiba Urban Monorail Line 1",
-    "Chiba Urban Monorail Line 2"
+    "Chiba Urban Monorail Line 2",
+    "JR Sotobō Line",
+    "JR Sōbu Main Line(Chiba - Chōshi)",
+    "JR Sōbu Main Line(Ochanomizu - Chiba)",
+    "JR Sōbu Main Line(Rapid)"
    ],
    "eki_code": "eki_1131339",
    "eki_line": "JR中央・総武線",
@@ -638,14 +642,15 @@
    "code": "eki_9933213"
   },
   {
-   "slug": "chibamonorail-tsuga",
+   "slug": "chibamonorail-tsuga,jr-tsuga",
    "name_kanji": "都賀",
    "name_en": "Tsuga",
    "yomi": null,
    "lat": 35.636088,
    "lon": 140.149222,
    "lines": [
-    "Chiba Urban Monorail Line 2"
+    "Chiba Urban Monorail Line 2",
+    "JR Sōbu Main Line(Chiba - Chōshi)"
    ],
    "eki_code": "eki_1131412",
    "eki_line": "JR総武本線",
@@ -708,14 +713,15 @@
    "code": "eki_9930630"
   },
   {
-   "slug": "chichibu-kumagaya",
+   "slug": "chichibu-kumagaya,jr-kumagaya",
    "name_kanji": "熊谷",
    "name_en": "Kumagaya",
    "yomi": null,
    "lat": 36.139627,
    "lon": 139.389528,
    "lines": [
-    "Chichibu Main Line"
+    "Chichibu Main Line",
+    "JR Takasaki Line"
    ],
    "eki_code": "eki_1132316",
    "eki_line": "JR高崎線",
@@ -947,14 +953,15 @@
    "code": "eki_9964410"
   },
   {
-   "slug": "chizukyu-ohara",
+   "slug": "chizukyu-ohara,jr-ohara",
    "name_kanji": "大原",
    "name_en": "Ohara",
    "yomi": null,
    "lat": 35.251097,
    "lon": 140.390864,
    "lines": [
-    "Chizu Express Chizu Line"
+    "Chizu Express Chizu Line",
+    "JR Sotobō Line"
    ],
    "eki_code": "eki_1132418",
    "eki_line": "JR外房線",
@@ -4053,6 +4060,9 @@
    "lon": 139.012354,
    "lines": [
     "JR Hokuriku Shinkansen(Takasaki - Jōetsumyōkō)",
+    "JR Jōetsu Line(Takasaki - Minakami)",
+    "JR Shin'etsu Main Line(Takasaki - Yokokawa)",
+    "JR Takasaki Line",
     "Jōshin Dentetsu Jōshin Line"
    ],
    "eki_code": "eki_1131816",
@@ -4130,6 +4140,22 @@
    "eki_code": "eki_1150119",
    "eki_line": "JR東海道本線(熱海～浜松)",
    "code": "eki_1150119"
+  },
+  {
+   "slug": "jr-abiko",
+   "name_kanji": "我孫子",
+   "name_en": "Abiko",
+   "yomi": null,
+   "lat": 35.87279,
+   "lon": 140.010466,
+   "lines": [
+    "JR Jōban Line(Kita-Senju - Toride)",
+    "JR Jōban Line(Rapid)",
+    "JR Narita Line(Abiko Branch Line)"
+   ],
+   "eki_code": "eki_1132017",
+   "eki_line": "JR常磐線(上野～取手)",
+   "code": "eki_1132017"
   },
   {
    "slug": "jr-abikocho",
@@ -4242,6 +4268,34 @@
    "eki_code": "eki_1141130",
    "eki_line": "JR中央本線(名古屋～塩尻)",
    "code": "eki_1141130"
+  },
+  {
+   "slug": "jr-ageo",
+   "name_kanji": "上尾",
+   "name_en": "Ageo",
+   "yomi": null,
+   "lat": 35.973522,
+   "lon": 139.588434,
+   "lines": [
+    "JR Takasaki Line"
+   ],
+   "eki_code": "eki_1132308",
+   "eki_line": "JR高崎線",
+   "code": "eki_1132308"
+  },
+  {
+   "slug": "jr-aihara",
+   "name_kanji": "相原",
+   "name_en": "Aihara",
+   "yomi": null,
+   "lat": 35.60694,
+   "lon": 139.33169,
+   "lines": [
+    "JR Yokohama Line"
+   ],
+   "eki_code": "eki_1130617",
+   "eki_line": "JR横浜線",
+   "code": "eki_1130617"
   },
   {
    "slug": "jr-aino,shimatetsu-aino",
@@ -4389,6 +4443,37 @@
    "code": "eki_1162402"
   },
   {
+   "slug": "jr-ajiki",
+   "name_kanji": "安食",
+   "name_en": "Ajiki",
+   "yomi": null,
+   "lat": 35.835682,
+   "lon": 140.242051,
+   "lines": [
+    "JR Narita Line(Abiko Branch Line)"
+   ],
+   "eki_code": "eki_1132727",
+   "eki_line": "JR成田線",
+   "code": "eki_1132727"
+  },
+  {
+   "slug": "jr-akabane",
+   "name_kanji": "赤羽",
+   "name_en": "Akabane",
+   "yomi": null,
+   "lat": 35.778026,
+   "lon": 139.720928,
+   "lines": [
+    "JR Keihin–Tōhoku Line",
+    "JR Saikyō Line",
+    "JR Shōnan–Shinjuku Line",
+    "JR Utsunomiya Line(Tōhoku Main Line)"
+   ],
+   "eki_code": "eki_1131903",
+   "eki_line": "宇都宮線",
+   "code": "eki_1131903"
+  },
+  {
    "slug": "jr-akabira",
    "name_kanji": "赤平",
    "name_en": "Akabira",
@@ -4461,6 +4546,36 @@
    "code": "eki_1171618"
   },
   {
+   "slug": "jr-akigawa",
+   "name_kanji": "秋川",
+   "name_en": "Akigawa",
+   "yomi": null,
+   "lat": 35.727998,
+   "lon": 139.286715,
+   "lines": [
+    "JR Itsukaichi Line"
+   ],
+   "eki_code": "eki_1131604",
+   "eki_line": "JR五日市線",
+   "code": "eki_1131604"
+  },
+  {
+   "slug": "jr-akihabara",
+   "name_kanji": "秋葉原",
+   "name_en": "Akihabara",
+   "yomi": null,
+   "lat": 35.698619,
+   "lon": 139.773288,
+   "lines": [
+    "JR Keihin–Tōhoku Line",
+    "JR Sōbu Main Line(Ochanomizu - Chiba)",
+    "JR Yamanote Line"
+   ],
+   "eki_code": "eki_1130222",
+   "eki_line": "JR山手線",
+   "code": "eki_1130222"
+  },
+  {
    "slug": "jr-akinagatsuka",
    "name_kanji": "安芸長束",
    "name_en": "Aki-Nagatsuka",
@@ -4473,6 +4588,20 @@
    "eki_code": "eki_1171704",
    "eki_line": "JR可部線",
    "code": "eki_1171704"
+  },
+  {
+   "slug": "jr-akishima",
+   "name_kanji": "昭島",
+   "name_en": "Akishima",
+   "yomi": null,
+   "lat": 35.713305,
+   "lon": 139.361564,
+   "lines": [
+    "JR Ōme Line"
+   ],
+   "eki_code": "eki_1131505",
+   "eki_line": "JR青梅線",
+   "code": "eki_1131505"
   },
   {
    "slug": "jr-akita",
@@ -4624,6 +4753,20 @@
    "code": "eki_1180413"
   },
   {
+   "slug": "jr-anegasaki",
+   "name_kanji": "姉ケ崎",
+   "name_en": "Anegasaki",
+   "yomi": null,
+   "lat": 35.4786,
+   "lon": 140.041749,
+   "lines": [
+    "JR Uchibō Line"
+   ],
+   "eki_code": "eki_1132507",
+   "eki_line": "JR内房線",
+   "code": "eki_1132507"
+  },
+  {
    "slug": "jr-anjo",
    "name_kanji": "安城",
    "name_en": "Anjo",
@@ -4636,6 +4779,20 @@
    "eki_code": "eki_1150221",
    "eki_line": "JR東海道本線(浜松～岐阜)",
    "code": "eki_1150221"
+  },
+  {
+   "slug": "jr-annaka",
+   "name_kanji": "安中",
+   "name_en": "Annaka",
+   "yomi": null,
+   "lat": 36.331657,
+   "lon": 138.914368,
+   "lines": [
+    "JR Shin'etsu Main Line(Takasaki - Yokokawa)"
+   ],
+   "eki_code": "eki_1133704",
+   "eki_line": "JR信越本線",
+   "code": "eki_1133704"
   },
   {
    "slug": "jr-annakaharuna",
@@ -4680,6 +4837,20 @@
    "code": "eki_1122201"
   },
   {
+   "slug": "jr-aohori",
+   "name_kanji": "青堀",
+   "name_en": "Aohori",
+   "yomi": null,
+   "lat": 35.330304,
+   "lon": 139.858189,
+   "lines": [
+    "JR Uchibō Line"
+   ],
+   "eki_code": "eki_1132513",
+   "eki_line": "JR内房線",
+   "code": "eki_1132513"
+  },
+  {
    "slug": "jr-aonogo",
    "name_kanji": "青郷",
    "name_en": "Aonogo",
@@ -4720,6 +4891,20 @@
    "eki_code": "eki_1122906",
    "eki_line": "JR常磐線(取手～いわき)",
    "code": "eki_1122906"
+  },
+  {
+   "slug": "jr-araki",
+   "name_kanji": "新木",
+   "name_en": "Araki",
+   "yomi": null,
+   "lat": 35.862352,
+   "lon": 140.107048,
+   "lines": [
+    "JR Narita Line(Abiko Branch Line)"
+   ],
+   "eki_code": "eki_1132723",
+   "eki_line": "JR成田線",
+   "code": "eki_1132723"
   },
   {
    "slug": "jr-arao",
@@ -4809,6 +4994,20 @@
    "code": "eki_1161230"
   },
   {
+   "slug": "jr-asagaya",
+   "name_kanji": "阿佐ケ谷",
+   "name_en": "Asagaya",
+   "yomi": null,
+   "lat": 35.704818,
+   "lon": 139.635868,
+   "lines": [
+    "JR Chūō Main Line(Tōkyō - Takao)"
+   ],
+   "eki_code": "eki_1131216",
+   "eki_line": "JR中央線(快速)",
+   "code": "eki_1131216"
+  },
+  {
    "slug": "jr-asagiri",
    "name_kanji": "朝霧",
    "name_en": "Asagiri",
@@ -4882,6 +5081,20 @@
    "code": "eki_1180139"
   },
   {
+   "slug": "jr-asakusabashi",
+   "name_kanji": "浅草橋",
+   "name_en": "Asakusabashi",
+   "yomi": null,
+   "lat": 35.697403,
+   "lon": 139.784427,
+   "lines": [
+    "JR Sōbu Main Line(Ochanomizu - Chiba)"
+   ],
+   "eki_code": "eki_1131320",
+   "eki_line": "JR中央・総武線",
+   "code": "eki_1131320"
+  },
+  {
    "slug": "jr-ashibetsu",
    "name_kanji": "芦別",
    "name_en": "Ashibetsu",
@@ -4908,6 +5121,20 @@
    "eki_code": "eki_1162304",
    "eki_line": "大阪環状線",
    "code": "eki_1162304"
+  },
+  {
+   "slug": "jr-ashikaga",
+   "name_kanji": "足利",
+   "name_en": "Ashikaga",
+   "yomi": null,
+   "lat": 36.331888,
+   "lon": 139.456295,
+   "lines": [
+    "JR Ryōmō Line"
+   ],
+   "eki_code": "eki_1134114",
+   "eki_line": "JR両毛線",
+   "code": "eki_1134114"
   },
   {
    "slug": "jr-ashisawa",
@@ -5068,6 +5295,35 @@
    "code": "eki_3400322"
   },
   {
+   "slug": "jr-awakamogawa",
+   "name_kanji": "安房鴨川",
+   "name_en": "Awa-Kamogawa",
+   "yomi": null,
+   "lat": 35.107465,
+   "lon": 140.103566,
+   "lines": [
+    "JR Sotobō Line",
+    "JR Uchibō Line"
+   ],
+   "eki_code": "eki_1132427",
+   "eki_line": "JR外房線",
+   "code": "eki_1132427"
+  },
+  {
+   "slug": "jr-awakominato",
+   "name_kanji": "安房小湊",
+   "name_en": "Awa-Kominato",
+   "yomi": null,
+   "lat": 35.128597,
+   "lon": 140.190337,
+   "lines": [
+    "JR Sotobō Line"
+   ],
+   "eki_code": "eki_1132425",
+   "eki_line": "JR外房線",
+   "code": "eki_1132425"
+  },
+  {
    "slug": "jr-ayabe",
    "name_kanji": "綾部",
    "name_en": "Ayabe",
@@ -5137,6 +5393,20 @@
    "eki_code": "eki_1140905",
    "eki_line": "北アルプス線",
    "code": "eki_1140905"
+  },
+  {
+   "slug": "jr-bakurocho",
+   "name_kanji": "馬喰町",
+   "name_en": "Bakurocho",
+   "yomi": null,
+   "lat": 35.693365,
+   "lon": 139.78238,
+   "lines": [
+    "JR Sōbu Main Line(Rapid)"
+   ],
+   "eki_code": "eki_1131403",
+   "eki_line": "JR総武本線",
+   "code": "eki_1131403"
   },
   {
    "slug": "jr-bandaiatami",
@@ -5407,6 +5677,20 @@
    "code": "eki_1191416"
   },
   {
+   "slug": "jr-chibaminato",
+   "name_kanji": "千葉みなと",
+   "name_en": "Chibaminato",
+   "yomi": null,
+   "lat": 35.607391,
+   "lon": 140.102495,
+   "lines": [
+    "JR Keiyō Line"
+   ],
+   "eki_code": "eki_9933101",
+   "eki_line": "千葉都市モノレール１号線",
+   "code": "eki_9933101"
+  },
+  {
    "slug": "jr-chigasaki",
    "name_kanji": "茅ケ崎",
    "name_en": "Chigasaki",
@@ -5414,6 +5698,7 @@
    "lat": 35.330741,
    "lon": 139.407197,
    "lines": [
+    "JR Sagami Line",
     "JR Tōkaidō Main Line(Tōkyō - Atami)"
    ],
    "eki_code": "eki_1130110",
@@ -5447,6 +5732,20 @@
    "eki_code": "eki_1191308",
    "eki_line": "ゆふ高原線",
    "code": "eki_1191308"
+  },
+  {
+   "slug": "jr-chikura",
+   "name_kanji": "千倉",
+   "name_en": "Chikura",
+   "yomi": null,
+   "lat": 34.976704,
+   "lon": 139.954738,
+   "lines": [
+    "JR Uchibō Line"
+   ],
+   "eki_code": "eki_1132526",
+   "eki_line": "JR内房線",
+   "code": "eki_1132526"
   },
   {
    "slug": "jr-chikusa",
@@ -5560,6 +5859,20 @@
    "eki_code": "eki_1190808",
    "eki_line": "福北ゆたか線",
    "code": "eki_1190808"
+  },
+  {
+   "slug": "jr-choshi",
+   "name_kanji": "銚子",
+   "name_en": "Choshi",
+   "yomi": null,
+   "lat": 35.729449,
+   "lon": 140.827557,
+   "lines": [
+    "JR Sōbu Main Line(Chiba - Chōshi)"
+   ],
+   "eki_code": "eki_1131431",
+   "eki_line": "JR総武本線",
+   "code": "eki_1131431"
   },
   {
    "slug": "jr-chuden",
@@ -5687,6 +6000,36 @@
    "eki_code": "eki_1162506",
    "eki_line": "JR東西線",
    "code": "eki_1162506"
+  },
+  {
+   "slug": "jr-ebina",
+   "name_kanji": "海老名",
+   "name_en": "Ebina",
+   "yomi": null,
+   "lat": 35.454282,
+   "lon": 139.389328,
+   "lines": [
+    "JR Sagami Line"
+   ],
+   "eki_code": "eki_1130910",
+   "eki_line": "JR相模線",
+   "code": "eki_1130910"
+  },
+  {
+   "slug": "jr-ebisu",
+   "name_kanji": "恵比寿",
+   "name_en": "Ebisu",
+   "yomi": null,
+   "lat": 35.646685,
+   "lon": 139.71007,
+   "lines": [
+    "JR Saikyō Line",
+    "JR Shōnan–Shinjuku Line",
+    "JR Yamanote Line"
+   ],
+   "eki_code": "eki_1130204",
+   "eki_line": "JR山手線",
+   "code": "eki_1130204"
   },
   {
    "slug": "jr-ebitsu",
@@ -5901,6 +6244,20 @@
    "code": "eki_1191320"
   },
   {
+   "slug": "jr-etchujima",
+   "name_kanji": "越中島",
+   "name_en": "Etchujima",
+   "yomi": null,
+   "lat": 35.667946,
+   "lon": 139.792713,
+   "lines": [
+    "JR Keiyō Line"
+   ],
+   "eki_code": "eki_1132603",
+   "eki_line": "JR京葉線",
+   "code": "eki_1132603"
+  },
+  {
    "slug": "jr-etchuyatsuo",
    "name_kanji": "越中八尾",
    "name_en": "Etchu-Yatsuo",
@@ -5913,6 +6270,35 @@
    "eki_code": "eki_1141640",
    "eki_line": "JR高山本線",
    "code": "eki_1141640"
+  },
+  {
+   "slug": "jr-fuchinobe",
+   "name_kanji": "淵野辺",
+   "name_en": "Fuchinobe",
+   "yomi": null,
+   "lat": 35.568784,
+   "lon": 139.395075,
+   "lines": [
+    "JR Yokohama Line"
+   ],
+   "eki_code": "eki_1130613",
+   "eki_line": "JR横浜線",
+   "code": "eki_1130613"
+  },
+  {
+   "slug": "jr-fuchuhonmachi",
+   "name_kanji": "府中本町",
+   "name_en": "Fuchuhommachi",
+   "yomi": null,
+   "lat": 35.665766,
+   "lon": 139.477142,
+   "lines": [
+    "JR Musashino Line",
+    "JR Nambu Line"
+   ],
+   "eki_code": "eki_1130320",
+   "eki_line": "JR南武線",
+   "code": "eki_1130320"
   },
   {
    "slug": "jr-fujieda",
@@ -6057,6 +6443,34 @@
    "code": "eki_1110338"
   },
   {
+   "slug": "jr-fukaya",
+   "name_kanji": "深谷",
+   "name_en": "Fukaya",
+   "yomi": null,
+   "lat": 36.191344,
+   "lon": 139.28127,
+   "lines": [
+    "JR Takasaki Line"
+   ],
+   "eki_code": "eki_1132318",
+   "eki_line": "JR高崎線",
+   "code": "eki_1132318"
+  },
+  {
+   "slug": "jr-fukiage",
+   "name_kanji": "吹上",
+   "name_en": "Fukiage",
+   "yomi": null,
+   "lat": 36.103062,
+   "lon": 139.45312,
+   "lines": [
+    "JR Takasaki Line"
+   ],
+   "eki_code": "eki_1132314",
+   "eki_line": "JR高崎線",
+   "code": "eki_1132314"
+  },
+  {
    "slug": "jr-fukuchiyama,ktr-fukuchiyama,wtktr-fukuchiyama",
    "name_kanji": "福知山",
    "name_en": "Fukuchiyama",
@@ -6191,6 +6605,36 @@
    "code": "eki_1161014"
   },
   {
+   "slug": "jr-funabashi,tobu-funabashi",
+   "name_kanji": "船橋",
+   "name_en": "Funabashi",
+   "yomi": null,
+   "lat": 35.701865,
+   "lon": 139.984707,
+   "lines": [
+    "JR Sōbu Main Line(Ochanomizu - Chiba)",
+    "JR Sōbu Main Line(Rapid)",
+    "Tōbu Urban Park Line(Noda Line)"
+   ],
+   "eki_code": "eki_1131331",
+   "eki_line": "JR中央・総武線",
+   "code": "eki_1131331"
+  },
+  {
+   "slug": "jr-funabashihoten",
+   "name_kanji": "船橋法典",
+   "name_en": "Funabashihoten",
+   "yomi": null,
+   "lat": 35.730435,
+   "lon": 139.966771,
+   "lines": [
+    "JR Musashino Line"
+   ],
+   "eki_code": "eki_1130523",
+   "eki_line": "JR武蔵野線",
+   "code": "eki_1130523"
+  },
+  {
    "slug": "jr-funagata",
    "name_kanji": "舟形",
    "name_en": "Funagata",
@@ -6293,6 +6737,20 @@
    "code": "eki_1122005"
   },
   {
+   "slug": "jr-fusa",
+   "name_kanji": "布佐",
+   "name_en": "Fusa",
+   "yomi": null,
+   "lat": 35.849371,
+   "lon": 140.13293,
+   "lines": [
+    "JR Narita Line(Abiko Branch Line)"
+   ],
+   "eki_code": "eki_1132724",
+   "eki_line": "JR成田線",
+   "code": "eki_1132724"
+  },
+  {
    "slug": "jr-fushiki",
    "name_kanji": "伏木",
    "name_en": "Fushiki",
@@ -6305,6 +6763,34 @@
    "eki_code": "eki_1141804",
    "eki_line": "JR氷見線",
    "code": "eki_1141804"
+  },
+  {
+   "slug": "jr-fussa",
+   "name_kanji": "福生",
+   "name_en": "Fussa",
+   "yomi": null,
+   "lat": 35.742456,
+   "lon": 139.327763,
+   "lines": [
+    "JR Ōme Line"
+   ],
+   "eki_code": "eki_1131508",
+   "eki_line": "JR青梅線",
+   "code": "eki_1131508"
+  },
+  {
+   "slug": "jr-futamatashimmachi",
+   "name_kanji": "二俣新町",
+   "name_en": "Futamatashimmachi",
+   "yomi": null,
+   "lat": 35.691273,
+   "lon": 139.959525,
+   "lines": [
+    "JR Keiyō Line"
+   ],
+   "eki_code": "eki_1132611",
+   "eki_line": "JR京葉線",
+   "code": "eki_1132611"
   },
   {
    "slug": "jr-futsukaichi",
@@ -6420,6 +6906,20 @@
    "code": "eki_1160820"
   },
   {
+   "slug": "jr-goi",
+   "name_kanji": "五井",
+   "name_en": "Goi",
+   "yomi": null,
+   "lat": 35.512985,
+   "lon": 140.089522,
+   "lines": [
+    "JR Uchibō Line"
+   ],
+   "eki_code": "eki_1132506",
+   "eki_line": "JR内房線",
+   "code": "eki_1132506"
+  },
+  {
    "slug": "jr-goido",
    "name_kanji": "五位堂",
    "name_en": "JR-Goido",
@@ -6520,6 +7020,20 @@
    "code": "eki_1120437"
   },
   {
+   "slug": "jr-gotanda",
+   "name_kanji": "五反田",
+   "name_en": "Gotanda",
+   "yomi": null,
+   "lat": 35.625974,
+   "lon": 139.723822,
+   "lines": [
+    "JR Yamanote Line"
+   ],
+   "eki_code": "eki_1130202",
+   "eki_line": "JR山手線",
+   "code": "eki_1130202"
+  },
+  {
    "slug": "jr-gotemba",
    "name_kanji": "御殿場",
    "name_en": "Gotemba",
@@ -6549,6 +7063,62 @@
    "code": "eki_1170131"
   },
   {
+   "slug": "jr-gummafujioka",
+   "name_kanji": "群馬藤岡",
+   "name_en": "Gumma-Fujioka",
+   "yomi": null,
+   "lat": 36.250336,
+   "lon": 139.08338,
+   "lines": [
+    "JR Hachikō Line"
+   ],
+   "eki_code": "eki_1131813",
+   "eki_line": "JR八高線(高麗川～高崎)",
+   "code": "eki_1131813"
+  },
+  {
+   "slug": "jr-gummasoja",
+   "name_kanji": "群馬総社",
+   "name_en": "Gumma-Soja",
+   "yomi": null,
+   "lat": 36.415574,
+   "lon": 139.032221,
+   "lines": [
+    "JR Jōetsu Line(Takasaki - Minakami)"
+   ],
+   "eki_code": "eki_1134205",
+   "eki_line": "JR上越線",
+   "code": "eki_1134205"
+  },
+  {
+   "slug": "jr-gummayawata",
+   "name_kanji": "群馬八幡",
+   "name_en": "Gumma-Yawata",
+   "yomi": null,
+   "lat": 36.337641,
+   "lon": 138.957433,
+   "lines": [
+    "JR Shin'etsu Main Line(Takasaki - Yokokawa)"
+   ],
+   "eki_code": "eki_1133703",
+   "eki_line": "JR信越本線",
+   "code": "eki_1133703"
+  },
+  {
+   "slug": "jr-gyoda",
+   "name_kanji": "行田",
+   "name_en": "Gyoda",
+   "yomi": null,
+   "lat": 36.113879,
+   "lon": 139.432103,
+   "lines": [
+    "JR Takasaki Line"
+   ],
+   "eki_code": "eki_1132315",
+   "eki_line": "JR高崎線",
+   "code": "eki_1132315"
+  },
+  {
    "slug": "jr-hachihommatsu",
    "name_kanji": "八本松",
    "name_en": "Hachihommatsu",
@@ -6575,6 +7145,36 @@
    "eki_code": "eki_1111203",
    "eki_line": "JR札沼線",
    "code": "eki_1111203"
+  },
+  {
+   "slug": "jr-hachioji",
+   "name_kanji": "八王子",
+   "name_en": "Hachioji",
+   "yomi": null,
+   "lat": 35.655555,
+   "lon": 139.338998,
+   "lines": [
+    "JR Chūō Main Line(Tōkyō - Takao)",
+    "JR Hachikō Line",
+    "JR Yokohama Line"
+   ],
+   "eki_code": "eki_1130620",
+   "eki_line": "JR横浜線",
+   "code": "eki_1130620"
+  },
+  {
+   "slug": "jr-hachioji-minamino",
+   "name_kanji": "八王子みなみ野",
+   "name_en": "Hachiojiminamino",
+   "yomi": null,
+   "lat": 35.630664,
+   "lon": 139.330678,
+   "lines": [
+    "JR Yokohama Line"
+   ],
+   "eki_code": "eki_1130618",
+   "eki_line": "JR横浜線",
+   "code": "eki_1130618"
   },
   {
    "slug": "jr-hachirogata",
@@ -6617,6 +7217,22 @@
    "eki_code": "eki_1140116",
    "eki_line": "小海線",
    "code": "eki_1140116"
+  },
+  {
+   "slug": "jr-haijima",
+   "name_kanji": "拝島",
+   "name_en": "Haijima",
+   "yomi": null,
+   "lat": 35.721278,
+   "lon": 139.343468,
+   "lines": [
+    "JR Hachikō Line",
+    "JR Itsukaichi Line",
+    "JR Ōme Line"
+   ],
+   "eki_code": "eki_1131506",
+   "eki_line": "JR青梅線",
+   "code": "eki_1131506"
   },
   {
    "slug": "jr-haiki",
@@ -6692,6 +7308,20 @@
    "code": "eki_1110101"
   },
   {
+   "slug": "jr-hakonegasaki",
+   "name_kanji": "箱根ケ崎",
+   "name_en": "Hakonegasaki",
+   "yomi": null,
+   "lat": 35.771158,
+   "lon": 139.346805,
+   "lines": [
+    "JR Hachikō Line"
+   ],
+   "eki_code": "eki_1131706",
+   "eki_line": "JR八高線(八王子～高麗川)",
+   "code": "eki_1131706"
+  },
+  {
    "slug": "jr-hakuba",
    "name_kanji": "白馬",
    "name_en": "Hakuba",
@@ -6762,6 +7392,20 @@
    "code": "eki_1170137"
   },
   {
+   "slug": "jr-hamakanaya",
+   "name_kanji": "浜金谷",
+   "name_en": "Hama-Kanaya",
+   "yomi": null,
+   "lat": 35.168215,
+   "lon": 139.822141,
+   "lines": [
+    "JR Uchibō Line"
+   ],
+   "eki_code": "eki_1132518",
+   "eki_line": "JR内房線",
+   "code": "eki_1132518"
+  },
+  {
    "slug": "jr-hamamatsu",
    "name_kanji": "浜松",
    "name_en": "Hamamatsu",
@@ -6774,6 +7418,21 @@
    "eki_code": "eki_1150134",
    "eki_line": "JR東海道本線(熱海～浜松)",
    "code": "eki_1150134"
+  },
+  {
+   "slug": "jr-hamamatucho",
+   "name_kanji": "浜松町",
+   "name_en": "Hamamatsucho",
+   "yomi": null,
+   "lat": 35.655391,
+   "lon": 139.757135,
+   "lines": [
+    "JR Keihin–Tōhoku Line",
+    "JR Yamanote Line"
+   ],
+   "eki_code": "eki_1130227",
+   "eki_line": "JR山手線",
+   "code": "eki_1130227"
   },
   {
    "slug": "jr-hamasaka",
@@ -6804,6 +7463,20 @@
    "eki_code": null,
    "eki_line": null,
    "code": "fk_jr-hamatombetsu"
+  },
+  {
+   "slug": "jr-hamura",
+   "name_kanji": "羽村",
+   "name_en": "Hamura",
+   "yomi": null,
+   "lat": 35.758073,
+   "lon": 139.316188,
+   "lines": [
+    "JR Ōme Line"
+   ],
+   "eki_code": "eki_1131509",
+   "eki_line": "JR青梅線",
+   "code": "eki_1131509"
   },
   {
    "slug": "jr-hanamaki",
@@ -6848,6 +7521,20 @@
    "eki_code": "eki_1161405",
    "eki_line": "嵯峨野線",
    "code": "eki_1161405"
+  },
+  {
+   "slug": "jr-harajuku",
+   "name_kanji": "原宿",
+   "name_en": "Harajuku",
+   "yomi": null,
+   "lat": 35.670646,
+   "lon": 139.702592,
+   "lines": [
+    "JR Yamanote Line"
+   ],
+   "eki_code": "eki_1130206",
+   "eki_line": "JR山手線",
+   "code": "eki_1130206"
   },
   {
    "slug": "jr-haranomachi",
@@ -6906,6 +7593,36 @@
    "code": "eki_1190311"
   },
   {
+   "slug": "jr-hashimoto,jrw-hashimoto",
+   "name_kanji": "橋本",
+   "name_en": "Hashimoto",
+   "yomi": null,
+   "lat": 35.594975,
+   "lon": 139.344586,
+   "lines": [
+    "JR Sagami Line",
+    "JR Wakayama Line",
+    "JR Yokohama Line"
+   ],
+   "eki_code": "eki_1130616",
+   "eki_line": "JR横浜線",
+   "code": "eki_1130616"
+  },
+  {
+   "slug": "jr-hasuda",
+   "name_kanji": "蓮田",
+   "name_en": "Hasuda",
+   "yomi": null,
+   "lat": 35.981272,
+   "lon": 139.653016,
+   "lines": [
+    "JR Utsunomiya Line(Tōhoku Main Line)"
+   ],
+   "eki_code": "eki_1131909",
+   "eki_line": "宇都宮線",
+   "code": "eki_1131909"
+  },
+  {
    "slug": "jr-hatakeda",
    "name_kanji": "畠田",
    "name_en": "Hatakeda",
@@ -6918,6 +7635,20 @@
    "eki_code": "eki_1163602",
    "eki_line": "JR和歌山線",
    "code": "eki_1163602"
+  },
+  {
+   "slug": "jr-hatchobori",
+   "name_kanji": "八丁堀",
+   "name_en": "Hatchobori",
+   "yomi": null,
+   "lat": 35.674617,
+   "lon": 139.777705,
+   "lines": [
+    "JR Keiyō Line"
+   ],
+   "eki_code": "eki_1132602",
+   "eki_line": "JR京葉線",
+   "code": "eki_1132602"
   },
   {
    "slug": "jr-hatsukaichi",
@@ -7047,6 +7778,34 @@
    "code": "eki_1160505"
   },
   {
+   "slug": "jr-higashiakiru",
+   "name_kanji": "東秋留",
+   "name_en": "Higashi-Akiru",
+   "yomi": null,
+   "lat": 35.725904,
+   "lon": 139.311665,
+   "lines": [
+    "JR Itsukaichi Line"
+   ],
+   "eki_code": "eki_1131603",
+   "eki_line": "JR五日市線",
+   "code": "eki_1131603"
+  },
+  {
+   "slug": "jr-higashifunabashi",
+   "name_kanji": "東船橋",
+   "name_en": "Higashi-Funabashi",
+   "yomi": null,
+   "lat": 35.699811,
+   "lon": 140.00393,
+   "lines": [
+    "JR Sōbu Main Line(Ochanomizu - Chiba)"
+   ],
+   "eki_code": "eki_1131332",
+   "eki_line": "JR中央・総武線",
+   "code": "eki_1131332"
+  },
+  {
    "slug": "jr-higashihagi",
    "name_kanji": "東萩",
    "name_en": "Higashi-Hagi",
@@ -7087,6 +7846,20 @@
    "eki_code": "eki_1140231",
    "eki_line": "JR身延線",
    "code": "eki_1140231"
+  },
+  {
+   "slug": "jr-higashihanno",
+   "name_kanji": "東飯能",
+   "name_en": "Higashi-Hanno",
+   "yomi": null,
+   "lat": 35.852928,
+   "lon": 139.325965,
+   "lines": [
+    "JR Hachikō Line"
+   ],
+   "eki_code": "eki_1131708",
+   "eki_line": "JR八高線(八王子～高麗川)",
+   "code": "eki_1131708"
   },
   {
    "slug": "jr-higashihimeji",
@@ -7131,6 +7904,20 @@
    "code": "eki_1190407"
   },
   {
+   "slug": "jr-higashijujo",
+   "name_kanji": "東十条",
+   "name_en": "Higashi-Jujo",
+   "yomi": null,
+   "lat": 35.763803,
+   "lon": 139.726858,
+   "lines": [
+    "JR Keihin–Tōhoku Line"
+   ],
+   "eki_code": "eki_1133211",
+   "eki_line": "JR京浜東北線",
+   "code": "eki_1133211"
+  },
+  {
    "slug": "jr-higashikaizuka",
    "name_kanji": "東貝塚",
    "name_en": "Higashi-Kaizuka",
@@ -7159,6 +7946,36 @@
    "code": "eki_1160815"
   },
   {
+   "slug": "jr-higashikanagawa",
+   "name_kanji": "東神奈川",
+   "name_en": "Higashi-Kanagawa",
+   "yomi": null,
+   "lat": 35.47804,
+   "lon": 139.633466,
+   "lines": [
+    "JR Keihin–Tōhoku Line",
+    "JR Yokohama Line"
+   ],
+   "eki_code": "eki_1130601",
+   "eki_line": "JR横浜線",
+   "code": "eki_1130601"
+  },
+  {
+   "slug": "jr-higashikawaguchi,sr-higashikawaguchi",
+   "name_kanji": "東川口",
+   "name_en": "Higashi-Kawaguchi",
+   "yomi": null,
+   "lat": 35.875246,
+   "lon": 139.744087,
+   "lines": [
+    "JR Musashino Line",
+    "Saitama Railway Saitama Stadium Line"
+   ],
+   "eki_code": "eki_1130513",
+   "eki_line": "JR武蔵野線",
+   "code": "eki_1130513"
+  },
+  {
    "slug": "jr-higashikishiwada",
    "name_kanji": "東岸和田",
    "name_en": "Higashi-Kishiwada",
@@ -7171,6 +7988,20 @@
    "eki_code": "eki_1162621",
    "eki_line": "阪和線(天王寺～和歌山)",
    "code": "eki_1162621"
+  },
+  {
+   "slug": "jr-higashikoganei",
+   "name_kanji": "東小金井",
+   "name_en": "Higashi-Koganei",
+   "yomi": null,
+   "lat": 35.701643,
+   "lon": 139.524837,
+   "lines": [
+    "JR Chūō Main Line(Tōkyō - Takao)"
+   ],
+   "eki_code": "eki_1131222",
+   "eki_line": "JR中央線(快速)",
+   "code": "eki_1131222"
   },
   {
    "slug": "jr-higashimaizuru",
@@ -7188,6 +8019,20 @@
    "code": "eki_1142201"
   },
   {
+   "slug": "jr-higashimatsudo",
+   "name_kanji": "東松戸",
+   "name_en": "Higashi-Matsudo",
+   "yomi": null,
+   "lat": 35.770611,
+   "lon": 139.943848,
+   "lines": [
+    "JR Musashino Line"
+   ],
+   "eki_code": "eki_1130521",
+   "eki_line": "JR武蔵野線",
+   "code": "eki_1130521"
+  },
+  {
    "slug": "jr-higashimuroran",
    "name_kanji": "東室蘭",
    "name_en": "Higashi-Muroran",
@@ -7201,6 +8046,34 @@
    "eki_code": "eki_1110420",
    "eki_line": "JR室蘭本線(長万部・室蘭～苫小牧)",
    "code": "eki_1110420"
+  },
+  {
+   "slug": "jr-higashinagami",
+   "name_kanji": "東中神",
+   "name_en": "Higashi-Nakagami",
+   "yomi": null,
+   "lat": 35.706337,
+   "lon": 139.384529,
+   "lines": [
+    "JR Ōme Line"
+   ],
+   "eki_code": "eki_1131503",
+   "eki_line": "JR青梅線",
+   "code": "eki_1131503"
+  },
+  {
+   "slug": "jr-higashinakano",
+   "name_kanji": "東中野",
+   "name_en": "Higashi-Nakano",
+   "yomi": null,
+   "lat": 35.706529,
+   "lon": 139.684436,
+   "lines": [
+    "JR Chūō Main Line(Tōkyō - Takao)"
+   ],
+   "eki_code": "eki_1131308",
+   "eki_line": "JR中央・総武線",
+   "code": "eki_1131308"
   },
   {
    "slug": "jr-higashinoshiro",
@@ -7245,6 +8118,34 @@
    "eki_code": "eki_1160915",
    "eki_line": "JR山陽本線(姫路～岡山)",
    "code": "eki_1160915"
+  },
+  {
+   "slug": "jr-higashiome",
+   "name_kanji": "東青梅",
+   "name_en": "Higashi-Ome",
+   "yomi": null,
+   "lat": 35.789768,
+   "lon": 139.272841,
+   "lines": [
+    "JR Ōme Line"
+   ],
+   "eki_code": "eki_1131512",
+   "eki_line": "JR青梅線",
+   "code": "eki_1131512"
+  },
+  {
+   "slug": "jr-higashiomiya",
+   "name_kanji": "東大宮",
+   "name_en": "Higashi-Omiya",
+   "yomi": null,
+   "lat": 35.948751,
+   "lon": 139.640291,
+   "lines": [
+    "JR Utsunomiya Line(Tōhoku Main Line)"
+   ],
+   "eki_code": "eki_1131908",
+   "eki_line": "宇都宮線",
+   "code": "eki_1131908"
   },
   {
    "slug": "jr-higashisanjo",
@@ -7316,6 +8217,63 @@
    "eki_code": "eki_1150117",
    "eki_line": "JR東海道本線(熱海～浜松)",
    "code": "eki_1150117"
+  },
+  {
+   "slug": "jr-higashitokorozawa",
+   "name_kanji": "東所沢",
+   "name_en": "Higashi-Tokorozawa",
+   "yomi": null,
+   "lat": 35.79461,
+   "lon": 139.513878,
+   "lines": [
+    "JR Musashino Line"
+   ],
+   "eki_code": "eki_1130506",
+   "eki_line": "JR武蔵野線",
+   "code": "eki_1130506"
+  },
+  {
+   "slug": "jr-higashitotsuka",
+   "name_kanji": "東戸塚",
+   "name_en": "Higashi-Totsuka",
+   "yomi": null,
+   "lat": 35.430353,
+   "lon": 139.556794,
+   "lines": [
+    "JR Shōnan–Shinjuku Line",
+    "JR Yokosuka Line"
+   ],
+   "eki_code": "eki_1130808",
+   "eki_line": "JR横須賀線",
+   "code": "eki_1130808"
+  },
+  {
+   "slug": "jr-higashiurawa",
+   "name_kanji": "東浦和",
+   "name_en": "Higashi-Urawa",
+   "yomi": null,
+   "lat": 35.864079,
+   "lon": 139.704627,
+   "lines": [
+    "JR Musashino Line"
+   ],
+   "eki_code": "eki_1130512",
+   "eki_line": "JR武蔵野線",
+   "code": "eki_1130512"
+  },
+  {
+   "slug": "jr-higashiwashinomiya",
+   "name_kanji": "東鷲宮",
+   "name_en": "Higashi-Washinomiya",
+   "yomi": null,
+   "lat": 36.089428,
+   "lon": 139.67913,
+   "lines": [
+    "JR Utsunomiya Line(Tōhoku Main Line)"
+   ],
+   "eki_code": "eki_1131913",
+   "eki_line": "宇都宮線",
+   "code": "eki_1131913"
   },
   {
    "slug": "jr-higashiyodogawa",
@@ -7451,6 +8409,21 @@
    "code": "eki_1162626"
   },
   {
+   "slug": "jr-hino,omi-hino",
+   "name_kanji": "日野",
+   "name_en": "Hino",
+   "yomi": null,
+   "lat": 35.679244,
+   "lon": 139.39393,
+   "lines": [
+    "JR Chūō Main Line(Tōkyō - Takao)",
+    "Ohmi Railway Main Line"
+   ],
+   "eki_code": "eki_1131108",
+   "eki_line": "JR中央本線(東京～塩尻)",
+   "code": "eki_1131108"
+  },
+  {
    "slug": "jr-hinoharu",
    "name_kanji": "日野春",
    "name_en": "Hinoharu",
@@ -7494,6 +8467,20 @@
    "code": "eki_9991120"
   },
   {
+   "slug": "jr-hirai",
+   "name_kanji": "平井",
+   "name_en": "Hirai",
+   "yomi": null,
+   "lat": 35.70643,
+   "lon": 139.842181,
+   "lines": [
+    "JR Sōbu Main Line(Ochanomizu - Chiba)"
+   ],
+   "eki_code": "eki_1131324",
+   "eki_line": "JR中央・総武線",
+   "code": "eki_1131324"
+  },
+  {
    "slug": "jr-hiraizumi",
    "name_kanji": "平泉",
    "name_en": "Hiraizumi",
@@ -7506,6 +8493,20 @@
    "eki_code": "eki_1123168",
    "eki_line": "JR東北本線(黒磯～利府・盛岡)",
    "code": "eki_1123168"
+  },
+  {
+   "slug": "jr-hirama",
+   "name_kanji": "平間",
+   "name_en": "Hirama",
+   "yomi": null,
+   "lat": 35.560565,
+   "lon": 139.671039,
+   "lines": [
+    "JR Nambu Line"
+   ],
+   "eki_code": "eki_1130305",
+   "eki_line": "JR南武線",
+   "code": "eki_1130305"
   },
   {
    "slug": "jr-hirano,noseden-hirano",
@@ -7665,6 +8666,20 @@
    "code": "eki_1133816"
   },
   {
+   "slug": "jr-hitachiota",
+   "name_kanji": "常陸太田",
+   "name_en": "Hitachi-Ota",
+   "yomi": null,
+   "lat": 36.531225,
+   "lon": 140.52777,
+   "lines": [
+    "JR Suigun Line(Hitachi-Ōta Branch Line)"
+   ],
+   "eki_code": "eki_1133812",
+   "eki_line": "JR水郡線",
+   "code": "eki_1133812"
+  },
+  {
    "slug": "jr-hitoichiba",
    "name_kanji": "一日市場",
    "name_en": "Hitoichiba",
@@ -7807,6 +8822,20 @@
    "code": "fk_jr-honbetsu"
   },
   {
+   "slug": "jr-hongodai",
+   "name_kanji": "本郷台",
+   "name_en": "Hongodai",
+   "yomi": null,
+   "lat": 35.36787,
+   "lon": 139.550159,
+   "lines": [
+    "JR Negishi Line"
+   ],
+   "eki_code": "eki_1130711",
+   "eki_line": "JR根岸線",
+   "code": "eki_1130711"
+  },
+  {
    "slug": "jr-honhachinohe",
    "name_kanji": "本八戸",
    "name_en": "Hon-Hachinohe",
@@ -7819,6 +8848,20 @@
    "eki_code": "eki_1120603",
    "eki_line": "JR八戸線",
    "code": "eki_1120603"
+  },
+  {
+   "slug": "jr-honjo",
+   "name_kanji": "本庄",
+   "name_en": "Honjo",
+   "yomi": null,
+   "lat": 36.236229,
+   "lon": 139.188299,
+   "lines": [
+    "JR Takasaki Line"
+   ],
+   "eki_code": "eki_1132320",
+   "eki_line": "JR高崎線",
+   "code": "eki_1132320"
   },
   {
    "slug": "jr-honnagashino",
@@ -7905,6 +8948,20 @@
    "code": "eki_1110307"
   },
   {
+   "slug": "jr-hota",
+   "name_kanji": "保田",
+   "name_en": "Hota",
+   "yomi": null,
+   "lat": 35.14148,
+   "lon": 139.838114,
+   "lines": [
+    "JR Uchibō Line"
+   ],
+   "eki_code": "eki_1132519",
+   "eki_line": "JR内房線",
+   "code": "eki_1132519"
+  },
+  {
    "slug": "jr-hotaka",
    "name_kanji": "穂高",
    "name_en": "Hotaka",
@@ -7947,6 +9004,21 @@
    "code": "eki_1161703"
   },
   {
+   "slug": "jr-housyakuji",
+   "name_kanji": "宝積寺",
+   "name_en": "Hoshakuji",
+   "yomi": null,
+   "lat": 36.631703,
+   "lon": 139.979487,
+   "lines": [
+    "JR Karasuyama Line",
+    "JR Utsunomiya Line(Tōhoku Main Line)"
+   ],
+   "eki_code": "eki_1131925",
+   "eki_line": "宇都宮線",
+   "code": "eki_1131925"
+  },
+  {
    "slug": "jr-huistenbosch",
    "name_kanji": "ハウステンボス",
    "name_en": "HUIS TEN BOSCH",
@@ -7973,6 +9045,20 @@
    "eki_code": "eki_1160802",
    "eki_line": "JR神戸線(神戸～姫路)",
    "code": "eki_1160802"
+  },
+  {
+   "slug": "jr-hyuga",
+   "name_kanji": "日向",
+   "name_en": "Hyuga",
+   "yomi": null,
+   "lat": 35.628402,
+   "lon": 140.362447,
+   "lines": [
+    "JR Sōbu Main Line(Chiba - Chōshi)"
+   ],
+   "eki_code": "eki_1131419",
+   "eki_line": "JR総武本線",
+   "code": "eki_1131419"
   },
   {
    "slug": "jr-hyugashi",
@@ -8017,6 +9103,35 @@
    "code": "eki_1193018"
   },
   {
+   "slug": "jr-ichigaya",
+   "name_kanji": "市ケ谷",
+   "name_en": "Ichigaya",
+   "yomi": null,
+   "lat": 35.691,
+   "lon": 139.735583,
+   "lines": [
+    "JR Chūō Main Line(Tōkyō - Takao)"
+   ],
+   "eki_code": "eki_1131315",
+   "eki_line": "JR中央・総武線",
+   "code": "eki_1131315"
+  },
+  {
+   "slug": "jr-ichikawa",
+   "name_kanji": "市川",
+   "name_en": "Ichikawa",
+   "yomi": null,
+   "lat": 35.728903,
+   "lon": 139.908142,
+   "lines": [
+    "JR Sōbu Main Line(Ochanomizu - Chiba)",
+    "JR Sōbu Main Line(Rapid)"
+   ],
+   "eki_code": "eki_1131327",
+   "eki_line": "JR中央・総武線",
+   "code": "eki_1131327"
+  },
+  {
    "slug": "jr-ichikawadaimon",
    "name_kanji": "市川大門",
    "name_en": "Ichikawadaimon",
@@ -8029,6 +9144,34 @@
    "eki_code": "eki_1140227",
    "eki_line": "JR身延線",
    "code": "eki_1140227"
+  },
+  {
+   "slug": "jr-ichikawaono",
+   "name_kanji": "市川大野",
+   "name_en": "Ichikawaono",
+   "yomi": null,
+   "lat": 35.755432,
+   "lon": 139.951227,
+   "lines": [
+    "JR Musashino Line"
+   ],
+   "eki_code": "eki_1130522",
+   "eki_line": "JR武蔵野線",
+   "code": "eki_1130522"
+  },
+  {
+   "slug": "jr-ichikawashiohama",
+   "name_kanji": "市川塩浜",
+   "name_en": "Ichikawashiohama",
+   "yomi": null,
+   "lat": 35.666554,
+   "lon": 139.923684,
+   "lines": [
+    "JR Keiyō Line"
+   ],
+   "eki_code": "eki_1132609",
+   "eki_line": "JR京葉線",
+   "code": "eki_1132609"
   },
   {
    "slug": "jr-ichinoseki",
@@ -8090,6 +9233,34 @@
    "code": "eki_1141410"
   },
   {
+   "slug": "jr-iidabashi",
+   "name_kanji": "飯田橋",
+   "name_en": "Iidabashi",
+   "yomi": null,
+   "lat": 35.701835,
+   "lon": 139.745143,
+   "lines": [
+    "JR Chūō Main Line(Tōkyō - Takao)"
+   ],
+   "eki_code": "eki_1131316",
+   "eki_line": "JR中央・総武線",
+   "code": "eki_1131316"
+  },
+  {
+   "slug": "jr-iioka",
+   "name_kanji": "飯岡",
+   "name_en": "Iioka",
+   "yomi": null,
+   "lat": 35.729339,
+   "lon": 140.683896,
+   "lines": [
+    "JR Sōbu Main Line(Chiba - Chōshi)"
+   ],
+   "eki_code": "eki_1131427",
+   "eki_line": "JR総武本線",
+   "code": "eki_1131427"
+  },
+  {
    "slug": "jr-iiyama",
    "name_kanji": "飯山",
    "name_en": "Iiyama",
@@ -8117,6 +9288,22 @@
    "eki_code": "eki_1120219",
    "eki_line": "JR奥羽本線(新庄～青森)",
    "code": "eki_1120219"
+  },
+  {
+   "slug": "jr-ikebukuro",
+   "name_kanji": "池袋",
+   "name_en": "Ikebukuro",
+   "yomi": null,
+   "lat": 35.730256,
+   "lon": 139.711086,
+   "lines": [
+    "JR Saikyō Line",
+    "JR Shōnan–Shinjuku Line",
+    "JR Yamanote Line"
+   ],
+   "eki_code": "eki_1130212",
+   "eki_line": "JR山手線",
+   "code": "eki_1130212"
   },
   {
    "slug": "jr-ikuno",
@@ -8159,6 +9346,20 @@
    "eki_code": "eki_1180642",
    "eki_line": "JR予讃線",
    "code": "eki_1180642"
+  },
+  {
+   "slug": "jr-imaichi",
+   "name_kanji": "今市",
+   "name_en": "Imaichi",
+   "yomi": null,
+   "lat": 36.720388,
+   "lon": 139.687348,
+   "lines": [
+    "JR Nikkō Line"
+   ],
+   "eki_code": "eki_1134006",
+   "eki_line": "JR日光線",
+   "code": "eki_1134006"
   },
   {
    "slug": "jr-imaizumi,yr-imaizumi",
@@ -8220,6 +9421,20 @@
    "code": "eki_1163112"
   },
   {
+   "slug": "jr-inadazutsumi",
+   "name_kanji": "稲田堤",
+   "name_en": "Inadazutsumi",
+   "yomi": null,
+   "lat": 35.633701,
+   "lon": 139.535173,
+   "lines": [
+    "JR Nambu Line"
+   ],
+   "eki_code": "eki_1130316",
+   "eki_line": "JR南武線",
+   "code": "eki_1130316"
+  },
+  {
    "slug": "jr-inadera",
    "name_kanji": "猪名寺",
    "name_en": "Inadera",
@@ -8246,6 +9461,49 @@
    "eki_code": "eki_1160105",
    "eki_line": "琵琶湖線",
    "code": "eki_1160105"
+  },
+  {
+   "slug": "jr-inage",
+   "name_kanji": "稲毛",
+   "name_en": "Inage",
+   "yomi": null,
+   "lat": 35.637264,
+   "lon": 140.09256,
+   "lines": [
+    "JR Sōbu Main Line(Ochanomizu - Chiba)",
+    "JR Sōbu Main Line(Rapid)"
+   ],
+   "eki_code": "eki_1131337",
+   "eki_line": "JR中央・総武線",
+   "code": "eki_1131337"
+  },
+  {
+   "slug": "jr-inagekaigan",
+   "name_kanji": "稲毛海岸",
+   "name_en": "Inagekaigan",
+   "yomi": null,
+   "lat": 35.629501,
+   "lon": 140.074034,
+   "lines": [
+    "JR Keiyō Line"
+   ],
+   "eki_code": "eki_1132616",
+   "eki_line": "JR京葉線",
+   "code": "eki_1132616"
+  },
+  {
+   "slug": "jr-inaginaganuma",
+   "name_kanji": "稲城長沼",
+   "name_en": "Inaginaganuma",
+   "yomi": null,
+   "lat": 35.644184,
+   "lon": 139.502811,
+   "lines": [
+    "JR Nambu Line"
+   ],
+   "eki_code": "eki_1130318",
+   "eki_line": "JR南武線",
+   "code": "eki_1130318"
   },
   {
    "slug": "jr-inahara",
@@ -8316,6 +9574,20 @@
    "eki_code": "eki_1120208",
    "eki_line": "JR奥羽本線(新庄～青森)",
    "code": "eki_1120208"
+  },
+  {
+   "slug": "jr-ino",
+   "name_kanji": "井野",
+   "name_en": "Ino",
+   "yomi": null,
+   "lat": 36.357457,
+   "lon": 139.023247,
+   "lines": [
+    "JR Jōetsu Line(Takasaki - Minakami)"
+   ],
+   "eki_code": "eki_1134103",
+   "eki_line": "JR両毛線",
+   "code": "eki_1134103"
   },
   {
    "slug": "jr-inotani",
@@ -8390,6 +9662,20 @@
    "code": "eki_1151315"
   },
   {
+   "slug": "jr-isesaki",
+   "name_kanji": "伊勢崎",
+   "name_en": "Isesaki",
+   "yomi": null,
+   "lat": 36.326849,
+   "lon": 139.193704,
+   "lines": [
+    "JR Ryōmō Line"
+   ],
+   "eki_code": "eki_1134108",
+   "eki_line": "JR両毛線",
+   "code": "eki_1134108"
+  },
+  {
    "slug": "jr-iseyachi",
    "name_kanji": "伊勢八知",
    "name_en": "Ise-yachi",
@@ -8402,6 +9688,20 @@
    "eki_code": "eki_1151313",
    "eki_line": "JR名松線",
    "code": "eki_1151313"
+  },
+  {
+   "slug": "jr-ishibashi",
+   "name_kanji": "石橋",
+   "name_en": "Ishibashi",
+   "yomi": null,
+   "lat": 36.43651,
+   "lon": 139.866536,
+   "lines": [
+    "JR Utsunomiya Line(Tōhoku Main Line)"
+   ],
+   "eki_code": "eki_1131921",
+   "eki_line": "宇都宮線",
+   "code": "eki_1131921"
   },
   {
    "slug": "jr-ishibe",
@@ -8444,6 +9744,20 @@
    "eki_code": "eki_1111213",
    "eki_line": "JR札沼線",
    "code": "eki_1111213"
+  },
+  {
+   "slug": "jr-ishikawacho",
+   "name_kanji": "石川町",
+   "name_en": "Ishikawacho",
+   "yomi": null,
+   "lat": 35.438808,
+   "lon": 139.642934,
+   "lines": [
+    "JR Negishi Line"
+   ],
+   "eki_code": "eki_1130704",
+   "eki_line": "JR根岸線",
+   "code": "eki_1130704"
   },
   {
    "slug": "jr-ishinomaki",
@@ -8490,6 +9804,34 @@
    "code": "eki_1160116"
   },
   {
+   "slug": "jr-isobe",
+   "name_kanji": "磯部",
+   "name_en": "Isobe",
+   "yomi": null,
+   "lat": 36.298397,
+   "lon": 138.84965,
+   "lines": [
+    "JR Shin'etsu Main Line(Takasaki - Yokokawa)"
+   ],
+   "eki_code": "eki_1133705",
+   "eki_line": "JR信越本線",
+   "code": "eki_1133705"
+  },
+  {
+   "slug": "jr-isogo",
+   "name_kanji": "磯子",
+   "name_en": "Isogo",
+   "yomi": null,
+   "lat": 35.399881,
+   "lon": 139.617916,
+   "lines": [
+    "JR Negishi Line"
+   ],
+   "eki_code": "eki_1130707",
+   "eki_line": "JR根岸線",
+   "code": "eki_1130707"
+  },
+  {
    "slug": "jr-isohara",
    "name_kanji": "磯原",
    "name_en": "Isohara",
@@ -8516,6 +9858,34 @@
    "eki_code": "eki_1192511",
    "eki_line": "えびの高原線(八代～吉松)",
    "code": "eki_1192511"
+  },
+  {
+   "slug": "jr-itabashi",
+   "name_kanji": "板橋",
+   "name_en": "Itabashi",
+   "yomi": null,
+   "lat": 35.745435,
+   "lon": 139.719507,
+   "lines": [
+    "JR Saikyō Line"
+   ],
+   "eki_code": "eki_1132106",
+   "eki_line": "JR埼京線",
+   "code": "eki_1132106"
+  },
+  {
+   "slug": "jr-itako",
+   "name_kanji": "潮来",
+   "name_en": "Itako",
+   "yomi": null,
+   "lat": 35.936904,
+   "lon": 140.549473,
+   "lines": [
+    "JR Kashima Line"
+   ],
+   "eki_code": "eki_1132904",
+   "eki_line": "JR鹿島線",
+   "code": "eki_1132904"
   },
   {
    "slug": "jr-itami",
@@ -8574,6 +9944,20 @@
    "code": "eki_1163630"
   },
   {
+   "slug": "jr-iwai",
+   "name_kanji": "岩井",
+   "name_en": "Iwai",
+   "yomi": null,
+   "lat": 35.093062,
+   "lon": 139.849839,
+   "lines": [
+    "JR Uchibō Line"
+   ],
+   "eki_code": "eki_1132521",
+   "eki_line": "JR内房線",
+   "code": "eki_1132521"
+  },
+  {
    "slug": "jr-iwaizumi",
    "name_kanji": "岩泉",
    "name_en": "Iwaizumi",
@@ -8586,6 +9970,20 @@
    "eki_code": null,
    "eki_line": null,
    "code": "fk_jr-iwaizumi"
+  },
+  {
+   "slug": "jr-iwajuku",
+   "name_kanji": "岩宿",
+   "name_en": "Iwajuku",
+   "yomi": null,
+   "lat": 36.395861,
+   "lon": 139.297058,
+   "lines": [
+    "JR Ryōmō Line"
+   ],
+   "eki_code": "eki_1134110",
+   "eki_line": "JR両毛線",
+   "code": "eki_1134110"
   },
   {
    "slug": "jr-iwaki",
@@ -8678,6 +10076,20 @@
    "code": "eki_1140124"
   },
   {
+   "slug": "jr-iwane",
+   "name_kanji": "巌根",
+   "name_en": "Iwane",
+   "yomi": null,
+   "lat": 35.414285,
+   "lon": 139.933229,
+   "lines": [
+    "JR Uchibō Line"
+   ],
+   "eki_code": "eki_1132510",
+   "eki_line": "JR内房線",
+   "code": "eki_1132510"
+  },
+  {
    "slug": "jr-iwanuma",
    "name_kanji": "岩沼",
    "name_en": "Iwanuma",
@@ -8691,6 +10103,20 @@
    "eki_code": "eki_1123028",
    "eki_line": "JR常磐線(いわき～仙台)",
    "code": "eki_1123028"
+  },
+  {
+   "slug": "jr-iwase",
+   "name_kanji": "岩瀬",
+   "name_en": "Iwase",
+   "yomi": null,
+   "lat": 36.359377,
+   "lon": 140.108739,
+   "lines": [
+    "JR Mito Line"
+   ],
+   "eki_code": "eki_1133910",
+   "eki_line": "JR水戸線",
+   "code": "eki_1133910"
   },
   {
    "slug": "jr-iwata",
@@ -8863,6 +10289,34 @@
    "code": "eki_1170113"
   },
   {
+   "slug": "jr-jichiidai",
+   "name_kanji": "自治医大",
+   "name_en": "Jichi Medical University",
+   "yomi": null,
+   "lat": 36.39543,
+   "lon": 139.854524,
+   "lines": [
+    "JR Utsunomiya Line(Tōhoku Main Line)"
+   ],
+   "eki_code": "eki_1131920",
+   "eki_line": "宇都宮線",
+   "code": "eki_1131920"
+  },
+  {
+   "slug": "jr-jimbohara",
+   "name_kanji": "神保原",
+   "name_en": "Jimbohara",
+   "yomi": null,
+   "lat": 36.25359,
+   "lon": 139.149172,
+   "lines": [
+    "JR Takasaki Line"
+   ],
+   "eki_code": "eki_1132321",
+   "eki_line": "JR高崎線",
+   "code": "eki_1132321"
+  },
+  {
    "slug": "jr-jogawara,tlr-jogawara",
    "name_kanji": "城川原",
    "name_en": "Jogawara",
@@ -8935,6 +10389,20 @@
    "code": "eki_1161812"
   },
   {
+   "slug": "jr-jujo",
+   "name_kanji": "十条",
+   "name_en": "Jujo",
+   "yomi": null,
+   "lat": 35.760321,
+   "lon": 139.722233,
+   "lines": [
+    "JR Saikyō Line"
+   ],
+   "eki_code": "eki_1132107",
+   "eki_line": "JR埼京線",
+   "code": "eki_1132107"
+  },
+  {
    "slug": "jr-jumonji",
    "name_kanji": "十文字",
    "name_en": "Jumonji",
@@ -8963,6 +10431,20 @@
    "code": "eki_1122925"
   },
   {
+   "slug": "jr-kabe",
+   "name_kanji": "河辺",
+   "name_en": "Kabe",
+   "yomi": null,
+   "lat": 35.78473,
+   "lon": 139.284032,
+   "lines": [
+    "JR Ōme Line"
+   ],
+   "eki_code": "eki_1131511",
+   "eki_line": "JR青梅線",
+   "code": "eki_1131511"
+  },
+  {
    "slug": "jr-kado",
    "name_kanji": "鹿渡",
    "name_en": "Kado",
@@ -8989,6 +10471,20 @@
    "eki_code": "eki_1190715",
    "eki_line": "JR日豊本線(佐伯～鹿児島中央)",
    "code": "eki_1190715"
+  },
+  {
+   "slug": "jr-kagohara",
+   "name_kanji": "籠原",
+   "name_en": "Kagohara",
+   "yomi": null,
+   "lat": 36.17448,
+   "lon": 139.330199,
+   "lines": [
+    "JR Takasaki Line"
+   ],
+   "eki_code": "eki_1132317",
+   "eki_line": "JR高崎線",
+   "code": "eki_1132317"
   },
   {
    "slug": "jr-kagoshima",
@@ -9034,6 +10530,20 @@
    "eki_code": "eki_1163005",
    "eki_line": "福知山線(篠山口～福知山)",
    "code": "eki_1163005"
+  },
+  {
+   "slug": "jr-kaihinmakuhari",
+   "name_kanji": "海浜幕張",
+   "name_en": "Kaihimmakuhari",
+   "yomi": null,
+   "lat": 35.648373,
+   "lon": 140.041917,
+   "lines": [
+    "JR Keiyō Line"
+   ],
+   "eki_code": "eki_1132614",
+   "eki_line": "JR京葉線",
+   "code": "eki_1132614"
   },
   {
    "slug": "jr-kainan",
@@ -9140,6 +10650,62 @@
    "code": "eki_1120924"
   },
   {
+   "slug": "jr-kamakura",
+   "name_kanji": "鎌倉",
+   "name_en": "Kamakura",
+   "yomi": null,
+   "lat": 35.318793,
+   "lon": 139.550428,
+   "lines": [
+    "JR Yokosuka Line"
+   ],
+   "eki_code": "eki_1130812",
+   "eki_line": "JR横須賀線",
+   "code": "eki_1130812"
+  },
+  {
+   "slug": "jr-kamasusaka",
+   "name_kanji": "蒲須坂",
+   "name_en": "Kamasusaka",
+   "yomi": null,
+   "lat": 36.720727,
+   "lon": 139.950461,
+   "lines": [
+    "JR Utsunomiya Line(Tōhoku Main Line)"
+   ],
+   "eki_code": "eki_1131927",
+   "eki_line": "宇都宮線",
+   "code": "eki_1131927"
+  },
+  {
+   "slug": "jr-kamata",
+   "name_kanji": "蒲田",
+   "name_en": "Kamata",
+   "yomi": null,
+   "lat": 35.562517,
+   "lon": 139.716032,
+   "lines": [
+    "JR Keihin–Tōhoku Line"
+   ],
+   "eki_code": "eki_1133230",
+   "eki_line": "JR京浜東北線",
+   "code": "eki_1133230"
+  },
+  {
+   "slug": "jr-kameari",
+   "name_kanji": "亀有",
+   "name_en": "Kameari",
+   "yomi": null,
+   "lat": 35.766527,
+   "lon": 139.847573,
+   "lines": [
+    "JR Jōban Line(Kita-Senju - Toride)"
+   ],
+   "eki_code": "eki_1132007",
+   "eki_line": "JR常磐線(上野～取手)",
+   "code": "eki_1132007"
+  },
+  {
    "slug": "jr-kameda",
    "name_kanji": "亀田",
    "name_en": "Kameda",
@@ -9180,6 +10746,20 @@
    "eki_code": "eki_1190638",
    "eki_line": "JR日豊本線(門司港～佐伯)",
    "code": "eki_1190638"
+  },
+  {
+   "slug": "jr-kameido",
+   "name_kanji": "亀戸",
+   "name_en": "Kameido",
+   "yomi": null,
+   "lat": 35.697345,
+   "lon": 139.826262,
+   "lines": [
+    "JR Sōbu Main Line(Ochanomizu - Chiba)"
+   ],
+   "eki_code": "eki_1131323",
+   "eki_line": "JR中央・総武線",
+   "code": "eki_1131323"
   },
   {
    "slug": "jr-kamenoko",
@@ -9308,6 +10888,20 @@
    "code": "eki_1142213"
   },
   {
+   "slug": "jr-kaminakazato",
+   "name_kanji": "上中里",
+   "name_en": "Kami-Nakazato",
+   "yomi": null,
+   "lat": 35.74728,
+   "lon": 139.745769,
+   "lines": [
+    "JR Keihin–Tōhoku Line"
+   ],
+   "eki_code": "eki_1133213",
+   "eki_line": "JR京浜東北線",
+   "code": "eki_1133213"
+  },
+  {
    "slug": "jr-kaminoyamaonsen",
    "name_kanji": "かみのやま温泉",
    "name_en": "Kaminoyamaonsen",
@@ -9358,7 +10952,8 @@
    "lat": 36.455378,
    "lon": 140.492659,
    "lines": [
-    "JR Suigun Line"
+    "JR Suigun Line",
+    "JR Suigun Line(Hitachi-Ōta Branch Line)"
    ],
    "eki_code": "eki_1133807",
    "eki_line": "JR水郡線",
@@ -9391,6 +10986,20 @@
    "eki_code": "eki_1140432",
    "eki_line": "JR信越本線(直江津～新潟)",
    "code": "eki_1140432"
+  },
+  {
+   "slug": "jr-kamoi",
+   "name_kanji": "鴨居",
+   "name_en": "Kamoi",
+   "yomi": null,
+   "lat": 35.510955,
+   "lon": 139.56707,
+   "lines": [
+    "JR Yokohama Line"
+   ],
+   "eki_code": "eki_1130606",
+   "eki_line": "JR横浜線",
+   "code": "eki_1130606"
   },
   {
    "slug": "jr-kamojima",
@@ -9435,6 +11044,20 @@
    "code": "eki_1141211"
   },
   {
+   "slug": "jr-kanamachi",
+   "name_kanji": "金町",
+   "name_en": "Kanamachi",
+   "yomi": null,
+   "lat": 35.769582,
+   "lon": 139.870482,
+   "lines": [
+    "JR Jōban Line(Kita-Senju - Toride)"
+   ],
+   "eki_code": "eki_1132008",
+   "eki_line": "JR常磐線(上野～取手)",
+   "code": "eki_1132008"
+  },
+  {
    "slug": "jr-kanaya,oigawa-kanaya",
    "name_kanji": "金谷",
    "name_en": "Kanaya",
@@ -9448,6 +11071,36 @@
    "eki_code": "eki_1150126",
    "eki_line": "JR東海道本線(熱海～浜松)",
    "code": "eki_1150126"
+  },
+  {
+   "slug": "jr-kanda",
+   "name_kanji": "神田",
+   "name_en": "Kanda",
+   "yomi": null,
+   "lat": 35.691173,
+   "lon": 139.770641,
+   "lines": [
+    "JR Chūō Main Line(Tōkyō - Takao)",
+    "JR Keihin–Tōhoku Line",
+    "JR Yamanote Line"
+   ],
+   "eki_code": "eki_1130223",
+   "eki_line": "JR山手線",
+   "code": "eki_1130223"
+  },
+  {
+   "slug": "jr-kaneko",
+   "name_kanji": "金子",
+   "name_en": "Kaneko",
+   "yomi": null,
+   "lat": 35.810822,
+   "lon": 139.328546,
+   "lines": [
+    "JR Hachikō Line"
+   ],
+   "eki_code": "eki_1131707",
+   "eki_line": "JR八高線(八王子～高麗川)",
+   "code": "eki_1131707"
   },
   {
    "slug": "jr-kanie",
@@ -9479,6 +11132,20 @@
    "code": "eki_1120511"
   },
   {
+   "slug": "jr-kannai",
+   "name_kanji": "関内",
+   "name_en": "Kannai",
+   "yomi": null,
+   "lat": 35.443336,
+   "lon": 139.636984,
+   "lines": [
+    "JR Negishi Line"
+   ],
+   "eki_code": "eki_1130703",
+   "eki_line": "JR根岸線",
+   "code": "eki_1130703"
+  },
+  {
    "slug": "jr-kanonji",
    "name_kanji": "観音寺",
    "name_en": "Kan-onji",
@@ -9505,6 +11172,20 @@
    "eki_code": "eki_1162803",
    "eki_line": "JR関西空港線",
    "code": "eki_1162803"
+  },
+  {
+   "slug": "jr-kanuma",
+   "name_kanji": "鹿沼",
+   "name_en": "Kanuma",
+   "yomi": null,
+   "lat": 36.571222,
+   "lon": 139.762961,
+   "lines": [
+    "JR Nikkō Line"
+   ],
+   "eki_code": "eki_1134003",
+   "eki_line": "JR日光線",
+   "code": "eki_1134003"
   },
   {
    "slug": "jr-kanzaki",
@@ -9594,6 +11275,48 @@
    "code": "eki_1150911"
   },
   {
+   "slug": "jr-kasahata",
+   "name_kanji": "笠幡",
+   "name_en": "Kasahata",
+   "yomi": null,
+   "lat": 35.907551,
+   "lon": 139.40622,
+   "lines": [
+    "JR Kawagoe Line"
+   ],
+   "eki_code": "eki_1132208",
+   "eki_line": "JR川越線",
+   "code": "eki_1132208"
+  },
+  {
+   "slug": "jr-kasairinkaikoen",
+   "name_kanji": "葛西臨海公園",
+   "name_en": "Kasai-Rinkai Park",
+   "yomi": null,
+   "lat": 35.644392,
+   "lon": 139.861529,
+   "lines": [
+    "JR Keiyō Line"
+   ],
+   "eki_code": "eki_1132606",
+   "eki_line": "JR京葉線",
+   "code": "eki_1132606"
+  },
+  {
+   "slug": "jr-kasama",
+   "name_kanji": "笠間",
+   "name_en": "Kasama",
+   "yomi": null,
+   "lat": 36.373056,
+   "lon": 140.246515,
+   "lines": [
+    "JR Mito Line"
+   ],
+   "eki_code": "eki_1133914",
+   "eki_line": "JR水戸線",
+   "code": "eki_1133914"
+  },
+  {
    "slug": "jr-kasaoka",
    "name_kanji": "笠岡",
    "name_en": "Kasaoka",
@@ -9665,6 +11388,49 @@
    "code": "eki_1162508"
   },
   {
+   "slug": "jr-kashimada",
+   "name_kanji": "鹿島田",
+   "name_en": "Kashimada",
+   "yomi": null,
+   "lat": 35.551459,
+   "lon": 139.674964,
+   "lines": [
+    "JR Nambu Line"
+   ],
+   "eki_code": "eki_1130304",
+   "eki_line": "JR南武線",
+   "code": "eki_1130304"
+  },
+  {
+   "slug": "jr-kashimajingu",
+   "name_kanji": "鹿島神宮",
+   "name_en": "Kashimajingu",
+   "yomi": null,
+   "lat": 35.970614,
+   "lon": 140.625676,
+   "lines": [
+    "JR Kashima Line"
+   ],
+   "eki_code": "eki_1132906",
+   "eki_line": "JR鹿島線",
+   "code": "eki_1132906"
+  },
+  {
+   "slug": "jr-kashiwa",
+   "name_kanji": "柏",
+   "name_en": "Kashiwa",
+   "yomi": null,
+   "lat": 35.862316,
+   "lon": 139.971148,
+   "lines": [
+    "JR Jōban Line(Kita-Senju - Toride)",
+    "JR Jōban Line(Rapid)"
+   ],
+   "eki_code": "eki_1132015",
+   "eki_line": "JR常磐線(上野～取手)",
+   "code": "eki_1132015"
+  },
+  {
    "slug": "jr-kashiwara",
    "name_kanji": "柏原",
    "name_en": "Kashiwara",
@@ -9706,6 +11472,34 @@
    "eki_code": "eki_1150105",
    "eki_line": "JR東海道本線(熱海～浜松)",
    "code": "eki_1150105"
+  },
+  {
+   "slug": "jr-katakura",
+   "name_kanji": "片倉",
+   "name_en": "Katakura",
+   "yomi": null,
+   "lat": 35.639704,
+   "lon": 139.34119,
+   "lines": [
+    "JR Yokohama Line"
+   ],
+   "eki_code": "eki_1130619",
+   "eki_line": "JR横浜線",
+   "code": "eki_1130619"
+  },
+  {
+   "slug": "jr-kataoka",
+   "name_kanji": "片岡",
+   "name_en": "Kataoka",
+   "yomi": null,
+   "lat": 36.754557,
+   "lon": 139.945665,
+   "lines": [
+    "JR Utsunomiya Line(Tōhoku Main Line)"
+   ],
+   "eki_code": "eki_1131928",
+   "eki_line": "宇都宮線",
+   "code": "eki_1131928"
   },
   {
    "slug": "jr-katata",
@@ -9792,6 +11586,20 @@
    "code": "eki_1122918"
   },
   {
+   "slug": "jr-katsuura",
+   "name_kanji": "勝浦",
+   "name_en": "Katsuura",
+   "yomi": null,
+   "lat": 35.152722,
+   "lon": 140.312142,
+   "lines": [
+    "JR Sotobō Line"
+   ],
+   "eki_code": "eki_1132421",
+   "eki_line": "JR外房線",
+   "code": "eki_1132421"
+  },
+  {
    "slug": "jr-kawachieiwa",
    "name_kanji": "河内永和",
    "name_en": "JR-Kawachi-Eiwa",
@@ -9818,6 +11626,34 @@
    "eki_code": "eki_1161713",
    "eki_line": "学研都市線",
    "code": "eki_1161713"
+  },
+  {
+   "slug": "jr-kawagoe",
+   "name_kanji": "川越",
+   "name_en": "Kawagoe",
+   "yomi": null,
+   "lat": 35.906742,
+   "lon": 139.483078,
+   "lines": [
+    "JR Kawagoe Line"
+   ],
+   "eki_code": "eki_1132205",
+   "eki_line": "JR川越線",
+   "code": "eki_1132205"
+  },
+  {
+   "slug": "jr-kawaguchi",
+   "name_kanji": "川口",
+   "name_en": "Kawaguchi",
+   "yomi": null,
+   "lat": 35.801869,
+   "lon": 139.717472,
+   "lines": [
+    "JR Keihin–Tōhoku Line"
+   ],
+   "eki_code": "eki_1133209",
+   "eki_line": "JR京浜東北線",
+   "code": "eki_1133209"
   },
   {
    "slug": "jr-kawake",
@@ -9897,6 +11733,8 @@
    "lat": 35.531311,
    "lon": 139.697485,
    "lines": [
+    "JR Keihin–Tōhoku Line",
+    "JR Nambu Line",
     "JR Tōkaidō Main Line(Tōkyō - Atami)"
    ],
    "eki_code": "eki_1130104",
@@ -9946,6 +11784,48 @@
    "code": "eki_1121217"
   },
   {
+   "slug": "jr-kazusaichinomiya",
+   "name_kanji": "上総一ノ宮",
+   "name_en": "Kazusa-Ichinomiya",
+   "yomi": null,
+   "lat": 35.373401,
+   "lon": 140.365138,
+   "lines": [
+    "JR Sotobō Line"
+   ],
+   "eki_code": "eki_1132413",
+   "eki_line": "JR外房線",
+   "code": "eki_1132413"
+  },
+  {
+   "slug": "jr-kazusaminato",
+   "name_kanji": "上総湊",
+   "name_en": "Kazusa-Minato",
+   "yomi": null,
+   "lat": 35.221855,
+   "lon": 139.871016,
+   "lines": [
+    "JR Uchibō Line"
+   ],
+   "eki_code": "eki_1132516",
+   "eki_line": "JR内房線",
+   "code": "eki_1132516"
+  },
+  {
+   "slug": "jr-kazusaokitsu",
+   "name_kanji": "上総興津",
+   "name_en": "Kazusa-Okitsu",
+   "yomi": null,
+   "lat": 35.137146,
+   "lon": 140.250487,
+   "lines": [
+    "JR Sotobō Line"
+   ],
+   "eki_code": "eki_1132423",
+   "eki_line": "JR外房線",
+   "code": "eki_1132423"
+  },
+  {
    "slug": "jr-keisen",
    "name_kanji": "桂川",
    "name_en": "Keisen",
@@ -9959,6 +11839,20 @@
    "eki_code": "eki_1190801",
    "eki_line": "福北ゆたか線",
    "code": "eki_1190801"
+  },
+  {
+   "slug": "jr-kemigawahama",
+   "name_kanji": "検見川浜",
+   "name_en": "Kemigawahama",
+   "yomi": null,
+   "lat": 35.637291,
+   "lon": 140.058888,
+   "lines": [
+    "JR Keiyō Line"
+   ],
+   "eki_code": "eki_1132615",
+   "eki_line": "JR京葉線",
+   "code": "eki_1132615"
   },
   {
    "slug": "jr-kesennuma",
@@ -9988,6 +11882,20 @@
    "eki_code": "eki_9960401",
    "eki_line": "信楽高原鐵道信楽線",
    "code": "eki_9960401"
+  },
+  {
+   "slug": "jr-kichijoji",
+   "name_kanji": "吉祥寺",
+   "name_en": "Kichijoji",
+   "yomi": null,
+   "lat": 35.703119,
+   "lon": 139.579765,
+   "lines": [
+    "JR Chūō Main Line(Tōkyō - Takao)"
+   ],
+   "eki_code": "eki_1131104",
+   "eki_line": "JR中央本線(東京～塩尻)",
+   "code": "eki_1131104"
   },
   {
    "slug": "jr-kidonanzoinmae",
@@ -10092,6 +12000,20 @@
    "code": "eki_1150127"
   },
   {
+   "slug": "jr-kikuna",
+   "name_kanji": "菊名",
+   "name_en": "Kikuna",
+   "yomi": null,
+   "lat": 35.509749,
+   "lon": 139.630147,
+   "lines": [
+    "JR Yokohama Line"
+   ],
+   "eki_code": "eki_1130603",
+   "eki_line": "JR横浜線",
+   "code": "eki_1130603"
+  },
+  {
    "slug": "jr-kimiidera",
    "name_kanji": "紀三井寺",
    "name_en": "Kimiidera",
@@ -10104,6 +12026,20 @@
    "eki_code": "eki_1163952",
    "eki_line": "きのくに線",
    "code": "eki_1163952"
+  },
+  {
+   "slug": "jr-kimitsu",
+   "name_kanji": "君津",
+   "name_en": "Kimitsu",
+   "yomi": null,
+   "lat": 35.333619,
+   "lon": 139.895697,
+   "lines": [
+    "JR Uchibō Line"
+   ],
+   "eki_code": "eki_1132512",
+   "eki_line": "JR内房線",
+   "code": "eki_1132512"
   },
   {
    "slug": "jr-kinomoto",
@@ -10134,6 +12070,49 @@
    "code": "eki_1161603"
   },
   {
+   "slug": "jr-kinshicho",
+   "name_kanji": "錦糸町",
+   "name_en": "Kinshicho",
+   "yomi": null,
+   "lat": 35.696802,
+   "lon": 139.814136,
+   "lines": [
+    "JR Sōbu Main Line(Ochanomizu - Chiba)",
+    "JR Sōbu Main Line(Rapid)"
+   ],
+   "eki_code": "eki_1131322",
+   "eki_line": "JR中央・総武線",
+   "code": "eki_1131322"
+  },
+  {
+   "slug": "jr-kioroshi",
+   "name_kanji": "木下",
+   "name_en": "Kioroshi",
+   "yomi": null,
+   "lat": 35.838817,
+   "lon": 140.147954,
+   "lines": [
+    "JR Narita Line(Abiko Branch Line)"
+   ],
+   "eki_code": "eki_1132725",
+   "eki_line": "JR成田線",
+   "code": "eki_1132725"
+  },
+  {
+   "slug": "jr-kiryu",
+   "name_kanji": "桐生",
+   "name_en": "Kiryu",
+   "yomi": null,
+   "lat": 36.41109,
+   "lon": 139.33319,
+   "lines": [
+    "JR Ryōmō Line"
+   ],
+   "eki_code": "eki_1134111",
+   "eki_line": "JR両毛線",
+   "code": "eki_1134111"
+  },
+  {
    "slug": "jr-kisakata",
    "name_kanji": "象潟",
    "name_en": "Kisakata",
@@ -10146,6 +12125,21 @@
    "eki_code": "eki_1121446",
    "eki_line": "JR羽越本線",
    "code": "eki_1121446"
+  },
+  {
+   "slug": "jr-kisarazu",
+   "name_kanji": "木更津",
+   "name_en": "Kisarazu",
+   "yomi": null,
+   "lat": 35.381668,
+   "lon": 139.92611,
+   "lines": [
+    "JR Kururi Line",
+    "JR Uchibō Line"
+   ],
+   "eki_code": "eki_1132511",
+   "eki_line": "JR内房線",
+   "code": "eki_1132511"
   },
   {
    "slug": "jr-kishibe",
@@ -10190,6 +12184,76 @@
    "code": "eki_1170607"
   },
   {
+   "slug": "jr-kitaageo",
+   "name_kanji": "北上尾",
+   "name_en": "Kita-Ageo",
+   "yomi": null,
+   "lat": 35.985632,
+   "lon": 139.577223,
+   "lines": [
+    "JR Takasaki Line"
+   ],
+   "eki_code": "eki_1132309",
+   "eki_line": "JR高崎線",
+   "code": "eki_1132309"
+  },
+  {
+   "slug": "jr-kitaakabane",
+   "name_kanji": "北赤羽",
+   "name_en": "Kita-Akabane",
+   "yomi": null,
+   "lat": 35.787007,
+   "lon": 139.70569,
+   "lines": [
+    "JR Saikyō Line"
+   ],
+   "eki_code": "eki_1132109",
+   "eki_line": "JR埼京線",
+   "code": "eki_1132109"
+  },
+  {
+   "slug": "jr-kitaasaka",
+   "name_kanji": "北朝霞",
+   "name_en": "Kita-Asaka",
+   "yomi": null,
+   "lat": 35.815475,
+   "lon": 139.587322,
+   "lines": [
+    "JR Musashino Line"
+   ],
+   "eki_code": "eki_1130508",
+   "eki_line": "JR武蔵野線",
+   "code": "eki_1130508"
+  },
+  {
+   "slug": "jr-kitafuchu",
+   "name_kanji": "北府中",
+   "name_en": "Kita-Fuchu",
+   "yomi": null,
+   "lat": 35.68088,
+   "lon": 139.471792,
+   "lines": [
+    "JR Musashino Line"
+   ],
+   "eki_code": "eki_1130502",
+   "eki_line": "JR武蔵野線",
+   "code": "eki_1130502"
+  },
+  {
+   "slug": "jr-kitahachioji",
+   "name_kanji": "北八王子",
+   "name_en": "Kita-Hachioji",
+   "yomi": null,
+   "lat": 35.669232,
+   "lon": 139.363348,
+   "lines": [
+    "JR Hachikō Line"
+   ],
+   "eki_code": "eki_1131702",
+   "eki_line": "JR八高線(八王子～高麗川)",
+   "code": "eki_1131702"
+  },
+  {
    "slug": "jr-kitahiroshima",
    "name_kanji": "北広島",
    "name_en": "Kita-Hiroshima",
@@ -10218,6 +12282,20 @@
    "code": "eki_1162907"
   },
   {
+   "slug": "jr-kitakamakura",
+   "name_kanji": "北鎌倉",
+   "name_en": "Kita-Kamakura",
+   "yomi": null,
+   "lat": 35.337198,
+   "lon": 139.545134,
+   "lines": [
+    "JR Yokosuka Line"
+   ],
+   "eki_code": "eki_1130811",
+   "eki_line": "JR横須賀線",
+   "code": "eki_1130811"
+  },
+  {
    "slug": "jr-kitakami",
    "name_kanji": "北上",
    "name_en": "Kitakami",
@@ -10234,6 +12312,20 @@
    "code": "eki_1121001"
   },
   {
+   "slug": "jr-kitakashiwa",
+   "name_kanji": "北柏",
+   "name_en": "Kita-Kashiwa",
+   "yomi": null,
+   "lat": 35.875623,
+   "lon": 139.988035,
+   "lines": [
+    "JR Jōban Line(Kita-Senju - Toride)"
+   ],
+   "eki_code": "eki_1132016",
+   "eki_line": "JR常磐線(上野～取手)",
+   "code": "eki_1132016"
+  },
+  {
    "slug": "jr-kitakata",
    "name_kanji": "喜多方",
    "name_en": "Kitakata",
@@ -10246,6 +12338,77 @@
    "eki_code": "eki_1122607",
    "eki_line": "森と水とロマンの鉄道",
    "code": "eki_1122607"
+  },
+  {
+   "slug": "jr-kitakogane",
+   "name_kanji": "北小金",
+   "name_en": "Kita-Kogane",
+   "yomi": null,
+   "lat": 35.833436,
+   "lon": 139.931303,
+   "lines": [
+    "JR Jōban Line(Kita-Senju - Toride)"
+   ],
+   "eki_code": "eki_1132013",
+   "eki_line": "JR常磐線(上野～取手)",
+   "code": "eki_1132013"
+  },
+  {
+   "slug": "jr-kitakonosu",
+   "name_kanji": "北鴻巣",
+   "name_en": "Kita-Konosu",
+   "yomi": null,
+   "lat": 36.085529,
+   "lon": 139.476894,
+   "lines": [
+    "JR Takasaki Line"
+   ],
+   "eki_code": "eki_1132313",
+   "eki_line": "JR高崎線",
+   "code": "eki_1132313"
+  },
+  {
+   "slug": "jr-kitamatsudo",
+   "name_kanji": "北松戸",
+   "name_en": "Kita-Matsudo",
+   "yomi": null,
+   "lat": 35.800459,
+   "lon": 139.911528,
+   "lines": [
+    "JR Jōban Line(Kita-Senju - Toride)"
+   ],
+   "eki_code": "eki_1132010",
+   "eki_line": "JR常磐線(上野～取手)",
+   "code": "eki_1132010"
+  },
+  {
+   "slug": "jr-kitamoto",
+   "name_kanji": "北本",
+   "name_en": "Kitamoto",
+   "yomi": null,
+   "lat": 36.032112,
+   "lon": 139.533591,
+   "lines": [
+    "JR Takasaki Line"
+   ],
+   "eki_code": "eki_1132311",
+   "eki_line": "JR高崎線",
+   "code": "eki_1132311"
+  },
+  {
+   "slug": "jr-kitasenju",
+   "name_kanji": "北千住",
+   "name_en": "Kita-Senju",
+   "yomi": null,
+   "lat": 35.749677,
+   "lon": 139.804872,
+   "lines": [
+    "JR Jōban Line(Kita-Senju - Toride)",
+    "JR Jōban Line(Rapid)"
+   ],
+   "eki_code": "eki_1132005",
+   "eki_line": "JR常磐線(上野～取手)",
+   "code": "eki_1132005"
   },
   {
    "slug": "jr-kitashinchi",
@@ -10276,6 +12439,34 @@
    "code": "eki_1162616"
   },
   {
+   "slug": "jr-kitatakasaki",
+   "name_kanji": "北高崎",
+   "name_en": "Kita-Takasaki",
+   "yomi": null,
+   "lat": 36.338791,
+   "lon": 139.001076,
+   "lines": [
+    "JR Shin'etsu Main Line(Takasaki - Yokokawa)"
+   ],
+   "eki_code": "eki_1133702",
+   "eki_line": "JR信越本線",
+   "code": "eki_1133702"
+  },
+  {
+   "slug": "jr-kitatoda",
+   "name_kanji": "北戸田",
+   "name_en": "Kita-Toda",
+   "yomi": null,
+   "lat": 35.826883,
+   "lon": 139.661201,
+   "lines": [
+    "JR Saikyō Line"
+   ],
+   "eki_code": "eki_1132113",
+   "eki_line": "JR埼京線",
+   "code": "eki_1132113"
+  },
+  {
    "slug": "jr-kitatokiwa",
    "name_kanji": "北常盤",
    "name_en": "Kita-Tokiwa",
@@ -10290,6 +12481,20 @@
    "code": "eki_1120260"
   },
   {
+   "slug": "jr-kitaurawa",
+   "name_kanji": "北浦和",
+   "name_en": "Kita-Urawa",
+   "yomi": null,
+   "lat": 35.872053,
+   "lon": 139.645951,
+   "lines": [
+    "JR Keihin–Tōhoku Line"
+   ],
+   "eki_code": "eki_1133204",
+   "eki_line": "JR京浜東北線",
+   "code": "eki_1133204"
+  },
+  {
    "slug": "jr-kitayama",
    "name_kanji": "北山",
    "name_en": "Kitayama",
@@ -10302,6 +12507,20 @@
    "eki_code": "eki_1121704",
    "eki_line": "JR仙山線",
    "code": "eki_1121704"
+  },
+  {
+   "slug": "jr-kitayono",
+   "name_kanji": "北与野",
+   "name_en": "Kita-Yono",
+   "yomi": null,
+   "lat": 35.890678,
+   "lon": 139.628521,
+   "lines": [
+    "JR Saikyō Line"
+   ],
+   "eki_code": "eki_1132118",
+   "eki_line": "JR埼京線",
+   "code": "eki_1132118"
   },
   {
    "slug": "jr-kitsuki",
@@ -10404,6 +12623,21 @@
    "code": "eki_1140828"
   },
   {
+   "slug": "jr-kobayashi,jrk-kobayashi",
+   "name_kanji": "小林",
+   "name_en": "Kobayashi",
+   "yomi": null,
+   "lat": 35.830783,
+   "lon": 140.193028,
+   "lines": [
+    "JR Kitto Line",
+    "JR Narita Line(Abiko Branch Line)"
+   ],
+   "eki_code": "eki_1132726",
+   "eki_line": "JR成田線",
+   "code": "eki_1132726"
+  },
+  {
    "slug": "jr-kobe,wa-godo",
    "name_kanji": "神戸",
    "name_en": "Kobe",
@@ -10420,6 +12654,20 @@
    "code": "eki_1160315"
   },
   {
+   "slug": "jr-kobuchi",
+   "name_kanji": "古淵",
+   "name_en": "Kobuchi",
+   "yomi": null,
+   "lat": 35.556055,
+   "lon": 139.419151,
+   "lines": [
+    "JR Yokohama Line"
+   ],
+   "eki_code": "eki_1130612",
+   "eki_line": "JR横浜線",
+   "code": "eki_1130612"
+  },
+  {
    "slug": "jr-kobuchizawa",
    "name_kanji": "小淵沢",
    "name_en": "Kobuchizawa",
@@ -10433,6 +12681,34 @@
    "eki_code": "eki_1131139",
    "eki_line": "JR中央本線(東京～塩尻)",
    "code": "eki_1131139"
+  },
+  {
+   "slug": "jr-koga",
+   "name_kanji": "古河",
+   "name_en": "Koga",
+   "yomi": null,
+   "lat": 36.194375,
+   "lon": 139.709726,
+   "lines": [
+    "JR Utsunomiya Line(Tōhoku Main Line)"
+   ],
+   "eki_code": "eki_1131915",
+   "eki_line": "宇都宮線",
+   "code": "eki_1131915"
+  },
+  {
+   "slug": "jr-koganei",
+   "name_kanji": "小金井",
+   "name_en": "Koganei",
+   "yomi": null,
+   "lat": 36.374435,
+   "lon": 139.842232,
+   "lines": [
+    "JR Utsunomiya Line(Tōhoku Main Line)"
+   ],
+   "eki_code": "eki_1131919",
+   "eki_line": "宇都宮線",
+   "code": "eki_1131919"
   },
   {
    "slug": "jr-koge",
@@ -10479,6 +12755,20 @@
    "code": "eki_1161807"
   },
   {
+   "slug": "jr-kohoku",
+   "name_kanji": "湖北",
+   "name_en": "Kohoku",
+   "yomi": null,
+   "lat": 35.867165,
+   "lon": 140.077959,
+   "lines": [
+    "JR Narita Line(Abiko Branch Line)"
+   ],
+   "eki_code": "eki_1132722",
+   "eki_line": "JR成田線",
+   "code": "eki_1132722"
+  },
+  {
    "slug": "jr-koide",
    "name_kanji": "小出",
    "name_en": "Koide",
@@ -10492,6 +12782,20 @@
    "eki_code": "eki_1122738",
    "eki_line": "JR只見線",
    "code": "eki_1122738"
+  },
+  {
+   "slug": "jr-koiwa",
+   "name_kanji": "小岩",
+   "name_en": "Koiwa",
+   "yomi": null,
+   "lat": 35.733207,
+   "lon": 139.881755,
+   "lines": [
+    "JR Sōbu Main Line(Ochanomizu - Chiba)"
+   ],
+   "eki_code": "eki_1131326",
+   "eki_line": "JR中央・総武線",
+   "code": "eki_1131326"
   },
   {
    "slug": "jr-koiwai",
@@ -10551,6 +12855,20 @@
    "code": "eki_1190747"
   },
   {
+   "slug": "jr-kokubunji",
+   "name_kanji": "国分寺",
+   "name_en": "Kokubunji",
+   "yomi": null,
+   "lat": 35.700123,
+   "lon": 139.480841,
+   "lines": [
+    "JR Chūō Main Line(Tōkyō - Takao)"
+   ],
+   "eki_code": "eki_1131106",
+   "eki_line": "JR中央本線(東京～塩尻)",
+   "code": "eki_1131106"
+  },
+  {
    "slug": "jr-kokufutagajo",
    "name_kanji": "国府多賀城",
    "name_en": "Kokufu-Tagajo",
@@ -10583,6 +12901,63 @@
    "code": "eki_1190205"
   },
   {
+   "slug": "jr-komagata",
+   "name_kanji": "駒形",
+   "name_en": "Komagata",
+   "yomi": null,
+   "lat": 36.354145,
+   "lon": 139.139483,
+   "lines": [
+    "JR Ryōmō Line"
+   ],
+   "eki_code": "eki_1134107",
+   "eki_line": "JR両毛線",
+   "code": "eki_1134107"
+  },
+  {
+   "slug": "jr-komagawa",
+   "name_kanji": "高麗川",
+   "name_en": "Komagawa",
+   "yomi": null,
+   "lat": 35.896328,
+   "lon": 139.33809,
+   "lines": [
+    "JR Hachikō Line",
+    "JR Kawagoe Line"
+   ],
+   "eki_code": "eki_1131709",
+   "eki_line": "JR八高線(八王子～高麗川)",
+   "code": "eki_1131709"
+  },
+  {
+   "slug": "jr-komagome",
+   "name_kanji": "駒込",
+   "name_en": "Komagome",
+   "yomi": null,
+   "lat": 35.736959,
+   "lon": 139.746442,
+   "lines": [
+    "JR Yamanote Line"
+   ],
+   "eki_code": "eki_2800906",
+   "eki_line": "東京メトロ南北線",
+   "code": "eki_2800906"
+  },
+  {
+   "slug": "jr-komiya",
+   "name_kanji": "小宮",
+   "name_en": "Komiya",
+   "yomi": null,
+   "lat": 35.685799,
+   "lon": 139.368481,
+   "lines": [
+    "JR Hachikō Line"
+   ],
+   "eki_code": "eki_1131703",
+   "eki_line": "JR八高線(八王子～高麗川)",
+   "code": "eki_1131703"
+  },
+  {
    "slug": "jr-komoro,shinano-komoro",
    "name_kanji": "小諸",
    "name_en": "Komoro",
@@ -10597,6 +12972,20 @@
    "eki_code": "eki_9940306",
    "eki_line": "しなの鉄道線",
    "code": "eki_9940306"
+  },
+  {
+   "slug": "jr-konandai",
+   "name_kanji": "港南台",
+   "name_en": "Konandai",
+   "yomi": null,
+   "lat": 35.375183,
+   "lon": 139.576243,
+   "lines": [
+    "JR Negishi Line"
+   ],
+   "eki_code": "eki_1130710",
+   "eki_line": "JR根岸線",
+   "code": "eki_1130710"
   },
   {
    "slug": "jr-konoha",
@@ -10625,6 +13014,20 @@
    "eki_code": "eki_1161720",
    "eki_line": "学研都市線",
    "code": "eki_1161720"
+  },
+  {
+   "slug": "jr-konosu",
+   "name_kanji": "鴻巣",
+   "name_en": "Konosu",
+   "yomi": null,
+   "lat": 36.0592,
+   "lon": 139.509552,
+   "lines": [
+    "JR Takasaki Line"
+   ],
+   "eki_code": "eki_1132312",
+   "eki_line": "JR高崎線",
+   "code": "eki_1132312"
   },
   {
    "slug": "jr-koori",
@@ -10687,6 +13090,20 @@
    "code": "eki_1160305"
   },
   {
+   "slug": "jr-koshigayalaketown",
+   "name_kanji": "越谷レイクタウン",
+   "name_en": "Koshigaya-Laketown",
+   "yomi": null,
+   "lat": 35.876199,
+   "lon": 139.822012,
+   "lines": [
+    "JR Musashino Line"
+   ],
+   "eki_code": "eki_1130525",
+   "eki_line": "JR武蔵野線",
+   "code": "eki_1130525"
+  },
+  {
    "slug": "jr-kotachi",
    "name_kanji": "甲立",
    "name_en": "Kotachi",
@@ -10742,6 +13159,20 @@
    "eki_code": "eki_1180134",
    "eki_line": "JR土讃線",
    "code": "eki_1180134"
+  },
+  {
+   "slug": "jr-kouenji",
+   "name_kanji": "高円寺",
+   "name_en": "Koenji",
+   "yomi": null,
+   "lat": 35.705326,
+   "lon": 139.649664,
+   "lines": [
+    "JR Chūō Main Line(Tōkyō - Takao)"
+   ],
+   "eki_code": "eki_1131215",
+   "eki_line": "JR中央線(快速)",
+   "code": "eki_1131215"
   },
   {
    "slug": "jr-koufu",
@@ -10802,6 +13233,20 @@
    "code": "eki_1130114"
   },
   {
+   "slug": "jr-kozukue",
+   "name_kanji": "小机",
+   "name_en": "Kozukue",
+   "yomi": null,
+   "lat": 35.508533,
+   "lon": 139.599787,
+   "lines": [
+    "JR Yokohama Line"
+   ],
+   "eki_code": "eki_1130605",
+   "eki_line": "JR横浜線",
+   "code": "eki_1130605"
+  },
+  {
    "slug": "jr-kozurushinden",
    "name_kanji": "小鶴新田",
    "name_en": "Kozurushinden",
@@ -10830,6 +13275,48 @@
    "eki_code": "eki_1180160",
    "eki_line": "JR土讃線",
    "code": "eki_1180160"
+  },
+  {
+   "slug": "jr-kugeta",
+   "name_kanji": "久下田",
+   "name_en": "Kugeta",
+   "yomi": null,
+   "lat": 36.37606,
+   "lon": 139.971756,
+   "lines": [
+    "JR Mōka Line"
+   ],
+   "eki_code": "eki_9933005",
+   "eki_line": "真岡鐵道真岡線",
+   "code": "eki_9933005"
+  },
+  {
+   "slug": "jr-kuji",
+   "name_kanji": "久地",
+   "name_en": "Kuji",
+   "yomi": null,
+   "lat": 35.610363,
+   "lon": 139.592714,
+   "lines": [
+    "JR Nambu Line"
+   ],
+   "eki_code": "eki_1130312",
+   "eki_line": "JR南武線",
+   "code": "eki_1130312"
+  },
+  {
+   "slug": "jr-kuki",
+   "name_kanji": "久喜",
+   "name_en": "Kuki",
+   "yomi": null,
+   "lat": 36.065684,
+   "lon": 139.67727,
+   "lines": [
+    "JR Utsunomiya Line(Tōhoku Main Line)"
+   ],
+   "eki_code": "eki_1131912",
+   "eki_line": "宇都宮線",
+   "code": "eki_1131912"
   },
   {
    "slug": "jr-kumamoto",
@@ -10876,6 +13363,34 @@
    "code": "eki_1162619"
   },
   {
+   "slug": "jr-kunisada",
+   "name_kanji": "国定",
+   "name_en": "Kunisada",
+   "yomi": null,
+   "lat": 36.359018,
+   "lon": 139.242463,
+   "lines": [
+    "JR Ryōmō Line"
+   ],
+   "eki_code": "eki_1134109",
+   "eki_line": "JR両毛線",
+   "code": "eki_1134109"
+  },
+  {
+   "slug": "jr-kunitachi",
+   "name_kanji": "国立",
+   "name_en": "Kunitachi",
+   "yomi": null,
+   "lat": 35.69923,
+   "lon": 139.44634,
+   "lines": [
+    "JR Chūō Main Line(Tōkyō - Takao)"
+   ],
+   "eki_code": "eki_1131226",
+   "eki_line": "JR中央線(快速)",
+   "code": "eki_1131226"
+  },
+  {
    "slug": "jr-kunnui",
    "name_kanji": "国縫",
    "name_en": "Kunnui",
@@ -10888,6 +13403,21 @@
    "eki_code": "eki_1110136",
    "eki_line": "JR函館本線(函館～長万部)",
    "code": "eki_1110136"
+  },
+  {
+   "slug": "jr-kuragano",
+   "name_kanji": "倉賀野",
+   "name_en": "Kuragano",
+   "yomi": null,
+   "lat": 36.300216,
+   "lon": 139.049474,
+   "lines": [
+    "JR Hachikō Line",
+    "JR Takasaki Line"
+   ],
+   "eki_code": "eki_1131815",
+   "eki_line": "JR八高線(高麗川～高崎)",
+   "code": "eki_1131815"
   },
   {
    "slug": "jr-kurashiki",
@@ -10917,6 +13447,34 @@
    "eki_code": "eki_1161628",
    "eki_line": "JR山陰本線(豊岡～米子)",
    "code": "eki_1161628"
+  },
+  {
+   "slug": "jr-kurihama",
+   "name_kanji": "久里浜",
+   "name_en": "Kurihama",
+   "yomi": null,
+   "lat": 35.233107,
+   "lon": 139.700862,
+   "lines": [
+    "JR Yokosuka Line"
+   ],
+   "eki_code": "eki_1130818",
+   "eki_line": "JR横須賀線",
+   "code": "eki_1130818"
+  },
+  {
+   "slug": "jr-kurihashi",
+   "name_kanji": "栗橋",
+   "name_en": "Kurihashi",
+   "yomi": null,
+   "lat": 36.136852,
+   "lon": 139.694177,
+   "lines": [
+    "JR Utsunomiya Line(Tōhoku Main Line)"
+   ],
+   "eki_code": "eki_1131914",
+   "eki_line": "宇都宮線",
+   "code": "eki_1131914"
   },
   {
    "slug": "jr-kurikomakogen",
@@ -11025,7 +13583,8 @@
    "lat": 36.970128,
    "lon": 140.060204,
    "lines": [
-    "JR Tōhoku Main Line(Kuroiso - Shiroishi)"
+    "JR Tōhoku Main Line(Kuroiso - Shiroishi)",
+    "JR Utsunomiya Line(Tōhoku Main Line)"
    ],
    "eki_code": "eki_1123101",
    "eki_line": "JR東北本線(黒磯～利府・盛岡)",
@@ -11060,6 +13619,20 @@
    "eki_code": "eki_1190318",
    "eki_line": "JR鹿児島本線(博多～八代)",
    "code": "eki_1190318"
+  },
+  {
+   "slug": "jr-kururi",
+   "name_kanji": "久留里",
+   "name_en": "Kururi",
+   "yomi": null,
+   "lat": 35.295812,
+   "lon": 140.075613,
+   "lines": [
+    "JR Kururi Line"
+   ],
+   "eki_code": "eki_1133011",
+   "eki_line": "JR久留里線",
+   "code": "eki_1133011"
   },
   {
    "slug": "jr-kusanagi",
@@ -11212,6 +13785,63 @@
    "code": "eki_1160715"
   },
   {
+   "slug": "jr-mabashi,ryu-mabashi",
+   "name_kanji": "馬橋",
+   "name_en": "Mabashi",
+   "yomi": null,
+   "lat": 35.811682,
+   "lon": 139.917305,
+   "lines": [
+    "JR Jōban Line(Kita-Senju - Toride)",
+    "Ryutetsu Nagareyama Line"
+   ],
+   "eki_code": "eki_1132011",
+   "eki_line": "JR常磐線(上野～取手)",
+   "code": "eki_1132011"
+  },
+  {
+   "slug": "jr-machida",
+   "name_kanji": "町田",
+   "name_en": "Machida",
+   "yomi": null,
+   "lat": 35.542004,
+   "lon": 139.445579,
+   "lines": [
+    "JR Yokohama Line"
+   ],
+   "eki_code": "eki_1130611",
+   "eki_line": "JR横浜線",
+   "code": "eki_1130611"
+  },
+  {
+   "slug": "jr-maebashi",
+   "name_kanji": "前橋",
+   "name_en": "Maebashi",
+   "yomi": null,
+   "lat": 36.383399,
+   "lon": 139.072833,
+   "lines": [
+    "JR Ryōmō Line"
+   ],
+   "eki_code": "eki_1134105",
+   "eki_line": "JR両毛線",
+   "code": "eki_1134105"
+  },
+  {
+   "slug": "jr-maebashioshima",
+   "name_kanji": "前橋大島",
+   "name_en": "Maebashioshima",
+   "yomi": null,
+   "lat": 36.370585,
+   "lon": 139.109557,
+   "lines": [
+    "JR Ryōmō Line"
+   ],
+   "eki_code": "eki_1134106",
+   "eki_line": "JR両毛線",
+   "code": "eki_1134106"
+  },
+  {
    "slug": "jr-maibara,jrt-maibara",
    "name_kanji": "米原",
    "name_en": "Maibara",
@@ -11227,6 +13857,20 @@
    "eki_code": "eki_1141501",
    "eki_line": "JR北陸本線(米原～敦賀)",
    "code": "eki_1141501"
+  },
+  {
+   "slug": "jr-maihama",
+   "name_kanji": "舞浜",
+   "name_en": "Maihama",
+   "yomi": null,
+   "lat": 35.636115,
+   "lon": 139.883714,
+   "lines": [
+    "JR Keiyō Line"
+   ],
+   "eki_code": "eki_1132607",
+   "eki_line": "JR京葉線",
+   "code": "eki_1132607"
   },
   {
    "slug": "jr-maiko",
@@ -11297,6 +13941,62 @@
    "eki_code": "eki_1110712",
    "eki_line": "JR根室本線(新得～釧路)",
    "code": "eki_1110712"
+  },
+  {
+   "slug": "jr-makuhari",
+   "name_kanji": "幕張",
+   "name_en": "Makuhari",
+   "yomi": null,
+   "lat": 35.6594,
+   "lon": 140.057899,
+   "lines": [
+    "JR Sōbu Main Line(Ochanomizu - Chiba)"
+   ],
+   "eki_code": "eki_1131335",
+   "eki_line": "JR中央・総武線",
+   "code": "eki_1131335"
+  },
+  {
+   "slug": "jr-makuharihongo",
+   "name_kanji": "幕張本郷",
+   "name_en": "Makuharihongo",
+   "yomi": null,
+   "lat": 35.672664,
+   "lon": 140.042241,
+   "lines": [
+    "JR Sōbu Main Line(Ochanomizu - Chiba)"
+   ],
+   "eki_code": "eki_1131334",
+   "eki_line": "JR中央・総武線",
+   "code": "eki_1131334"
+  },
+  {
+   "slug": "jr-makuharitoyosuna",
+   "name_kanji": "幕張豊砂",
+   "name_en": "Makuharitoyosuna",
+   "yomi": null,
+   "lat": 35.6579,
+   "lon": 140.0272,
+   "lines": [
+    "JR Keiyō Line"
+   ],
+   "eki_code": "eki_1132619",
+   "eki_line": "JR京葉線",
+   "code": "eki_1132619"
+  },
+  {
+   "slug": "jr-mamada",
+   "name_kanji": "間々田",
+   "name_en": "Mamada",
+   "yomi": null,
+   "lat": 36.257907,
+   "lon": 139.761039,
+   "lines": [
+    "JR Utsunomiya Line(Tōhoku Main Line)"
+   ],
+   "eki_code": "eki_1131917",
+   "eki_line": "宇都宮線",
+   "code": "eki_1131917"
   },
   {
    "slug": "jr-mamurogawa",
@@ -11385,6 +14085,20 @@
    "code": "eki_1111717"
   },
   {
+   "slug": "jr-matoba",
+   "name_kanji": "的場",
+   "name_en": "Matoba",
+   "yomi": null,
+   "lat": 35.917478,
+   "lon": 139.435376,
+   "lines": [
+    "JR Kawagoe Line"
+   ],
+   "eki_code": "eki_1132207",
+   "eki_line": "JR川越線",
+   "code": "eki_1132207"
+  },
+  {
    "slug": "jr-matsubase",
    "name_kanji": "松橋",
    "name_en": "Matsubase",
@@ -11413,6 +14127,21 @@
    "code": "eki_1150505"
   },
   {
+   "slug": "jr-matsudo",
+   "name_kanji": "松戸",
+   "name_en": "Matsudo",
+   "yomi": null,
+   "lat": 35.784472,
+   "lon": 139.900779,
+   "lines": [
+    "JR Jōban Line(Kita-Senju - Toride)",
+    "JR Jōban Line(Rapid)"
+   ],
+   "eki_code": "eki_1132009",
+   "eki_line": "JR常磐線(上野～取手)",
+   "code": "eki_1132009"
+  },
+  {
    "slug": "jr-matsue",
    "name_kanji": "松江",
    "name_en": "Matsue",
@@ -11425,6 +14154,21 @@
    "eki_code": "eki_1170106",
    "eki_line": "JR山陰本線(米子～益田)",
    "code": "eki_1170106"
+  },
+  {
+   "slug": "jr-matsugishi",
+   "name_kanji": "松岸",
+   "name_en": "Matsugishi",
+   "yomi": null,
+   "lat": 35.739386,
+   "lon": 140.795143,
+   "lines": [
+    "JR Narita Line",
+    "JR Sōbu Main Line(Chiba - Chōshi)"
+   ],
+   "eki_code": "eki_1131430",
+   "eki_line": "JR総武本線",
+   "code": "eki_1131430"
   },
   {
    "slug": "jr-matsuiyamate",
@@ -11512,6 +14256,20 @@
    "code": "eki_1142202"
   },
   {
+   "slug": "jr-matsuo",
+   "name_kanji": "松尾",
+   "name_en": "Matsuo",
+   "yomi": null,
+   "lat": 35.63604,
+   "lon": 140.457587,
+   "lines": [
+    "JR Sōbu Main Line(Chiba - Chōshi)"
+   ],
+   "eki_code": "eki_1131421",
+   "eki_line": "JR総武本線",
+   "code": "eki_1131421"
+  },
+  {
    "slug": "jr-matsusaka",
    "name_kanji": "松阪",
    "name_en": "Matsusaka",
@@ -11596,6 +14354,34 @@
    "eki_code": "eki_1110911",
    "eki_line": "JR千歳線",
    "code": "eki_1110911"
+  },
+  {
+   "slug": "jr-meguro",
+   "name_kanji": "目黒",
+   "name_en": "Meguro",
+   "yomi": null,
+   "lat": 35.633923,
+   "lon": 139.715775,
+   "lines": [
+    "JR Yamanote Line"
+   ],
+   "eki_code": "eki_1130203",
+   "eki_line": "JR山手線",
+   "code": "eki_1130203"
+  },
+  {
+   "slug": "jr-mejiro",
+   "name_kanji": "目白",
+   "name_en": "Mejiro",
+   "yomi": null,
+   "lat": 35.720476,
+   "lon": 139.706228,
+   "lines": [
+    "JR Yamanote Line"
+   ],
+   "eki_code": "eki_1130211",
+   "eki_line": "JR山手線",
+   "code": "eki_1130211"
   },
   {
    "slug": "jr-miemachi",
@@ -11685,6 +14471,20 @@
    "code": "eki_1150222"
   },
   {
+   "slug": "jr-mikawashima",
+   "name_kanji": "三河島",
+   "name_en": "Mikawashima",
+   "yomi": null,
+   "lat": 35.733383,
+   "lon": 139.777131,
+   "lines": [
+    "JR Jōban Line(Rapid)"
+   ],
+   "eki_code": "eki_1132003",
+   "eki_line": "JR常磐線(上野～取手)",
+   "code": "eki_1132003"
+  },
+  {
    "slug": "jr-mikumo",
    "name_kanji": "三雲",
    "name_en": "Mikumo",
@@ -11762,7 +14562,8 @@
    "lat": 36.778614,
    "lon": 138.9688,
    "lines": [
-    "JR Jōetsu Line(Minakami - Miyauchi)"
+    "JR Jōetsu Line(Minakami - Miyauchi)",
+    "JR Jōetsu Line(Takasaki - Minakami)"
    ],
    "eki_code": "eki_1134214",
    "eki_line": "JR上越線",
@@ -11799,6 +14600,48 @@
    "code": "eki_1110906"
   },
   {
+   "slug": "jr-minamifunabashi",
+   "name_kanji": "南船橋",
+   "name_en": "Minami-Funabashi",
+   "yomi": null,
+   "lat": 35.681804,
+   "lon": 139.995773,
+   "lines": [
+    "JR Keiyō Line"
+   ],
+   "eki_code": "eki_1132612",
+   "eki_line": "JR京葉線",
+   "code": "eki_1132612"
+  },
+  {
+   "slug": "jr-minamifuruya",
+   "name_kanji": "南古谷",
+   "name_en": "Minami-Furuya",
+   "yomi": null,
+   "lat": 35.903344,
+   "lon": 139.519082,
+   "lines": [
+    "JR Kawagoe Line"
+   ],
+   "eki_code": "eki_1132204",
+   "eki_line": "JR川越線",
+   "code": "eki_1132204"
+  },
+  {
+   "slug": "jr-minamihashimoto",
+   "name_kanji": "南橋本",
+   "name_en": "Minami-Hashimoto",
+   "yomi": null,
+   "lat": 35.58042,
+   "lon": 139.352484,
+   "lines": [
+    "JR Sagami Line"
+   ],
+   "eki_code": "eki_1130917",
+   "eki_line": "JR相模線",
+   "code": "eki_1130917"
+  },
+  {
    "slug": "jr-minamihikone",
    "name_kanji": "南彦根",
    "name_en": "Minami-Hikone",
@@ -11811,6 +14654,20 @@
    "eki_code": "eki_1160103",
    "eki_line": "琵琶湖線",
    "code": "eki_1160103"
+  },
+  {
+   "slug": "jr-minamikashiwa",
+   "name_kanji": "南柏",
+   "name_en": "Minami-Kashiwa",
+   "yomi": null,
+   "lat": 35.844655,
+   "lon": 139.954111,
+   "lines": [
+    "JR Jōban Line(Kita-Senju - Toride)"
+   ],
+   "eki_code": "eki_1132014",
+   "eki_line": "JR常磐線(上野～取手)",
+   "code": "eki_1132014"
   },
   {
    "slug": "jr-minamikofu",
@@ -11841,6 +14698,20 @@
    "code": "eki_1190606"
   },
   {
+   "slug": "jr-minamikoshigaya",
+   "name_kanji": "南越谷",
+   "name_en": "Minami-Koshigaya",
+   "yomi": null,
+   "lat": 35.876106,
+   "lon": 139.790499,
+   "lines": [
+    "JR Musashino Line"
+   ],
+   "eki_code": "eki_1130514",
+   "eki_line": "JR武蔵野線",
+   "code": "eki_1130514"
+  },
+  {
    "slug": "jr-minamikusatsu",
    "name_kanji": "南草津",
    "name_en": "Minami-Kusatsu",
@@ -11868,6 +14739,20 @@
    "eki_code": "eki_1190730",
    "eki_line": "JR日豊本線(佐伯～鹿児島中央)",
    "code": "eki_1190730"
+  },
+  {
+   "slug": "jr-minaminagareyama",
+   "name_kanji": "南流山",
+   "name_en": "Minami-Nagareyama",
+   "yomi": null,
+   "lat": 35.838035,
+   "lon": 139.903865,
+   "lines": [
+    "JR Musashino Line"
+   ],
+   "eki_code": "eki_1130518",
+   "eki_line": "JR武蔵野線",
+   "code": "eki_1130518"
   },
   {
    "slug": "jr-minamioita",
@@ -11913,6 +14798,20 @@
    "code": "eki_1110302"
   },
   {
+   "slug": "jr-minamisenju",
+   "name_kanji": "南千住",
+   "name_en": "Minami-Senju",
+   "yomi": null,
+   "lat": 35.734033,
+   "lon": 139.7994,
+   "lines": [
+    "JR Jōban Line(Rapid)"
+   ],
+   "eki_code": "eki_1132004",
+   "eki_line": "JR常磐線(上野～取手)",
+   "code": "eki_1132004"
+  },
+  {
    "slug": "jr-minamisuita",
    "name_kanji": "南吹田",
    "name_en": "Minami-Suita",
@@ -11925,6 +14824,20 @@
    "eki_code": "eki_1164110",
    "eki_line": "おおさか東線",
    "code": "eki_1164110"
+  },
+  {
+   "slug": "jr-minamitama",
+   "name_kanji": "南多摩",
+   "name_en": "Minami-Tama",
+   "yomi": null,
+   "lat": 35.649249,
+   "lon": 139.489781,
+   "lines": [
+    "JR Nambu Line"
+   ],
+   "eki_code": "eki_1130319",
+   "eki_line": "JR南武線",
+   "code": "eki_1130319"
   },
   {
    "slug": "jr-minamitanabe",
@@ -11955,6 +14868,21 @@
    "code": "eki_1140908"
   },
   {
+   "slug": "jr-minamiurawa",
+   "name_kanji": "南浦和",
+   "name_en": "Minami-Urawa",
+   "yomi": null,
+   "lat": 35.847648,
+   "lon": 139.669125,
+   "lines": [
+    "JR Keihin–Tōhoku Line",
+    "JR Musashino Line"
+   ],
+   "eki_code": "eki_1130511",
+   "eki_line": "JR武蔵野線",
+   "code": "eki_1130511"
+  },
+  {
    "slug": "jr-minamiwakkanai",
    "name_kanji": "南稚内",
    "name_en": "Minami-Wakkanai",
@@ -11968,6 +14896,20 @@
    "eki_code": "eki_1111552",
    "eki_line": "JR宗谷本線",
    "code": "eki_1111552"
+  },
+  {
+   "slug": "jr-minamiyono",
+   "name_kanji": "南与野",
+   "name_en": "Minami-Yono",
+   "yomi": null,
+   "lat": 35.867456,
+   "lon": 139.631117,
+   "lines": [
+    "JR Saikyō Line"
+   ],
+   "eki_code": "eki_1132116",
+   "eki_line": "JR埼京線",
+   "code": "eki_1132116"
   },
   {
    "slug": "jr-mineyoshikawa",
@@ -12027,6 +14969,21 @@
    "code": "eki_1163945"
   },
   {
+   "slug": "jr-misato,jr-sango",
+   "name_kanji": "三郷",
+   "name_en": "Misato",
+   "yomi": null,
+   "lat": 35.845004,
+   "lon": 139.886341,
+   "lines": [
+    "JR Musashino Line",
+    "JR Yamatoji Line(Kansai Main Line)"
+   ],
+   "eki_code": "eki_1130517",
+   "eki_line": "JR武蔵野線",
+   "code": "eki_1130517"
+  },
+  {
    "slug": "jr-mishima",
    "name_kanji": "三島",
    "name_en": "Mishima",
@@ -12039,6 +14996,20 @@
    "eki_code": "eki_1150103",
    "eki_line": "JR東海道本線(熱海～浜松)",
    "code": "eki_1150103"
+  },
+  {
+   "slug": "jr-mitaka",
+   "name_kanji": "三鷹",
+   "name_en": "Mitaka",
+   "yomi": null,
+   "lat": 35.702683,
+   "lon": 139.560325,
+   "lines": [
+    "JR Chūō Main Line(Tōkyō - Takao)"
+   ],
+   "eki_code": "eki_1131105",
+   "eki_line": "JR中央本線(東京～塩尻)",
+   "code": "eki_1131105"
   },
   {
    "slug": "jr-mitejima",
@@ -12096,6 +15067,20 @@
    "eki_code": "eki_1163709",
    "eki_line": "万葉まほろば線",
    "code": "eki_1163709"
+  },
+  {
+   "slug": "jr-miyahara",
+   "name_kanji": "宮原",
+   "name_en": "Miyahara",
+   "yomi": null,
+   "lat": 35.940256,
+   "lon": 139.609455,
+   "lines": [
+    "JR Takasaki Line"
+   ],
+   "eki_code": "eki_1132307",
+   "eki_line": "JR高崎線",
+   "code": "eki_1132307"
   },
   {
    "slug": "jr-miyaji",
@@ -12294,6 +15279,20 @@
    "code": "eki_1123171"
   },
   {
+   "slug": "jr-mobara",
+   "name_kanji": "茂原",
+   "name_en": "Mobara",
+   "yomi": null,
+   "lat": 35.426733,
+   "lon": 140.304121,
+   "lines": [
+    "JR Sotobō Line"
+   ],
+   "eki_code": "eki_1132411",
+   "eki_line": "JR外房線",
+   "code": "eki_1132411"
+  },
+  {
    "slug": "jr-mochimune",
    "name_kanji": "用宗",
    "name_en": "Mochimune",
@@ -12407,6 +15406,20 @@
    "code": "eki_1161805"
   },
   {
+   "slug": "jr-monoi",
+   "name_kanji": "物井",
+   "name_en": "Monoi",
+   "yomi": null,
+   "lat": 35.68566,
+   "lon": 140.200263,
+   "lines": [
+    "JR Sōbu Main Line(Chiba - Chōshi)"
+   ],
+   "eki_code": "eki_1131414",
+   "eki_line": "JR総武本線",
+   "code": "eki_1131414"
+  },
+  {
    "slug": "jr-mori",
    "name_kanji": "森",
    "name_en": "Mori",
@@ -12478,6 +15491,21 @@
    "code": "eki_1160111"
   },
   {
+   "slug": "jr-motegi,moka-motegi",
+   "name_kanji": "茂木",
+   "name_en": "Motegi",
+   "yomi": null,
+   "lat": 36.530851,
+   "lon": 140.181382,
+   "lines": [
+    "JR Mōka Line",
+    "Mooka Railway Mooka Line"
+   ],
+   "eki_code": "eki_9933017",
+   "eki_line": "真岡鐵道真岡線",
+   "code": "eki_9933017"
+  },
+  {
    "slug": "jr-motomachi",
    "name_kanji": "元町",
    "name_en": "Motomachi",
@@ -12506,6 +15534,20 @@
    "code": "eki_1123117"
   },
   {
+   "slug": "jr-motoyawata",
+   "name_kanji": "本八幡",
+   "name_en": "Moto-Yawata",
+   "yomi": null,
+   "lat": 35.720898,
+   "lon": 139.92741,
+   "lines": [
+    "JR Sōbu Main Line(Ochanomizu - Chiba)"
+   ],
+   "eki_code": "eki_1131328",
+   "eki_line": "JR中央・総武線",
+   "code": "eki_1131328"
+  },
+  {
    "slug": "jr-mozu",
    "name_kanji": "百舌鳥",
    "name_en": "Mozu",
@@ -12532,6 +15574,20 @@
    "eki_code": "eki_1180426",
    "eki_line": "JR牟岐線",
    "code": "eki_1180426"
+  },
+  {
+   "slug": "jr-mukaigawara",
+   "name_kanji": "向河原",
+   "name_en": "Mukaigawara",
+   "yomi": null,
+   "lat": 35.572891,
+   "lon": 139.66725,
+   "lines": [
+    "JR Nambu Line"
+   ],
+   "eki_code": "eki_1130306",
+   "eki_line": "JR南武線",
+   "code": "eki_1130306"
   },
   {
    "slug": "jr-mukainada",
@@ -12631,6 +15687,163 @@
    "eki_code": "eki_1140309",
    "eki_line": "北しなの線",
    "code": "eki_1140309"
+  },
+  {
+   "slug": "jr-musashihikida",
+   "name_kanji": "武蔵引田",
+   "name_en": "Musashi-Hikida",
+   "yomi": null,
+   "lat": 35.729711,
+   "lon": 139.269907,
+   "lines": [
+    "JR Itsukaichi Line"
+   ],
+   "eki_code": "eki_1131605",
+   "eki_line": "JR五日市線",
+   "code": "eki_1131605"
+  },
+  {
+   "slug": "jr-musashiitsukaichi",
+   "name_kanji": "武蔵五日市",
+   "name_en": "Musashi-Itsukaichi",
+   "yomi": null,
+   "lat": 35.732248,
+   "lon": 139.228039,
+   "lines": [
+    "JR Itsukaichi Line"
+   ],
+   "eki_code": "eki_1131607",
+   "eki_line": "JR五日市線",
+   "code": "eki_1131607"
+  },
+  {
+   "slug": "jr-musashikoganei",
+   "name_kanji": "武蔵小金井",
+   "name_en": "Musashi-Koganei",
+   "yomi": null,
+   "lat": 35.701337,
+   "lon": 139.506483,
+   "lines": [
+    "JR Chūō Main Line(Tōkyō - Takao)"
+   ],
+   "eki_code": "eki_1131223",
+   "eki_line": "JR中央線(快速)",
+   "code": "eki_1131223"
+  },
+  {
+   "slug": "jr-musashikosugi",
+   "name_kanji": "武蔵小杉",
+   "name_en": "Musashi-Kosugi",
+   "yomi": null,
+   "lat": 35.57669,
+   "lon": 139.65963,
+   "lines": [
+    "JR Nambu Line",
+    "JR Shōnan–Shinjuku Line",
+    "JR Yokosuka Line"
+   ],
+   "eki_code": "eki_1130307",
+   "eki_line": "JR南武線",
+   "code": "eki_1130307"
+  },
+  {
+   "slug": "jr-musashimasuko",
+   "name_kanji": "武蔵増戸",
+   "name_en": "Musashi-Masuko",
+   "yomi": null,
+   "lat": 35.730961,
+   "lon": 139.256355,
+   "lines": [
+    "JR Itsukaichi Line"
+   ],
+   "eki_code": "eki_1131606",
+   "eki_line": "JR五日市線",
+   "code": "eki_1131606"
+  },
+  {
+   "slug": "jr-musashimizonokuchi",
+   "name_kanji": "武蔵溝ノ口",
+   "name_en": "Musashi-Mizonokuchi",
+   "yomi": null,
+   "lat": 35.598923,
+   "lon": 139.61139,
+   "lines": [
+    "JR Nambu Line"
+   ],
+   "eki_code": "eki_1130310",
+   "eki_line": "JR南武線",
+   "code": "eki_1130310"
+  },
+  {
+   "slug": "jr-musashinakahara",
+   "name_kanji": "武蔵中原",
+   "name_en": "Musashi-Nakahara",
+   "yomi": null,
+   "lat": 35.581498,
+   "lon": 139.640613,
+   "lines": [
+    "JR Nambu Line"
+   ],
+   "eki_code": "eki_1130308",
+   "eki_line": "JR南武線",
+   "code": "eki_1130308"
+  },
+  {
+   "slug": "jr-musashisakai",
+   "name_kanji": "武蔵境",
+   "name_en": "Musashi-Sakai",
+   "yomi": null,
+   "lat": 35.702083,
+   "lon": 139.543402,
+   "lines": [
+    "JR Chūō Main Line(Tōkyō - Takao)"
+   ],
+   "eki_code": "eki_1131221",
+   "eki_line": "JR中央線(快速)",
+   "code": "eki_1131221"
+  },
+  {
+   "slug": "jr-musashishinjo",
+   "name_kanji": "武蔵新城",
+   "name_en": "Musashi-Shinjo",
+   "yomi": null,
+   "lat": 35.587369,
+   "lon": 139.629419,
+   "lines": [
+    "JR Nambu Line"
+   ],
+   "eki_code": "eki_1130309",
+   "eki_line": "JR南武線",
+   "code": "eki_1130309"
+  },
+  {
+   "slug": "jr-musashitakahagi",
+   "name_kanji": "武蔵高萩",
+   "name_en": "Musashi-Takahagi",
+   "yomi": null,
+   "lat": 35.901729,
+   "lon": 139.371123,
+   "lines": [
+    "JR Kawagoe Line"
+   ],
+   "eki_code": "eki_1132209",
+   "eki_line": "JR川越線",
+   "code": "eki_1132209"
+  },
+  {
+   "slug": "jr-musashiurawa",
+   "name_kanji": "武蔵浦和",
+   "name_en": "Musashi-Urawa",
+   "yomi": null,
+   "lat": 35.846047,
+   "lon": 139.647974,
+   "lines": [
+    "JR Musashino Line",
+    "JR Saikyō Line"
+   ],
+   "eki_code": "eki_1130510",
+   "eki_line": "JR武蔵野線",
+   "code": "eki_1130510"
   },
   {
    "slug": "jr-musota",
@@ -12748,6 +15961,20 @@
    "code": "eki_1140305"
   },
   {
+   "slug": "jr-naganoharakusatsuguchi",
+   "name_kanji": "長野原草津口",
+   "name_en": "Naganoharakusatsuguchi",
+   "yomi": null,
+   "lat": 36.5465,
+   "lon": 138.64959,
+   "lines": [
+    "JR Agatsuma Line"
+   ],
+   "eki_code": "eki_1133513",
+   "eki_line": "JR吾妻線",
+   "code": "eki_1133513"
+  },
+  {
    "slug": "jr-nagao",
    "name_kanji": "長尾",
    "name_en": "Nagao",
@@ -12834,6 +16061,20 @@
    "code": "eki_1170217"
   },
   {
+   "slug": "jr-nagatsuta",
+   "name_kanji": "長津田",
+   "name_en": "Nagatsuta",
+   "yomi": null,
+   "lat": 35.531698,
+   "lon": 139.49468,
+   "lines": [
+    "JR Yokohama Line"
+   ],
+   "eki_code": "eki_1130609",
+   "eki_line": "JR横浜線",
+   "code": "eki_1130609"
+  },
+  {
    "slug": "jr-nagayama",
    "name_kanji": "永山",
    "name_en": "Nagayama",
@@ -12902,6 +16143,20 @@
    "eki_code": "eki_1190503",
    "eki_line": "JR長崎本線(鳥栖～長崎)",
    "code": "eki_1190503"
+  },
+  {
+   "slug": "jr-nakagami",
+   "name_kanji": "中神",
+   "name_en": "Nakagami",
+   "yomi": null,
+   "lat": 35.709058,
+   "lon": 139.375816,
+   "lines": [
+    "JR Ōme Line"
+   ],
+   "eki_code": "eki_1131504",
+   "eki_line": "JR青梅線",
+   "code": "eki_1131504"
   },
   {
    "slug": "jr-nakagaya",
@@ -12977,6 +16232,48 @@
    "code": "eki_9981415"
   },
   {
+   "slug": "jr-nakano",
+   "name_kanji": "中野",
+   "name_en": "Nakano",
+   "yomi": null,
+   "lat": 35.705765,
+   "lon": 139.665835,
+   "lines": [
+    "JR Chūō Main Line(Tōkyō - Takao)"
+   ],
+   "eki_code": "eki_1131214",
+   "eki_line": "JR中央線(快速)",
+   "code": "eki_1131214"
+  },
+  {
+   "slug": "jr-nakanojo",
+   "name_kanji": "中之条",
+   "name_en": "Nakanojo",
+   "yomi": null,
+   "lat": 36.585541,
+   "lon": 138.850908,
+   "lines": [
+    "JR Agatsuma Line"
+   ],
+   "eki_code": "eki_1133507",
+   "eki_line": "JR吾妻線",
+   "code": "eki_1133507"
+  },
+  {
+   "slug": "jr-nakanoshima",
+   "name_kanji": "中野島",
+   "name_en": "Nakanoshima",
+   "yomi": null,
+   "lat": 35.630135,
+   "lon": 139.5501,
+   "lines": [
+    "JR Nambu Line"
+   ],
+   "eki_code": "eki_1130315",
+   "eki_line": "JR南武線",
+   "code": "eki_1130315"
+  },
+  {
    "slug": "jr-nakashibetsu",
    "name_kanji": "中標津",
    "name_en": "Nakashibetsu",
@@ -13033,6 +16330,34 @@
    "eki_code": "eki_1141120",
    "eki_line": "JR中央本線(名古屋～塩尻)",
    "code": "eki_1141120"
+  },
+  {
+   "slug": "jr-nakaurawa",
+   "name_kanji": "中浦和",
+   "name_en": "Naka-Urawa",
+   "yomi": null,
+   "lat": 35.853769,
+   "lon": 139.6375,
+   "lines": [
+    "JR Saikyō Line"
+   ],
+   "eki_code": "eki_1132115",
+   "eki_line": "JR埼京線",
+   "code": "eki_1132115"
+  },
+  {
+   "slug": "jr-nakayama",
+   "name_kanji": "中山",
+   "name_en": "Nakayama",
+   "yomi": null,
+   "lat": 35.514745,
+   "lon": 139.539692,
+   "lines": [
+    "JR Yokohama Line"
+   ],
+   "eki_code": "eki_1130607",
+   "eki_line": "JR横浜線",
+   "code": "eki_1130607"
   },
   {
    "slug": "jr-nakayamadera",
@@ -13092,18 +16417,33 @@
    "code": "eki_1162911"
   },
   {
-   "slug": "jr-namba",
+   "slug": "jr-namba,nankai-namba",
    "name_kanji": "難波",
    "name_en": "JR-Namba",
    "yomi": null,
    "lat": 34.66357,
    "lon": 135.501949,
    "lines": [
-    "JR Yamatoji Line(Kansai Main Line)"
+    "JR Yamatoji Line(Kansai Main Line)",
+    "Nankai Main Line"
    ],
    "eki_code": "eki_3200101",
    "eki_line": "南海本線",
    "code": "eki_3200101"
+  },
+  {
+   "slug": "jr-namegawa",
+   "name_kanji": "滑河",
+   "name_en": "Namegawa",
+   "yomi": null,
+   "lat": 35.877079,
+   "lon": 140.347871,
+   "lines": [
+    "JR Narita Line"
+   ],
+   "eki_code": "eki_1132707",
+   "eki_line": "JR成田線",
+   "code": "eki_1132707"
   },
   {
    "slug": "jr-namerikawa",
@@ -13261,6 +16601,49 @@
    "code": "eki_1160703"
   },
   {
+   "slug": "jr-narita",
+   "name_kanji": "成田",
+   "name_en": "Narita",
+   "yomi": null,
+   "lat": 35.777796,
+   "lon": 140.313853,
+   "lines": [
+    "JR Narita Line",
+    "JR Narita Line(Abiko Branch Line)"
+   ],
+   "eki_code": "eki_1132703",
+   "eki_line": "JR成田線",
+   "code": "eki_1132703"
+  },
+  {
+   "slug": "jr-naritaairport",
+   "name_kanji": "成田空港（第１旅客ターミナル）",
+   "name_en": "Narita Airport Terminal 1",
+   "yomi": null,
+   "lat": 35.763983,
+   "lon": 140.384644,
+   "lines": [
+    "JR Narita Line"
+   ],
+   "eki_code": "eki_1132705",
+   "eki_line": "JR成田線",
+   "code": "eki_1132705"
+  },
+  {
+   "slug": "jr-naritaairport2",
+   "name_kanji": "空港第２ビル（第２旅客ターミナル）",
+   "name_en": "Narita Airport Terminal 2･3",
+   "yomi": null,
+   "lat": 35.773327,
+   "lon": 140.387871,
+   "lines": [
+    "JR Narita Line"
+   ],
+   "eki_code": "eki_1132704",
+   "eki_line": "JR成田線",
+   "code": "eki_1132704"
+  },
+  {
    "slug": "jr-naruko",
    "name_kanji": "鳴子温泉",
    "name_en": "Naruko-Onsen",
@@ -13289,6 +16672,34 @@
    "code": "eki_1122114"
   },
   {
+   "slug": "jr-naruse",
+   "name_kanji": "成瀬",
+   "name_en": "Naruse",
+   "yomi": null,
+   "lat": 35.535412,
+   "lon": 139.472875,
+   "lines": [
+    "JR Yokohama Line"
+   ],
+   "eki_code": "eki_1130610",
+   "eki_line": "JR横浜線",
+   "code": "eki_1130610"
+  },
+  {
+   "slug": "jr-naruto",
+   "name_kanji": "成東",
+   "name_en": "Naruto",
+   "yomi": null,
+   "lat": 35.608513,
+   "lon": 140.410109,
+   "lines": [
+    "JR Sōbu Main Line(Chiba - Chōshi)"
+   ],
+   "eki_code": "eki_1131420",
+   "eki_line": "JR総武本線",
+   "code": "eki_1131420"
+  },
+  {
    "slug": "jr-nasushiobara",
    "name_kanji": "那須塩原",
    "name_en": "Nasushiobara",
@@ -13296,7 +16707,8 @@
    "lat": 36.931956,
    "lon": 140.020694,
    "lines": [
-    "JR Tōhoku Shinkansen"
+    "JR Tōhoku Shinkansen",
+    "JR Utsunomiya Line(Tōhoku Main Line)"
    ],
    "eki_code": "eki_1131932",
    "eki_line": "宇都宮線",
@@ -13331,6 +16743,20 @@
    "eki_code": "eki_1111521",
    "eki_line": "JR宗谷本線",
    "code": "eki_1111521"
+  },
+  {
+   "slug": "jr-negishi",
+   "name_kanji": "根岸",
+   "name_en": "Negishi",
+   "yomi": null,
+   "lat": 35.415887,
+   "lon": 139.636034,
+   "lines": [
+    "JR Negishi Line"
+   ],
+   "eki_code": "eki_1130706",
+   "eki_line": "JR根岸線",
+   "code": "eki_1130706"
   },
   {
    "slug": "jr-nemuro",
@@ -13506,6 +16932,20 @@
    "code": "eki_1121401"
   },
   {
+   "slug": "jr-niiza",
+   "name_kanji": "新座",
+   "name_en": "Niiza",
+   "yomi": null,
+   "lat": 35.80381,
+   "lon": 139.556328,
+   "lines": [
+    "JR Musashino Line"
+   ],
+   "eki_code": "eki_1130507",
+   "eki_line": "JR武蔵野線",
+   "code": "eki_1130507"
+  },
+  {
    "slug": "jr-niizaki",
    "name_kanji": "新崎",
    "name_en": "Niizaki",
@@ -13534,6 +16974,20 @@
    "code": "eki_1161403"
   },
   {
+   "slug": "jr-nikko",
+   "name_kanji": "日光",
+   "name_en": "Nikko",
+   "yomi": null,
+   "lat": 36.7474,
+   "lon": 139.62215,
+   "lines": [
+    "JR Nikkō Line"
+   ],
+   "eki_code": "eki_1134007",
+   "eki_line": "JR日光線",
+   "code": "eki_1134007"
+  },
+  {
    "slug": "jr-ninomiya",
    "name_kanji": "二宮",
    "name_en": "Ninomiya",
@@ -13546,6 +17000,22 @@
    "eki_code": "eki_1130113",
    "eki_line": "JR東海道本線(東京～熱海)",
    "code": "eki_1130113"
+  },
+  {
+   "slug": "jr-nippori",
+   "name_kanji": "日暮里",
+   "name_en": "Nippori",
+   "yomi": null,
+   "lat": 35.727908,
+   "lon": 139.771287,
+   "lines": [
+    "JR Jōban Line(Rapid)",
+    "JR Keihin–Tōhoku Line",
+    "JR Yamanote Line"
+   ],
+   "eki_code": "eki_1130218",
+   "eki_line": "JR山手線",
+   "code": "eki_1130218"
   },
   {
    "slug": "jr-nirasaki",
@@ -13605,6 +17075,20 @@
    "code": "eki_1193027"
   },
   {
+   "slug": "jr-nishifu",
+   "name_kanji": "西府",
+   "name_en": "Nishifu",
+   "yomi": null,
+   "lat": 35.670912,
+   "lon": 139.457477,
+   "lines": [
+    "JR Nambu Line"
+   ],
+   "eki_code": "eki_1130329",
+   "eki_line": "JR南武線",
+   "code": "eki_1130329"
+  },
+  {
    "slug": "jr-nishifujinomiya",
    "name_kanji": "西富士宮",
    "name_en": "Nishi-Fujinomiya",
@@ -13618,6 +17102,36 @@
    "eki_code": "eki_1140208",
    "eki_line": "JR身延線",
    "code": "eki_1140208"
+  },
+  {
+   "slug": "jr-nishifunabashi",
+   "name_kanji": "西船橋",
+   "name_en": "Nishi-Funabashi",
+   "yomi": null,
+   "lat": 35.707127,
+   "lon": 139.958972,
+   "lines": [
+    "JR Keiyō Line",
+    "JR Musashino Line",
+    "JR Sōbu Main Line(Ochanomizu - Chiba)"
+   ],
+   "eki_code": "eki_2800423",
+   "eki_line": "東京メトロ東西線",
+   "code": "eki_2800423"
+  },
+  {
+   "slug": "jr-nishihachioji",
+   "name_kanji": "西八王子",
+   "name_en": "Nishi-Hachioji",
+   "yomi": null,
+   "lat": 35.656621,
+   "lon": 139.31264,
+   "lines": [
+    "JR Chūō Main Line(Tōkyō - Takao)"
+   ],
+   "eki_code": "eki_1131111",
+   "eki_line": "JR中央本線(東京～塩尻)",
+   "code": "eki_1131111"
   },
   {
    "slug": "jr-nishihiroshima",
@@ -13662,6 +17176,49 @@
    "code": "eki_1141208"
   },
   {
+   "slug": "jr-nishikawagoe",
+   "name_kanji": "西川越",
+   "name_en": "Nishi-Kawagoe",
+   "yomi": null,
+   "lat": 35.91909,
+   "lon": 139.459746,
+   "lines": [
+    "JR Kawagoe Line"
+   ],
+   "eki_code": "eki_1132206",
+   "eki_line": "JR川越線",
+   "code": "eki_1132206"
+  },
+  {
+   "slug": "jr-nishikawaguchi",
+   "name_kanji": "西川口",
+   "name_en": "Nishi-Kawaguchi",
+   "yomi": null,
+   "lat": 35.815514,
+   "lon": 139.704312,
+   "lines": [
+    "JR Keihin–Tōhoku Line"
+   ],
+   "eki_code": "eki_1133208",
+   "eki_line": "JR京浜東北線",
+   "code": "eki_1133208"
+  },
+  {
+   "slug": "jr-nishikokubunji",
+   "name_kanji": "西国分寺",
+   "name_en": "Nishi-Kokubunji",
+   "yomi": null,
+   "lat": 35.699744,
+   "lon": 139.465994,
+   "lines": [
+    "JR Chūō Main Line(Tōkyō - Takao)",
+    "JR Musashino Line"
+   ],
+   "eki_code": "eki_1130503",
+   "eki_line": "JR武蔵野線",
+   "code": "eki_1130503"
+  },
+  {
    "slug": "jr-nishikokura",
    "name_kanji": "西小倉",
    "name_en": "Nishi-Kokura",
@@ -13690,6 +17247,20 @@
    "eki_code": "eki_1162307",
    "eki_line": "大阪環状線",
    "code": "eki_1162307"
+  },
+  {
+   "slug": "jr-nishikunitachi",
+   "name_kanji": "西国立",
+   "name_en": "Nishi-Kunitachi",
+   "yomi": null,
+   "lat": 35.69375,
+   "lon": 139.423887,
+   "lines": [
+    "JR Nambu Line"
+   ],
+   "eki_code": "eki_1130324",
+   "eki_line": "JR南武線",
+   "code": "eki_1130324"
   },
   {
    "slug": "jr-nishimaizuru,ktr-nishimaizuru,wtktr-nishimaizuru",
@@ -13724,6 +17295,35 @@
    "code": "eki_1190740"
   },
   {
+   "slug": "jr-nishinasuno",
+   "name_kanji": "西那須野",
+   "name_en": "Nishi-Nasuno",
+   "yomi": null,
+   "lat": 36.883726,
+   "lon": 139.986383,
+   "lines": [
+    "JR Utsunomiya Line(Tōhoku Main Line)"
+   ],
+   "eki_code": "eki_1131931",
+   "eki_line": "宇都宮線",
+   "code": "eki_1131931"
+  },
+  {
+   "slug": "jr-nishinippori",
+   "name_kanji": "西日暮里",
+   "name_en": "Nishi-Nippori",
+   "yomi": null,
+   "lat": 35.731954,
+   "lon": 139.766857,
+   "lines": [
+    "JR Keihin–Tōhoku Line",
+    "JR Yamanote Line"
+   ],
+   "eki_code": "eki_1130217",
+   "eki_line": "JR山手線",
+   "code": "eki_1130217"
+  },
+  {
    "slug": "jr-nishinomiya",
    "name_kanji": "西宮",
    "name_en": "Nishinomiya",
@@ -13752,6 +17352,20 @@
    "code": "eki_1162912"
   },
   {
+   "slug": "jr-nishiogikubo",
+   "name_kanji": "西荻窪",
+   "name_en": "Nishi-Ogikubo",
+   "yomi": null,
+   "lat": 35.703842,
+   "lon": 139.599361,
+   "lines": [
+    "JR Chūō Main Line(Tōkyō - Takao)"
+   ],
+   "eki_code": "eki_1131218",
+   "eki_line": "JR中央線(快速)",
+   "code": "eki_1131218"
+  },
+  {
    "slug": "jr-nishioji",
    "name_kanji": "西大路",
    "name_en": "Nishioji",
@@ -13764,6 +17378,35 @@
    "eki_code": "eki_1160202",
    "eki_line": "JR京都線",
    "code": "eki_1160202"
+  },
+  {
+   "slug": "jr-nishiomiya",
+   "name_kanji": "西大宮",
+   "name_en": "Nishi-Omiya",
+   "yomi": null,
+   "lat": 35.92228133,
+   "lon": 139.5797968,
+   "lines": [
+    "JR Kawagoe Line"
+   ],
+   "eki_code": "eki_1132211",
+   "eki_line": "JR川越線",
+   "code": "eki_1132211"
+  },
+  {
+   "slug": "jr-nishiooi",
+   "name_kanji": "西大井",
+   "name_en": "Nishi-Oi",
+   "yomi": null,
+   "lat": 35.601616,
+   "lon": 139.721729,
+   "lines": [
+    "JR Shōnan–Shinjuku Line",
+    "JR Yokosuka Line"
+   ],
+   "eki_code": "eki_1130804",
+   "eki_line": "JR横須賀線",
+   "code": "eki_1130804"
   },
   {
    "slug": "jr-nishisakawa",
@@ -13780,6 +17423,20 @@
    "code": "eki_1180146"
   },
   {
+   "slug": "jr-nishitachikawa",
+   "name_kanji": "西立川",
+   "name_en": "Nishi-Tachikawa",
+   "yomi": null,
+   "lat": 35.703526,
+   "lon": 139.393556,
+   "lines": [
+    "JR Ōme Line"
+   ],
+   "eki_code": "eki_1131502",
+   "eki_line": "JR青梅線",
+   "code": "eki_1131502"
+  },
+  {
    "slug": "jr-nishitakaya",
    "name_kanji": "西高屋",
    "name_en": "Nishitakaya",
@@ -13792,6 +17449,20 @@
    "eki_code": "eki_1161106",
    "eki_line": "JR山陽本線(三原～岩国)",
    "code": "eki_1161106"
+  },
+  {
+   "slug": "jr-nishiurawa",
+   "name_kanji": "西浦和",
+   "name_en": "Nishi-Urawa",
+   "yomi": null,
+   "lat": 35.844139,
+   "lon": 139.627707,
+   "lines": [
+    "JR Musashino Line"
+   ],
+   "eki_code": "eki_1130509",
+   "eki_line": "JR武蔵野線",
+   "code": "eki_1130509"
   },
   {
    "slug": "jr-nishiwakishi",
@@ -13821,6 +17492,20 @@
    "eki_code": "eki_1150122",
    "eki_line": "JR東海道本線(熱海～浜松)",
    "code": "eki_1150122"
+  },
+  {
+   "slug": "jr-nissin",
+   "name_kanji": "日進",
+   "name_en": "Nisshin",
+   "yomi": null,
+   "lat": 35.931555,
+   "lon": 139.606111,
+   "lines": [
+    "JR Kawagoe Line"
+   ],
+   "eki_code": "eki_1132202",
+   "eki_line": "JR川越線",
+   "code": "eki_1132202"
   },
   {
    "slug": "jr-nobeoka",
@@ -13863,6 +17548,20 @@
    "eki_code": "eki_1110424",
    "eki_line": "JR室蘭本線(長万部・室蘭～苫小牧)",
    "code": "eki_1110424"
+  },
+  {
+   "slug": "jr-noborito",
+   "name_kanji": "登戸",
+   "name_en": "Noborito",
+   "yomi": null,
+   "lat": 35.620889,
+   "lon": 139.570028,
+   "lines": [
+    "JR Nambu Line"
+   ],
+   "eki_code": "eki_1130314",
+   "eki_line": "JR南武線",
+   "code": "eki_1130314"
   },
   {
    "slug": "jr-nochi",
@@ -13935,6 +17634,20 @@
    "code": "eki_9990201"
   },
   {
+   "slug": "jr-nogi",
+   "name_kanji": "野木",
+   "name_en": "Nogi",
+   "yomi": null,
+   "lat": 36.229963,
+   "lon": 139.734729,
+   "lines": [
+    "JR Utsunomiya Line(Tōhoku Main Line)"
+   ],
+   "eki_code": "eki_1131916",
+   "eki_line": "宇都宮線",
+   "code": "eki_1131916"
+  },
+  {
    "slug": "jr-nopporo",
    "name_kanji": "野幌",
    "name_en": "Nopporo",
@@ -13992,6 +17705,21 @@
    "code": "eki_1172014"
   },
   {
+   "slug": "jr-nozaki,jrw-nozaki",
+   "name_kanji": "野崎",
+   "name_en": "Nozaki",
+   "yomi": null,
+   "lat": 36.843722,
+   "lon": 139.957752,
+   "lines": [
+    "JR Gakkentoshi Line(Katamachi Line)",
+    "JR Utsunomiya Line(Tōhoku Main Line)"
+   ],
+   "eki_code": "eki_1131930",
+   "eki_line": "宇都宮線",
+   "code": "eki_1131930"
+  },
+  {
    "slug": "jr-nozawa",
    "name_kanji": "野沢",
    "name_en": "Nozawa",
@@ -14004,6 +17732,20 @@
    "eki_code": "eki_1122611",
    "eki_line": "森と水とロマンの鉄道",
    "code": "eki_1122611"
+  },
+  {
+   "slug": "jr-numata",
+   "name_kanji": "沼田",
+   "name_en": "Numata",
+   "yomi": null,
+   "lat": 36.642513,
+   "lon": 139.035734,
+   "lines": [
+    "JR Jōetsu Line(Takasaki - Minakami)"
+   ],
+   "eki_code": "eki_1134211",
+   "eki_line": "JR上越線",
+   "code": "eki_1134211"
   },
   {
    "slug": "jr-numazu",
@@ -14033,6 +17775,21 @@
    "eki_code": "eki_1180638",
    "eki_line": "JR予讃線",
    "code": "eki_1180638"
+  },
+  {
+   "slug": "jr-oami",
+   "name_kanji": "大網",
+   "name_en": "Oami",
+   "yomi": null,
+   "lat": 35.522427,
+   "lon": 140.311111,
+   "lines": [
+    "JR Sotobō Line",
+    "JR Tōgane Line"
+   ],
+   "eki_code": "eki_1132407",
+   "eki_line": "JR外房線",
+   "code": "eki_1132407"
   },
   {
    "slug": "jr-obaku",
@@ -14150,6 +17907,21 @@
    "code": "eki_1150226"
   },
   {
+   "slug": "jr-ochanomizu",
+   "name_kanji": "御茶ノ水",
+   "name_en": "Ochanomizu",
+   "yomi": null,
+   "lat": 35.700614,
+   "lon": 139.763952,
+   "lines": [
+    "JR Chūō Main Line(Tōkyō - Takao)",
+    "JR Sōbu Main Line(Ochanomizu - Chiba)"
+   ],
+   "eki_code": "eki_2800206",
+   "eki_line": "東京メトロ丸ノ内線",
+   "code": "eki_2800206"
+  },
+  {
    "slug": "jr-oda",
    "name_kanji": "網田",
    "name_en": "Oda",
@@ -14229,7 +18001,10 @@
    "lat": 35.353466,
    "lon": 139.531127,
    "lines": [
-    "JR Tōkaidō Main Line(Tōkyō - Atami)"
+    "JR Negishi Line",
+    "JR Shōnan–Shinjuku Line",
+    "JR Tōkaidō Main Line(Tōkyō - Atami)",
+    "JR Yokosuka Line"
    ],
    "eki_code": "eki_1130107",
    "eki_line": "JR東海道本線(東京～熱海)",
@@ -14292,6 +18067,20 @@
    "code": "eki_1140439"
   },
   {
+   "slug": "jr-ogikubo",
+   "name_kanji": "荻窪",
+   "name_en": "Ogikubo",
+   "yomi": null,
+   "lat": 35.704523,
+   "lon": 139.620109,
+   "lines": [
+    "JR Chūō Main Line(Tōkyō - Takao)"
+   ],
+   "eki_code": "eki_1131217",
+   "eki_line": "JR中央線(快速)",
+   "code": "eki_1131217"
+  },
+  {
    "slug": "jr-ogotoonsen",
    "name_kanji": "おごと温泉",
    "name_en": "Ogotoonsen",
@@ -14306,6 +18095,20 @@
    "code": "eki_1160506"
   },
   {
+   "slug": "jr-oguchi",
+   "name_kanji": "大口",
+   "name_en": "Oguchi",
+   "yomi": null,
+   "lat": 35.492375,
+   "lon": 139.646288,
+   "lines": [
+    "JR Yokohama Line"
+   ],
+   "eki_code": "eki_1130602",
+   "eki_line": "JR横浜線",
+   "code": "eki_1130602"
+  },
+  {
    "slug": "jr-ogushigo",
    "name_kanji": "小串郷",
    "name_en": "Ogushigo",
@@ -14318,6 +18121,20 @@
    "eki_code": "eki_1192204",
    "eki_line": "JR大村線",
    "code": "eki_1192204"
+  },
+  {
+   "slug": "jr-oimachi",
+   "name_kanji": "大井町",
+   "name_en": "Oimachi",
+   "yomi": null,
+   "lat": 35.606257,
+   "lon": 139.73485,
+   "lines": [
+    "JR Keihin–Tōhoku Line"
+   ],
+   "eki_code": "eki_1133228",
+   "eki_line": "JR京浜東北線",
+   "code": "eki_1133228"
   },
   {
    "slug": "jr-oishida",
@@ -14381,6 +18198,20 @@
    "code": "eki_1120231"
   },
   {
+   "slug": "jr-oji",
+   "name_kanji": "王子",
+   "name_en": "Oji",
+   "yomi": null,
+   "lat": 35.752538,
+   "lon": 139.73809,
+   "lines": [
+    "JR Keihin–Tōhoku Line"
+   ],
+   "eki_code": "eki_1133212",
+   "eki_line": "JR京浜東北線",
+   "code": "eki_1133212"
+  },
+  {
    "slug": "jr-ojiya",
    "name_kanji": "小千谷",
    "name_en": "Ojiya",
@@ -14393,6 +18224,49 @@
    "eki_code": "eki_1134233",
    "eki_line": "JR上越線",
    "code": "eki_1134233"
+  },
+  {
+   "slug": "jr-okabe",
+   "name_kanji": "岡部",
+   "name_en": "Okabe",
+   "yomi": null,
+   "lat": 36.205645,
+   "lon": 139.237622,
+   "lines": [
+    "JR Takasaki Line"
+   ],
+   "eki_code": "eki_1132319",
+   "eki_line": "JR高崎線",
+   "code": "eki_1132319"
+  },
+  {
+   "slug": "jr-okachimachi",
+   "name_kanji": "御徒町",
+   "name_en": "Okachimachi",
+   "yomi": null,
+   "lat": 35.707282,
+   "lon": 139.774727,
+   "lines": [
+    "JR Keihin–Tōhoku Line",
+    "JR Yamanote Line"
+   ],
+   "eki_code": "eki_1130221",
+   "eki_line": "JR山手線",
+   "code": "eki_1130221"
+  },
+  {
+   "slug": "jr-okamoto",
+   "name_kanji": "岡本",
+   "name_en": "Okamoto",
+   "yomi": null,
+   "lat": 36.598182,
+   "lon": 139.944363,
+   "lines": [
+    "JR Utsunomiya Line(Tōhoku Main Line)"
+   ],
+   "eki_code": "eki_1131924",
+   "eki_line": "宇都宮線",
+   "code": "eki_1131924"
   },
   {
    "slug": "jr-okawara",
@@ -14443,6 +18317,20 @@
    "code": "eki_1160917"
   },
   {
+   "slug": "jr-okegawa",
+   "name_kanji": "桶川",
+   "name_en": "Okegawa",
+   "yomi": null,
+   "lat": 35.998375,
+   "lon": 139.564274,
+   "lines": [
+    "JR Takasaki Line"
+   ],
+   "eki_code": "eki_1132310",
+   "eki_line": "JR高崎線",
+   "code": "eki_1132310"
+  },
+  {
    "slug": "jr-okitsu",
    "name_kanji": "興津",
    "name_en": "Okitsu",
@@ -14469,6 +18357,48 @@
    "eki_code": null,
    "eki_line": null,
    "code": "fk_jr-okoppe"
+  },
+  {
+   "slug": "jr-oku",
+   "name_kanji": "尾久",
+   "name_en": "Oku",
+   "yomi": null,
+   "lat": 35.74683,
+   "lon": 139.753846,
+   "lines": [
+    "JR Utsunomiya Line(Tōhoku Main Line)"
+   ],
+   "eki_code": "eki_1131902",
+   "eki_line": "宇都宮線",
+   "code": "eki_1131902"
+  },
+  {
+   "slug": "jr-okubo",
+   "name_kanji": "大久保",
+   "name_en": "Okubo",
+   "yomi": null,
+   "lat": 35.700784,
+   "lon": 139.69732,
+   "lines": [
+    "JR Chūō Main Line(Tōkyō - Takao)"
+   ],
+   "eki_code": "eki_1131309",
+   "eki_line": "JR中央・総武線",
+   "code": "eki_1131309"
+  },
+  {
+   "slug": "jr-okutama",
+   "name_kanji": "奥多摩",
+   "name_en": "Oku-Tama",
+   "yomi": null,
+   "lat": 35.809357,
+   "lon": 139.096961,
+   "lines": [
+    "JR Ōme Line"
+   ],
+   "eki_code": "eki_1131525",
+   "eki_line": "JR青梅線",
+   "code": "eki_1131525"
   },
   {
    "slug": "jr-okutsugaruimabetsu",
@@ -14513,6 +18443,20 @@
    "eki_code": "eki_1120220",
    "eki_line": "JR奥羽本線(新庄～青森)",
    "code": "eki_1120220"
+  },
+  {
+   "slug": "jr-omigawa",
+   "name_kanji": "小見川",
+   "name_en": "Omigawa",
+   "yomi": null,
+   "lat": 35.849971,
+   "lon": 140.604587,
+   "lines": [
+    "JR Narita Line"
+   ],
+   "eki_code": "eki_1132713",
+   "eki_line": "JR成田線",
+   "code": "eki_1132713"
   },
   {
    "slug": "jr-omihachiman,omi-omihachiman",
@@ -14573,19 +18517,40 @@
    "code": "eki_1141510"
   },
   {
-   "slug": "jr-omiya,ktr-tangooomiya",
+   "slug": "jr-omiya,ktr-tangooomiya,tobu-omiya",
    "name_kanji": "大宮",
    "name_en": "Omiya",
    "yomi": null,
    "lat": 35.906439,
    "lon": 139.62405,
    "lines": [
+    "JR Kawagoe Line",
+    "JR Keihin–Tōhoku Line",
+    "JR Saikyō Line",
+    "JR Shōnan–Shinjuku Line",
+    "JR Takasaki Line",
     "JR Tōhoku Shinkansen",
-    "Kitakinki Tango Railway Miyazu Line Stamp"
+    "JR Utsunomiya Line(Tōhoku Main Line)",
+    "Kitakinki Tango Railway Miyazu Line Stamp",
+    "Tōbu Urban Park Line(Noda Line)"
    ],
    "eki_code": "eki_1131906",
    "eki_line": "宇都宮線",
    "code": "eki_1131906"
+  },
+  {
+   "slug": "jr-omori",
+   "name_kanji": "大森",
+   "name_en": "Omori",
+   "yomi": null,
+   "lat": 35.588903,
+   "lon": 139.728079,
+   "lines": [
+    "JR Keihin–Tōhoku Line"
+   ],
+   "eki_code": "eki_1133229",
+   "eki_line": "JR京浜東北線",
+   "code": "eki_1133229"
   },
   {
    "slug": "jr-omoto,okayamarinko-omoto",
@@ -14630,6 +18595,20 @@
    "eki_code": "eki_1190328",
    "eki_line": "JR鹿児島本線(博多～八代)",
    "code": "eki_1190328"
+  },
+  {
+   "slug": "jr-onjuku",
+   "name_kanji": "御宿",
+   "name_en": "Onjuku",
+   "yomi": null,
+   "lat": 35.188028,
+   "lon": 140.35197,
+   "lines": [
+    "JR Sotobō Line"
+   ],
+   "eki_code": "eki_1132420",
+   "eki_line": "JR外房線",
+   "code": "eki_1132420"
   },
   {
    "slug": "jr-onoda",
@@ -14686,6 +18665,20 @@
    "eki_code": "eki_1190332",
    "eki_line": "JR鹿児島本線(博多～八代)",
    "code": "eki_1190332"
+  },
+  {
+   "slug": "jr-onuki",
+   "name_kanji": "大貫",
+   "name_en": "Onuki",
+   "yomi": null,
+   "lat": 35.291661,
+   "lon": 139.855541,
+   "lines": [
+    "JR Uchibō Line"
+   ],
+   "eki_code": "eki_1132514",
+   "eki_line": "JR内房線",
+   "code": "eki_1132514"
   },
   {
    "slug": "jr-onuma",
@@ -14818,6 +18811,22 @@
    "code": "eki_1162503"
   },
   {
+   "slug": "jr-osaki",
+   "name_kanji": "大崎",
+   "name_en": "Osaki",
+   "yomi": null,
+   "lat": 35.619772,
+   "lon": 139.728439,
+   "lines": [
+    "JR Saikyō Line",
+    "JR Shōnan–Shinjuku Line",
+    "JR Yamanote Line"
+   ],
+   "eki_code": "eki_1130201",
+   "eki_line": "JR山手線",
+   "code": "eki_1130201"
+  },
+  {
    "slug": "jr-oshamanbe",
    "name_kanji": "長万部",
    "name_en": "Oshamambe",
@@ -14948,6 +18957,20 @@
    "code": "eki_1160118"
   },
   {
+   "slug": "jr-otsuka",
+   "name_kanji": "大塚",
+   "name_en": "Otsuka",
+   "yomi": null,
+   "lat": 35.731412,
+   "lon": 139.728584,
+   "lines": [
+    "JR Yamanote Line"
+   ],
+   "eki_code": "eki_1130213",
+   "eki_line": "JR山手線",
+   "code": "eki_1130213"
+  },
+  {
    "slug": "jr-otsuko",
    "name_kanji": "大津港",
    "name_en": "Otsuko",
@@ -14976,6 +18999,20 @@
    "code": "eki_1160503"
   },
   {
+   "slug": "jr-oume",
+   "name_kanji": "青梅",
+   "name_en": "Ome",
+   "yomi": null,
+   "lat": 35.790512,
+   "lon": 139.258096,
+   "lines": [
+    "JR Ōme Line"
+   ],
+   "eki_code": "eki_1131513",
+   "eki_line": "JR青梅線",
+   "code": "eki_1131513"
+  },
+  {
    "slug": "jr-owanionsen",
    "name_kanji": "大鰐温泉",
    "name_en": "Owani-Onsen",
@@ -14997,11 +19034,28 @@
    "lat": 36.312747,
    "lon": 139.806241,
    "lines": [
-    "JR Tōhoku Shinkansen"
+    "JR Mito Line",
+    "JR Ryōmō Line",
+    "JR Tōhoku Shinkansen",
+    "JR Utsunomiya Line(Tōhoku Main Line)"
    ],
    "eki_code": "eki_1131918",
    "eki_line": "宇都宮線",
    "code": "eki_1131918"
+  },
+  {
+   "slug": "jr-ozaku",
+   "name_kanji": "小作",
+   "name_en": "Ozaku",
+   "yomi": null,
+   "lat": 35.776048,
+   "lon": 139.302233,
+   "lines": [
+    "JR Ōme Line"
+   ],
+   "eki_code": "eki_1131510",
+   "eki_line": "JR青梅線",
+   "code": "eki_1131510"
   },
   {
    "slug": "jr-ozore",
@@ -15158,6 +19212,20 @@
    "code": "fk_jr-rumoi"
   },
   {
+   "slug": "jr-ryougoku",
+   "name_kanji": "両国",
+   "name_en": "Ryogoku",
+   "yomi": null,
+   "lat": 35.69579,
+   "lon": 139.793334,
+   "lines": [
+    "JR Sōbu Main Line(Ochanomizu - Chiba)"
+   ],
+   "eki_code": "eki_1131321",
+   "eki_line": "JR中央・総武線",
+   "code": "eki_1131321"
+  },
+  {
    "slug": "jr-ryuo",
    "name_kanji": "竜王",
    "name_en": "Ryuo",
@@ -15243,6 +19311,20 @@
    "code": "eki_1121808"
   },
   {
+   "slug": "jr-sagamihara",
+   "name_kanji": "相模原",
+   "name_en": "Sagamihara",
+   "yomi": null,
+   "lat": 35.58113,
+   "lon": 139.371007,
+   "lines": [
+    "JR Yokohama Line"
+   ],
+   "eki_code": "eki_1130615",
+   "eki_line": "JR横浜線",
+   "code": "eki_1130615"
+  },
+  {
    "slug": "jr-sagamiko",
    "name_kanji": "相模湖",
    "name_en": "Sagamiko",
@@ -15311,6 +19393,21 @@
    "eki_code": "eki_1190660",
    "eki_line": "JR日豊本線(門司港～佐伯)",
    "code": "eki_1190660"
+  },
+  {
+   "slug": "jr-saitamashintoshin",
+   "name_kanji": "さいたま新都心",
+   "name_en": "Saitama-Shintoshin",
+   "yomi": null,
+   "lat": 35.893867,
+   "lon": 139.633587,
+   "lines": [
+    "JR Keihin–Tōhoku Line",
+    "JR Utsunomiya Line(Tōhoku Main Line)"
+   ],
+   "eki_code": "eki_1131905",
+   "eki_line": "宇都宮線",
+   "code": "eki_1131905"
   },
   {
    "slug": "jr-saitozaki",
@@ -15486,6 +19583,35 @@
    "code": "eki_1140125"
   },
   {
+   "slug": "jr-sakura",
+   "name_kanji": "佐倉",
+   "name_en": "Sakura",
+   "yomi": null,
+   "lat": 35.709743,
+   "lon": 140.226722,
+   "lines": [
+    "JR Narita Line",
+    "JR Sōbu Main Line(Chiba - Chōshi)"
+   ],
+   "eki_code": "eki_1131415",
+   "eki_line": "JR総武本線",
+   "code": "eki_1131415"
+  },
+  {
+   "slug": "jr-sakuragicho",
+   "name_kanji": "桜木町",
+   "name_en": "Sakuragicho",
+   "yomi": null,
+   "lat": 35.451112,
+   "lon": 139.630881,
+   "lines": [
+    "JR Negishi Line"
+   ],
+   "eki_code": "eki_1130702",
+   "eki_line": "JR根岸線",
+   "code": "eki_1130702"
+  },
+  {
    "slug": "jr-sakurai",
    "name_kanji": "桜井",
    "name_en": "Sakurai",
@@ -15599,6 +19725,20 @@
    "code": "eki_1120607"
   },
   {
+   "slug": "jr-samukawa",
+   "name_kanji": "寒川",
+   "name_en": "Samukawa",
+   "yomi": null,
+   "lat": 35.367579,
+   "lon": 139.387452,
+   "lines": [
+    "JR Sagami Line"
+   ],
+   "eki_code": "eki_1130904",
+   "eki_line": "JR相模線",
+   "code": "eki_1130904"
+  },
+  {
    "slug": "jr-sanagu",
    "name_kanji": "佐那具",
    "name_en": "Sanagu",
@@ -15626,20 +19766,6 @@
    "eki_code": "eki_1162915",
    "eki_line": "JR宝塚線",
    "code": "eki_1162915"
-  },
-  {
-   "slug": "jr-sango",
-   "name_kanji": "三郷",
-   "name_en": "Sango",
-   "yomi": null,
-   "lat": 35.845004,
-   "lon": 139.886341,
-   "lines": [
-    "JR Yamatoji Line(Kansai Main Line)"
-   ],
-   "eki_code": "eki_1130517",
-   "eki_line": "JR武蔵野線",
-   "code": "eki_1130517"
   },
   {
    "slug": "jr-sanjo",
@@ -15684,6 +19810,20 @@
    "code": "eki_1160313"
   },
   {
+   "slug": "jr-sano",
+   "name_kanji": "佐野",
+   "name_en": "Sano",
+   "yomi": null,
+   "lat": 36.316668,
+   "lon": 139.578858,
+   "lines": [
+    "JR Ryōmō Line"
+   ],
+   "eki_code": "eki_1134116",
+   "eki_line": "JR両毛線",
+   "code": "eki_1134116"
+  },
+  {
    "slug": "jr-sansai",
    "name_kanji": "三才",
    "name_en": "Sansai",
@@ -15710,6 +19850,20 @@
    "eki_code": "eki_1122903",
    "eki_line": "JR常磐線(取手～いわき)",
    "code": "eki_1122903"
+  },
+  {
+   "slug": "jr-sanukimachi",
+   "name_kanji": "佐貫町",
+   "name_en": "Sanukimachi",
+   "yomi": null,
+   "lat": 35.260113,
+   "lon": 139.876106,
+   "lines": [
+    "JR Uchibō Line"
+   ],
+   "eki_code": "eki_1132515",
+   "eki_line": "JR内房線",
+   "code": "eki_1132515"
   },
   {
    "slug": "jr-sapporo",
@@ -15785,6 +19939,20 @@
    "code": "eki_1191814"
   },
   {
+   "slug": "jr-sashiougi",
+   "name_kanji": "指扇",
+   "name_en": "Sashiogi",
+   "yomi": null,
+   "lat": 35.917023,
+   "lon": 139.564951,
+   "lines": [
+    "JR Kawagoe Line"
+   ],
+   "eki_code": "eki_1132203",
+   "eki_line": "JR川越線",
+   "code": "eki_1132203"
+  },
+  {
    "slug": "jr-satsumaokuchi",
    "name_kanji": "薩摩大口",
    "name_en": "Satsuma-Okuchi",
@@ -15798,6 +19966,20 @@
    "eki_code": null,
    "eki_line": null,
    "code": "fk_jr-satsumaokuchi"
+  },
+  {
+   "slug": "jr-sawara",
+   "name_kanji": "佐原",
+   "name_en": "Sawara",
+   "yomi": null,
+   "lat": 35.894522,
+   "lon": 140.494074,
+   "lines": [
+    "JR Narita Line"
+   ],
+   "eki_code": "eki_1132710",
+   "eki_line": "JR成田線",
+   "code": "eki_1132710"
   },
   {
    "slug": "jr-seki",
@@ -15840,6 +20022,20 @@
    "eki_code": "eki_1140313",
    "eki_line": "妙高はねうまライン",
    "code": "eki_1140313"
+  },
+  {
+   "slug": "jr-sendagaya",
+   "name_kanji": "千駄ケ谷",
+   "name_en": "Sendagaya",
+   "yomi": null,
+   "lat": 35.681231,
+   "lon": 139.711644,
+   "lines": [
+    "JR Chūō Main Line(Tōkyō - Takao)"
+   ],
+   "eki_code": "eki_1131312",
+   "eki_line": "JR中央・総武線",
+   "code": "eki_1131312"
   },
   {
    "slug": "jr-sendai",
@@ -16018,6 +20214,21 @@
    "code": "eki_1111515"
   },
   {
+   "slug": "jr-shibukawa",
+   "name_kanji": "渋川",
+   "name_en": "Shibukawa",
+   "yomi": null,
+   "lat": 36.491251,
+   "lon": 139.008786,
+   "lines": [
+    "JR Agatsuma Line",
+    "JR Jōetsu Line(Takasaki - Minakami)"
+   ],
+   "eki_code": "eki_1133501",
+   "eki_line": "JR吾妻線",
+   "code": "eki_1133501"
+  },
+  {
    "slug": "jr-shibushi",
    "name_kanji": "志布志",
    "name_en": "Shibushi",
@@ -16031,6 +20242,22 @@
    "eki_code": "eki_1192829",
    "eki_line": "JR日南線",
    "code": "eki_1192829"
+  },
+  {
+   "slug": "jr-shibuya",
+   "name_kanji": "渋谷",
+   "name_en": "Shibuya",
+   "yomi": null,
+   "lat": 35.6587,
+   "lon": 139.700872,
+   "lines": [
+    "JR Saikyō Line",
+    "JR Shōnan–Shinjuku Line",
+    "JR Yamanote Line"
+   ],
+   "eki_code": "eki_2400601",
+   "eki_line": "京王井の頭線",
+   "code": "eki_2400601"
   },
   {
    "slug": "jr-shichinohetowada",
@@ -16204,6 +20431,20 @@
    "code": "eki_1150115"
   },
   {
+   "slug": "jr-shimmachi",
+   "name_kanji": "新町",
+   "name_en": "Shimmachi",
+   "yomi": null,
+   "lat": 36.272984,
+   "lon": 139.105457,
+   "lines": [
+    "JR Takasaki Line"
+   ],
+   "eki_code": "eki_1132322",
+   "eki_line": "JR高崎線",
+   "code": "eki_1132322"
+  },
+  {
    "slug": "jr-shimoda",
    "name_kanji": "下田",
    "name_en": "Shimoda",
@@ -16216,6 +20457,22 @@
    "eki_code": "eki_1120103",
    "eki_line": "青い森鉄道線",
    "code": "eki_1120103"
+  },
+  {
+   "slug": "jr-shimodate,kanto-shimodate",
+   "name_kanji": "下館",
+   "name_en": "Shimodate",
+   "yomi": null,
+   "lat": 36.304197,
+   "lon": 139.97866,
+   "lines": [
+    "JR Mito Line",
+    "JR Mōka Line",
+    "Kantō Railway Jōsō Line"
+   ],
+   "eki_code": "eki_1133907",
+   "eki_line": "JR水戸線",
+   "code": "eki_1133907"
   },
   {
    "slug": "jr-shimogion",
@@ -16277,6 +20534,34 @@
    "code": "eki_1161236"
   },
   {
+   "slug": "jr-shimosakozaki",
+   "name_kanji": "下総神崎",
+   "name_en": "Shimosa-Kozaki",
+   "yomi": null,
+   "lat": 35.8948,
+   "lon": 140.410657,
+   "lines": [
+    "JR Narita Line"
+   ],
+   "eki_code": "eki_1132708",
+   "eki_line": "JR成田線",
+   "code": "eki_1132708"
+  },
+  {
+   "slug": "jr-shimosamanzaki",
+   "name_kanji": "下総松崎",
+   "name_en": "Shimosa-Manzaki",
+   "yomi": null,
+   "lat": 35.807806,
+   "lon": 140.27749,
+   "lines": [
+    "JR Narita Line(Abiko Branch Line)"
+   ],
+   "eki_code": "eki_1132728",
+   "eki_line": "JR成田線",
+   "code": "eki_1132728"
+  },
+  {
    "slug": "jr-shimosoga",
    "name_kanji": "下曽我",
    "name_en": "Shimosoga",
@@ -16333,6 +20618,34 @@
    "code": "eki_1150517"
   },
   {
+   "slug": "jr-shimotsukeosawa",
+   "name_kanji": "下野大沢",
+   "name_en": "Shimotsuke-Osawa",
+   "yomi": null,
+   "lat": 36.686427,
+   "lon": 139.732367,
+   "lines": [
+    "JR Nikkō Line"
+   ],
+   "eki_code": "eki_1134005",
+   "eki_line": "JR日光線",
+   "code": "eki_1134005"
+  },
+  {
+   "slug": "jr-shimousanakayama",
+   "name_kanji": "下総中山",
+   "name_en": "Shimosa-Nakayama",
+   "yomi": null,
+   "lat": 35.714276,
+   "lon": 139.943092,
+   "lines": [
+    "JR Sōbu Main Line(Ochanomizu - Chiba)"
+   ],
+   "eki_code": "eki_1131329",
+   "eki_line": "JR中央・総武線",
+   "code": "eki_1131329"
+  },
+  {
    "slug": "jr-shimukappu",
    "name_kanji": "占冠",
    "name_en": "Shimukappu",
@@ -16354,7 +20667,10 @@
    "lat": 35.628284,
    "lon": 139.73809,
    "lines": [
-    "JR Tōkaidō Main Line(Tōkyō - Atami)"
+    "JR Keihin–Tōhoku Line",
+    "JR Tōkaidō Main Line(Tōkyō - Atami)",
+    "JR Yamanote Line",
+    "JR Yokosuka Line"
    ],
    "eki_code": "eki_2700102",
    "eki_line": "京急本線",
@@ -16373,6 +20689,20 @@
    "eki_code": "eki_1123153",
    "eki_line": "JR東北本線(黒磯～利府・盛岡)",
    "code": "eki_1123153"
+  },
+  {
+   "slug": "jr-shinakitsu",
+   "name_kanji": "新秋津",
+   "name_en": "Shin-Akitsu",
+   "yomi": null,
+   "lat": 35.778331,
+   "lon": 139.493592,
+   "lines": [
+    "JR Musashino Line"
+   ],
+   "eki_code": "eki_1130505",
+   "eki_line": "JR武蔵野線",
+   "code": "eki_1130505"
   },
   {
    "slug": "jr-shinano-omachi",
@@ -16418,6 +20748,20 @@
    "code": "eki_1140106"
   },
   {
+   "slug": "jr-shinanomachi",
+   "name_kanji": "信濃町",
+   "name_en": "Shinanomachi",
+   "yomi": null,
+   "lat": 35.680031,
+   "lon": 139.720729,
+   "lines": [
+    "JR Chūō Main Line(Tōkyō - Takao)"
+   ],
+   "eki_code": "eki_1131313",
+   "eki_line": "JR中央・総武線",
+   "code": "eki_1131313"
+  },
+  {
    "slug": "jr-shinanomatsukawa",
    "name_kanji": "信濃松川",
    "name_en": "Shinano-Matsukawa",
@@ -16455,7 +20799,10 @@
    "lat": 35.666195,
    "lon": 139.758587,
    "lines": [
-    "JR Tōkaidō Main Line(Tōkyō - Atami)"
+    "JR Keihin–Tōhoku Line",
+    "JR Tōkaidō Main Line(Tōkyō - Atami)",
+    "JR Yamanote Line",
+    "JR Yokosuka Line"
    ],
    "eki_code": "eki_1130102",
    "eki_line": "JR東海道本線(東京～熱海)",
@@ -16710,6 +21057,23 @@
    "code": "eki_1150208"
   },
   {
+   "slug": "jr-shinjuku",
+   "name_kanji": "新宿",
+   "name_en": "Shinjuku",
+   "yomi": null,
+   "lat": 35.691435,
+   "lon": 139.699574,
+   "lines": [
+    "JR Chūō Main Line(Tōkyō - Takao)",
+    "JR Saikyō Line",
+    "JR Shōnan–Shinjuku Line",
+    "JR Yamanote Line"
+   ],
+   "eki_code": "eki_2500101",
+   "eki_line": "小田急線",
+   "code": "eki_2500101"
+  },
+  {
    "slug": "jr-shinkami",
    "name_kanji": "新加美",
    "name_en": "Shin-Kami",
@@ -16738,6 +21102,49 @@
    "code": "eki_1111204"
   },
   {
+   "slug": "jr-shinkawasaki",
+   "name_kanji": "新川崎",
+   "name_en": "Shin-Kawasaki",
+   "yomi": null,
+   "lat": 35.551784,
+   "lon": 139.671481,
+   "lines": [
+    "JR Shōnan–Shinjuku Line",
+    "JR Yokosuka Line"
+   ],
+   "eki_code": "eki_1130805",
+   "eki_line": "JR横須賀線",
+   "code": "eki_1130805"
+  },
+  {
+   "slug": "jr-shinkemigawa",
+   "name_kanji": "新検見川",
+   "name_en": "Shin-Kemigawa",
+   "yomi": null,
+   "lat": 35.65169,
+   "lon": 140.073025,
+   "lines": [
+    "JR Sōbu Main Line(Ochanomizu - Chiba)"
+   ],
+   "eki_code": "eki_1131336",
+   "eki_line": "JR中央・総武線",
+   "code": "eki_1131336"
+  },
+  {
+   "slug": "jr-shinkiba",
+   "name_kanji": "新木場",
+   "name_en": "Shin-Kiba",
+   "yomi": null,
+   "lat": 35.646172,
+   "lon": 139.827402,
+   "lines": [
+    "JR Keiyō Line"
+   ],
+   "eki_code": "eki_1132605",
+   "eki_line": "JR京葉線",
+   "code": "eki_1132605"
+  },
+  {
    "slug": "jr-shinkobe",
    "name_kanji": "新神戸",
    "name_en": "Shin-Kobe",
@@ -16752,6 +21159,35 @@
    "code": "eki_9963601"
   },
   {
+   "slug": "jr-shinkodaira",
+   "name_kanji": "新小平",
+   "name_en": "Shin-Kodaira",
+   "yomi": null,
+   "lat": 35.73128,
+   "lon": 139.470745,
+   "lines": [
+    "JR Musashino Line"
+   ],
+   "eki_code": "eki_1130504",
+   "eki_line": "JR武蔵野線",
+   "code": "eki_1130504"
+  },
+  {
+   "slug": "jr-shinkoiwa",
+   "name_kanji": "新小岩",
+   "name_en": "Shin-Koiwa",
+   "yomi": null,
+   "lat": 35.716903,
+   "lon": 139.857777,
+   "lines": [
+    "JR Sōbu Main Line(Ochanomizu - Chiba)",
+    "JR Sōbu Main Line(Rapid)"
+   ],
+   "eki_code": "eki_1131325",
+   "eki_line": "JR中央・総武線",
+   "code": "eki_1131325"
+  },
+  {
    "slug": "jr-shinkotoni",
    "name_kanji": "新琴似",
    "name_en": "Shin-Kotoni",
@@ -16764,6 +21200,20 @@
    "eki_code": "eki_1111205",
    "eki_line": "JR札沼線",
    "code": "eki_1111205"
+  },
+  {
+   "slug": "jr-shinkoyasu",
+   "name_kanji": "新子安",
+   "name_en": "Shin-Koyasu",
+   "yomi": null,
+   "lat": 35.487064,
+   "lon": 139.654776,
+   "lines": [
+    "JR Keihin–Tōhoku Line"
+   ],
+   "eki_code": "eki_1133233",
+   "eki_line": "JR京浜東北線",
+   "code": "eki_1133233"
   },
   {
    "slug": "jr-shinkurashiki",
@@ -16781,6 +21231,36 @@
    "code": "eki_1161007"
   },
   {
+   "slug": "jr-shinmaebashi",
+   "name_kanji": "新前橋",
+   "name_en": "Shim-Maebashi",
+   "yomi": null,
+   "lat": 36.378936,
+   "lon": 139.046924,
+   "lines": [
+    "JR Jōetsu Line(Takasaki - Minakami)",
+    "JR Ryōmō Line"
+   ],
+   "eki_code": "eki_1134104",
+   "eki_line": "JR両毛線",
+   "code": "eki_1134104"
+  },
+  {
+   "slug": "jr-shinmatsudo",
+   "name_kanji": "新松戸",
+   "name_en": "Shim-Matsudo",
+   "yomi": null,
+   "lat": 35.825467,
+   "lon": 139.921076,
+   "lines": [
+    "JR Jōban Line(Kita-Senju - Toride)",
+    "JR Musashino Line"
+   ],
+   "eki_code": "eki_1130519",
+   "eki_line": "JR武蔵野線",
+   "code": "eki_1130519"
+  },
+  {
    "slug": "jr-shinminamata",
    "name_kanji": "新水俣",
    "name_en": "Shin-Minamata",
@@ -16795,6 +21275,20 @@
    "code": "eki_9992112"
   },
   {
+   "slug": "jr-shinmisato",
+   "name_kanji": "新三郷",
+   "name_en": "Shim-Misato",
+   "yomi": null,
+   "lat": 35.858667,
+   "lon": 139.869341,
+   "lines": [
+    "JR Musashino Line"
+   ],
+   "eki_code": "eki_1130516",
+   "eki_line": "JR武蔵野線",
+   "code": "eki_1130516"
+  },
+  {
    "slug": "jr-shinnagata",
    "name_kanji": "新長田",
    "name_en": "Shin-Nagata",
@@ -16807,6 +21301,34 @@
    "eki_code": "eki_1160803",
    "eki_line": "JR神戸線(神戸～姫路)",
    "code": "eki_1160803"
+  },
+  {
+   "slug": "jr-shinnarashino",
+   "name_kanji": "新習志野",
+   "name_en": "Shin-Narashino",
+   "yomi": null,
+   "lat": 35.667342,
+   "lon": 140.012825,
+   "lines": [
+    "JR Keiyō Line"
+   ],
+   "eki_code": "eki_1132613",
+   "eki_line": "JR京葉線",
+   "code": "eki_1132613"
+  },
+  {
+   "slug": "jr-shinnihonbashi",
+   "name_kanji": "新日本橋",
+   "name_en": "Shin-Nihombashi",
+   "yomi": null,
+   "lat": 35.688687,
+   "lon": 139.77323,
+   "lines": [
+    "JR Sōbu Main Line(Rapid)"
+   ],
+   "eki_code": "eki_1131402",
+   "eki_line": "JR総武本線",
+   "code": "eki_1131402"
   },
   {
    "slug": "jr-shinobugaoka",
@@ -16849,6 +21371,20 @@
    "eki_code": "eki_1160109",
    "eki_line": "琵琶湖線",
    "code": "eki_1160109"
+  },
+  {
+   "slug": "jr-shinokubo",
+   "name_kanji": "新大久保",
+   "name_en": "Shin-Okubo",
+   "yomi": null,
+   "lat": 35.700875,
+   "lon": 139.700261,
+   "lines": [
+    "JR Yamanote Line"
+   ],
+   "eki_code": "eki_1130209",
+   "eki_line": "JR山手線",
+   "code": "eki_1130209"
   },
   {
    "slug": "jr-shinomura",
@@ -16999,6 +21535,20 @@
    "code": "eki_1123106"
   },
   {
+   "slug": "jr-shinshiraoka",
+   "name_kanji": "新白岡",
+   "name_en": "Shin-Shiraoka",
+   "yomi": null,
+   "lat": 36.038732,
+   "lon": 139.67208,
+   "lines": [
+    "JR Utsunomiya Line(Tōhoku Main Line)"
+   ],
+   "eki_code": "eki_1131911",
+   "eki_line": "宇都宮線",
+   "code": "eki_1131911"
+  },
+  {
    "slug": "jr-shinshiro",
    "name_kanji": "新城",
    "name_en": "Shinshiro",
@@ -17011,6 +21561,20 @@
    "eki_code": "eki_1141312",
    "eki_line": "JR飯田線(豊橋～天竜峡)",
    "code": "eki_1141312"
+  },
+  {
+   "slug": "jr-shinsugita",
+   "name_kanji": "新杉田",
+   "name_en": "Shin-Sugita",
+   "yomi": null,
+   "lat": 35.386863,
+   "lon": 139.619483,
+   "lines": [
+    "JR Negishi Line"
+   ],
+   "eki_code": "eki_1130708",
+   "eki_line": "JR根岸線",
+   "code": "eki_1130708"
   },
   {
    "slug": "jr-shinsuizenji",
@@ -17101,6 +21665,34 @@
    "code": "fk_jr-shintotsukawa"
   },
   {
+   "slug": "jr-shinurayasu",
+   "name_kanji": "新浦安",
+   "name_en": "Shin-Urayasu",
+   "yomi": null,
+   "lat": 35.649526,
+   "lon": 139.912553,
+   "lines": [
+    "JR Keiyō Line"
+   ],
+   "eki_code": "eki_1132608",
+   "eki_line": "JR京葉線",
+   "code": "eki_1132608"
+  },
+  {
+   "slug": "jr-shinyahashira",
+   "name_kanji": "新八柱",
+   "name_en": "Shin-Yahashira",
+   "yomi": null,
+   "lat": 35.792013,
+   "lon": 139.938393,
+   "lines": [
+    "JR Musashino Line"
+   ],
+   "eki_code": "eki_1130520",
+   "eki_line": "JR武蔵野線",
+   "code": "eki_1130520"
+  },
+  {
    "slug": "jr-shinyamaguchi",
    "name_kanji": "新山口",
    "name_en": "Shin-Yamaguchi",
@@ -17116,6 +21708,21 @@
    "eki_code": "eki_1161224",
    "eki_line": "JR山陽本線(岩国～門司)",
    "code": "eki_1161224"
+  },
+  {
+   "slug": "jr-shinyokohama,jrt-shinyokohama",
+   "name_kanji": "新横浜",
+   "name_en": "Shin-Yokohama",
+   "yomi": null,
+   "lat": 35.506824,
+   "lon": 139.617348,
+   "lines": [
+    "JR Tokaido Shinkansen",
+    "JR Yokohama Line"
+   ],
+   "eki_code": "eki_1130604",
+   "eki_line": "JR横浜線",
+   "code": "eki_1130604"
   },
   {
    "slug": "jr-shinyubari",
@@ -17160,6 +21767,20 @@
    "eki_code": "eki_1111510",
    "eki_line": "JR宗谷本線",
    "code": "eki_1111510"
+  },
+  {
+   "slug": "jr-shiomi",
+   "name_kanji": "潮見",
+   "name_en": "Shiomi",
+   "yomi": null,
+   "lat": 35.658702,
+   "lon": 139.817341,
+   "lines": [
+    "JR Keiyō Line"
+   ],
+   "eki_code": "eki_1132604",
+   "eki_line": "JR京葉線",
+   "code": "eki_1132604"
   },
   {
    "slug": "jr-shiotsu",
@@ -17274,6 +21895,20 @@
    "code": "eki_1110429"
   },
   {
+   "slug": "jr-shiraoka",
+   "name_kanji": "白岡",
+   "name_en": "Shiraoka",
+   "yomi": null,
+   "lat": 36.01774,
+   "lon": 139.666826,
+   "lines": [
+    "JR Utsunomiya Line(Tōhoku Main Line)"
+   ],
+   "eki_code": "eki_1131910",
+   "eki_line": "宇都宮線",
+   "code": "eki_1131910"
+  },
+  {
    "slug": "jr-shiretokosyari",
    "name_kanji": "知床斜里",
    "name_en": "Shiretoko-Shari",
@@ -17329,6 +21964,20 @@
    "eki_code": "eki_1164112",
    "eki_line": "おおさか東線",
    "code": "eki_1164112"
+  },
+  {
+   "slug": "jr-shisui",
+   "name_kanji": "酒々井",
+   "name_en": "Shisui",
+   "yomi": null,
+   "lat": 35.731737,
+   "lon": 140.275271,
+   "lines": [
+    "JR Narita Line"
+   ],
+   "eki_code": "eki_1132702",
+   "eki_line": "JR成田線",
+   "code": "eki_1132702"
   },
   {
    "slug": "jr-shiwachuo",
@@ -17447,6 +22096,20 @@
    "code": "eki_1191327"
   },
   {
+   "slug": "jr-shukugawara",
+   "name_kanji": "宿河原",
+   "name_en": "Shukugawara",
+   "yomi": null,
+   "lat": 35.615429,
+   "lon": 139.579565,
+   "lines": [
+    "JR Nambu Line"
+   ],
+   "eki_code": "eki_1130313",
+   "eki_line": "JR南武線",
+   "code": "eki_1130313"
+  },
+  {
    "slug": "jr-shumarinai",
    "name_kanji": "朱鞠内",
    "name_en": "Shumarinai",
@@ -17475,6 +22138,34 @@
    "code": "eki_3100505"
   },
   {
+   "slug": "jr-sitte",
+   "name_kanji": "尻手",
+   "name_en": "Shitte",
+   "yomi": null,
+   "lat": 35.530939,
+   "lon": 139.684233,
+   "lines": [
+    "JR Nambu Line"
+   ],
+   "eki_code": "eki_1130302",
+   "eki_line": "JR南武線",
+   "code": "eki_1130302"
+  },
+  {
+   "slug": "jr-sodegaura",
+   "name_kanji": "袖ケ浦",
+   "name_en": "Sodegaura",
+   "yomi": null,
+   "lat": 35.431997,
+   "lon": 139.95788,
+   "lines": [
+    "JR Uchibō Line"
+   ],
+   "eki_code": "eki_1132509",
+   "eki_line": "JR内房線",
+   "code": "eki_1132509"
+  },
+  {
    "slug": "jr-soen",
    "name_kanji": "桑園",
    "name_en": "Soen",
@@ -17488,6 +22179,22 @@
    "eki_code": "eki_1110314",
    "eki_line": "JR函館本線(小樽～旭川)",
    "code": "eki_1110314"
+  },
+  {
+   "slug": "jr-soga",
+   "name_kanji": "蘇我",
+   "name_en": "Soga",
+   "yomi": null,
+   "lat": 35.582065,
+   "lon": 140.130767,
+   "lines": [
+    "JR Keiyō Line",
+    "JR Sotobō Line",
+    "JR Uchibō Line"
+   ],
+   "eki_code": "eki_1132403",
+   "eki_line": "JR外房線",
+   "code": "eki_1132403"
   },
   {
    "slug": "jr-soja",
@@ -17604,6 +22311,20 @@
    "code": "eki_1191709"
   },
   {
+   "slug": "jr-sugamo",
+   "name_kanji": "巣鴨",
+   "name_en": "Sugamo",
+   "yomi": null,
+   "lat": 35.733445,
+   "lon": 139.739303,
+   "lines": [
+    "JR Yamanote Line"
+   ],
+   "eki_code": "eki_1130214",
+   "eki_line": "JR山手線",
+   "code": "eki_1130214"
+  },
+  {
    "slug": "jr-sugimotocho",
    "name_kanji": "杉本町",
    "name_en": "Sugimotocho",
@@ -17616,6 +22337,20 @@
    "eki_code": "eki_1162607",
    "eki_line": "阪和線(天王寺～和歌山)",
    "code": "eki_1162607"
+  },
+  {
+   "slug": "jr-suidobashi",
+   "name_kanji": "水道橋",
+   "name_en": "Suidobashi",
+   "yomi": null,
+   "lat": 35.702039,
+   "lon": 139.754312,
+   "lines": [
+    "JR Chūō Main Line(Tōkyō - Takao)"
+   ],
+   "eki_code": "eki_1131317",
+   "eki_line": "JR中央・総武線",
+   "code": "eki_1131317"
   },
   {
    "slug": "jr-suita",
@@ -17774,6 +22509,35 @@
    "code": "eki_1150515"
   },
   {
+   "slug": "jr-suzumenomiya",
+   "name_kanji": "雀宮",
+   "name_en": "Suzumenomiya",
+   "yomi": null,
+   "lat": 36.493845,
+   "lon": 139.876811,
+   "lines": [
+    "JR Utsunomiya Line(Tōhoku Main Line)"
+   ],
+   "eki_code": "eki_1131922",
+   "eki_line": "宇都宮線",
+   "code": "eki_1131922"
+  },
+  {
+   "slug": "jr-tabata",
+   "name_kanji": "田端",
+   "name_en": "Tabata",
+   "yomi": null,
+   "lat": 35.737781,
+   "lon": 139.761229,
+   "lines": [
+    "JR Keihin–Tōhoku Line",
+    "JR Yamanote Line"
+   ],
+   "eki_code": "eki_1130216",
+   "eki_line": "JR山手線",
+   "code": "eki_1130216"
+  },
+  {
    "slug": "jr-tachibana",
    "name_kanji": "立花",
    "name_en": "Tachibana",
@@ -17786,6 +22550,22 @@
    "eki_code": "eki_1160304",
    "eki_line": "JR神戸線(大阪～神戸)",
    "code": "eki_1160304"
+  },
+  {
+   "slug": "jr-tachikawa",
+   "name_kanji": "立川",
+   "name_en": "Tachikawa",
+   "yomi": null,
+   "lat": 35.698202,
+   "lon": 139.413704,
+   "lines": [
+    "JR Chūō Main Line(Tōkyō - Takao)",
+    "JR Nambu Line",
+    "JR Ōme Line"
+   ],
+   "eki_code": "eki_1130325",
+   "eki_line": "JR南武線",
+   "code": "eki_1130325"
   },
   {
    "slug": "jr-tadami",
@@ -17874,6 +22654,20 @@
    "code": "eki_1162305"
   },
   {
+   "slug": "jr-takadanobaba",
+   "name_kanji": "高田馬場",
+   "name_en": "Takadanobaba",
+   "yomi": null,
+   "lat": 35.712677,
+   "lon": 139.703715,
+   "lines": [
+    "JR Yamanote Line"
+   ],
+   "eki_code": "eki_1130210",
+   "eki_line": "JR山手線",
+   "code": "eki_1130210"
+  },
+  {
    "slug": "jr-takahagi",
    "name_kanji": "高萩",
    "name_en": "Takahagi",
@@ -17947,6 +22741,21 @@
    "code": "eki_1141907"
   },
   {
+   "slug": "jr-takanawagateway",
+   "name_kanji": "高輪ゲートウェイ",
+   "name_en": "Takanawa Gateway",
+   "yomi": null,
+   "lat": 35.6355,
+   "lon": 139.7407,
+   "lines": [
+    "JR Keihin–Tōhoku Line",
+    "JR Yamanote Line"
+   ],
+   "eki_code": "eki_1130230",
+   "eki_line": "JR山手線",
+   "code": "eki_1130230"
+  },
+  {
    "slug": "jr-takanosu",
    "name_kanji": "鷹ノ巣",
    "name_en": "Takanosu",
@@ -17968,7 +22777,8 @@
    "lat": 35.642026,
    "lon": 139.282288,
    "lines": [
-    "JR Chūō Main Line(Takao - Shiojiri)"
+    "JR Chūō Main Line(Takao - Shiojiri)",
+    "JR Chūō Main Line(Tōkyō - Takao)"
    ],
    "eki_code": "eki_1131112",
    "eki_line": "JR中央本線(東京～塩尻)",
@@ -17987,6 +22797,20 @@
    "eki_code": "eki_1162910",
    "eki_line": "JR宝塚線",
    "code": "eki_1162910"
+  },
+  {
+   "slug": "jr-takasakitonyamachi",
+   "name_kanji": "高崎問屋町",
+   "name_en": "Takasakitonyamachi",
+   "yomi": null,
+   "lat": 36.346097,
+   "lon": 139.017089,
+   "lines": [
+    "JR Jōetsu Line(Takasaki - Minakami)"
+   ],
+   "eki_code": "eki_1134102",
+   "eki_line": "JR両毛線",
+   "code": "eki_1134102"
   },
   {
    "slug": "jr-takashima",
@@ -18188,6 +23012,21 @@
    "code": "eki_1180616"
   },
   {
+   "slug": "jr-tamachi",
+   "name_kanji": "田町",
+   "name_en": "Tamachi",
+   "yomi": null,
+   "lat": 35.645736,
+   "lon": 139.747575,
+   "lines": [
+    "JR Keihin–Tōhoku Line",
+    "JR Yamanote Line"
+   ],
+   "eki_code": "eki_1130228",
+   "eki_line": "JR山手線",
+   "code": "eki_1130228"
+  },
+  {
    "slug": "jr-tamagawamura",
    "name_kanji": "玉川村",
    "name_en": "Tamagawamura",
@@ -18387,6 +23226,20 @@
    "code": "eki_1140203"
   },
   {
+   "slug": "jr-tateyama",
+   "name_kanji": "館山",
+   "name_en": "Tateyama",
+   "yomi": null,
+   "lat": 34.9959,
+   "lon": 139.861888,
+   "lines": [
+    "JR Uchibō Line"
+   ],
+   "eki_code": "eki_1132524",
+   "eki_line": "JR内房線",
+   "code": "eki_1132524"
+  },
+  {
    "slug": "jr-tatsuta",
    "name_kanji": "竜田",
    "name_en": "Tatsuta",
@@ -18499,6 +23352,21 @@
    "eki_code": "eki_1161114",
    "eki_line": "JR山陽本線(三原～岩国)",
    "code": "eki_1161114"
+  },
+  {
+   "slug": "jr-tennodai",
+   "name_kanji": "天王台",
+   "name_en": "Tennodai",
+   "yomi": null,
+   "lat": 35.872558,
+   "lon": 140.04121,
+   "lines": [
+    "JR Jōban Line(Kita-Senju - Toride)",
+    "JR Jōban Line(Rapid)"
+   ],
+   "eki_code": "eki_1132018",
+   "eki_line": "JR常磐線(上野～取手)",
+   "code": "eki_1132018"
   },
   {
    "slug": "jr-tennoji",
@@ -18658,6 +23526,48 @@
    "code": "eki_1160718"
   },
   {
+   "slug": "jr-tochigi",
+   "name_kanji": "栃木",
+   "name_en": "Tochigi",
+   "yomi": null,
+   "lat": 36.371912,
+   "lon": 139.731037,
+   "lines": [
+    "JR Ryōmō Line"
+   ],
+   "eki_code": "eki_1134119",
+   "eki_line": "JR両毛線",
+   "code": "eki_1134119"
+  },
+  {
+   "slug": "jr-toda",
+   "name_kanji": "戸田",
+   "name_en": "Toda",
+   "yomi": null,
+   "lat": 35.817665,
+   "lon": 139.669548,
+   "lines": [
+    "JR Saikyō Line"
+   ],
+   "eki_code": "eki_1132112",
+   "eki_line": "JR埼京線",
+   "code": "eki_1132112"
+  },
+  {
+   "slug": "jr-todakoen",
+   "name_kanji": "戸田公園",
+   "name_en": "Toda-Koen",
+   "yomi": null,
+   "lat": 35.807906,
+   "lon": 139.678203,
+   "lines": [
+    "JR Saikyō Line"
+   ],
+   "eki_code": "eki_1132111",
+   "eki_line": "JR埼京線",
+   "code": "eki_1132111"
+  },
+  {
    "slug": "jr-tofukuji",
    "name_kanji": "東福寺",
    "name_en": "Tofukuji",
@@ -18670,6 +23580,20 @@
    "eki_code": "eki_1161802",
    "eki_line": "奈良線",
    "code": "eki_1161802"
+  },
+  {
+   "slug": "jr-togane",
+   "name_kanji": "東金",
+   "name_en": "Togane",
+   "yomi": null,
+   "lat": 35.560172,
+   "lon": 140.363743,
+   "lines": [
+    "JR Tōgane Line"
+   ],
+   "eki_code": "eki_1133103",
+   "eki_line": "JR東金線",
+   "code": "eki_1133103"
   },
   {
    "slug": "jr-togarinozawaonsen",
@@ -18757,6 +23681,20 @@
    "code": "eki_1122920"
   },
   {
+   "slug": "jr-tokaichiba",
+   "name_kanji": "十日市場",
+   "name_en": "Tokaichiba",
+   "yomi": null,
+   "lat": 35.526254,
+   "lon": 139.51669,
+   "lines": [
+    "JR Yokohama Line"
+   ],
+   "eki_code": "eki_1130608",
+   "eki_line": "JR横浜線",
+   "code": "eki_1130608"
+  },
+  {
    "slug": "jr-tokuan",
    "name_kanji": "徳庵",
    "name_en": "Tokuan",
@@ -18822,9 +23760,16 @@
    "lat": 35.681391,
    "lon": 139.766103,
    "lines": [
+    "JR Chūō Main Line(Tōkyō - Takao)",
+    "JR Keihin–Tōhoku Line",
+    "JR Keiyō Line",
+    "JR Sōbu Main Line(Rapid)",
     "JR Tokaido Shinkansen",
     "JR Tōhoku Shinkansen",
-    "JR Tōkaidō Main Line(Tōkyō - Atami)"
+    "JR Tōkaidō Main Line(Tōkyō - Atami)",
+    "JR Utsunomiya Line(Tōhoku Main Line)",
+    "JR Yamanote Line",
+    "JR Yokosuka Line"
    ],
    "eki_code": "eki_1130101",
    "eki_line": "JR東海道本線(東京～熱海)",
@@ -18861,6 +23806,20 @@
    "code": "eki_1140511"
   },
   {
+   "slug": "jr-tomiura",
+   "name_kanji": "富浦",
+   "name_en": "Tomiura",
+   "yomi": null,
+   "lat": 35.04614,
+   "lon": 139.837811,
+   "lines": [
+    "JR Uchibō Line"
+   ],
+   "eki_code": "eki_1132522",
+   "eki_line": "JR内房線",
+   "code": "eki_1132522"
+  },
+  {
    "slug": "jr-tomobe",
    "name_kanji": "友部",
    "name_en": "Tomobe",
@@ -18868,7 +23827,8 @@
    "lat": 36.350597,
    "lon": 140.306306,
    "lines": [
-    "JR Jōban Line(Toride - Iwaki)"
+    "JR Jōban Line(Toride - Iwaki)",
+    "JR Mito Line"
    ],
    "eki_code": "eki_1122913",
    "eki_line": "JR常磐線(取手～いわき)",
@@ -18952,12 +23912,28 @@
    "lat": 35.89553,
    "lon": 140.063004,
    "lines": [
+    "JR Jōban Line(Kita-Senju - Toride)",
+    "JR Jōban Line(Rapid)",
     "JR Jōban Line(Toride - Iwaki)",
     "Kantō Railway Jōsō Line"
    ],
    "eki_code": "eki_1122901",
    "eki_line": "JR常磐線(取手～いわき)",
    "code": "eki_1122901"
+  },
+  {
+   "slug": "jr-toro",
+   "name_kanji": "土呂",
+   "name_en": "Toro",
+   "yomi": null,
+   "lat": 35.931997,
+   "lon": 139.63214,
+   "lines": [
+    "JR Utsunomiya Line(Tōhoku Main Line)"
+   ],
+   "eki_code": "eki_1131907",
+   "eki_line": "宇都宮線",
+   "code": "eki_1131907"
   },
   {
    "slug": "jr-tosataisho",
@@ -19024,7 +24000,9 @@
    "lat": 35.400432,
    "lon": 139.534282,
    "lines": [
-    "JR Tōkaidō Main Line(Tōkyō - Atami)"
+    "JR Shōnan–Shinjuku Line",
+    "JR Tōkaidō Main Line(Tōkyō - Atami)",
+    "JR Yokosuka Line"
    ],
    "eki_code": "eki_1130106",
    "eki_line": "JR東海道本線(東京～熱海)",
@@ -19072,6 +24050,20 @@
    "eki_code": "eki_1110407",
    "eki_line": "JR室蘭本線(長万部・室蘭～苫小牧)",
    "code": "eki_1110407"
+  },
+  {
+   "slug": "jr-toyoda",
+   "name_kanji": "豊田",
+   "name_en": "Toyoda",
+   "yomi": null,
+   "lat": 35.659502,
+   "lon": 139.381495,
+   "lines": [
+    "JR Chūō Main Line(Tōkyō - Takao)"
+   ],
+   "eki_code": "eki_1131109",
+   "eki_line": "JR中央本線(東京～塩尻)",
+   "code": "eki_1131109"
   },
   {
    "slug": "jr-toyodacho",
@@ -19274,6 +24266,35 @@
    "code": "eki_1161712"
   },
   {
+   "slug": "jr-tsudanuma",
+   "name_kanji": "津田沼",
+   "name_en": "Tsudanuma",
+   "yomi": null,
+   "lat": 35.691367,
+   "lon": 140.020179,
+   "lines": [
+    "JR Sōbu Main Line(Ochanomizu - Chiba)",
+    "JR Sōbu Main Line(Rapid)"
+   ],
+   "eki_code": "eki_1131333",
+   "eki_line": "JR中央・総武線",
+   "code": "eki_1131333"
+  },
+  {
+   "slug": "jr-tsudayama",
+   "name_kanji": "津田山",
+   "name_en": "Tsudayama",
+   "yomi": null,
+   "lat": 35.604259,
+   "lon": 139.600002,
+   "lines": [
+    "JR Nambu Line"
+   ],
+   "eki_code": "eki_1130311",
+   "eki_line": "JR南武線",
+   "code": "eki_1130311"
+  },
+  {
    "slug": "jr-tsuge",
    "name_kanji": "柘植",
    "name_en": "Tsuge",
@@ -19415,6 +24436,21 @@
    "code": "eki_1162317"
   },
   {
+   "slug": "jr-tsurumi",
+   "name_kanji": "鶴見",
+   "name_en": "Tsurumi",
+   "yomi": null,
+   "lat": 35.508387,
+   "lon": 139.67614,
+   "lines": [
+    "JR Keihin–Tōhoku Line",
+    "JR Tsurumi Line"
+   ],
+   "eki_code": "eki_1130401",
+   "eki_line": "JR鶴見線",
+   "code": "eki_1130401"
+  },
+  {
    "slug": "jr-tsuruoka",
    "name_kanji": "鶴岡",
    "name_en": "Tsuruoka",
@@ -19441,6 +24477,20 @@
    "eki_code": "eki_1190646",
    "eki_line": "JR日豊本線(門司港～佐伯)",
    "code": "eki_1190646"
+  },
+  {
+   "slug": "jr-tsuruta",
+   "name_kanji": "鶴田",
+   "name_en": "Tsuruta",
+   "yomi": null,
+   "lat": 36.538319,
+   "lon": 139.858818,
+   "lines": [
+    "JR Nikkō Line"
+   ],
+   "eki_code": "eki_1134002",
+   "eki_line": "JR日光線",
+   "code": "eki_1134002"
   },
   {
    "slug": "jr-tsuwano",
@@ -19609,7 +24659,10 @@
    "lat": 35.71379,
    "lon": 139.777043,
    "lines": [
-    "JR Tōhoku Shinkansen"
+    "JR Keihin–Tōhoku Line",
+    "JR Tōhoku Shinkansen",
+    "JR Utsunomiya Line(Tōhoku Main Line)",
+    "JR Yamanote Line"
    ],
    "eki_code": "eki_1130220",
    "eki_line": "JR山手線",
@@ -19659,6 +24712,21 @@
    "code": "eki_1121450"
   },
   {
+   "slug": "jr-uguisudani",
+   "name_kanji": "鶯谷",
+   "name_en": "Uguisudani",
+   "yomi": null,
+   "lat": 35.721484,
+   "lon": 139.778015,
+   "lines": [
+    "JR Keihin–Tōhoku Line",
+    "JR Yamanote Line"
+   ],
+   "eki_code": "eki_1130219",
+   "eki_line": "JR山手線",
+   "code": "eki_1130219"
+  },
+  {
    "slug": "jr-uji",
    "name_kanji": "宇治",
    "name_en": "Uji",
@@ -19671,6 +24739,34 @@
    "eki_code": "eki_1161809",
    "eki_line": "奈良線",
    "code": "eki_1161809"
+  },
+  {
+   "slug": "jr-ujiie",
+   "name_kanji": "氏家",
+   "name_en": "Ujiie",
+   "yomi": null,
+   "lat": 36.681696,
+   "lon": 139.9621,
+   "lines": [
+    "JR Utsunomiya Line(Tōhoku Main Line)"
+   ],
+   "eki_code": "eki_1131926",
+   "eki_line": "宇都宮線",
+   "code": "eki_1131926"
+  },
+  {
+   "slug": "jr-ukimafunado",
+   "name_kanji": "浮間舟渡",
+   "name_en": "Ukimafunado",
+   "yomi": null,
+   "lat": 35.791209,
+   "lon": 139.691341,
+   "lines": [
+    "JR Saikyō Line"
+   ],
+   "eki_code": "eki_1132110",
+   "eki_line": "JR埼京線",
+   "code": "eki_1132110"
   },
   {
    "slug": "jr-umahori",
@@ -19870,6 +24966,22 @@
    "code": "eki_1134227"
   },
   {
+   "slug": "jr-urawa",
+   "name_kanji": "浦和",
+   "name_en": "Urawa",
+   "yomi": null,
+   "lat": 35.858496,
+   "lon": 139.657109,
+   "lines": [
+    "JR Keihin–Tōhoku Line",
+    "JR Shōnan–Shinjuku Line",
+    "JR Utsunomiya Line(Tōhoku Main Line)"
+   ],
+   "eki_code": "eki_1131904",
+   "eki_line": "宇都宮線",
+   "code": "eki_1131904"
+  },
+  {
    "slug": "jr-ureshinoonsen",
    "name_kanji": "嬉野温泉",
    "name_en": "Ureshino-Onsen",
@@ -19910,6 +25022,20 @@
    "eki_code": "eki_1190629",
    "eki_line": "JR日豊本線(門司港～佐伯)",
    "code": "eki_1190629"
+  },
+  {
+   "slug": "jr-ushihama",
+   "name_kanji": "牛浜",
+   "name_en": "Ushihama",
+   "yomi": null,
+   "lat": 35.734547,
+   "lon": 139.333677,
+   "lines": [
+    "JR Ōme Line"
+   ],
+   "eki_code": "eki_1131507",
+   "eki_line": "JR青梅線",
+   "code": "eki_1131507"
   },
   {
    "slug": "jr-ushiku",
@@ -19977,7 +25103,9 @@
    "lat": 36.559246,
    "lon": 139.898389,
    "lines": [
-    "JR Tōhoku Shinkansen"
+    "JR Nikkō Line",
+    "JR Tōhoku Shinkansen",
+    "JR Utsunomiya Line(Tōhoku Main Line)"
    ],
    "eki_code": "eki_1131923",
    "eki_line": "宇都宮線",
@@ -20268,6 +25396,20 @@
    "code": "eki_1120418"
   },
   {
+   "slug": "jr-yabe",
+   "name_kanji": "矢部",
+   "name_en": "Yabe",
+   "yomi": null,
+   "lat": 35.573275,
+   "lon": 139.386373,
+   "lines": [
+    "JR Yokohama Line"
+   ],
+   "eki_code": "eki_1130614",
+   "eki_line": "JR横浜線",
+   "code": "eki_1130614"
+  },
+  {
    "slug": "jr-yabu",
    "name_kanji": "養父",
    "name_en": "Yabu",
@@ -20324,6 +25466,48 @@
    "code": "eki_1140114"
   },
   {
+   "slug": "jr-yachimata",
+   "name_kanji": "八街",
+   "name_en": "Yachimata",
+   "yomi": null,
+   "lat": 35.663228,
+   "lon": 140.317304,
+   "lines": [
+    "JR Sōbu Main Line(Chiba - Chōshi)"
+   ],
+   "eki_code": "eki_1131418",
+   "eki_line": "JR総武本線",
+   "code": "eki_1131418"
+  },
+  {
+   "slug": "jr-yagawa",
+   "name_kanji": "矢川",
+   "name_en": "Yagawa",
+   "yomi": null,
+   "lat": 35.685079,
+   "lon": 139.431611,
+   "lines": [
+    "JR Nambu Line"
+   ],
+   "eki_code": "eki_1130323",
+   "eki_line": "JR南武線",
+   "code": "eki_1130323"
+  },
+  {
+   "slug": "jr-yagihara",
+   "name_kanji": "八木原",
+   "name_en": "Yagihara",
+   "yomi": null,
+   "lat": 36.463738,
+   "lon": 139.019239,
+   "lines": [
+    "JR Jōetsu Line(Takasaki - Minakami)"
+   ],
+   "eki_code": "eki_1134206",
+   "eki_line": "JR上越線",
+   "code": "eki_1134206"
+  },
+  {
    "slug": "jr-yahata",
    "name_kanji": "八幡",
    "name_en": "Yahata",
@@ -20352,6 +25536,34 @@
    "code": "eki_1141001"
   },
   {
+   "slug": "jr-yaho",
+   "name_kanji": "谷保",
+   "name_en": "Yaho",
+   "yomi": null,
+   "lat": 35.681377,
+   "lon": 139.446724,
+   "lines": [
+    "JR Nambu Line"
+   ],
+   "eki_code": "eki_1130322",
+   "eki_line": "JR南武線",
+   "code": "eki_1130322"
+  },
+  {
+   "slug": "jr-yaita",
+   "name_kanji": "矢板",
+   "name_en": "Yaita",
+   "yomi": null,
+   "lat": 36.80655,
+   "lon": 139.932912,
+   "lines": [
+    "JR Utsunomiya Line(Tōhoku Main Line)"
+   ],
+   "eki_code": "eki_1131929",
+   "eki_line": "宇都宮線",
+   "code": "eki_1131929"
+  },
+  {
    "slug": "jr-yaizu",
    "name_kanji": "焼津",
    "name_en": "Yaizu",
@@ -20364,6 +25576,20 @@
    "eki_code": "eki_1150121",
    "eki_line": "JR東海道本線(熱海～浜松)",
    "code": "eki_1150121"
+  },
+  {
+   "slug": "jr-yako",
+   "name_kanji": "矢向",
+   "name_en": "Yako",
+   "yomi": null,
+   "lat": 35.539408,
+   "lon": 139.68055,
+   "lines": [
+    "JR Nambu Line"
+   ],
+   "eki_code": "eki_1130303",
+   "eki_line": "JR南武線",
+   "code": "eki_1130303"
   },
   {
    "slug": "jr-yakujin",
@@ -20538,6 +25764,20 @@
    "code": "eki_1123024"
   },
   {
+   "slug": "jr-yamate",
+   "name_kanji": "山手",
+   "name_en": "Yamate",
+   "yomi": null,
+   "lat": 35.426891,
+   "lon": 139.646425,
+   "lines": [
+    "JR Negishi Line"
+   ],
+   "eki_code": "eki_1130705",
+   "eki_line": "JR根岸線",
+   "code": "eki_1130705"
+  },
+  {
    "slug": "jr-yamatokoizumi",
    "name_kanji": "大和小泉",
    "name_en": "Yamato-Koizumi",
@@ -20620,6 +25860,20 @@
    "eki_code": "eki_1171628",
    "eki_line": "JR呉線",
    "code": "eki_1171628"
+  },
+  {
+   "slug": "jr-yanoguchi",
+   "name_kanji": "矢野口",
+   "name_en": "Yanokuchi",
+   "yomi": null,
+   "lat": 35.641305,
+   "lon": 139.520849,
+   "lines": [
+    "JR Nambu Line"
+   ],
+   "eki_code": "eki_1130317",
+   "eki_line": "JR南武線",
+   "code": "eki_1130317"
   },
   {
    "slug": "jr-yao",
@@ -20763,6 +26017,20 @@
    "code": "eki_1110216"
   },
   {
+   "slug": "jr-yokaichiba",
+   "name_kanji": "八日市場",
+   "name_en": "Yokaichiba",
+   "yomi": null,
+   "lat": 35.699317,
+   "lon": 140.552419,
+   "lines": [
+    "JR Sōbu Main Line(Chiba - Chōshi)"
+   ],
+   "eki_code": "eki_1131424",
+   "eki_line": "JR総武本線",
+   "code": "eki_1131424"
+  },
+  {
    "slug": "jr-yokkaichi",
    "name_kanji": "四日市",
    "name_en": "Yokkaichi",
@@ -20775,6 +26043,20 @@
    "eki_code": "eki_1150812",
    "eki_line": "JR関西本線(名古屋～亀山)",
    "code": "eki_1150812"
+  },
+  {
+   "slug": "jr-yokodai",
+   "name_kanji": "洋光台",
+   "name_en": "Yokodai",
+   "yomi": null,
+   "lat": 35.378785,
+   "lon": 139.596852,
+   "lines": [
+    "JR Negishi Line"
+   ],
+   "eki_code": "eki_1130709",
+   "eki_line": "JR根岸線",
+   "code": "eki_1130709"
   },
   {
    "slug": "jr-yokogawa",
@@ -20799,7 +26081,11 @@
    "lat": 35.466195,
    "lon": 139.622704,
    "lines": [
-    "JR Tōkaidō Main Line(Tōkyō - Atami)"
+    "JR Keihin–Tōhoku Line",
+    "JR Negishi Line",
+    "JR Shōnan–Shinjuku Line",
+    "JR Tōkaidō Main Line(Tōkyō - Atami)",
+    "JR Yokosuka Line"
    ],
    "eki_code": "eki_1130105",
    "eki_line": "JR東海道本線(東京～熱海)",
@@ -20813,11 +26099,40 @@
    "lat": 36.336009,
    "lon": 138.737926,
    "lines": [
-    "JR Shin&apos;etsu Main Line(Yokokawa - Shinonoi)"
+    "JR Shin&apos;etsu Main Line(Yokokawa - Shinonoi)",
+    "JR Shin'etsu Main Line(Takasaki - Yokokawa)"
    ],
    "eki_code": "eki_1133708",
    "eki_line": "JR信越本線",
    "code": "eki_1133708"
+  },
+  {
+   "slug": "jr-yokoshiba",
+   "name_kanji": "横芝",
+   "name_en": "Yokoshiba",
+   "yomi": null,
+   "lat": 35.661739,
+   "lon": 140.490736,
+   "lines": [
+    "JR Sōbu Main Line(Chiba - Chōshi)"
+   ],
+   "eki_code": "eki_1131422",
+   "eki_line": "JR総武本線",
+   "code": "eki_1131422"
+  },
+  {
+   "slug": "jr-yokosuka",
+   "name_kanji": "横須賀",
+   "name_en": "Yokosuka",
+   "yomi": null,
+   "lat": 35.284022,
+   "lon": 139.655855,
+   "lines": [
+    "JR Yokosuka Line"
+   ],
+   "eki_code": "eki_1130816",
+   "eki_line": "JR横須賀線",
+   "code": "eki_1130816"
   },
   {
    "slug": "jr-yokote",
@@ -20867,6 +26182,34 @@
    "code": "eki_1121609"
   },
   {
+   "slug": "jr-yono",
+   "name_kanji": "与野",
+   "name_en": "Yono",
+   "yomi": null,
+   "lat": 35.884393,
+   "lon": 139.639085,
+   "lines": [
+    "JR Keihin–Tōhoku Line"
+   ],
+   "eki_code": "eki_1133203",
+   "eki_line": "JR京浜東北線",
+   "code": "eki_1133203"
+  },
+  {
+   "slug": "jr-yonohoncho",
+   "name_kanji": "与野本町",
+   "name_en": "Yono-Hommachi",
+   "yomi": null,
+   "lat": 35.880968,
+   "lon": 139.626075,
+   "lines": [
+    "JR Saikyō Line"
+   ],
+   "eki_code": "eki_1132117",
+   "eki_line": "JR埼京線",
+   "code": "eki_1132117"
+  },
+  {
    "slug": "jr-yoshida",
    "name_kanji": "吉田",
    "name_en": "Yoshida",
@@ -20880,6 +26223,34 @@
    "eki_code": "eki_1140818",
    "eki_line": "JR越後線",
    "code": "eki_1140818"
+  },
+  {
+   "slug": "jr-yoshikawa",
+   "name_kanji": "吉川",
+   "name_en": "Yoshikawa",
+   "yomi": null,
+   "lat": 35.87662,
+   "lon": 139.843162,
+   "lines": [
+    "JR Musashino Line"
+   ],
+   "eki_code": "eki_1130515",
+   "eki_line": "JR武蔵野線",
+   "code": "eki_1130515"
+  },
+  {
+   "slug": "jr-yoshikawaminami",
+   "name_kanji": "吉川美南",
+   "name_en": "Yoshikawaminami",
+   "yomi": null,
+   "lat": 35.868056,
+   "lon": 139.858167,
+   "lines": [
+    "JR Musashino Line"
+   ],
+   "eki_code": "eki_1130526",
+   "eki_line": "JR武蔵野線",
+   "code": "eki_1130526"
   },
   {
    "slug": "jr-yoshinogarikoen",
@@ -20925,6 +26296,20 @@
    "code": "eki_1190230"
   },
   {
+   "slug": "jr-yotsukaido",
+   "name_kanji": "四街道",
+   "name_en": "Yotsukaido",
+   "yomi": null,
+   "lat": 35.662756,
+   "lon": 140.165023,
+   "lines": [
+    "JR Sōbu Main Line(Chiba - Chōshi)"
+   ],
+   "eki_code": "eki_1131413",
+   "eki_line": "JR総武本線",
+   "code": "eki_1131413"
+  },
+  {
    "slug": "jr-yotsukura",
    "name_kanji": "四ツ倉",
    "name_en": "Yotsukura",
@@ -20937,6 +26322,35 @@
    "eki_code": "eki_1123003",
    "eki_line": "JR常磐線(いわき～仙台)",
    "code": "eki_1123003"
+  },
+  {
+   "slug": "jr-yotsuya",
+   "name_kanji": "四ツ谷",
+   "name_en": "Yotsuya",
+   "yomi": null,
+   "lat": 35.686041,
+   "lon": 139.730644,
+   "lines": [
+    "JR Chūō Main Line(Tōkyō - Takao)"
+   ],
+   "eki_code": "eki_1131102",
+   "eki_line": "JR中央本線(東京～塩尻)",
+   "code": "eki_1131102"
+  },
+  {
+   "slug": "jr-yoyogi",
+   "name_kanji": "代々木",
+   "name_en": "Yoyogi",
+   "yomi": null,
+   "lat": 35.683061,
+   "lon": 139.702042,
+   "lines": [
+    "JR Chūō Main Line(Tōkyō - Takao)",
+    "JR Yamanote Line"
+   ],
+   "eki_code": "eki_1130207",
+   "eki_line": "JR山手線",
+   "code": "eki_1130207"
   },
   {
    "slug": "jr-yudaonsen",
@@ -20995,6 +26409,20 @@
    "code": "eki_1171507"
   },
   {
+   "slug": "jr-yuki",
+   "name_kanji": "結城",
+   "name_en": "Yuki",
+   "yomi": null,
+   "lat": 36.298056,
+   "lon": 139.873028,
+   "lines": [
+    "JR Mito Line"
+   ],
+   "eki_code": "eki_1133903",
+   "eki_line": "JR水戸線",
+   "code": "eki_1133903"
+  },
+  {
    "slug": "jr-yukuhashi",
    "name_kanji": "行橋",
    "name_en": "Yukuhashi",
@@ -21021,6 +26449,21 @@
    "eki_code": "eki_1122933",
    "eki_line": "JR常磐線(取手～いわき)",
    "code": "eki_1122933"
+  },
+  {
+   "slug": "jr-yurakucho",
+   "name_kanji": "有楽町",
+   "name_en": "Yurakucho",
+   "yomi": null,
+   "lat": 35.675441,
+   "lon": 139.763806,
+   "lines": [
+    "JR Keihin–Tōhoku Line",
+    "JR Yamanote Line"
+   ],
+   "eki_code": "eki_1130225",
+   "eki_line": "JR山手線",
+   "code": "eki_1130225"
   },
   {
    "slug": "jr-yuza",
@@ -21091,6 +26534,20 @@
    "eki_code": "eki_1160117",
    "eki_line": "琵琶湖線",
    "code": "eki_1160117"
+  },
+  {
+   "slug": "jr-zushi",
+   "name_kanji": "逗子",
+   "name_en": "Zushi",
+   "yomi": null,
+   "lat": 35.297392,
+   "lon": 139.578292,
+   "lines": [
+    "JR Yokosuka Line"
+   ],
+   "eki_code": "eki_1130813",
+   "eki_line": "JR横須賀線",
+   "code": "eki_1130813"
   },
   {
    "slug": "jre-kuji,santetsu-kuji",
@@ -21167,20 +26624,6 @@
    "code": "eki_9992116"
   },
   {
-   "slug": "jrk-kobayashi",
-   "name_kanji": "小林",
-   "name_en": "Kobayashi",
-   "yomi": null,
-   "lat": 35.830783,
-   "lon": 140.193028,
-   "lines": [
-    "JR Kitto Line"
-   ],
-   "eki_code": "eki_1132726",
-   "eki_line": "JR成田線",
-   "code": "eki_1132726"
-  },
-  {
    "slug": "jrk-sendai",
    "name_kanji": "川内",
    "name_en": "Sendai",
@@ -21226,20 +26669,6 @@
    "code": "eki_1130103"
   },
   {
-   "slug": "jrt-shinyokohama",
-   "name_kanji": "新横浜",
-   "name_en": "Shin-Yokohama",
-   "yomi": "JR東海",
-   "lat": 35.506824,
-   "lon": 139.617348,
-   "lines": [
-    "JR Tokaido Shinkansen"
-   ],
-   "eki_code": "eki_1130604",
-   "eki_line": "JR横浜線",
-   "code": "eki_1130604"
-  },
-  {
    "slug": "jrw-aino",
    "name_kanji": "相野",
    "name_en": "Aino",
@@ -21283,20 +26712,6 @@
    "code": "eki_9990503"
   },
   {
-   "slug": "jrw-hashimoto",
-   "name_kanji": "橋本",
-   "name_en": "Hashimoto",
-   "yomi": null,
-   "lat": 35.594975,
-   "lon": 139.344586,
-   "lines": [
-    "JR Wakayama Line"
-   ],
-   "eki_code": "eki_1130616",
-   "eki_line": "JR横浜線",
-   "code": "eki_1130616"
-  },
-  {
    "slug": "jrw-kamo",
    "name_kanji": "加茂",
    "name_en": "Kamo",
@@ -21324,20 +26739,6 @@
    "eki_code": "eki_1151105",
    "eki_line": "JR草津線",
    "code": "eki_1151105"
-  },
-  {
-   "slug": "jrw-nozaki",
-   "name_kanji": "野崎",
-   "name_en": "Nozaki",
-   "yomi": null,
-   "lat": 36.843722,
-   "lon": 139.957752,
-   "lines": [
-    "JR Gakkentoshi Line(Katamachi Line)"
-   ],
-   "eki_code": "eki_1131930",
-   "eki_line": "宇都宮線",
-   "code": "eki_1131930"
   },
   {
    "slug": "jrw-oji",
@@ -21480,20 +26881,6 @@
    "eki_code": "eki_9931903",
    "eki_line": "関東鉄道竜ヶ崎線",
    "code": "eki_9931903"
-  },
-  {
-   "slug": "kanto-shimodate",
-   "name_kanji": "下館",
-   "name_en": "Shimodate",
-   "yomi": null,
-   "lat": 36.304197,
-   "lon": 139.97866,
-   "lines": [
-    "Kantō Railway Jōsō Line"
-   ],
-   "eki_code": "eki_1133907",
-   "eki_line": "JR水戸線",
-   "code": "eki_1133907"
   },
   {
    "slug": "kanto-shinmoriya",
@@ -22428,20 +27815,6 @@
    "code": "eki_9933007"
   },
   {
-   "slug": "moka-motegi",
-   "name_kanji": "茂木",
-   "name_en": "Motegi",
-   "yomi": null,
-   "lat": 36.530851,
-   "lon": 140.181382,
-   "lines": [
-    "Mooka Railway Mooka Line"
-   ],
-   "eki_code": "eki_9933017",
-   "eki_line": "真岡鐵道真岡線",
-   "code": "eki_9933017"
-  },
-  {
    "slug": "mr-imari",
    "name_kanji": "伊万里",
    "name_en": "Imari",
@@ -22569,6 +27942,48 @@
    "eki_code": "eki_9931505",
    "eki_line": "ひたちなか海浜鉄道湊線",
    "code": "eki_9931505"
+  },
+  {
+   "slug": "nankai-kishinosatotamade",
+   "name_kanji": "岸里玉出",
+   "name_en": "Kishinosato-Tamade",
+   "yomi": null,
+   "lat": 34.628291,
+   "lon": 135.494388,
+   "lines": [
+    "Nankai Main Line"
+   ],
+   "eki_code": "eki_3200104",
+   "eki_line": "南海本線",
+   "code": "eki_3200104"
+  },
+  {
+   "slug": "nankai-shinimamiya",
+   "name_kanji": "新今宮",
+   "name_en": "Shin-Imamiya",
+   "yomi": null,
+   "lat": 34.650429,
+   "lon": 135.500302,
+   "lines": [
+    "Nankai Main Line"
+   ],
+   "eki_code": "eki_3200102",
+   "eki_line": "南海本線",
+   "code": "eki_3200102"
+  },
+  {
+   "slug": "nankai-tengachaya",
+   "name_kanji": "天下茶屋",
+   "name_en": "Tengachaya",
+   "yomi": null,
+   "lat": 34.636847,
+   "lon": 135.496673,
+   "lines": [
+    "Nankai Main Line"
+   ],
+   "eki_code": "eki_3200103",
+   "eki_line": "南海本線",
+   "code": "eki_3200103"
   },
   {
    "slug": "ngr-minamikariyasu",
@@ -22919,20 +28334,6 @@
    "eki_code": "eki_9960109",
    "eki_line": "近江鉄道本線",
    "code": "eki_9960109"
-  },
-  {
-   "slug": "omi-hino",
-   "name_kanji": "日野",
-   "name_en": "Hino",
-   "yomi": null,
-   "lat": 35.679244,
-   "lon": 139.39393,
-   "lines": [
-    "Ohmi Railway Main Line"
-   ],
-   "eki_code": "eki_1131108",
-   "eki_line": "JR中央本線(東京～塩尻)",
-   "code": "eki_1131108"
   },
   {
    "slug": "omi-kibukawa",
@@ -23286,20 +28687,6 @@
    "eki_code": "eki_9933302",
    "eki_line": "流鉄流山線",
    "code": "eki_9933302"
-  },
-  {
-   "slug": "ryu-mabashi",
-   "name_kanji": "馬橋",
-   "name_en": "Mabashi",
-   "yomi": null,
-   "lat": 35.811682,
-   "lon": 139.917305,
-   "lines": [
-    "Ryutetsu Nagareyama Line"
-   ],
-   "eki_code": "eki_1132011",
-   "eki_line": "JR常磐線(上野～取手)",
-   "code": "eki_1132011"
   },
   {
    "slug": "ryu-nagareyama",
@@ -23904,20 +29291,6 @@
    "code": "eki_9930704"
   },
   {
-   "slug": "sr-higashikawaguchi",
-   "name_kanji": "東川口",
-   "name_en": "Higashi-Kawaguchi",
-   "yomi": null,
-   "lat": 35.875246,
-   "lon": 139.744087,
-   "lines": [
-    "Saitama Railway Saitama Stadium Line"
-   ],
-   "eki_code": "eki_1130513",
-   "eki_line": "JR武蔵野線",
-   "code": "eki_1130513"
-  },
-  {
    "slug": "sr-kawaguchimotogo",
    "name_kanji": "川口元郷",
    "name_en": "Kawaguchi-motogo",
@@ -24451,6 +29824,90 @@
    "eki_code": "eki_9981405",
    "eki_line": "中村線",
    "code": "eki_9981405"
+  },
+  {
+   "slug": "tobu-fujinoushijima",
+   "name_kanji": "藤の牛島",
+   "name_en": "Tobu Fujino-ushijima",
+   "yomi": null,
+   "lat": 35.98026,
+   "lon": 139.778038,
+   "lines": [
+    "Tōbu Urban Park Line(Noda Line)"
+   ],
+   "eki_code": "eki_2100411",
+   "eki_line": "東武アーバンパークライン（東武野田線）",
+   "code": "eki_2100411"
+  },
+  {
+   "slug": "tobu-iwatsuki",
+   "name_kanji": "岩槻",
+   "name_en": "Tobu Iwatsuki",
+   "yomi": null,
+   "lat": 35.950239,
+   "lon": 139.693197,
+   "lines": [
+    "Tōbu Urban Park Line(Noda Line)"
+   ],
+   "eki_code": "eki_2100406",
+   "eki_line": "東武アーバンパークライン（東武野田線）",
+   "code": "eki_2100406"
+  },
+  {
+   "slug": "tobu-kasukabe",
+   "name_kanji": "春日部",
+   "name_en": "Tobu Kasukabe",
+   "yomi": null,
+   "lat": 35.980095,
+   "lon": 139.752345,
+   "lines": [
+    "Tōbu Urban Park Line(Noda Line)"
+   ],
+   "eki_code": "eki_2100227",
+   "eki_line": "東武伊勢崎線",
+   "code": "eki_2100227"
+  },
+  {
+   "slug": "tobu-nagareyamaotakanomori",
+   "name_kanji": "流山おおたかの森",
+   "name_en": "Tobu Nagareyama-otakanomori",
+   "yomi": null,
+   "lat": 35.872051,
+   "lon": 139.925898,
+   "lines": [
+    "Tōbu Urban Park Line(Noda Line)"
+   ],
+   "eki_code": "eki_2100422",
+   "eki_line": "東武アーバンパークライン（東武野田線）",
+   "code": "eki_2100422"
+  },
+  {
+   "slug": "tobu-nodashi",
+   "name_kanji": "野田市",
+   "name_en": "Tobu Nodashi",
+   "yomi": null,
+   "lat": 35.943652,
+   "lon": 139.870728,
+   "lines": [
+    "Tōbu Urban Park Line(Noda Line)"
+   ],
+   "eki_code": "eki_2100417",
+   "eki_line": "東武アーバンパークライン（東武野田線）",
+   "code": "eki_2100417"
+  },
+  {
+   "slug": "tobu-toyoshiki",
+   "name_kanji": "豊四季",
+   "name_en": "Tobu Toyoshiki",
+   "yomi": null,
+   "lat": 35.86657,
+   "lon": 139.93929,
+   "lines": [
+    "Tōbu Urban Park Line(Noda Line)"
+   ],
+   "eki_code": "eki_2100423",
+   "eki_line": "東武アーバンパークライン（東武野田線）",
+   "code": "eki_2100423"
   },
   {
    "slug": "torokko-arashiyama",
