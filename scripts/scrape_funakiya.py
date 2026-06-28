@@ -102,25 +102,39 @@ def enumerate_lines():
     return sorted(slugs)
 
 def parse_stations(html, lang):
-    """Extract station entries from a line page (EN or JP)."""
+    """Extract station entries from a line page (EN or JP).
+
+    Each <li> anchors either to the station's detail page (<a href="...">,
+    giving a jp_slug we later fetch for kanji/coords) or, for stamps that have
+    no detail page yet, to an in-page bookmark (<a name="04">, no slug).
+
+    Titles may carry a trailing station-number suffix, e.g. on subway lines
+    "Toei Subway Shinjuku-nishiguchi Station stamp (E01)" — that parenthetical
+    must be stripped before matching, otherwise whole lines (the entire Toei
+    Oedo/Mita/Shinjuku/Asakusa subways) are silently dropped."""
     out = []
     for ul in re.findall(r'<ul class="allArticleList[^"]*">(.*?)</ul>', html, re.S):
-        for href, inner in re.findall(r'<li>\s*<a href="([^"]+)">(.*?)</a>\s*</li>', ul, re.S):
+        for href, inner in re.findall(
+                r'<li>\s*<a (?:href="([^"]*)"|name="[^"]*")>(.*?)</a>\s*</li>',
+                ul, re.S):
             h3 = re.search(r'<h3 class="title">([^<]*)</h3>', inner)
             if not h3:
                 continue
             name = h3.group(1).strip()
             if lang == "en":
-                if not name.endswith("Station stamp"):
+                m = re.match(r'(.*Station) stamp(?:\s*[（(][^）)]+[）)])?\s*$', name)
+                if not m:
                     continue
-                name_en, name_kanji = name[:-len(" stamp")].strip(), None
+                name_en, name_kanji = m.group(1).strip(), None
             else:
-                if not (name.endswith("のスタンプ") and "駅" in name):
+                m = re.match(r'(.+?駅)のスタンプ(?:\s*[（(][^）)]+[）)])?\s*$', name)
+                if not m:
                     continue
-                name_en, name_kanji = None, name[:-len("のスタンプ")].strip()
+                name_en, name_kanji = None, m.group(1).strip()
             cls = re.search(r'<span class="lo0(\d)"', inner)
+            slug = href.split("/")[-1].replace(".html", "") if href else None
             out.append({
-                "jp_slug": href.split("/")[-1].replace(".html",""),
+                "jp_slug": slug,             # None when the stamp has no detail page
                 "name_full": name_en,        # English label incl. "Station" (EN pages only)
                 "name_kanji": name_kanji,    # kanji label incl. "駅" (JP pages only)
                 "status": STATUS.get(cls.group(1), "") if cls else "",
