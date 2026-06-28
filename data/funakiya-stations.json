@@ -1721,6 +1721,13 @@
   "lon": null,
   "en": null
  },
+ "jnr-embetsu": {
+  "kanji": "国鉄遠別駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null,
+  "en": null
+ },
  "jnr-fudai": {
   "kanji": "国鉄普代駅",
   "yomi": null,
@@ -1737,6 +1744,13 @@
  },
  "jnr-gujohachiman": {
   "kanji": "国鉄郡上八幡駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null,
+  "en": null
+ },
+ "jnr-haboro": {
+  "kanji": "国鉄羽幌駅",
   "yomi": null,
   "lat": null,
   "lon": null,
@@ -2022,6 +2036,13 @@
   "lon": 142.959861,
   "en": "JNR Omu Station"
  },
+ "jnr-onishika": {
+  "kanji": "国鉄鬼鹿駅",
+  "yomi": null,
+  "lat": 44.149444,
+  "lon": 141.655972,
+  "en": "JNR Onishika Station"
+ },
  "jnr-osumikoyama": {
   "kanji": "国鉄大隅高山駅",
   "yomi": null,
@@ -2078,6 +2099,13 @@
   "lon": 141.07975,
   "en": "JNR Shin-Ōtaki Station"
  },
+ "jnr-shosambetsu": {
+  "kanji": "国鉄初山別駅",
+  "yomi": null,
+  "lat": 44.532944,
+  "lon": 141.768278,
+  "en": "JNR Shosambetsu Station"
+ },
  "jnr-sobetsu": {
   "kanji": "国鉄壮瞥駅",
   "yomi": null,
@@ -2119,6 +2147,13 @@
   "lat": 31.494889,
   "lon": 130.702556,
   "en": "JNR Tarumizu Station"
+ },
+ "jnr-teshio": {
+  "kanji": "国鉄天塩駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null,
+  "en": "JNR Teshio Station"
  },
  "jnr-tokachimitsumata": {
   "kanji": "国鉄十勝三股駅",
