@@ -56,7 +56,8 @@ def parse(slug,h):
 
 def main():
     raw=json.load(open("data/funakiya-raw.json",encoding="utf-8"))
-    slugs=sorted({s["jp_slug"] for l in raw["lines"] for s in l["stations"] if s["status"]=="Found"})
+    slugs=sorted({s["jp_slug"] for l in raw["lines"] for s in l["stations"]
+                  if s["status"]=="Found" and s["jp_slug"]})
     print(f"fetching {len(slugs)} JP pages ...")
     out={}; done=[0]
     def work(slug):
