@@ -954,7 +954,7 @@
     // App version — shown discreetly on the welcome modal. Bump on every merge
     // to main. It is also part of the station-cache key, so each release
     // invalidates the 7-day IndexedDB cache and users immediately get fresh data.
-    const APP_VERSION       = 'v1.0.8';
+    const APP_VERSION       = 'v1.0.9';
     const CACHE_TTL         = 7 * 24 * 60 * 60 * 1000;  // 7 days
     const BATCH_SIZE        = 150;      // features per animation frame (line rendering)
     const SYNC_DEBOUNCE_MS  = 2000;     // ms after last stamp change before auto-save
@@ -962,12 +962,13 @@
     const POPUP_GRACE_MS    = 250;      // ms grace period before hover-opened popup auto-closes
     const SEARCH_JUMP_MS    = 300;      // ms before popup opens after search jump
     const FOCUS_DELAY_MS    = 100;      // ms before focusing modal input (after paint)
-    const MARKER_MIN_R      = 4;        // minimum circle radius on desktop
-    const MARKER_MIN_R_TOUCH = 8;       // minimum circle radius on touch devices
+    const MARKER_BASE_R     = 4;        // circle radius at ZOOM_BASE on desktop
+    const MARKER_BASE_R_TOUCH = 8;      // circle radius at ZOOM_BASE on touch (tappable)
+    const MARKER_ABS_MIN    = 1.4;      // hard floor so dots stay visible but don't blob when zoomed out
     const MARKER_COLL_BONUS = 3;        // extra radius for collected markers
     const MARKER_MAX_R      = 18;       // cap radius at high zoom to avoid clutter
-    const ZOOM_BASE         = 12;       // zoom at which radius = MARKER_MIN_R
-    const ZOOM_SCALE        = 1.18;     // radius multiplier per zoom step above ZOOM_BASE
+    const ZOOM_BASE         = 12;       // zoom at which radius = MARKER_BASE_R
+    const ZOOM_SCALE        = 1.18;     // radius multiplier per zoom step away from ZOOM_BASE
     const MAX_SUGGESTIONS   = 6;
     const RESET_CONFIRM_MS  = 3000;     // window for second click on destructive action
     const MAX_ZOOM          = 19;       // maximum tile zoom level
@@ -1379,8 +1380,12 @@
     };
 
     const markerRadius = (collected, zoom) => {
-        const minR = IS_TOUCH ? MARKER_MIN_R_TOUCH : MARKER_MIN_R;
-        const r    = Math.min(MARKER_MAX_R, Math.max(minR, Math.round(MARKER_MIN_R * Math.pow(ZOOM_SCALE, zoom - ZOOM_BASE))));
+        // Single smooth exponential anchored at the device base size, so dots
+        // shrink as you zoom OUT (down to MARKER_ABS_MIN) instead of staying a
+        // flat ~8px and merging into one blob over the whole country.
+        const base = (IS_TOUCH ? MARKER_BASE_R_TOUCH : MARKER_BASE_R)
+                     * Math.pow(ZOOM_SCALE, zoom - ZOOM_BASE);
+        const r = Math.min(MARKER_MAX_R, Math.max(MARKER_ABS_MIN, base));
         return collected ? r + MARKER_COLL_BONUS : r;
     };
 
