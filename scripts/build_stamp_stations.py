@@ -172,6 +172,7 @@ for line in raw["lines"]:
     for st in line["stations"]:
         if st["status"] != "Found": continue
         slug = st["jp_slug"]
+        if not slug: continue              # stamp has no detail page -> no coords
         a = agg.setdefault(slug, {"name_full": None, "lines": set()})
         if st.get("name_full") and not a["name_full"]:
             a["name_full"] = st["name_full"]   # prefer the English line-page label
