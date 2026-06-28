@@ -83,7 +83,7 @@
             z-index: var(--z-map-ui);
             display: flex; align-items: flex-start; gap: 8px;
         }
-        #search-container { position: relative; flex: 1 1 auto; min-width: 0; max-width: 360px; }
+        #search-container { position: relative; flex: 1 1 0; min-width: 0; max-width: 360px; }
         #search-wrap {
             display: flex; align-items: center; gap: 8px;
             background: var(--surface); border: 1px solid var(--border);
@@ -93,7 +93,7 @@
         #search-wrap:focus-within { border-color: var(--accent); }
         #search-icon { color: var(--muted); flex-shrink: 0; }
         #stationSearch {
-            flex: 1; background: none; border: none; outline: none;
+            flex: 1; min-width: 0; width: 100%; background: none; border: none; outline: none;
             font-family: var(--ui-font); font-size: 13px; color: var(--text);
         }
         #stationSearch::placeholder { color: var(--muted); }
@@ -944,7 +944,7 @@
     // App version — shown discreetly on the welcome modal. Bump on every merge
     // to main. It is also part of the station-cache key, so each release
     // invalidates the 7-day IndexedDB cache and users immediately get fresh data.
-    const APP_VERSION       = 'v1.0.0';
+    const APP_VERSION       = 'v1.0.1';
     const CACHE_TTL         = 7 * 24 * 60 * 60 * 1000;  // 7 days
     const BATCH_SIZE        = 150;      // features per animation frame (line rendering)
     const SYNC_DEBOUNCE_MS  = 2000;     // ms after last stamp change before auto-save
@@ -1250,9 +1250,17 @@
     };
 
     /** Repaint all station markers on top of lines (they were added first to the canvas). */
+    // Collected (gold) markers are drawn last so they sit on top of grey ones —
+    // makes progress easy to see when zoomed out and markers overlap.
+    const bringCollectedToFront = () => {
+        if (!mapInstance) return;
+        markers.forEach(m => { if (m._isCollected) m.bringToFront(); });
+    };
+
     const bringStationsToFront = () => {
         if (!mapInstance) return;
         markers.forEach(m => { m.removeFrom(mapInstance); m.addTo(mapInstance); });
+        bringCollectedToFront();
     };
 
     const loadLines = async (map) => {
@@ -1456,6 +1464,7 @@
             m.setStyle(circleStyle(m._isCollected, zoom));
             m.setPopupContent(buildPopupHtml(m));
         });
+        bringCollectedToFront();
         updateStats();
     };
 
@@ -1482,8 +1491,10 @@
                 zoomDebounce = setTimeout(() => {
                     const zoom = map.getZoom();
                     markers.forEach(m => m.setStyle(circleStyle(m._isCollected, zoom)));
+                    bringCollectedToFront();
                 }, 150);
             });
+            bringCollectedToFront();
             updateStats();
             hideLoading();
         };
@@ -1857,6 +1868,7 @@
             state.stamps[next ? 'add' : 'delete'](marker._stationData.code);
             scheduleSave();
             marker.setStyle(circleStyle(next, map.getZoom()));
+            if (next) marker.bringToFront();   // gold marker on top of grey ones
             // Update button in-place without rebuilding popup
             btn.className   = 'popup-collect-btn' + (next ? ' collected' : '');
             const ariaName = state.lang === 'jp' ? (marker.stationNameJP || marker.stationNameEN)
