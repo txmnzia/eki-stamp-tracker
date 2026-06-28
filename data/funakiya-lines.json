@@ -76,7 +76,7 @@
   "name_kanji": "北海道ちほく高原鉄道ふるさと銀河線"
  },
  "dowa-katakami-line": {
-  "name_en": null,
+  "name_en": "Katakami Railway Line",
   "name_kanji": "同和鉱業片上鉄道線"
  },
  "echizen-katsuyamaeiheiji-line": {
@@ -316,7 +316,7 @@
   "name_kanji": "国鉄三木線"
  },
  "jnr-mikuni-line": {
-  "name_en": null,
+  "name_en": "JNR Mikuni Line",
   "name_kanji": "国鉄三国線"
  },
  "jnr-miyahara-line": {
@@ -364,11 +364,11 @@
   "name_kanji": "国鉄清水港線"
  },
  "jnr-shokotsu-line": {
-  "name_en": null,
+  "name_en": "JNR Shokotsu Line",
   "name_kanji": "国鉄渚滑線"
  },
  "jnr-takamori-line": {
-  "name_en": null,
+  "name_en": "JNR Takamori Line",
   "name_kanji": "国鉄高森線"
  },
  "jnr-tarumi-line": {
@@ -468,7 +468,7 @@
   "name_kanji": "JR中央本線"
  },
  "jr-chuo-tatsuno-line": {
-  "name_en": null,
+  "name_en": "JR Chūō Main Line(Tatsuno Branch Line)",
   "name_kanji": "JR中央本線辰野支線"
  },
  "jr-chuoeast-line": {
@@ -1540,15 +1540,15 @@
   "name_kanji": "鹿島臨海鉄道線"
  },
  "keihan-ishiyamasakamoto-line": {
-  "name_en": null,
+  "name_en": "Keihan Ishiyama Sakamoto Line",
   "name_kanji": "京阪電鉄石山坂本線"
  },
  "keikyu-airport-line": {
-  "name_en": null,
+  "name_en": "Keikyū Airport Line",
   "name_kanji": "京急空港線"
  },
  "keikyu-daishi-line": {
-  "name_en": null,
+  "name_en": "Keikyū Daishi Line",
   "name_kanji": "京急大師線"
  },
  "keikyu-line": {
@@ -1556,15 +1556,15 @@
   "name_kanji": "京急本線"
  },
  "keio-inokashira-line": {
-  "name_en": null,
+  "name_en": "Keiō Inokashira Line",
   "name_kanji": "京王井の頭線"
  },
  "keio-line": {
-  "name_en": null,
+  "name_en": "Keiō Line",
   "name_kanji": "京王本線"
  },
  "keio-sagamihara-line": {
-  "name_en": null,
+  "name_en": "Keiō Sagamihara Line",
   "name_kanji": "京王相模原線"
  },
  "keisei-line": {
@@ -1572,31 +1572,31 @@
   "name_kanji": "京成本線"
  },
  "keisei-matsudo-line": {
-  "name_en": null,
+  "name_en": "Keisei Matsudo Line",
   "name_kanji": "京成松戸線"
  },
  "kintetsu-kyoto-line": {
-  "name_en": null,
+  "name_en": "Kintetsu Kyoto Line",
   "name_kanji": "近鉄京都線"
  },
  "kintetsu-nagoya-line": {
-  "name_en": null,
+  "name_en": "Kintetsu Nagoya Line",
   "name_kanji": "近鉄名古屋線"
  },
  "kintetsu-osaka-line": {
-  "name_en": null,
+  "name_en": "Kintetsu Osaka Line",
   "name_kanji": "近鉄大阪線"
  },
  "kintetsu-toba-line": {
-  "name_en": null,
+  "name_en": "Kintetsu Toba Line",
   "name_kanji": "近鉄鳥羽線"
  },
  "kintetsu-yamada-line": {
-  "name_en": null,
+  "name_en": "Kintetsu Yamada Line",
   "name_kanji": "近鉄山田線"
  },
  "kintetsu-yunoyama-line": {
-  "name_en": null,
+  "name_en": "Kintetsu Yunoyama Line",
   "name_kanji": "近鉄湯の山線"
  },
  "kitakyushu-monorail-kokura-line": {
@@ -1668,7 +1668,7 @@
   "name_kanji": "黒部峡谷鉄道本線"
  },
  "kyotosubway-karasuma-line": {
-  "name_en": null,
+  "name_en": "Kyoto Municipal Subway Karasuma Line",
   "name_kanji": "京都市営地下鉄烏丸線"
  },
  "linimo-line": {
@@ -1720,11 +1720,11 @@
   "name_kanji": "長良川鉄道越美南線"
  },
  "nagoyasubway-higashiyama-line": {
-  "name_en": null,
+  "name_en": "Nagoya Municipal Subway Higashiyama Line",
   "name_kanji": "名古屋市営地下鉄東山線"
  },
  "nagoyasubway-sakuradori-line": {
-  "name_en": null,
+  "name_en": "Nagoya Municipal Subway Sakura-dōri Line",
   "name_kanji": "名古屋市営地下鉄桜通線"
  },
  "nankai-main-line": {
@@ -1752,7 +1752,7 @@
   "name_kanji": "のと鉄道能登線"
  },
  "odakyu-odawara-line": {
-  "name_en": null,
+  "name_en": "Odakyū Odawara Line",
   "name_kanji": "小田急小田原線"
  },
  "ohmitetudo-line": {
@@ -1784,7 +1784,7 @@
   "name_kanji": null
  },
  "osakametro-sennichimae-line": {
-  "name_en": null,
+  "name_en": "Osaka Metro Sennichimae Line",
   "name_kanji": "Osaka Metro千日前線"
  },
  "osakamonorail-line": {
@@ -1844,11 +1844,11 @@
   "name_kanji": "JR山陽新幹線"
  },
  "seibu-ikebukuro-line": {
-  "name_en": null,
+  "name_en": "Seibu Ikebukuro Line",
   "name_kanji": "西武池袋線"
  },
  "seibu-shinjuku-line": {
-  "name_en": null,
+  "name_en": "Seibu Shinjuku Line",
   "name_kanji": "西武新宿線"
  },
  "semboku-line": {
@@ -1860,7 +1860,7 @@
   "name_kanji": "仙台空港鉄道仙台空港線"
  },
  "sendaisubway-namboku-line": {
-  "name_en": null,
+  "name_en": "Sendai Subway Namboku Line",
   "name_kanji": "仙台市地下鉄南北線"
  },
  "shigarakikohgen-line": {
@@ -1872,7 +1872,7 @@
   "name_kanji": "島原鉄道線"
  },
  "shimabara-minanme-line": {
-  "name_en": null,
+  "name_en": "Shimabara Railway Line(Shimabara Gaikō - Kazusa)",
   "name_kanji": "島原鉄道線"
  },
  "shimokitakotsu-line": {
@@ -1960,7 +1960,7 @@
   "name_kanji": "天竜浜名湖鉄道天竜浜名湖線"
  },
  "tobu-nikko-line": {
-  "name_en": null,
+  "name_en": "Tōbu Nikkō Line",
   "name_kanji": "東武日光線"
  },
  "tobu-noda-line": {
@@ -1968,31 +1968,31 @@
   "name_kanji": "東武野田線"
  },
  "tobu-ogose-line": {
-  "name_en": null,
+  "name_en": "Tōbu Ogose Line",
   "name_kanji": "東武越生線"
  },
  "tobu-skytree-line": {
-  "name_en": null,
+  "name_en": "Tōbu Skytree Line(Isesaki Line)",
   "name_kanji": null
  },
  "tobu-tojo-line": {
-  "name_en": null,
+  "name_en": "Tōbu Tōjō Line",
   "name_kanji": "東武東上線"
  },
  "toei-asakusa-line": {
-  "name_en": null,
+  "name_en": "Toei Subway Asakusa Line",
   "name_kanji": "都営地下鉄浅草線"
  },
  "toei-mita-line": {
-  "name_en": null,
+  "name_en": "Toei Subway Mita Line",
   "name_kanji": "都営地下鉄三田線"
  },
  "toei-oedo-line": {
-  "name_en": null,
+  "name_en": "Toei Subway Ōedo Line",
   "name_kanji": "都営地下鉄大江戸線"
  },
  "toei-shinjuku-line": {
-  "name_en": null,
+  "name_en": "Toei Subway Shinjuku Line",
   "name_kanji": "都営地下鉄新宿線"
  },
  "toei-todenarakawa-line": {
@@ -2000,67 +2000,67 @@
   "name_kanji": "都電荒川線"
  },
  "tokyometro-chiyoda-line": {
-  "name_en": null,
+  "name_en": "Tokyo Metro Chiyoda Line",
   "name_kanji": "東京メトロ千代田線"
  },
  "tokyometro-fukutoshin-line": {
-  "name_en": null,
+  "name_en": "Tokyo Metro Fukutoshin Line",
   "name_kanji": "東京メトロ副都心線"
  },
  "tokyometro-ginza-line": {
-  "name_en": null,
+  "name_en": "Tokyo Metro Ginza Line",
   "name_kanji": "東京メトロ銀座線"
  },
  "tokyometro-hanzomon-line": {
-  "name_en": null,
+  "name_en": "Tokyo Metro Hanzōmon Line",
   "name_kanji": "東京メトロ半蔵門線"
  },
  "tokyometro-hibiya-line": {
-  "name_en": null,
+  "name_en": "Tokyo Metro Hibiya Line",
   "name_kanji": "東京メトロ日比谷線"
  },
  "tokyometro-marunouchi-line": {
-  "name_en": null,
+  "name_en": "Tokyo Metro Marunouchi Line",
   "name_kanji": "東京メトロ丸ノ内線"
  },
  "tokyometro-nanboku-line": {
-  "name_en": null,
+  "name_en": "Tokyo Metro Namboku Line",
   "name_kanji": "東京メトロ南北線"
  },
  "tokyometro-tozai-line": {
-  "name_en": null,
+  "name_en": "Tokyo Metro Tozai Line",
   "name_kanji": "東京メトロ東西線"
  },
  "tokyometro-yurakucho-line": {
-  "name_en": null,
+  "name_en": "Tokyo Metro Yūrakuchō Line",
   "name_kanji": "東京メトロ有楽町線"
  },
  "tokyu-denentoshi-line": {
-  "name_en": null,
+  "name_en": "Tōkyū Den-en-toshi Line",
   "name_kanji": "東急田園都市線"
  },
  "tokyu-ikegami-line": {
-  "name_en": null,
+  "name_en": "Tōkyū Ikegami Line",
   "name_kanji": "東急池上線"
  },
  "tokyu-meguro-line": {
-  "name_en": null,
+  "name_en": "Tōkyū Meguro Line",
   "name_kanji": "東急目黒線"
  },
  "tokyu-oimachi-line": {
-  "name_en": null,
+  "name_en": "Tōkyū Ōimachi Line",
   "name_kanji": "東急大井町線"
  },
  "tokyu-shinyokohama-line": {
-  "name_en": null,
+  "name_en": "Tōkyū Shin-yokohama Line",
   "name_kanji": "東急新横浜線"
  },
  "tokyu-tamagawa-line": {
-  "name_en": null,
+  "name_en": "Tōkyū Tamagawa Line",
   "name_kanji": "東急多摩川線"
  },
  "tokyu-toyoko-line": {
-  "name_en": null,
+  "name_en": "Tōkyū Tōyoko Line",
   "name_kanji": "東急東横線"
  },
  "tosakuroshio-gomen-line": {
@@ -2088,7 +2088,7 @@
   "name_kanji": "富山地方鉄道富山港線"
  },
  "toyamachitesu-tateyama-line": {
-  "name_en": null,
+  "name_en": "Toyama Chihō Railway Tateyama Line",
   "name_kanji": "富山地方鉄道立山線"
  },
  "toyokosoku-line": {
@@ -2136,7 +2136,7 @@
   "name_kanji": "野岩鉄道会津鬼怒川線"
  },
  "yar-utsube-line": {
-  "name_en": null,
+  "name_en": "Yokkaichi Asunarou Railway Utsube Line",
   "name_kanji": "四日市あすなろう鉄道内部線"
  },
  "yokohama-mm21-line": {
@@ -2184,7 +2184,7 @@
   "name_kanji": "由利高原鉄道鳥海山ろく線"
  },
  "yutorito-line": {
-  "name_en": null,
+  "name_en": "Nagoya Guideway Bus Shidami Line(Yutorito Line)",
   "name_kanji": "名古屋ガイドウェイバスガイドウェイバス志段味線"
  }
 }

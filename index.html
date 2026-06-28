@@ -944,7 +944,7 @@
     // App version — shown discreetly on the welcome modal. Bump on every merge
     // to main. It is also part of the station-cache key, so each release
     // invalidates the 7-day IndexedDB cache and users immediately get fresh data.
-    const APP_VERSION       = 'v1.0.1';
+    const APP_VERSION       = 'v1.0.2';
     const CACHE_TTL         = 7 * 24 * 60 * 60 * 1000;  // 7 days
     const BATCH_SIZE        = 150;      // features per animation frame (line rendering)
     const SYNC_DEBOUNCE_MS  = 2000;     // ms after last stamp change before auto-save
@@ -1477,15 +1477,42 @@
             // Funakiya's properly spaced English line names take precedence over
             // ekidata's run-together romaji (e.g. "Jrtokaidohonsen(Tokyo~Atami)").
             Object.assign(lineEnMap, lineNames || {});
+
+            // A stamp belongs to a physical station, not a single line. Funakiya
+            // matches each stamp to one ekidata row, but an interchange (Tokyo,
+            // Shinjuku…) has several rows at the same place. So we render every
+            // ekidata line-row at a stamped location and let createMarker merge
+            // them into one marker showing all its lines.
+            const stampedLoc = {};   // dedupeKey -> curated English name (or null)
+            stations.forEach(g => g.stations.forEach(s => {
+                const en = stampNames[s.code];
+                if (en === undefined) return;
+                const k = dedupeKey(s);
+                if (!(k in stampedLoc)) stampedLoc[k] = en || null;
+            }));
+
+            // Pass A: create markers from the matched rows first, so each
+            // marker's identity (its stamp code) is the matched ekidata code —
+            // keeps saved progress lighting up correctly.
             stations.forEach(g => {
                 if (g.line_name_en && !lineEnMap[g.line_name]) lineEnMap[g.line_name] = g.line_name_en;
                 g.stations.forEach(s => {
-                    const en = stampNames[s.code];
-                    if (en === undefined) return;          // no stamp here
-                    if (en) s.name_en = en;                // prefer curated name
+                    if (stampNames[s.code] === undefined) return;
+                    const en = stampedLoc[dedupeKey(s)];
+                    if (en) s.name_en = en;
                     createMarker(s, map);
                 });
             });
+            // Pass B: add the station's other lines (rows at a stamped location
+            // that aren't themselves the matched row) so all line badges show.
+            stations.forEach(g => g.stations.forEach(s => {
+                if (stampNames[s.code] !== undefined) return;   // handled in pass A
+                const k = dedupeKey(s);
+                if (!(k in stampedLoc)) return;
+                const en = stampedLoc[k];
+                if (en) s.name_en = en;
+                createMarker(s, map);
+            }));
             map.on('zoomend', () => {
                 clearTimeout(zoomDebounce);
                 zoomDebounce = setTimeout(() => {
