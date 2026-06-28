@@ -67,6 +67,25 @@ def romaji_kanji(kanji):
             out.append(t)
     return " ".join(w[:1].upper() + w[1:] for w in out).strip()
 
+_LINE_SUFFIX = [("新幹線", " Shinkansen"), ("本線", " Main Line"),
+                ("ライン", " Line"), ("線", " Line"), ("エクスプレス", " Express")]
+
+def romaji_line(kanji):
+    """Readable English for a kanji line name with no curated translation,
+    e.g. 上野東京ライン -> 'Ueno Tokyo Line', 京王線 -> 'Keio Line'. The line
+    suffix (線/本線/ライン/新幹線/エクスプレス) is mapped explicitly; the rest
+    is romanised. Beats ekidata's run-together 'Uenotokyorain'."""
+    if not kanji or not _kks:
+        return kanji or ""
+    k = kanji.replace("・", " ")
+    suf = ""
+    for jp_s, en_s in _LINE_SUFFIX:
+        if k.endswith(jp_s):
+            suf = en_s; k = k[:-len(jp_s)]; break
+    toks = [_contract(t["hepburn"]) for t in _kks.convert(k) if t["hepburn"].strip()]
+    body = " ".join(w[:1].upper() + w[1:] for w in toks)
+    return (re.sub(r"\s+", " ", body).strip() + suf).strip()
+
 raw = json.load(open("data/funakiya-raw.json", encoding="utf-8"))
 jp  = json.load(open("data/funakiya-stations.json", encoding="utf-8"))
 eki = json.load(open("data/stations.json", encoding="utf-8"))
@@ -223,6 +242,15 @@ for line in raw["lines"]:
 for ek, cnt in line_votes.items():
     if ek not in line_names:
         line_names[ek] = cnt.most_common(1)[0][0]
+
+# Source 3 (last resort): romanise the kanji line name for any remaining line,
+# so the app never shows ekidata's run-together romaji (e.g. "Uenotokyorain").
+for g in eki:
+    ln = g["line_name"]
+    if ln not in line_names:
+        r = romaji_line(ln)
+        if r and r != ln:
+            line_names[ln] = r
 
 out={"source":"stamp.funakiya.com","count":len(stations),
      "line_names":line_names,"stations":stations}
