@@ -916,7 +916,16 @@
         return h;
     };
 
-    const getLineColor = (name) => LINE_DATA[name]?.color ?? FALLBACK_PALETTE[hashName(name) % FALLBACK_PALETTE.length];
+    // Strip a branch/segment suffix so a branch inherits its parent line's
+    // colour instead of getting a different hashed one (e.g.
+    // "4号線丸ノ内線分岐線" -> "4号線丸ノ内線", "東北線（埼京線）" -> "東北線").
+    const lineColorBase = (name) => name
+        .replace(/分岐線$/, '線').replace(/支線$/, '線')
+        .replace(/[(（][^)）]*[)）]\s*$/, '').trim();
+    const getLineColor = (name) =>
+        LINE_DATA[name]?.color
+        ?? LINE_DATA[lineColorBase(name)]?.color
+        ?? FALLBACK_PALETTE[hashName(name) % FALLBACK_PALETTE.length];
     const getLineEn    = (name) => LINE_DATA[name]?.en ?? '';
 
     // ── 2. CONSTANTS ──────────────────────────────────────────────────────────
@@ -944,7 +953,7 @@
     // App version — shown discreetly on the welcome modal. Bump on every merge
     // to main. It is also part of the station-cache key, so each release
     // invalidates the 7-day IndexedDB cache and users immediately get fresh data.
-    const APP_VERSION       = 'v1.0.3';
+    const APP_VERSION       = 'v1.0.4';
     const CACHE_TTL         = 7 * 24 * 60 * 60 * 1000;  // 7 days
     const BATCH_SIZE        = 150;      // features per animation frame (line rendering)
     const SYNC_DEBOUNCE_MS  = 2000;     // ms after last stamp change before auto-save

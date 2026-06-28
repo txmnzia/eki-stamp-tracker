@@ -70,21 +70,52 @@ def romaji_kanji(kanji):
 _LINE_SUFFIX = [("新幹線", " Shinkansen"), ("本線", " Main Line"),
                 ("ライン", " Line"), ("線", " Line"), ("エクスプレス", " Express")]
 
+# Curated English for irregular-reading or well-known track lines that romaji
+# gets wrong (山手 reads "Yamanote", not "Yamate"; 丸ノ内 "Marunouchi", etc.).
+CURATED_LINE = {
+    "山手線": "Yamanote Line", "東北線": "Tohoku Line", "東北本線": "Tohoku Main Line",
+    "東海道線": "Tokaido Line", "東海道本線": "Tokaido Main Line",
+    "中央線": "Chuo Line", "中央本線": "Chuo Main Line",
+    "総武線": "Sobu Line", "総武本線": "Sobu Main Line", "常磐線": "Joban Line",
+    "横須賀線": "Yokosuka Line", "京浜東北線": "Keihin-Tohoku Line",
+    "根岸線": "Negishi Line", "南武線": "Nambu Line", "武蔵野線": "Musashino Line",
+    "京葉線": "Keiyo Line", "埼京線": "Saikyo Line", "横浜線": "Yokohama Line",
+    "東西線": "Tozai Line", "大江戸線": "Oedo Line", "副都心線": "Fukutoshin Line",
+    "上野東京ライン": "Ueno-Tokyo Line", "湘南新宿ライン": "Shonan-Shinjuku Line",
+}
+
 def romaji_line(kanji):
     """Readable English for a kanji line name with no curated translation,
-    e.g. 上野東京ライン -> 'Ueno Tokyo Line', 京王線 -> 'Keio Line'. The line
-    suffix (線/本線/ライン/新幹線/エクスプレス) is mapped explicitly; the rest
-    is romanised. Beats ekidata's run-together 'Uenotokyorain'."""
-    if not kanji or not _kks:
-        return kanji or ""
+    e.g. 上野東京ライン -> 'Ueno-Tokyo Line', 京王線 -> 'Keio Line'. The line
+    suffix is mapped explicitly and the rest romanised (no long-vowel
+    contraction — it mangles morpheme boundaries like 丸ノ内 'Marunouchi')."""
+    if not kanji:
+        return ""
+    if kanji in CURATED_LINE:
+        return CURATED_LINE[kanji]
+    # The geojson often parenthesises the recognisable service name, e.g.
+    # "4号線(中央線)" or "東北線（埼京線）" -> use the inner line.
+    mp = re.search(r"[(（]([^)）]*線)[)）]", kanji)
+    if mp:
+        inner = mp.group(1)
+        return CURATED_LINE.get(inner) or romaji_line(inner)
+    if not _kks:
+        return ""
     k = kanji.replace("・", " ")
-    suf = ""
+    branch = ""
+    for b in ("分岐線", "支線"):
+        if k.endswith(b):
+            branch = " (Branch)"; k = k[:-len(b)]; break
+    suf = " Line" if branch else ""
     for jp_s, en_s in _LINE_SUFFIX:
         if k.endswith(jp_s):
             suf = en_s; k = k[:-len(jp_s)]; break
-    toks = [_contract(t["hepburn"]) for t in _kks.convert(k) if t["hepburn"].strip()]
+    k = re.sub(r"^\d+号線?", "", k)          # drop metro line-number prefix (4号線丸ノ内 -> 丸ノ内)
+    if not k:
+        return ""
+    toks = [t["hepburn"] for t in _kks.convert(k) if t["hepburn"].strip()]
     body = " ".join(w[:1].upper() + w[1:] for w in toks)
-    return (re.sub(r"\s+", " ", body).strip() + suf).strip()
+    return (re.sub(r"\s+", " ", body).strip() + suf + branch).strip()
 
 raw = json.load(open("data/funakiya-raw.json", encoding="utf-8"))
 jp  = json.load(open("data/funakiya-stations.json", encoding="utf-8"))
@@ -251,6 +282,20 @@ for g in eki:
         r = romaji_line(ln)
         if r and r != ln:
             line_names[ln] = r
+
+# The map geometry (railroad-section.geojson) uses official *track* line names
+# that mostly differ from the station data (e.g. "山手線", "東北本線",
+# "4号線丸ノ内線"). Add English for those too so line hover tooltips are
+# translated everywhere: curated where the kanji matches, else romanised.
+try:
+    geo = json.load(open("data/railroad-section.geojson", encoding="utf-8"))
+    geonames = {f["properties"].get("路線名", "") for f in geo["features"]}
+    for n in geonames:
+        if not n or n in line_names:
+            continue
+        line_names[n] = k2en.get(normln(n)) or romaji_line(n)
+except FileNotFoundError:
+    pass
 
 out={"source":"stamp.funakiya.com","count":len(stations),
      "line_names":line_names,"stations":stations}
