@@ -15105,6 +15105,13 @@
   "lon": null,
   "en": null
  },
+ "metro-ginza": {
+  "kanji": "東京メトロ銀座駅",
+  "yomi": null,
+  "lat": 35.672833,
+  "lon": 139.76325,
+  "en": "Tokyo Metro Ginza Station"
+ },
  "mitsubishi-minamioyubari": {
   "kanji": "三菱石炭鉱業南大夕張駅",
   "yomi": null,
@@ -17282,13 +17289,6 @@
   "lon": null,
   "en": null
  },
- "tkt-kubokawa": {
-  "kanji": "土佐くろしお鉄道窪川駅",
-  "yomi": null,
-  "lat": 33.212422,
-  "lon": 133.137178,
-  "en": "Tosa Kuroshio Railway Kubokawa Station"
- },
  "tkt-nahari": {
   "kanji": "土佐くろしお鉄道奈半利駅",
   "yomi": null,
@@ -17554,6 +17554,671 @@
   "lat": null,
   "lon": null,
   "en": null
+ },
+ "toei-akabanebashi": {
+  "kanji": "都営地下鉄赤羽橋駅",
+  "yomi": null,
+  "lat": 35.655,
+  "lon": 139.743611,
+  "en": "Toei Subway Akabanebashi Station"
+ },
+ "toei-akebonobashi": {
+  "kanji": "都営地下鉄曙橋駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null,
+  "en": null
+ },
+ "toei-aoyamaitchome": {
+  "kanji": "都営地下鉄青山一丁目駅",
+  "yomi": null,
+  "lat": 35.67297,
+  "lon": 139.72384,
+  "en": "Toei Subway Aoyama-itchome Station"
+ },
+ "toei-asakusa": {
+  "kanji": "都営地下鉄浅草駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null,
+  "en": null
+ },
+ "toei-asakusabashi": {
+  "kanji": "都営地下鉄浅草橋駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null,
+  "en": null
+ },
+ "toei-azabu-juban": {
+  "kanji": "都営地下鉄麻布十番駅",
+  "yomi": null,
+  "lat": 35.6565,
+  "lon": 139.736111,
+  "en": "Toei Subway Azabu-juban Station"
+ },
+ "toei-bakuroyokoyama": {
+  "kanji": "都営地下鉄馬喰横山駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null,
+  "en": null
+ },
+ "toei-daimon": {
+  "kanji": "都営地下鉄大門駅",
+  "yomi": null,
+  "lat": 35.65675,
+  "lon": 139.754639,
+  "en": "Toei Subway Daimon Station"
+ },
+ "toei-funabori": {
+  "kanji": "都営地下鉄船堀駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null,
+  "en": null
+ },
+ "toei-gotanda": {
+  "kanji": "都営地下鉄五反田駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null,
+  "en": null
+ },
+ "toei-hakusan": {
+  "kanji": "都営地下鉄白山駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null,
+  "en": null
+ },
+ "toei-hamacho": {
+  "kanji": "都営地下鉄浜町駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null,
+  "en": null
+ },
+ "toei-hasune": {
+  "kanji": "都営地下鉄蓮根駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null,
+  "en": null
+ },
+ "toei-hibiya": {
+  "kanji": "都営地下鉄日比谷駅",
+  "yomi": null,
+  "lat": 35.676361,
+  "lon": 139.760222,
+  "en": "Toei Subway Hibiya Station"
+ },
+ "toei-higashiginza": {
+  "kanji": "都営地下鉄東銀座駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null,
+  "en": null
+ },
+ "toei-higashinakano": {
+  "kanji": "都営地下鉄東中野駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null,
+  "en": null
+ },
+ "toei-higashinihonbashi": {
+  "kanji": "都営地下鉄東日本橋駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null,
+  "en": null
+ },
+ "toei-higashioojima": {
+  "kanji": "都営地下鉄東大島駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null,
+  "en": null
+ },
+ "toei-higashishinjuku": {
+  "kanji": "都営地下鉄東新宿駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null,
+  "en": null
+ },
+ "toei-hikarigaoka": {
+  "kanji": "都営地下鉄光が丘駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null,
+  "en": null
+ },
+ "toei-hongosanchome": {
+  "kanji": "都営地下鉄本郷三丁目駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null,
+  "en": null
+ },
+ "toei-honjoazumabashi": {
+  "kanji": "都営地下鉄本所吾妻橋駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null,
+  "en": null
+ },
+ "toei-ichigaya": {
+  "kanji": "都営地下鉄市ヶ谷駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null,
+  "en": null
+ },
+ "toei-ichinoe": {
+  "kanji": "都営地下鉄一之江駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null,
+  "en": null
+ },
+ "toei-iidabashi": {
+  "kanji": "都営地下鉄飯田橋駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null,
+  "en": null
+ },
+ "toei-itabashihoncho": {
+  "kanji": "都営地下鉄板橋本町駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null,
+  "en": null
+ },
+ "toei-itabashikuyakushomae": {
+  "kanji": "都営地下鉄板橋区役所前駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null,
+  "en": null
+ },
+ "toei-iwamotocho": {
+  "kanji": "都営地下鉄岩本町駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null,
+  "en": null
+ },
+ "toei-jimbocho": {
+  "kanji": "都営地下鉄神保町駅",
+  "yomi": null,
+  "lat": 35.695944,
+  "lon": 139.757667,
+  "en": "Toei Subway Jimbocho Station"
+ },
+ "toei-kachidoki": {
+  "kanji": "都営地下鉄勝どき駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null,
+  "en": null
+ },
+ "toei-kasuga": {
+  "kanji": "都営地下鉄春日駅",
+  "yomi": null,
+  "lat": 35.709639,
+  "lon": 139.75325,
+  "en": "Toei Subway Kasuga Station"
+ },
+ "toei-kikukawa": {
+  "kanji": "都営地下鉄菊川駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null,
+  "en": null
+ },
+ "toei-kiyosumishirakawa": {
+  "kanji": "都営地下鉄清澄白河駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null,
+  "en": null
+ },
+ "toei-kokuritsukyogijo": {
+  "kanji": "都営地下鉄国立競技場駅",
+  "yomi": null,
+  "lat": 35.680056,
+  "lon": 139.714111,
+  "en": "Toei Subway Kokuritsu-kyogijo Station"
+ },
+ "toei-kudanshita": {
+  "kanji": "都営地下鉄九段下駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null,
+  "en": null
+ },
+ "toei-kuramae": {
+  "kanji": "都営地下鉄蔵前駅",
+  "yomi": null,
+  "lat": 35.703222,
+  "lon": 139.790944,
+  "en": "Toei Subway Kuramae Station"
+ },
+ "toei-magome": {
+  "kanji": "都営地下鉄馬込駅",
+  "yomi": null,
+  "lat": 35.596417,
+  "lon": 139.711806,
+  "en": "Toei Subway Magome Station"
+ },
+ "toei-mita": {
+  "kanji": "都営地下鉄三田駅",
+  "yomi": null,
+  "lat": 35.646889,
+  "lon": 139.747222,
+  "en": "Toei Subway Mita Station"
+ },
+ "toei-mizue": {
+  "kanji": "都営地下鉄瑞江駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null,
+  "en": null
+ },
+ "toei-monzennakacho": {
+  "kanji": "都営地下鉄門前仲町駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null,
+  "en": null
+ },
+ "toei-morishita": {
+  "kanji": "都営地下鉄森下駅",
+  "yomi": null,
+  "lat": 35.687972,
+  "lon": 139.797028,
+  "en": "Toei Subway Morishita Station"
+ },
+ "toei-motohasunuma": {
+  "kanji": "都営地下鉄本蓮沼駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null,
+  "en": null
+ },
+ "toei-motoyawata": {
+  "kanji": "都営地下鉄本八幡駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null,
+  "en": null
+ },
+ "toei-nakai": {
+  "kanji": "都営地下鉄中井駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null,
+  "en": null
+ },
+ "toei-nakanobu": {
+  "kanji": "都営地下鉄中延駅",
+  "yomi": null,
+  "lat": 35.605556,
+  "lon": 139.713694,
+  "en": "Toei Subway Nakanobu Station"
+ },
+ "toei-nakanosakaue": {
+  "kanji": "都営地下鉄中野坂上駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null,
+  "en": null
+ },
+ "toei-nerima": {
+  "kanji": "都営地下鉄練馬駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null,
+  "en": null
+ },
+ "toei-nerimakasugacho": {
+  "kanji": "都営地下鉄練馬春日町駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null,
+  "en": null
+ },
+ "toei-nihonbashi": {
+  "kanji": "都営地下鉄日本橋駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null,
+  "en": null
+ },
+ "toei-ningyocho": {
+  "kanji": "都営地下鉄人形町駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null,
+  "en": null
+ },
+ "toei-nishidai": {
+  "kanji": "都営地下鉄西台駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null,
+  "en": null
+ },
+ "toei-nishimagome": {
+  "kanji": "都営地下鉄西馬込駅",
+  "yomi": null,
+  "lat": 35.586861,
+  "lon": 139.705944,
+  "en": "Toei Subway Nishi-magome Station"
+ },
+ "toei-nishioojima": {
+  "kanji": "都営地下鉄西大島駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null,
+  "en": null
+ },
+ "toei-nishishinjuku5": {
+  "kanji": "都営地下鉄西新宿五丁目駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null,
+  "en": null
+ },
+ "toei-nishisugamo": {
+  "kanji": "都営地下鉄西巣鴨駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null,
+  "en": null
+ },
+ "toei-nishitakashimadaira": {
+  "kanji": "都営地下鉄西高島平駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null,
+  "en": null
+ },
+ "toei-ochiaiminaminagasaki": {
+  "kanji": "都営地下鉄落合南長崎駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null,
+  "en": null
+ },
+ "toei-ogawamachi": {
+  "kanji": "都営地下鉄小川町駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null,
+  "en": null
+ },
+ "toei-onarimon": {
+  "kanji": "都営地下鉄御成門駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null,
+  "en": null
+ },
+ "toei-oojima": {
+  "kanji": "都営地下鉄大島駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null,
+  "en": null
+ },
+ "toei-otemachi": {
+  "kanji": "都営地下鉄大手町駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null,
+  "en": null
+ },
+ "toei-roppongi": {
+  "kanji": "都営地下鉄六本木駅",
+  "yomi": null,
+  "lat": 35.663333,
+  "lon": 139.732111,
+  "en": "Toei Subway Roppongi Station"
+ },
+ "toei-ryougoku": {
+  "kanji": "都営地下鉄両国駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null,
+  "en": null
+ },
+ "toei-sengakuji": {
+  "kanji": "都営地下鉄泉岳寺駅",
+  "yomi": null,
+  "lat": 35.638694,
+  "lon": 139.74,
+  "en": "Toei Subway Sengakuji Station"
+ },
+ "toei-sengoku": {
+  "kanji": "都営地下鉄千石駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null,
+  "en": null
+ },
+ "toei-shibakoen": {
+  "kanji": "都営地下鉄芝公園駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null,
+  "en": null
+ },
+ "toei-shimurasakaue": {
+  "kanji": "都営地下鉄志村坂上駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null,
+  "en": null
+ },
+ "toei-shimurasanchome": {
+  "kanji": "都営地下鉄志村三丁目駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null,
+  "en": null
+ },
+ "toei-shinbashi": {
+  "kanji": "都営地下鉄新橋駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null,
+  "en": null
+ },
+ "toei-shinegota": {
+  "kanji": "都営地下鉄新江古田駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null,
+  "en": null
+ },
+ "toei-shinitabashi": {
+  "kanji": "都営地下鉄新板橋駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null,
+  "en": null
+ },
+ "toei-shinjuku": {
+  "kanji": "都営地下鉄新宿駅",
+  "yomi": null,
+  "lat": 35.688694,
+  "lon": 139.699139,
+  "en": "Toei Subway Shinjuku Station"
+ },
+ "toei-shinjukunishiguchi": {
+  "kanji": "都営地下鉄新宿西口駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null,
+  "en": null
+ },
+ "toei-shinjukusanchome": {
+  "kanji": "都営地下鉄新宿三丁目駅",
+  "yomi": null,
+  "lat": 35.690639,
+  "lon": 139.705833,
+  "en": "Toei Subway Shinjuku-sanchome Station"
+ },
+ "toei-shinokachimachi": {
+  "kanji": "都営地下鉄新御徒町駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null,
+  "en": null
+ },
+ "toei-shinozaki": {
+  "kanji": "都営地下鉄篠崎駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null,
+  "en": null
+ },
+ "toei-shintakashimadaira": {
+  "kanji": "都営地下鉄新高島平駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null,
+  "en": null
+ },
+ "toei-shiodome": {
+  "kanji": "都営地下鉄汐留駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null,
+  "en": null
+ },
+ "toei-sugamo": {
+  "kanji": "都営地下鉄巣鴨駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null,
+  "en": null
+ },
+ "toei-suidobashi": {
+  "kanji": "都営地下鉄水道橋駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null,
+  "en": null
+ },
+ "toei-sumiyoshi": {
+  "kanji": "都営地下鉄住吉駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null,
+  "en": null
+ },
+ "toei-takanawadai": {
+  "kanji": "都営地下鉄高輪台駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null,
+  "en": null
+ },
+ "toei-takaracho": {
+  "kanji": "都営地下鉄宝町駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null,
+  "en": null
+ },
+ "toei-takashimadaira": {
+  "kanji": "都営地下鉄高島平駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null,
+  "en": null
+ },
+ "toei-tochomae": {
+  "kanji": "都営地下鉄都庁前駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null,
+  "en": null
+ },
+ "toei-togoshi": {
+  "kanji": "都営地下鉄戸越駅",
+  "yomi": null,
+  "lat": 35.614722,
+  "lon": 139.716417,
+  "en": "Toei Subway Togoshi Station"
+ },
+ "toei-toshimaen": {
+  "kanji": "都営地下鉄豊島園駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null,
+  "en": null
+ },
+ "toei-tsukijishijo": {
+  "kanji": "都営地下鉄築地市場駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null,
+  "en": null
+ },
+ "toei-tsukishima": {
+  "kanji": "都営地下鉄月島駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null,
+  "en": null
+ },
+ "toei-uchisaiwaicho": {
+  "kanji": "都営地下鉄内幸町駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null,
+  "en": null
+ },
+ "toei-uokachimachi": {
+  "kanji": "都営地下鉄上野御徒町駅",
+  "yomi": null,
+  "lat": 35.707889,
+  "lon": 139.774333,
+  "en": "Toei Subway Ueno-okachimachi Station"
+ },
+ "toei-ushigomekagurazaka": {
+  "kanji": "都営地下鉄牛込神楽坂駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null,
+  "en": null
+ },
+ "toei-ushigomeyanagicho": {
+  "kanji": "都営地下鉄牛込柳町駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null,
+  "en": null
+ },
+ "toei-wakamatsukawada": {
+  "kanji": "都営地下鉄若松河田駅",
+  "yomi": null,
+  "lat": null,
+  "lon": null,
+  "en": null
+ },
+ "toei-yoyogi": {
+  "kanji": "都営地下鉄代々木駅",
+  "yomi": null,
+  "lat": 35.683,
+  "lon": 139.701722,
+  "en": "Toei Subway Yoyogi Station"
  },
  "tokyu-shibuya": {
   "kanji": "東急電鉄渋谷駅",
