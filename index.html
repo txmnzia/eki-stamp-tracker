@@ -361,7 +361,7 @@
         #ride-hint { padding: 10px 20px; font-size: 11px; color: var(--muted); line-height: 1.5; background: rgba(126,184,247,0.05); }
         #ride-station-list {
             flex: 1; overflow-y: auto; padding: 8px 16px 12px;
-            touch-action: none;            /* drag selects; edge auto-scroll handles long lines */
+            touch-action: pan-y;           /* names area scrolls normally; the rail grip selects */
             -webkit-user-select: none; user-select: none;
         }
         .ride-row {
@@ -389,6 +389,13 @@
             background: var(--surface); border: 2px solid var(--border); transition: background 0.1s, border-color 0.1s;
         }
         .ride-row.sel .ride-node { background: var(--ride-color, var(--accent)); border-color: var(--ride-color, var(--accent)); }
+        /* Transparent drag-handle over the rail/node column: selecting only starts here. */
+        .ride-grip {
+            position: absolute; left: 0; top: 0; bottom: 0; width: 40px; z-index: 2;
+            touch-action: none;            /* a drag that starts here selects instead of scrolling */
+            cursor: grab;
+        }
+        .ride-grip:active { cursor: grabbing; }
         .ride-row-name { display: flex; flex-direction: column; gap: 1px; line-height: 1.25; padding: 8px 0; }
         .ride-jp { font-family: var(--jp-font); font-size: 14px; color: var(--text); }
         .ride-row.sel .ride-jp { color: var(--text); }
@@ -1048,7 +1055,7 @@
     // App version — shown discreetly on the welcome modal. Bump on every merge
     // to main. It is also part of the station-cache key, so each release
     // invalidates the 7-day IndexedDB cache and users immediately get fresh data.
-    const APP_VERSION       = 'v1.1.0';
+    const APP_VERSION       = 'v1.1.1';
     const CACHE_TTL         = 7 * 24 * 60 * 60 * 1000;  // 7 days
     const BATCH_SIZE        = 150;      // features per animation frame (line rendering)
     const SYNC_DEBOUNCE_MS  = 2000;     // ms after last stamp change before auto-save
@@ -1072,8 +1079,11 @@
     const LINE_DIM      = { weight: 1.2, opacity: 0.10 };  // other lines while one is focused
     const LINE_FOCUS    = { weight: 4,   opacity: 0.85 };  // hovered/tapped line
     const RIDE_OVERLAY  = { weight: 4.5, opacity: 0.95 };  // ridden-stretch overlay (full colour)
-    const RIDE_SNAP_M   = 90;           // max metres a station may sit from the line to belong to it
+    const RIDE_SNAP_M   = 60;           // max metres a station may sit from the line to belong to it
     const RIDE_BBOX_PAD = 0.01;         // ~1.1km bbox padding when gathering candidate stations
+    const RIDE_BRIDGE_M = 6000;         // bridge data gaps up to 6km within one corridor; drop
+                                        // far-away segments that merely SHARE the line name (e.g.
+                                        // the Tokyo vs Osaka 山手線). Keeps the clicked corridor only.
 
     // ── 3. APP STATE ──────────────────────────────────────────────────────────
     // All mutable app state lives here. Read via state.*, write via setState().
@@ -1111,9 +1121,12 @@
 
     // Ride-section feature
     const allStations   = [];  // flat [{code,name_kanji,name_en,lat,lon}] from ekidata (for the ride picker)
-    const lineGeomCache = {};  // lineName → { chains, stations } computed lazily on first ride-edit
+    const lineGroups    = [];  // ekidata lines, each with its stations IN ORDER (authoritative station list)
+    const stationByCode = {};  // ekidata code → station record (for seeding overlays from saved rides)
+    const lineGeomCache = {};  // cacheKey(name|bucket) → { chains, stations } computed lazily
     const rideOverlays  = {};  // lineName → [polyline, ...] bright "ridden stretch" overlays
     let   currentPopupLine = null;  // line whose popup is open (for the ride button)
+    let   linePopupSeed    = null;  // {lat,lng} where the open line popup was clicked (corridor seed)
 
     /**
      * Order a line's kanji + English names by the current UI language.
@@ -1438,6 +1451,7 @@
                     L.DomEvent.stopPropagation(e);
                     highlightLine(name, map);
                     currentPopupLine = name;
+                    linePopupSeed = e.latlng;   // remember where on the corridor we clicked
                     polyline.closeTooltip();
                     polyline.openPopup(e.latlng);
                 });
@@ -1495,9 +1509,10 @@
     };
 
     // ── 7b. RIDE SECTIONS ─────────────────────────────────────────────────────
-    // Lets the user log the stretch of a line they've ridden. The clicked line's
-    // own geometry is the single source of truth: we stitch its GeoJSON segments
-    // into ordered path(s), snap nearby stations onto them, and colour the exact
+    // Lets the user log the stretch of a line they've ridden. Geometry decides
+    // WHICH existing segments can be coloured; ekidata's ordered station groups
+    // decide WHICH stations (in order). We stitch the clicked line's GeoJSON
+    // segments into ordered path(s), keep only the clicked corridor, and colour the exact
     // sub-path between ridden stations. No fragile line-name ↔ station-name bridge.
 
     // Equirectangular metres-per-degree at a latitude (good enough at line scale).
@@ -1553,44 +1568,92 @@
         return chains;
     };
 
+    // 1° cache bucket so the Tokyo and Osaka 山手線 don't share a cache entry.
+    const seedBucket = (seed) => seed ? Math.round(seed.lat) + '_' + Math.round(seed.lng) : 'all';
+
+    // Build a chain descriptor (coords + cumulative arc + scale + bbox).
+    const describeChain = (coords) => {
+        const mid = coords[Math.floor(coords.length / 2)];
+        const [sx, sy] = mPerDeg(mid[0]);
+        const arc = [0];
+        let mnLat = 90, mxLat = -90, mnLng = 180, mxLng = -180;
+        const acc = (p) => { if (p[0] < mnLat) mnLat = p[0]; if (p[0] > mxLat) mxLat = p[0]; if (p[1] < mnLng) mnLng = p[1]; if (p[1] > mxLng) mxLng = p[1]; };
+        acc(coords[0]);
+        for (let i = 1; i < coords.length; i++) {
+            const a = coords[i - 1], b = coords[i];
+            arc.push(arc[i - 1] + Math.hypot((b[1] - a[1]) * sx, (b[0] - a[0]) * sy));
+            acc(b);
+        }
+        return { coords, arc, sx, sy, bbox: [mnLat, mxLat, mnLng, mxLng] };
+    };
+
+    // Gap (metres) between two chain bboxes (0 if they overlap).
+    const bboxGap = (A, B) => {
+        const [aLat, sy] = mPerDeg((A.bbox[0] + A.bbox[1]) / 2);
+        const dLat = Math.max(0, A.bbox[0] - B.bbox[1], B.bbox[0] - A.bbox[1]) * 110540;
+        const dLng = Math.max(0, A.bbox[2] - B.bbox[3], B.bbox[2] - A.bbox[3]) * aLat;
+        return Math.hypot(dLat, dLng);
+    };
+
+    const distToBbox = (seed, ch) => {
+        const [sx, sy] = mPerDeg(seed.lat);
+        const dLat = Math.max(0, ch.bbox[0] - seed.lat, seed.lat - ch.bbox[1]) * 110540;
+        const dLng = Math.max(0, ch.bbox[2] - seed.lng, seed.lng - ch.bbox[3]) * sx;
+        return Math.hypot(dLat, dLng);
+    };
+
     /**
-     * Build (and cache) the ride geometry for a line: ordered stitched chains and
-     * the line's stations snapped onto them in along-track order.
-     * @returns {{chains:{coords:Array,arc:number[]}[], stations:Array}}
+     * Build (and cache) the ride geometry for the corridor of a line nearest `seed`:
+     * ordered stitched chains (far same-name regions dropped) and the corridor's
+     * stations snapped onto them in along-track order.
+     * @param {string} name  line's 路線名
+     * @param {{lat:number,lng:number}} [seed]  a point on the clicked corridor
+     * @returns {{chains:Array, stations:Array}}
      */
-    const buildLineGeometry = (name) => {
-        if (lineGeomCache[name]) return lineGeomCache[name];
+    const buildLineGeometry = (name, seed) => {
+        const cacheKey = name + '|' + seedBucket(seed);
+        if (lineGeomCache[cacheKey]) return lineGeomCache[cacheKey];
 
         const polys = linesByName[name] || [];
         const segs  = polys.map(pl => pl.getLatLngs().map(ll => [ll.lat, ll.lng]));
-        const rawChains = stitchChains(segs).filter(c => c.length >= 2);
-        rawChains.sort((a, b) => b.length - a.length);          // dominant chain first
+        let all = stitchChains(segs).filter(c => c.length >= 2).map(describeChain);
+        all.sort((a, b) => b.coords.length - a.coords.length);
+
+        // Keep only the corridor connected to the seed: start from the chain nearest
+        // the seed (or the longest chain if no seed) and transitively add chains
+        // whose bbox is within RIDE_BRIDGE_M of the kept set. This drops far-away
+        // segments that merely share the line name.
+        let chains = all;
+        if (all.length > 1) {
+            let seedIdx = 0;
+            if (seed) { let bd = Infinity; all.forEach((c, i) => { const d = distToBbox(seed, c); if (d < bd) { bd = d; seedIdx = i; } }); }
+            const keep = new Set([seedIdx]);
+            for (let grew = true; grew; ) {
+                grew = false;
+                for (let i = 0; i < all.length; i++) {
+                    if (keep.has(i)) continue;
+                    for (const k of keep) {
+                        if (bboxGap(all[i], all[k]) <= RIDE_BRIDGE_M) { keep.add(i); grew = true; break; }
+                    }
+                }
+            }
+            chains = [...keep].sort((a, b) => a - b).map(i => all[i]);
+            chains.sort((a, b) => b.coords.length - a.coords.length);
+        }
 
         let minLat = 90, maxLat = -90, minLng = 180, maxLng = -180;
-        const chains = rawChains.map(coords => {
-            const mid = coords[Math.floor(coords.length / 2)];
-            const [sx, sy] = mPerDeg(mid[0]);
-            const arc = [0];
-            for (let i = 1; i < coords.length; i++) {
-                const a = coords[i - 1], b = coords[i];
-                arc.push(arc[i - 1] + Math.hypot((b[1] - a[1]) * sx, (b[0] - a[0]) * sy));
-                if (a[0] < minLat) minLat = a[0]; if (a[0] > maxLat) maxLat = a[0];
-                if (a[1] < minLng) minLng = a[1]; if (a[1] > maxLng) maxLng = a[1];
-            }
-            const last = coords.at(-1);
-            if (last[0] < minLat) minLat = last[0]; if (last[0] > maxLat) maxLat = last[0];
-            if (last[1] < minLng) minLng = last[1]; if (last[1] > maxLng) maxLng = last[1];
-            return { coords, arc, sx, sy };
+        chains.forEach(ch => {
+            if (ch.bbox[0] < minLat) minLat = ch.bbox[0]; if (ch.bbox[1] > maxLat) maxLat = ch.bbox[1];
+            if (ch.bbox[2] < minLng) minLng = ch.bbox[2]; if (ch.bbox[3] > maxLng) maxLng = ch.bbox[3];
         });
 
-        // Gather candidate stations in the line's bbox, snap each onto the nearest
-        // chain, keep those within RIDE_SNAP_M, dedupe by name+rough-location.
         const snapMax2 = RIDE_SNAP_M ** 2;
-        const best = {};   // dedupe key -> winning station record
-        for (const st of allStations) {
-            if (st.lat < minLat - RIDE_BBOX_PAD || st.lat > maxLat + RIDE_BBOX_PAD ||
-                st.lon < minLng - RIDE_BBOX_PAD || st.lon > maxLng + RIDE_BBOX_PAD) continue;
-            const p = [st.lat, st.lon];
+        const inBox = (lat, lon) => lat >= minLat - RIDE_BBOX_PAD && lat <= maxLat + RIDE_BBOX_PAD &&
+                                    lon >= minLng - RIDE_BBOX_PAD && lon <= maxLng + RIDE_BBOX_PAD;
+
+        // Snap a coordinate onto the nearest kept chain; null if farther than RIDE_SNAP_M.
+        const snap = (lat, lon) => {
+            const p = [lat, lon];
             let bd2 = Infinity, bc = -1, bseg = 0, bt = 0;
             for (let ci = 0; ci < chains.length; ci++) {
                 const { coords, sx, sy } = chains[ci];
@@ -1599,20 +1662,45 @@
                     if (d2 < bd2) { bd2 = d2; bc = ci; bseg = i - 1; bt = t; }
                 }
             }
-            if (bd2 > snapMax2) continue;
+            if (bd2 > snapMax2) return null;
             const ch = chains[bc];
-            const pos = ch.arc[bseg] + bt * (ch.arc[bseg + 1] - ch.arc[bseg]);
-            const dkey = (st.name_kanji || st.code) + '|' + st.lat.toFixed(2) + '|' + st.lon.toFixed(2);
-            if (!best[dkey] || bd2 < best[dkey]._d2) {
-                best[dkey] = { ...st, chainIdx: bc, segIdx: bseg, t: bt, pos, _d2: bd2 };
+            return { chainIdx: bc, segIdx: bseg, t: bt, pos: ch.arc[bseg] + bt * (ch.arc[bseg + 1] - ch.arc[bseg]), d2: bd2 };
+        };
+
+        // STATION LIST comes from ekidata's authoritative per-line ordered groups, NOT
+        // from blind proximity — so we get this line's real stations, in order, with no
+        // foreign/parallel-line stations or duplicates. Pick the ekidata group whose
+        // stations best lie along the clicked corridor, keep its on-corridor run in order.
+        let bestSeq = [];
+        for (const g of lineGroups) {
+            const seq = [];
+            for (const s of g.stations) {
+                if (!inBox(s.lat, s.lon)) continue;
+                const sn = snap(s.lat, s.lon);
+                if (sn) seq.push({ code: s.code, name_kanji: s.name_kanji, name_en: s.name_en, lat: s.lat, lon: s.lon, ...sn });
             }
+            if (seq.length > bestSeq.length) bestSeq = seq;
         }
 
-        const stations = Object.values(best)
-            .sort((a, b) => a.chainIdx - b.chainIdx || a.pos - b.pos)
-            .map((s, i) => (s.idx = i, s));
+        let stations;
+        if (bestSeq.length >= 2) {
+            stations = bestSeq.map((s, i) => (s.idx = i, s));   // ekidata order preserved
+        } else {
+            // Fallback (line not in ekidata groups): proximity snap, deduped by name.
+            const best = {};
+            for (const st of allStations) {
+                if (!inBox(st.lat, st.lon)) continue;
+                const sn = snap(st.lat, st.lon);
+                if (!sn) continue;
+                const dkey = (st.name_kanji || st.code) + '|' + st.lat.toFixed(2) + '|' + st.lon.toFixed(2);
+                if (!best[dkey] || sn.d2 < best[dkey].d2) best[dkey] = { ...st, ...sn };
+            }
+            stations = Object.values(best)
+                .sort((a, b) => a.chainIdx - b.chainIdx || a.pos - b.pos)
+                .map((s, i) => (s.idx = i, s));
+        }
 
-        return (lineGeomCache[name] = { chains, stations });
+        return (lineGeomCache[cacheKey] = { chains, stations });
     };
 
     // Exact projected [lat,lng] of a snapped station on its chain.
@@ -1622,10 +1710,12 @@
         return [a[0] + (b[0] - a[0]) * rec.t, a[1] + (b[1] - a[1]) * rec.t];
     };
 
-    // The track sub-path between two adjacent ridden stations. Follows the real
-    // geometry when both sit on the same chain; straight-hops across chain gaps.
+    // The EXISTING track sub-path between two adjacent ridden stations — exact
+    // vertices of the already-drawn line geometry. Returns null when the two
+    // stations are on different chains (a data gap): we never invent a connecting
+    // line, we only highlight geometry that is actually drawn.
     const trackBetween = (geom, a, b) => {
-        if (a.chainIdx !== b.chainIdx) return [snappedPoint(geom, a), snappedPoint(geom, b)];
+        if (a.chainIdx !== b.chainIdx) return null;
         const lo = a.pos <= b.pos ? a : b, hi = a.pos <= b.pos ? b : a;
         const coords = geom.chains[lo.chainIdx].coords;
         const pts = [snappedPoint(geom, lo)];
@@ -1635,24 +1725,33 @@
     };
 
     // Redraw the bright "ridden stretch" overlays for one line from state.rides.
+    // Seeds the corridor from the saved stations' own location so it rebuilds the
+    // right region (not a far same-name region) after a session load.
     const renderRideOverlays = (name) => {
         (rideOverlays[name] || []).forEach(p => p.remove());
         rideOverlays[name] = [];
         const codes = state.rides[name];
         if (!codes || !codes.length || !linesByName[name]) return;
 
-        const geom  = buildLineGeometry(name);
+        // Seed = centroid of the saved ridden stations' coordinates.
+        let sLat = 0, sLng = 0, n = 0;
+        codes.forEach(c => { const s = stationByCode[c]; if (s) { sLat += s.lat; sLng += s.lon; n++; } });
+        const seed = n ? { lat: sLat / n, lng: sLng / n } : undefined;
+
+        const geom  = buildLineGeometry(name, seed);
         const byCode = {};
         geom.stations.forEach(s => { byCode[s.code] = s; });
         const ridden = codes.map(c => byCode[c]).filter(Boolean).sort((a, b) => a.idx - b.idx);
         if (ridden.length < 2) return;
 
         const color = lineColorMap[name] || '#7eb8f7';
-        // Connect consecutive ridden stations that are adjacent in along-track
-        // order (a contiguous section); gaps (separate sections) stay unconnected.
+        // Highlight each contiguous pair using ONLY the existing drawn geometry
+        // between them. Cross-chain pairs (data gaps) return null and are skipped —
+        // we never draw a synthetic connector.
         for (let i = 1; i < ridden.length; i++) {
             if (ridden[i].idx !== ridden[i - 1].idx + 1) continue;
             const pts = trackBetween(geom, ridden[i - 1], ridden[i]);
+            if (!pts) continue;
             const pl = L.polyline(pts, { color, ...RIDE_OVERLAY, renderer: canvasRenderer, interactive: false }).addTo(mapInstance);
             rideOverlays[name].push(pl);
         }
@@ -1693,7 +1792,7 @@
     const openRideModal = (name) => {
         const overlay = document.getElementById('ride-modal-overlay');
         const list    = document.getElementById('ride-station-list');
-        const geom    = buildLineGeometry(name);
+        const geom    = buildLineGeometry(name, linePopupSeed);
         const { primary, secondary } = orderLineNames(name);
         const color   = lineColorMap[name] || '#7eb8f7';
 
@@ -1711,7 +1810,7 @@
         }
         footer.classList.remove('hidden');
         document.getElementById('ride-hint').textContent =
-            'Swipe along the line to select the stretch you rode. Swipe over a highlighted stretch to remove it.';
+            'Drag along the line on the left to select the stretch you rode (drag over a highlighted stretch to remove it). Scroll the names to move through the line.';
 
         // Build rows
         list.innerHTML = '';
@@ -1721,7 +1820,7 @@
             row.className = 'ride-row';
             row.dataset.idx = i;
             row.setAttribute('role', 'option');
-            row.innerHTML = `<span class="ride-node"></span><span class="ride-row-name"><span class="ride-jp">${p}</span>${s ? `<span class="ride-en">${s}</span>` : ''}</span>`;
+            row.innerHTML = `<span class="ride-node"></span><span class="ride-grip" aria-hidden="true"></span><span class="ride-row-name"><span class="ride-jp">${p}</span>${s ? `<span class="ride-en">${s}</span>` : ''}</span>`;
             list.appendChild(row);
             return row;
         });
@@ -1789,10 +1888,15 @@
 
         list.addEventListener('pointerdown', (e) => {
             if (!ridePicker) return;
-            const idx = rideIdxFromPoint(e.clientX, e.clientY);
+            // Only the left rail/node column starts a selection drag; a press on the
+            // station names (or anywhere else) is left alone so the list scrolls.
+            const grip = e.target.closest && e.target.closest('.ride-grip');
+            if (!grip) return;
+            const row = grip.closest('.ride-row');
+            const idx = row ? +row.dataset.idx : null;
             if (idx == null) return;
             e.preventDefault();
-            list.setPointerCapture(e.pointerId);
+            try { list.setPointerCapture(e.pointerId); } catch { /* ignore */ }
             ridePicker.dragging = true;
             ridePicker.start = idx;
             ridePicker.base  = new Set(ridePicker.sel);
@@ -2038,10 +2142,19 @@
 
             // Retain a flat list of every ekidata station with coordinates — the
             // pool the ride picker snaps onto a clicked line's geometry.
-            allStations.length = 0;
-            stations.forEach(g => g.stations.forEach(s => {
-                if (s.lat && s.lon) allStations.push({ code: s.code, name_kanji: s.name_kanji, name_en: s.name_en, lat: s.lat, lon: s.lon });
-            }));
+            allStations.length = 0; lineGroups.length = 0;
+            stations.forEach(g => {
+                const ordered = [];
+                g.stations.forEach(s => {
+                    if (s.lat && s.lon) {
+                        const rec = { code: s.code, name_kanji: s.name_kanji, name_en: s.name_en, lat: s.lat, lon: s.lon };
+                        allStations.push(rec);
+                        stationByCode[s.code] = rec;
+                        ordered.push(rec);
+                    }
+                });
+                if (ordered.length) lineGroups.push({ line_name: g.line_name, stations: ordered });
+            });
 
             // A stamp belongs to a physical station, not a single line. Funakiya
             // matches each stamp to one ekidata row, but an interchange (Tokyo,
