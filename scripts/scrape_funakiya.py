@@ -117,7 +117,9 @@ def parse_stations(html, lang):
         for href, inner in re.findall(
                 r'<li>\s*<a (?:href="([^"]*)"|name="[^"]*")>(.*?)</a>\s*</li>',
                 ul, re.S):
-            h3 = re.search(r'<h3 class="title">([^<]*)</h3>', inner)
+            # closing tag is sometimes malformed in the source (e.g.
+            # "<h3 class="title">JNR Rumoi Station stamp</h4>"), so accept any </hN>
+            h3 = re.search(r'<h3 class="title">([^<]*)</h\d>', inner)
             if not h3:
                 continue
             name = h3.group(1).strip()
