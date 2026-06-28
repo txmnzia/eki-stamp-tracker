@@ -6091,6 +6091,253 @@
    ]
   },
   {
+   "line_slug": "jnr-haboro-line",
+   "line_name_en": "JNR Haboro Line",
+   "src": "en",
+   "stations": [
+    {
+     "jp_slug": "jr-rumoi",
+     "name_full": "JNR Rumoi Station",
+     "name_kanji": null,
+     "status": "Found"
+    },
+    {
+     "jp_slug": null,
+     "name_full": "JNR Higashi-rumoi Station",
+     "name_kanji": null,
+     "status": "None"
+    },
+    {
+     "jp_slug": null,
+     "name_full": "JNR Santomari Station",
+     "name_kanji": null,
+     "status": "None"
+    },
+    {
+     "jp_slug": null,
+     "name_full": "JNR Usuya Station",
+     "name_kanji": null,
+     "status": "None"
+    },
+    {
+     "jp_slug": null,
+     "name_full": "JNR Obira Station",
+     "name_kanji": null,
+     "status": "Found"
+    },
+    {
+     "jp_slug": null,
+     "name_full": "JNR Hanaoka Station",
+     "name_kanji": null,
+     "status": "None"
+    },
+    {
+     "jp_slug": null,
+     "name_full": "JNR Ōtodo Station",
+     "name_kanji": null,
+     "status": "None"
+    },
+    {
+     "jp_slug": null,
+     "name_full": "JNR Tomioka Station",
+     "name_kanji": null,
+     "status": "None"
+    },
+    {
+     "jp_slug": "jnr-onishika",
+     "name_full": "JNR Onishika Station",
+     "name_kanji": null,
+     "status": "Found"
+    },
+    {
+     "jp_slug": null,
+     "name_full": "JNR Semmatsu Station",
+     "name_kanji": null,
+     "status": "None"
+    },
+    {
+     "jp_slug": null,
+     "name_full": "JNR Rikibiru Station",
+     "name_kanji": null,
+     "status": "None"
+    },
+    {
+     "jp_slug": null,
+     "name_full": "JNR Banyanosawa Station",
+     "name_kanji": null,
+     "status": "None"
+    },
+    {
+     "jp_slug": "jnr-kotambetsu",
+     "name_full": "JNR Kotambetsu Station",
+     "name_kanji": null,
+     "status": "None"
+    },
+    {
+     "jp_slug": null,
+     "name_full": "JNR Uehira Station",
+     "name_kanji": null,
+     "status": "None"
+    },
+    {
+     "jp_slug": null,
+     "name_full": "JNR Tomamae Station",
+     "name_kanji": null,
+     "status": "Found"
+    },
+    {
+     "jp_slug": null,
+     "name_full": "JNR Okotsu Station",
+     "name_kanji": null,
+     "status": "None"
+    },
+    {
+     "jp_slug": "jnr-haboro",
+     "name_full": "JNR Haboro Station",
+     "name_kanji": null,
+     "status": "Found"
+    },
+    {
+     "jp_slug": null,
+     "name_full": "JNR Shimonotaki Station",
+     "name_kanji": null,
+     "status": "None"
+    },
+    {
+     "jp_slug": null,
+     "name_full": "JNR Chikubetsu Station",
+     "name_kanji": null,
+     "status": "None"
+    },
+    {
+     "jp_slug": null,
+     "name_full": "JNR Teshio-Ariake Station",
+     "name_kanji": null,
+     "status": "None"
+    },
+    {
+     "jp_slug": null,
+     "name_full": "JNR Teshio-Sakae Station",
+     "name_kanji": null,
+     "status": "None"
+    },
+    {
+     "jp_slug": "jnr-shosambetsu",
+     "name_full": "JNR Shosambetsu Station",
+     "name_kanji": null,
+     "status": "Found"
+    },
+    {
+     "jp_slug": null,
+     "name_full": "JNR Toyosaki Station",
+     "name_kanji": null,
+     "status": "None"
+    },
+    {
+     "jp_slug": null,
+     "name_full": "JNR Teshio-Ōsawa Station",
+     "name_kanji": null,
+     "status": "None"
+    },
+    {
+     "jp_slug": null,
+     "name_full": "JNR Kyōsei Station",
+     "name_kanji": null,
+     "status": "None"
+    },
+    {
+     "jp_slug": null,
+     "name_full": "JNR Utakoshi Station",
+     "name_kanji": null,
+     "status": "None"
+    },
+    {
+     "jp_slug": null,
+     "name_full": "JNR Teshio-Kanaura Station",
+     "name_kanji": null,
+     "status": "None"
+    },
+    {
+     "jp_slug": "jnr-embetsu",
+     "name_full": "JNR Embetsu Station",
+     "name_kanji": null,
+     "status": "Found"
+    },
+    {
+     "jp_slug": null,
+     "name_full": "JNR Keimei Station",
+     "name_kanji": null,
+     "status": "None"
+    },
+    {
+     "jp_slug": null,
+     "name_full": "JNR Marumatsu Station",
+     "name_kanji": null,
+     "status": "None"
+    },
+    {
+     "jp_slug": null,
+     "name_full": "JNR Kitasato Station",
+     "name_kanji": null,
+     "status": "None"
+    },
+    {
+     "jp_slug": null,
+     "name_full": "JNR Sarakishi Station",
+     "name_kanji": null,
+     "status": "None"
+    },
+    {
+     "jp_slug": null,
+     "name_full": "JNR Kantaku Station",
+     "name_kanji": null,
+     "status": "None"
+    },
+    {
+     "jp_slug": "jnr-teshio",
+     "name_full": "JNR Teshio Station",
+     "name_kanji": null,
+     "status": "Found"
+    },
+    {
+     "jp_slug": null,
+     "name_full": "JNR Naka-Kawaguchi Station",
+     "name_kanji": null,
+     "status": "None"
+    },
+    {
+     "jp_slug": null,
+     "name_full": "JNR Kita-Kawaguchi Station",
+     "name_kanji": null,
+     "status": "None"
+    },
+    {
+     "jp_slug": null,
+     "name_full": "JNR NishiFuraoi Station",
+     "name_kanji": null,
+     "status": "None"
+    },
+    {
+     "jp_slug": null,
+     "name_full": "JNR Furaoi Station",
+     "name_kanji": null,
+     "status": "None"
+    },
+    {
+     "jp_slug": null,
+     "name_full": "JNR Sakukaeshi Station",
+     "name_kanji": null,
+     "status": "None"
+    },
+    {
+     "jp_slug": "jr-horonobe",
+     "name_full": "JNR Horonobe Station",
+     "name_kanji": null,
+     "status": "Found"
+    }
+   ]
+  },
+  {
    "line_slug": "jnr-hiroo-line",
    "line_name_en": "JNR Hiroo Line",
    "src": "en",
