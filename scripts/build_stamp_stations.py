@@ -15,7 +15,7 @@ Stations Funakiya knows but ekidata doesn't (minor private lines) are still
 included using Funakiya's own kanji/coords.
 """
 import json, re, math
-from collections import defaultdict
+from collections import defaultdict, Counter
 
 OP_PREFIX = {"JR","JNR","TX","IR","IGR","KTR","SR","ST","TKK","WKT","Watetsu"}
 MACRON = {"ā":"a","ī":"i","ū":"u","ē":"e","ō":"o","Ā":"A","Ī":"I","Ū":"U","Ē":"E","Ō":"O",
@@ -100,7 +100,7 @@ for line in raw["lines"]:
         if st["name_full"].startswith("JNR") or line["line_slug"].startswith("jnr-"):
             a["is_jnr"]=True
 
-stations=[]; by_code={}; n_eki=0; n_only=0; n_nodata=0
+stations=[]; by_code={}; slug2ekiline={}; n_eki=0; n_only=0; n_nodata=0
 for slug, a in sorted(agg.items()):
     meta = jp.get(slug) or {}
     kcore = clean_kanji(meta.get("kanji"))
@@ -136,6 +136,7 @@ for slug, a in sorted(agg.items()):
     }
     if rec["lat"] is None or rec["name_kanji"] is None:
         n_nodata+=1; continue               # cannot place on map
+    if m: slug2ekiline[slug] = m["line_code"]
     rec["code"] = m["code"] if m else f"fk_{slug}"
     if m: n_eki+=1
     else: n_only+=1
@@ -148,7 +149,21 @@ for slug, a in sorted(agg.items()):
         by_code[rec["code"]] = rec
         stations.append(rec)
 
-out={"source":"stamp.funakiya.com","count":len(stations),"stations":stations}
+# Map each ekidata line (the kanji line_code used by the app) to Funakiya's
+# properly spaced English line name, by majority vote across its stamp stations.
+# ekidata's own line_name_en is run-together (e.g. "Jrtokaidohonsen(Tokyo~Atami)").
+line_votes = defaultdict(Counter)
+for line in raw["lines"]:
+    en = demacron(line["line_name_en"] or "").strip()
+    if not en: continue
+    for st in line["stations"]:
+        if st["status"] != "Found": continue
+        ek = slug2ekiline.get(st["jp_slug"])
+        if ek: line_votes[ek][en] += 1
+line_names = {ek: cnt.most_common(1)[0][0] for ek, cnt in line_votes.items()}
+
+out={"source":"stamp.funakiya.com","count":len(stations),
+     "line_names":line_names,"stations":stations}
 json.dump(out, open("data/stamp-stations.json","w",encoding="utf-8"),
           ensure_ascii=False, indent=1)
 matched = sum(1 for s in stations if s["eki_code"])
