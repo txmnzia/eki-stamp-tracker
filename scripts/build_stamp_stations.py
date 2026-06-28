@@ -17,7 +17,12 @@ included using Funakiya's own kanji/coords.
 import json, re, math
 from collections import defaultdict, Counter
 
-OP_PREFIX = {"JR","JNR","TX","IR","IGR","KTR","SR","ST","TKK","WKT","Watetsu"}
+# Operator names that appear as a leading word on Funakiya's English labels and
+# are not part of the station name itself (station names with the operator baked
+# in use a hyphen, e.g. "Seibu-Shinjuku", so they are one token and unaffected).
+OP_PREFIX = {"JR","JNR","TX","IR","IGR","KTR","SR","ST","TKK","WKT","Watetsu",
+             "Odakyu","Tobu","Keisei","Keikyu","Keio","Tokyu","Hankyu","Hanshin",
+             "Kintetsu","Nankai","Meitetsu","Nishitetsu","Sotetsu","Nankai"}
 MACRON = {"ā":"a","ī":"i","ū":"u","ē":"e","ō":"o","Ā":"A","Ī":"I","Ū":"U","Ē":"E","Ō":"O",
           "â":"a","î":"i","û":"u","ê":"e","ô":"o","’":"'"}
 
@@ -25,11 +30,11 @@ def demacron(s):
     return "".join(MACRON.get(c, c) for c in s)
 
 def clean_en(name_full):
-    name = name_full.replace(" Station", "").strip()
+    name = demacron(name_full.replace(" Station", "").strip())
     toks = name.split()
     if toks and (toks[0] in OP_PREFIX or re.fullmatch(r"[A-Z]{2,4}", toks[0])):
         toks = toks[1:]
-    return demacron(" ".join(toks)).strip()
+    return " ".join(toks).strip()
 
 def clean_kanji(kanji):
     if not kanji: return None
@@ -39,6 +44,28 @@ def clean_kanji(kanji):
 
 def normk(k):
     return re.sub(r"[ 　・]", "", k) if k else k
+
+try:
+    import pykakasi
+    _kks = pykakasi.kakasi()
+except Exception:
+    _kks = None
+
+def _contract(s):
+    return s.replace("ou", "o").replace("oo", "o").replace("uu", "u")
+
+def romaji_kanji(kanji):
+    """Spaced Hepburn romanisation of a kanji station name (JP-only lines)."""
+    if not kanji or not _kks:
+        return kanji or ""
+    toks = [_contract(t["hepburn"]) for t in _kks.convert(kanji) if t["hepburn"].strip()]
+    out = []
+    for t in toks:
+        if out and out[-1].lower() in ("o", "go"):   # merge honorific お/ご
+            out[-1] = out[-1] + t
+        else:
+            out.append(t)
+    return " ".join(w[:1].upper() + w[1:] for w in out).strip()
 
 raw = json.load(open("data/funakiya-raw.json", encoding="utf-8"))
 jp  = json.load(open("data/funakiya-stations.json", encoding="utf-8"))
@@ -91,21 +118,22 @@ def coord_match(lat, lon, kcore):
 # aggregate per unique Found slug
 agg = {}
 for line in raw["lines"]:
+    lname = line.get("line_name_en") or line.get("line_name_kanji")
     for st in line["stations"]:
         if st["status"] != "Found": continue
         slug = st["jp_slug"]
-        a = agg.setdefault(slug, {"name_full":st["name_full"],
-                                   "lines_en":set(), "is_jnr":False})
-        a["lines_en"].add(line["line_name_en"])
-        if st["name_full"].startswith("JNR") or line["line_slug"].startswith("jnr-"):
-            a["is_jnr"]=True
+        a = agg.setdefault(slug, {"name_full": None, "lines": set()})
+        if st.get("name_full") and not a["name_full"]:
+            a["name_full"] = st["name_full"]   # prefer the English line-page label
+        if lname:
+            a["lines"].add(lname)
 
 stations=[]; by_code={}; slug2ekiline={}; n_eki=0; n_only=0; n_nodata=0
 for slug, a in sorted(agg.items()):
     meta = jp.get(slug) or {}
     kcore = clean_kanji(meta.get("kanji"))
     lat, lon = meta.get("lat"), meta.get("lon")
-    line_en = sorted(a["lines_en"])[0] if a["lines_en"] else ""
+    line_en = sorted(a["lines"])[0] if a["lines"] else ""
     if lat is not None and lon is not None:
         # Has coordinates: trust location only. No nearby ekidata station means
         # it's genuinely absent from ekidata (keep as funakiya-only at its own
@@ -123,14 +151,24 @@ for slug, a in sorted(agg.items()):
                 m = pick_by_line(c, line_en); break
     else:
         m = None
+    # English name, in order of preference:
+    #   1. English line-page label (clean, spaced)            — EN-page lines
+    #   2. station page's curated "EN:" field                 — JP-only lines
+    #   3. romanised kanji                                    — last resort
+    if a["name_full"]:
+        name_en = clean_en(a["name_full"])
+    elif meta.get("en"):
+        name_en = clean_en(meta["en"])
+    else:
+        name_en = romaji_kanji(m["name_kanji"] if m else kcore)
     rec = {
         "slug": slug,
         "name_kanji": (m["name_kanji"] if m else kcore),
-        "name_en": clean_en(a["name_full"]),
+        "name_en": name_en,
         "yomi": meta.get("yomi"),
         "lat": (m["lat"] if m else lat),
         "lon": (m["lon"] if m else lon),
-        "lines": sorted(a["lines_en"]),
+        "lines": sorted(a["lines"]),
         "eki_code": (m["code"] if m else None),
         "eki_line": (m["line_code"] if m else None),
     }
