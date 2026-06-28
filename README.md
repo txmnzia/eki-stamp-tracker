@@ -141,32 +141,44 @@ keys to `localStorage`). Map data is cached in **IndexedDB** (`eki-cache`, keyed
 
 ### How a clicked line maps to its stations (the important bit)
 
-We do **not** try to match the GeoJSON line name to `stations.json` line names
-(that mapping is unreliable — see the handover doc). Instead the clicked line's
-**own geometry is the single source of truth**, computed lazily on first use and
-cached in `lineGeomCache`:
+Two different sources are combined, each used for what it's actually good at:
 
-1. **Stitch** (`stitchChains`) the line's many GeoJSON segments into ordered
-   path(s) by matching coincident endpoints. ~73% of lines form a single chain;
-   fragmented lines yield several.
-2. **Snap stations** (`buildLineGeometry`): take every ekidata station within the
-   line's bounding box, project it onto the chains, and keep those within
-   `RIDE_SNAP_M` (90 m). Dedupe interchange duplicates by name + rough location.
-   Order them along the track by arc-length.
-3. **Colour the ridden sub-path** (`renderRideOverlays` → `trackBetween`): for each
-   pair of adjacent ridden stations, slice the exact stretch of track between their
-   snapped positions and draw it. Stations that land on different chains (rare,
-   fragmented lines) fall back to a straight hop.
+- **Geometry** (`railroad-section.geojson`) → *which existing segments to colour.*
+- **Ordered station groups** (`stations.json`, ekidata) → *which stations, in what
+  order.* (Matching the two by **name** is unreliable, so we don't — see the
+  handover doc.)
 
-This is track-accurate, needs no extra runtime data file, and sidesteps both the
-name-matching problem and the cross-line routing detours of a national graph.
+`buildLineGeometry(name, seed)` (lazy, cached in `lineGeomCache`) does:
 
-**Known limitations (acceptable for v1):**
-- Heavily fragmented mega-lines (~17%, e.g. 東海道線/山陽線 as a single GeoJSON
-  name) only fully resolve their longest chain; other parts use straight-hop
-  fallbacks.
-- Stations on a parallel line within the snap distance can occasionally be pulled
-  in; the picker is user-curated so this is low-impact.
+1. **Stitch** (`stitchChains`) the clicked line's GeoJSON segments into ordered
+   chains by matching coincident endpoints.
+2. **Keep only the clicked corridor.** A bare `路線名` can be reused in different
+   regions (the Tokyo *and* Osaka 山手線 share the name, 420 km apart). Starting
+   from the chain nearest the click `seed`, we transitively keep chains within
+   `RIDE_BRIDGE_M` (6 km) and **drop far same-name regions**.
+3. **Pick the station list from ekidata, not from proximity.** For each ekidata
+   line group, take its stations that snap onto the corridor (within
+   `RIDE_SNAP_M`, 60 m) **in ekidata order**, and choose the group with the best
+   fit. This yields *this* line's real stations, correctly ordered, with **no
+   parallel-line/interchange stations and no duplicates** — which blind proximity
+   snapping cannot do in dense areas. (Falls back to proximity only for lines
+   absent from ekidata.)
+4. **Colour only existing geometry** (`renderRideOverlays` → `trackBetween`):
+   between two adjacent ridden stations, slice the **exact existing track
+   vertices** between their snapped positions. If the two land on different chains
+   (a data gap), the pair is **skipped — never bridged with an invented line**.
+
+The overlay is therefore always a slice of the already-drawn geometry; nothing is
+synthesized.
+
+**Known limitations (acceptable for now):**
+- Where a `路線名` has parallel rapid/local alignments, the best-fit group is one
+  of them; the other's stations may not all snap. The handover documents this as a
+  genuinely hard case.
+- At chain gaps within a corridor, the stretch across the gap isn't coloured
+  (we won't draw a synthetic connector).
+- Station English names here come straight from ekidata's auto-romaji, which is
+  sometimes wrong (e.g. 四ツ谷 → "Shitsutani"); the kanji is always correct.
 - A national track-accurate version (`data/rail-graph.json` + Dijkstra) is
   documented in `docs/HANDOVER-line-highlight.md` as a future option.
 
