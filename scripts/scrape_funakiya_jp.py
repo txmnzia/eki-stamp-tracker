@@ -49,7 +49,10 @@ def parse(slug,h):
     geo=re.search(r'Geo URI[：:]\s*([0-9]+\.[0-9]+)[^0-9]+([0-9]+\.[0-9]+)',h)
     lat=float(geo.group(1)) if geo else None
     lon=float(geo.group(2)) if geo else None
-    return {"kanji":kanji,"yomi":yomi,"lat":lat,"lon":lon}
+    # curated English name, e.g. "EN: Keisei Keisei-Ueno Station"
+    e=re.search(r'EN:\s*([^<\n]+?Station)\b',h)
+    en=e.group(1).strip() if e else None
+    return {"kanji":kanji,"yomi":yomi,"lat":lat,"lon":lon,"en":en}
 
 def main():
     raw=json.load(open("data/funakiya-raw.json",encoding="utf-8"))

@@ -77,11 +77,13 @@
         .ui-btn:hover  { background: var(--surface2); border-color: var(--accent); color: var(--accent); }
         .ui-btn.active { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
 
-        /* ── Search ───────────────────────────────────────────────────────── */
-        #search-container {
-            position: absolute; top: 16px; left: 50%; transform: translateX(-50%);
-            z-index: var(--z-map-ui); width: min(360px, calc(100vw - 120px));
+        /* ── Top bar (search + controls) ──────────────────────────────────── */
+        #topbar {
+            position: absolute; top: 12px; left: 12px; right: 12px;
+            z-index: var(--z-map-ui);
+            display: flex; align-items: flex-start; gap: 8px;
         }
+        #search-container { position: relative; flex: 1 1 auto; min-width: 0; max-width: 360px; }
         #search-wrap {
             display: flex; align-items: center; gap: 8px;
             background: var(--surface); border: 1px solid var(--border);
@@ -118,7 +120,7 @@
         }
 
         /* ── Controls ─────────────────────────────────────────────────────── */
-        #controls { position: absolute; top: 16px; right: 16px; z-index: var(--z-map-ui); display: flex; gap: 6px; }
+        #controls { flex: 0 0 auto; display: flex; gap: 6px; }
         #session-toggle { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
         #session-toggle:hover  { background: rgba(126,184,247,0.22); }
         #session-toggle.active { background: rgba(126,184,247,0.28); }
@@ -159,10 +161,11 @@
 
         /* ── Session panel ────────────────────────────────────────────────── */
         #session-panel {
-            position: absolute; top: 58px; right: 16px;
-            z-index: var(--z-map-ui); width: 268px;
+            position: absolute; top: 56px; right: 12px;
+            z-index: var(--z-map-ui); width: min(290px, calc(100vw - 24px));
+            max-height: calc(100vh - 72px); overflow-y: auto;
             background: var(--surface); border: 1px solid var(--border);
-            border-radius: var(--radius); box-shadow: 0 8px 24px rgba(0,0,0,0.5); overflow: hidden;
+            border-radius: var(--radius); box-shadow: 0 8px 24px rgba(0,0,0,0.5);
         }
         #session-header { padding: 14px 16px 10px; border-bottom: 1px solid var(--border); }
         #session-user-row { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
@@ -239,6 +242,7 @@
         }
         #name-modal h2 { font-family: var(--jp-font); font-size: 20px; color: var(--text); margin-bottom: 6px; }
         #name-modal p  { font-size: 12px; color: var(--muted); margin-bottom: 20px; line-height: 1.7; }
+        #app-version { margin-top: 14px; text-align: right; font-size: 10px; color: var(--muted); opacity: 0.5; letter-spacing: 0.05em; }
         #modal-name-input {
             width: 100%; padding: 10px 12px; margin-bottom: 8px;
             background: var(--surface2); border: 1px solid var(--border);
@@ -305,6 +309,15 @@
             .session-btn { padding: 9px 10px; }
             .popup-collect-btn { padding: 12px 14px; font-size: 12px; }
         }
+        /* Narrow screens: drop the "Session" text so the top bar never overflows */
+        @media (max-width: 480px) {
+            #topbar { gap: 6px; }
+            .ui-btn { padding: 8px 10px; }
+            .session-label { display: none; }
+        }
+        /* Discreet version label inside the session panel */
+        #session-version { padding: 6px 12px 10px; text-align: right; font-size: 10px;
+            color: var(--muted); opacity: 0.5; letter-spacing: 0.05em; }
     </style>
 </head>
 <body>
@@ -315,24 +328,26 @@
         <p class="loading-sub">First load may take a few seconds</p>
     </div>
 
-    <div id="search-container">
-        <div id="search-wrap">
-            <svg id="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-            </svg>
-            <input type="text" id="stationSearch" aria-label="Search station by name" placeholder="Search station…" autocomplete="off" />
+    <div id="topbar">
+        <div id="search-container">
+            <div id="search-wrap">
+                <svg id="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
+                <input type="text" id="stationSearch" aria-label="Search station by name" placeholder="Search station…" autocomplete="off" />
+            </div>
+            <div id="suggestions" role="listbox" aria-label="Station suggestions"></div>
         </div>
-        <div id="suggestions" role="listbox" aria-label="Station suggestions"></div>
-    </div>
 
-    <div id="controls">
-        <button class="ui-btn" id="lang-toggle">EN</button>
-        <button class="ui-btn" id="session-toggle" aria-expanded="false" aria-controls="session-panel">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
-            </svg>
-            Session
-        </button>
+        <div id="controls">
+            <button class="ui-btn" id="lang-toggle">EN</button>
+            <button class="ui-btn" id="session-toggle" aria-expanded="false" aria-controls="session-panel">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                </svg>
+                <span class="session-label">Session</span>
+            </button>
+        </div>
     </div>
 
     <div id="session-panel" class="hidden" role="region" aria-label="Session management">
@@ -381,6 +396,7 @@
             <button class="session-btn danger" id="session-reset">Reset all stamps</button>
             <input type="file" id="session-import-file" accept=".json" style="display:none" aria-label="Import stamps JSON file">
         </div>
+        <div id="session-version"></div>
     </div>
 
     <div id="name-modal-overlay" class="hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
@@ -394,6 +410,7 @@
                 <button class="modal-btn secondary" id="modal-skip">Skip for now</button>
                 <button class="modal-btn confirm" id="modal-confirm">Start collecting</button>
             </div>
+            <div id="app-version" aria-hidden="true"></div>
         </div>
     </div>
 
@@ -924,6 +941,10 @@
     const GIST_TOKEN        = GH_TOK_OBF.length ? decTok(GH_TOK_OBF) : '';
     const getToken          = () => GIST_TOKEN;
     const GIST_PREFIX       = 'eki-stamp-tracker:';
+    // App version — shown discreetly on the welcome modal. Bump on every merge
+    // to main. It is also part of the station-cache key, so each release
+    // invalidates the 7-day IndexedDB cache and users immediately get fresh data.
+    const APP_VERSION       = 'v1.0.0';
     const CACHE_TTL         = 7 * 24 * 60 * 60 * 1000;  // 7 days
     const BATCH_SIZE        = 150;      // features per animation frame (line rendering)
     const SYNC_DEBOUNCE_MS  = 2000;     // ms after last stamp change before auto-save
@@ -1468,7 +1489,7 @@
         };
 
         try {
-            const cached = await cacheGet('eki_stamp_stations');
+            const cached = await cacheGet('eki_stamp_stations_' + APP_VERSION);
             if (cached && Date.now() - cached.ts < CACHE_TTL) {
                 renderStations(cached.stations, cached.stampNames, cached.lineNames);
                 return;
@@ -1484,7 +1505,7 @@
             stampData.stations.forEach(s => { if (s.eki_code) stampNames[s.eki_code] = s.name_en || ''; });
             const lineNames = stampData.line_names || {};
             renderStations(stations, stampNames, lineNames);
-            cacheSet('eki_stamp_stations', { stations, stampNames, lineNames, ts: Date.now() }).catch(() => {});
+            cacheSet('eki_stamp_stations_' + APP_VERSION, { stations, stampNames, lineNames, ts: Date.now() }).catch(() => {});
         } catch (err) {
             console.error('loadStations:', err);
             hideLoading();
@@ -1657,6 +1678,8 @@
     };
 
     const setupSessionPanel = (map) => {
+        const sv = document.getElementById('session-version');
+        if (sv) sv.textContent = APP_VERSION;
         // Toggle panel open/close
         document.getElementById('session-toggle').addEventListener('click', () => {
             const panel = document.getElementById('session-panel');
@@ -1786,6 +1809,8 @@
         const title   = document.getElementById('modal-title');
 
         if (title) title.textContent = state.lang === 'jp' ? 'ようこそ！' : 'Welcome!';
+        const ver = document.getElementById('app-version');
+        if (ver) ver.textContent = APP_VERSION;
         setupFocusTrap(modal, overlay);
 
         if (!state.user) {
