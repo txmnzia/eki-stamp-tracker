@@ -319,6 +319,82 @@
         /* Discreet version label inside the session panel */
         #session-version { padding: 6px 12px 10px; text-align: right; font-size: 10px;
             color: var(--muted); opacity: 0.5; letter-spacing: 0.05em; }
+
+        /* ── Line popup: "add a ride" ─────────────────────────────────────── */
+        .popup-ride-summary { font-size: 11px; color: var(--muted); margin: 2px 0 10px; }
+        .popup-line-ride-btn {
+            display: flex; align-items: center; justify-content: center; gap: 6px;
+            width: 100%; padding: 9px 12px; cursor: pointer;
+            font-family: var(--ui-font); font-size: 11px; font-weight: 700;
+            letter-spacing: 0.04em; border-radius: 4px;
+            background: var(--surface2); color: var(--text); border: 1px solid var(--border);
+            transition: background 0.15s, border-color 0.15s, color 0.15s;
+        }
+        .popup-line-ride-btn:hover { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
+        .popup-line-ride-btn.has-rides { background: rgba(126,184,247,0.12); border-color: rgba(126,184,247,0.35); color: var(--accent); }
+
+        /* ── Ride-selection modal (vertical line / swipe to pick) ─────────── */
+        #ride-modal-overlay {
+            position: fixed; inset: 0; z-index: var(--z-modal);
+            background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
+            display: flex; align-items: center; justify-content: center;
+        }
+        #ride-modal {
+            display: flex; flex-direction: column;
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+            width: min(420px, calc(100vw - 24px));
+            max-height: min(80vh, 760px); overflow: hidden;
+        }
+        #ride-modal-header {
+            display: flex; align-items: flex-start; justify-content: space-between; gap: 10px;
+            padding: 18px 20px 12px; border-bottom: 1px solid var(--border);
+        }
+        #ride-modal-title { font-family: var(--jp-font); font-size: 17px; font-weight: 700; color: var(--text); line-height: 1.3; }
+        #ride-modal-sub   { font-size: 11px; color: var(--muted); letter-spacing: 0.04em; margin-top: 2px; }
+        #ride-close {
+            flex-shrink: 0; width: 30px; height: 30px; border-radius: 6px; cursor: pointer;
+            background: var(--surface2); border: 1px solid var(--border); color: var(--muted);
+            font-size: 15px; line-height: 1; display: flex; align-items: center; justify-content: center;
+        }
+        #ride-close:hover { color: var(--text); border-color: var(--accent); }
+        #ride-hint { padding: 10px 20px; font-size: 11px; color: var(--muted); line-height: 1.5; background: rgba(126,184,247,0.05); }
+        #ride-station-list {
+            flex: 1; overflow-y: auto; padding: 8px 16px 12px;
+            touch-action: none;            /* drag selects; edge auto-scroll handles long lines */
+            -webkit-user-select: none; user-select: none;
+        }
+        .ride-row {
+            position: relative; display: flex; align-items: center;
+            min-height: 38px; padding: 0 8px 0 40px; cursor: pointer;
+        }
+        /* faint full-height rail behind every node */
+        .ride-row::before {
+            content: ''; position: absolute; left: 20px; top: 0; bottom: 0;
+            width: 2px; transform: translateX(-50%); background: var(--border);
+        }
+        .ride-row:first-child::before { top: 50%; }
+        .ride-row:last-child::before  { bottom: 50%; }
+        /* coloured connector for ridden stretches */
+        .ride-row::after {
+            content: ''; position: absolute; left: 20px; width: 3px;
+            transform: translateX(-50%); background: var(--ride-color, var(--accent)); display: none;
+        }
+        .ride-row.link-up::after   { display: block; top: 0;   height: 50%; }
+        .ride-row.link-down::after { display: block; top: 50%; height: 50%; }
+        .ride-row.link-up.link-down::after { display: block; top: 0; height: 100%; }
+        .ride-node {
+            position: absolute; left: 20px; top: 50%; transform: translate(-50%, -50%);
+            width: 11px; height: 11px; border-radius: 50%; z-index: 1;
+            background: var(--surface); border: 2px solid var(--border); transition: background 0.1s, border-color 0.1s;
+        }
+        .ride-row.sel .ride-node { background: var(--ride-color, var(--accent)); border-color: var(--ride-color, var(--accent)); }
+        .ride-row-name { display: flex; flex-direction: column; gap: 1px; line-height: 1.25; padding: 8px 0; }
+        .ride-jp { font-family: var(--jp-font); font-size: 14px; color: var(--text); }
+        .ride-row.sel .ride-jp { color: var(--text); }
+        .ride-en { font-size: 10px; color: var(--muted); letter-spacing: 0.03em; }
+        #ride-footer { display: flex; gap: 8px; padding: 12px 16px; border-top: 1px solid var(--border); }
+        #ride-empty { padding: 28px 20px; text-align: center; font-size: 12px; color: var(--muted); line-height: 1.6; }
     </style>
 </head>
 <body>
@@ -412,6 +488,24 @@
                 <button class="modal-btn confirm" id="modal-confirm">Start collecting</button>
             </div>
             <div id="app-version" aria-hidden="true"></div>
+        </div>
+    </div>
+
+    <div id="ride-modal-overlay" class="hidden" role="dialog" aria-modal="true" aria-labelledby="ride-modal-title">
+        <div id="ride-modal">
+            <div id="ride-modal-header">
+                <div>
+                    <div id="ride-modal-title"></div>
+                    <div id="ride-modal-sub"></div>
+                </div>
+                <button id="ride-close" aria-label="Close ride editor">✕</button>
+            </div>
+            <div id="ride-hint"></div>
+            <div id="ride-station-list" role="listbox" aria-label="Stations on this line"></div>
+            <div id="ride-footer">
+                <button class="modal-btn secondary" id="ride-cancel">Cancel</button>
+                <button class="modal-btn confirm" id="ride-save">Save ride</button>
+            </div>
         </div>
     </div>
 
@@ -954,7 +1048,7 @@
     // App version — shown discreetly on the welcome modal. Bump on every merge
     // to main. It is also part of the station-cache key, so each release
     // invalidates the 7-day IndexedDB cache and users immediately get fresh data.
-    const APP_VERSION       = 'v1.0.9';
+    const APP_VERSION       = 'v1.1.0';
     const CACHE_TTL         = 7 * 24 * 60 * 60 * 1000;  // 7 days
     const BATCH_SIZE        = 150;      // features per animation frame (line rendering)
     const SYNC_DEBOUNCE_MS  = 2000;     // ms after last stamp change before auto-save
@@ -973,6 +1067,14 @@
     const RESET_CONFIRM_MS  = 3000;     // window for second click on destructive action
     const MAX_ZOOM          = 19;       // maximum tile zoom level
 
+    // Line prominence (AC0: lines are discreet by default; ridden stretches pop).
+    const LINE_BASE     = { weight: 1.5, opacity: 0.20 };  // faint colour tint — default look
+    const LINE_DIM      = { weight: 1.2, opacity: 0.10 };  // other lines while one is focused
+    const LINE_FOCUS    = { weight: 4,   opacity: 0.85 };  // hovered/tapped line
+    const RIDE_OVERLAY  = { weight: 4.5, opacity: 0.95 };  // ridden-stretch overlay (full colour)
+    const RIDE_SNAP_M   = 90;           // max metres a station may sit from the line to belong to it
+    const RIDE_BBOX_PAD = 0.01;         // ~1.1km bbox padding when gathering candidate stations
+
     // ── 3. APP STATE ──────────────────────────────────────────────────────────
     // All mutable app state lives here. Read via state.*, write via setState().
     const state = {
@@ -980,6 +1082,7 @@
         user:   localStorage.getItem('eki_current_user') || '',
         gistId: null,
         stamps: new Set(),
+        rides:  {},   // lineName(kanji) -> [ridden station code, ...] (ride-section feature)
     };
 
     // Persist a state key and trigger any required side effects
@@ -1006,6 +1109,12 @@
     let   hoveredLine   = null;
     let   hoverTimer;
 
+    // Ride-section feature
+    const allStations   = [];  // flat [{code,name_kanji,name_en,lat,lon}] from ekidata (for the ride picker)
+    const lineGeomCache = {};  // lineName → { chains, stations } computed lazily on first ride-edit
+    const rideOverlays  = {};  // lineName → [polyline, ...] bright "ridden stretch" overlays
+    let   currentPopupLine = null;  // line whose popup is open (for the ride button)
+
     /**
      * Order a line's kanji + English names by the current UI language.
      * EN mode → English primary, kanji secondary; JP mode → the reverse.
@@ -1031,6 +1140,8 @@
     // Rubber stamp shape: handle (top rect) + wide body + base line.
     const ICON_STAMP_FILLED  = '<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="9" y="2" width="6" height="6" rx="1"/><rect x="3" y="8" width="18" height="10" rx="2"/><rect x="2" y="20" width="20" height="3" rx="1"/></svg>';
     const ICON_STAMP_OUTLINE = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="2" width="6" height="6" rx="1"/><rect x="3" y="8" width="18" height="10" rx="2"/><line x1="2" y1="21.5" x2="22" y2="21.5"/></svg>';
+    // Route/ride icon: two nodes joined by a path.
+    const ICON_RIDE = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="5" cy="19" r="2.4"/><circle cx="19" cy="5" r="2.4"/><path d="M7 17 C 12 12, 9 8, 17 6.5"/></svg>';
 
     // ── 4. GIST PERSISTENCE ───────────────────────────────────────────────────
 
@@ -1073,12 +1184,13 @@
         setSyncStatus('saving');
         try {
             const gistId = await findGistId(username);
-            if (!gistId) { state.stamps = new Set(); state.gistId = null; setSyncStatus('saved'); return; }
+            if (!gistId) { state.stamps = new Set(); state.rides = {}; state.gistId = null; setSyncStatus('saved'); return; }
             state.gistId = gistId;
             const gist = await apiFetch(`https://api.github.com/gists/${gistId}`);
             const raw  = gist.files?.['stamps.json']?.content;
             const data = raw ? JSON.parse(raw) : { stamps: [] };
             state.stamps = new Set(Array.isArray(data.stamps) ? data.stamps : []);
+            state.rides  = (data.rides && typeof data.rides === 'object') ? data.rides : {};
             setSyncStatus('saved');
         } catch (err) {
             console.error('loadFromGist:', err);
@@ -1090,7 +1202,7 @@
     const syncToGist = async () => {
         if (!state.user) return;
         setSyncStatus('saving');
-        const content = JSON.stringify({ stamps: [...state.stamps] });
+        const content = JSON.stringify({ stamps: [...state.stamps], rides: state.rides });
         try {
             if (state.gistId) {
                 await apiFetch(`https://api.github.com/gists/${state.gistId}`, {
@@ -1231,7 +1343,7 @@
     // ── 7. LINE RENDERING ─────────────────────────────────────────────────────
 
     const resetAllLines = () => {
-        allLineSegs.forEach(p => p.setStyle({ weight: 2.5, opacity: 0.75 }));
+        allLineSegs.forEach(p => p.setStyle(LINE_BASE));
     };
 
     // Highlight every segment of a line (dim the rest). Shared by hover (desktop)
@@ -1243,11 +1355,31 @@
         const prev = hoveredLine;
         hoveredLine = name;
         if (prev === null) {
-            allLineSegs.forEach(p => p.setStyle({ opacity: 0.15, weight: 1.5 }));
+            allLineSegs.forEach(p => p.setStyle(LINE_DIM));
         } else {
-            linesByName[prev]?.forEach(p => p.setStyle({ opacity: 0.15, weight: 1.5 }));
+            linesByName[prev]?.forEach(p => p.setStyle(LINE_DIM));
         }
-        linesByName[name]?.forEach(p => p.setStyle({ weight: 5, opacity: 1 }));
+        linesByName[name]?.forEach(p => p.setStyle(LINE_FOCUS));
+    };
+
+    /** Popup shown when a line is clicked — carries the "add a ride" button. */
+    const buildLinePopupHtml = (name) => {
+        const { primary, secondary } = orderLineNames(name);
+        const color   = lineColorMap[name] || '#6b6b7a';
+        const ridden  = state.rides[name]?.length || 0;
+        const summary = ridden
+            ? `${ridden} station${ridden > 1 ? 's' : ''} on your ridden sections`
+            : 'No ride logged yet';
+        const label   = ridden ? 'Edit ride' : 'Add a ride';
+        const btnCls  = 'popup-line-ride-btn' + (ridden ? ' has-rides' : '');
+        const nameHtml = secondary
+            ? `<span class="popup-line-label"><span class="popup-line-jp">${primary}</span><span class="popup-line-en">${secondary}</span></span>`
+            : `<span class="popup-line-jp">${primary}</span>`;
+        return `<div class="popup-inner">
+            <div class="popup-line" style="margin-bottom:6px"><span class="popup-line-dot" style="background:${color}"></span>${nameHtml}</div>
+            <div class="popup-ride-summary">${summary}</div>
+            <button class="${btnCls}" data-line="${encodeURIComponent(name)}" aria-label="${label} on ${primary}">${ICON_RIDE} ${label}</button>
+        </div>`;
     };
 
     /**
@@ -1270,7 +1402,7 @@
 
                 const polyline = L.polyline(
                     geometry.coordinates.map(([lng, lat]) => [lat, lng]),
-                    { color, weight: 2.5, opacity: 0.75, renderer: canvasRenderer, interactive: true }
+                    { color, ...LINE_BASE, renderer: canvasRenderer, interactive: true }
                 ).addTo(map);
 
                 if (!linesByName[name]) linesByName[name] = [];
@@ -1287,25 +1419,30 @@
                     { sticky: true, direction: 'top', offset: [0, -8], className: 'line-tooltip' }
                 );
 
+                // Line popup with the "add a ride" entry point (built fresh each
+                // open so it reflects the current language + ride state).
+                polyline.bindPopup(() => buildLinePopupHtml(name),
+                    { offset: L.point(0, -4), closeButton: true, maxWidth: 260, className: 'line-popup' });
+
                 polyline.on('mouseover', () => highlightLine(name, map));
 
                 polyline.on('mouseout', () => {
                     hoverTimer = setTimeout(() => { hoveredLine = null; resetAllLines(); }, HOVER_RESET_MS);
                 });
 
-                // Tap (touch) / click: highlight the line and show its name, then
-                // self-clear after a few seconds. Without this, lines are
-                // uninteractive on touch (no hover event fires).
+                // Tap (touch) / click: highlight the line and open its popup
+                // (which holds the "add a ride" button). Lines are uninteractive
+                // on touch without this (no hover event fires).
                 polyline.on('click', (e) => {
                     if (suppressTap) { suppressTap = false; return; }   // ignore long-press
                     L.DomEvent.stopPropagation(e);
                     highlightLine(name, map);
-                    polyline.openTooltip(e.latlng);
-                    clearTimeout(hoverTimer);
-                    hoverTimer = setTimeout(() => {
-                        hoveredLine = null; resetAllLines(); polyline.closeTooltip();
-                    }, 4000);
+                    currentPopupLine = name;
+                    polyline.closeTooltip();
+                    polyline.openPopup(e.latlng);
                 });
+
+                polyline.on('popupclose', () => { if (currentPopupLine === name) currentPopupLine = null; });
             }
 
             if (i < features.length) {
@@ -1334,10 +1471,12 @@
     };
 
     const loadLines = async (map) => {
+        // After lines are drawn, restack markers and paint any saved ride overlays.
+        const onLinesReady = () => { bringStationsToFront(); renderAllRideOverlays(); };
         try {
             const cached = await cacheGet('eki_lines');
             if (cached && Date.now() - cached.ts < CACHE_TTL) {
-                renderLines(map, cached.data, bringStationsToFront);
+                renderLines(map, cached.data, onLinesReady);
                 return;
             }
         } catch { /* cache miss is fine */ }
@@ -1347,12 +1486,356 @@
                 if (!r.ok) throw new Error(`HTTP ${r.status}`);
                 return r.json();
             });
-            renderLines(map, data, bringStationsToFront);
+            renderLines(map, data, onLinesReady);
             cacheSet('eki_lines', { data, ts: Date.now() }).catch(() => {});
         } catch (err) {
             console.error('loadLines:', err);
             showToast('Failed to load train lines — map may be incomplete', 4000);
         }
+    };
+
+    // ── 7b. RIDE SECTIONS ─────────────────────────────────────────────────────
+    // Lets the user log the stretch of a line they've ridden. The clicked line's
+    // own geometry is the single source of truth: we stitch its GeoJSON segments
+    // into ordered path(s), snap nearby stations onto them, and colour the exact
+    // sub-path between ridden stations. No fragile line-name ↔ station-name bridge.
+
+    // Equirectangular metres-per-degree at a latitude (good enough at line scale).
+    const mPerDeg = (lat) => [111320 * Math.cos(lat * Math.PI / 180), 110540];
+
+    // Distance² (in metres²) from P to segment A–B, plus the clamped projection
+    // parameter t. Planar approximation scaled around the segment's latitude.
+    const projToSeg = (p, a, b, sx, sy) => {
+        const ax = a[1] * sx, ay = a[0] * sy, bx = b[1] * sx, by = b[0] * sy;
+        const px = p[1] * sx, py = p[0] * sy;
+        const dx = bx - ax, dy = by - ay, L2 = dx * dx + dy * dy;
+        let t = L2 === 0 ? 0 : ((px - ax) * dx + (py - ay) * dy) / L2;
+        t = t < 0 ? 0 : t > 1 ? 1 : t;
+        const cx = ax + t * dx, cy = ay + t * dy;
+        return { d2: (px - cx) ** 2 + (py - cy) ** 2, t };
+    };
+
+    // Stitch many (unordered) [lat,lng] segments into ordered chains by matching
+    // coincident endpoints. Most lines form one chain; branched/disjoint lines
+    // yield several (handled as straight-hop fallbacks downstream).
+    const stitchChains = (segs) => {
+        const key = (pt) => pt[0].toFixed(5) + ',' + pt[1].toFixed(5);
+        const ep = {};
+        segs.forEach((s, i) => {
+            if (s.length < 2) return;
+            (ep[key(s[0])]   = ep[key(s[0])]   || []).push([i, 0]);
+            (ep[key(s.at(-1))] = ep[key(s.at(-1))] || []).push([i, 1]);
+        });
+        const used = new Array(segs.length).fill(false);
+        const chains = [];
+        for (let start = 0; start < segs.length; start++) {
+            if (used[start] || segs[start].length < 2) continue;
+            used[start] = true;
+            let chain = segs[start].slice();
+            for (let grow = true; grow; ) {                       // extend tail
+                grow = false;
+                for (const [j, end] of (ep[key(chain.at(-1))] || [])) {
+                    if (used[j]) continue;
+                    const add = end === 0 ? segs[j] : segs[j].slice().reverse();
+                    chain = chain.concat(add.slice(1)); used[j] = true; grow = true; break;
+                }
+            }
+            for (let grow = true; grow; ) {                       // extend head
+                grow = false;
+                for (const [j, end] of (ep[key(chain[0])] || [])) {
+                    if (used[j]) continue;
+                    const add = end === 0 ? segs[j].slice().reverse() : segs[j];
+                    chain = add.slice(0, -1).concat(chain); used[j] = true; grow = true; break;
+                }
+            }
+            chains.push(chain);
+        }
+        return chains;
+    };
+
+    /**
+     * Build (and cache) the ride geometry for a line: ordered stitched chains and
+     * the line's stations snapped onto them in along-track order.
+     * @returns {{chains:{coords:Array,arc:number[]}[], stations:Array}}
+     */
+    const buildLineGeometry = (name) => {
+        if (lineGeomCache[name]) return lineGeomCache[name];
+
+        const polys = linesByName[name] || [];
+        const segs  = polys.map(pl => pl.getLatLngs().map(ll => [ll.lat, ll.lng]));
+        const rawChains = stitchChains(segs).filter(c => c.length >= 2);
+        rawChains.sort((a, b) => b.length - a.length);          // dominant chain first
+
+        let minLat = 90, maxLat = -90, minLng = 180, maxLng = -180;
+        const chains = rawChains.map(coords => {
+            const mid = coords[Math.floor(coords.length / 2)];
+            const [sx, sy] = mPerDeg(mid[0]);
+            const arc = [0];
+            for (let i = 1; i < coords.length; i++) {
+                const a = coords[i - 1], b = coords[i];
+                arc.push(arc[i - 1] + Math.hypot((b[1] - a[1]) * sx, (b[0] - a[0]) * sy));
+                if (a[0] < minLat) minLat = a[0]; if (a[0] > maxLat) maxLat = a[0];
+                if (a[1] < minLng) minLng = a[1]; if (a[1] > maxLng) maxLng = a[1];
+            }
+            const last = coords.at(-1);
+            if (last[0] < minLat) minLat = last[0]; if (last[0] > maxLat) maxLat = last[0];
+            if (last[1] < minLng) minLng = last[1]; if (last[1] > maxLng) maxLng = last[1];
+            return { coords, arc, sx, sy };
+        });
+
+        // Gather candidate stations in the line's bbox, snap each onto the nearest
+        // chain, keep those within RIDE_SNAP_M, dedupe by name+rough-location.
+        const snapMax2 = RIDE_SNAP_M ** 2;
+        const best = {};   // dedupe key -> winning station record
+        for (const st of allStations) {
+            if (st.lat < minLat - RIDE_BBOX_PAD || st.lat > maxLat + RIDE_BBOX_PAD ||
+                st.lon < minLng - RIDE_BBOX_PAD || st.lon > maxLng + RIDE_BBOX_PAD) continue;
+            const p = [st.lat, st.lon];
+            let bd2 = Infinity, bc = -1, bseg = 0, bt = 0;
+            for (let ci = 0; ci < chains.length; ci++) {
+                const { coords, sx, sy } = chains[ci];
+                for (let i = 1; i < coords.length; i++) {
+                    const { d2, t } = projToSeg(p, coords[i - 1], coords[i], sx, sy);
+                    if (d2 < bd2) { bd2 = d2; bc = ci; bseg = i - 1; bt = t; }
+                }
+            }
+            if (bd2 > snapMax2) continue;
+            const ch = chains[bc];
+            const pos = ch.arc[bseg] + bt * (ch.arc[bseg + 1] - ch.arc[bseg]);
+            const dkey = (st.name_kanji || st.code) + '|' + st.lat.toFixed(2) + '|' + st.lon.toFixed(2);
+            if (!best[dkey] || bd2 < best[dkey]._d2) {
+                best[dkey] = { ...st, chainIdx: bc, segIdx: bseg, t: bt, pos, _d2: bd2 };
+            }
+        }
+
+        const stations = Object.values(best)
+            .sort((a, b) => a.chainIdx - b.chainIdx || a.pos - b.pos)
+            .map((s, i) => (s.idx = i, s));
+
+        return (lineGeomCache[name] = { chains, stations });
+    };
+
+    // Exact projected [lat,lng] of a snapped station on its chain.
+    const snappedPoint = (geom, rec) => {
+        const c = geom.chains[rec.chainIdx].coords;
+        const a = c[rec.segIdx], b = c[rec.segIdx + 1];
+        return [a[0] + (b[0] - a[0]) * rec.t, a[1] + (b[1] - a[1]) * rec.t];
+    };
+
+    // The track sub-path between two adjacent ridden stations. Follows the real
+    // geometry when both sit on the same chain; straight-hops across chain gaps.
+    const trackBetween = (geom, a, b) => {
+        if (a.chainIdx !== b.chainIdx) return [snappedPoint(geom, a), snappedPoint(geom, b)];
+        const lo = a.pos <= b.pos ? a : b, hi = a.pos <= b.pos ? b : a;
+        const coords = geom.chains[lo.chainIdx].coords;
+        const pts = [snappedPoint(geom, lo)];
+        for (let i = lo.segIdx + 1; i <= hi.segIdx; i++) pts.push(coords[i]);
+        pts.push(snappedPoint(geom, hi));
+        return pts;
+    };
+
+    // Redraw the bright "ridden stretch" overlays for one line from state.rides.
+    const renderRideOverlays = (name) => {
+        (rideOverlays[name] || []).forEach(p => p.remove());
+        rideOverlays[name] = [];
+        const codes = state.rides[name];
+        if (!codes || !codes.length || !linesByName[name]) return;
+
+        const geom  = buildLineGeometry(name);
+        const byCode = {};
+        geom.stations.forEach(s => { byCode[s.code] = s; });
+        const ridden = codes.map(c => byCode[c]).filter(Boolean).sort((a, b) => a.idx - b.idx);
+        if (ridden.length < 2) return;
+
+        const color = lineColorMap[name] || '#7eb8f7';
+        // Connect consecutive ridden stations that are adjacent in along-track
+        // order (a contiguous section); gaps (separate sections) stay unconnected.
+        for (let i = 1; i < ridden.length; i++) {
+            if (ridden[i].idx !== ridden[i - 1].idx + 1) continue;
+            const pts = trackBetween(geom, ridden[i - 1], ridden[i]);
+            const pl = L.polyline(pts, { color, ...RIDE_OVERLAY, renderer: canvasRenderer, interactive: false }).addTo(mapInstance);
+            rideOverlays[name].push(pl);
+        }
+        bringStationsToFront();   // keep station markers tappable above overlays
+    };
+
+    // Clear and redraw every line's ride overlays (after a session load/import).
+    const renderAllRideOverlays = () => {
+        if (!mapInstance || !Object.keys(linesByName).length) return;
+        Object.keys(rideOverlays).forEach(n => { (rideOverlays[n] || []).forEach(p => p.remove()); rideOverlays[n] = []; });
+        Object.keys(state.rides).forEach(renderRideOverlays);
+    };
+
+    // ── 7c. RIDE-SELECTION MODAL (swipe to pick a stretch) ─────────────────────
+
+    let ridePicker = null;   // { name, geom, sel:Set<idx>, ... } while modal is open
+
+    const rideRowName = (st) => {
+        const jp = st.name_kanji || '';
+        const en = st.name_en || '';
+        const primary   = state.lang === 'jp' ? (jp || en) : (en || jp);
+        const secondary = state.lang === 'jp' ? en : jp;
+        return { primary, secondary: secondary && secondary !== primary ? secondary : '' };
+    };
+
+    // Repaint selected nodes + the coloured connectors between adjacent picks.
+    const paintRideRows = () => {
+        const { sel, rows } = ridePicker;
+        rows.forEach((row, i) => {
+            const on = sel.has(i);
+            row.classList.toggle('sel', on);
+            row.setAttribute('aria-selected', on ? 'true' : 'false');
+            row.classList.toggle('link-up',   on && sel.has(i - 1));
+            row.classList.toggle('link-down', on && sel.has(i + 1));
+        });
+    };
+
+    const openRideModal = (name) => {
+        const overlay = document.getElementById('ride-modal-overlay');
+        const list    = document.getElementById('ride-station-list');
+        const geom    = buildLineGeometry(name);
+        const { primary, secondary } = orderLineNames(name);
+        const color   = lineColorMap[name] || '#7eb8f7';
+
+        document.getElementById('ride-modal-title').textContent = primary;
+        document.getElementById('ride-modal-sub').textContent   = secondary || '';
+        list.style.setProperty('--ride-color', color);
+
+        const footer = document.getElementById('ride-footer');
+        if (geom.stations.length < 2) {
+            list.innerHTML = `<div id="ride-empty">No track data is available to log a ride on this line yet.</div>`;
+            footer.classList.add('hidden');
+            ridePicker = null;
+            overlay.classList.remove('hidden');
+            return;
+        }
+        footer.classList.remove('hidden');
+        document.getElementById('ride-hint').textContent =
+            'Swipe along the line to select the stretch you rode. Swipe over a highlighted stretch to remove it.';
+
+        // Build rows
+        list.innerHTML = '';
+        const rows = geom.stations.map((st, i) => {
+            const { primary: p, secondary: s } = rideRowName(st);
+            const row = document.createElement('div');
+            row.className = 'ride-row';
+            row.dataset.idx = i;
+            row.setAttribute('role', 'option');
+            row.innerHTML = `<span class="ride-node"></span><span class="ride-row-name"><span class="ride-jp">${p}</span>${s ? `<span class="ride-en">${s}</span>` : ''}</span>`;
+            list.appendChild(row);
+            return row;
+        });
+
+        const sel = new Set();
+        const ridden = new Set(state.rides[name] || []);
+        geom.stations.forEach((st, i) => { if (ridden.has(st.code)) sel.add(i); });
+
+        ridePicker = { name, geom, rows, sel, list, dragging: false, mode: 'add', start: 0, base: null, autoTimer: null, autoDir: 0 };
+        paintRideRows();
+        overlay.classList.remove('hidden');
+    };
+
+    const closeRideModal = () => {
+        if (ridePicker) stopRideAutoScroll();
+        ridePicker = null;
+        document.getElementById('ride-modal-overlay').classList.add('hidden');
+    };
+
+    const rideIdxFromPoint = (x, y) => {
+        const el = document.elementFromPoint(x, y);
+        const row = el && el.closest('.ride-row');
+        return row ? +row.dataset.idx : null;
+    };
+
+    const applyRideRange = (cur) => {
+        const { start, mode, base, sel, geom } = ridePicker;
+        const lo = Math.min(start, cur), hi = Math.max(start, cur);
+        sel.clear(); base.forEach(i => sel.add(i));
+        for (let i = lo; i <= hi; i++) { if (mode === 'add') sel.add(i); else sel.delete(i); }
+        paintRideRows();
+    };
+
+    const stopRideAutoScroll = () => {
+        if (ridePicker && ridePicker.autoTimer) { cancelAnimationFrame(ridePicker.autoTimer); ridePicker.autoTimer = null; }
+    };
+
+    // Auto-scroll the list when dragging near its top/bottom edge (long lines).
+    const rideAutoScroll = (clientY) => {
+        if (!ridePicker) return;
+        const { list } = ridePicker;
+        const r = list.getBoundingClientRect();
+        const EDGE = 44;
+        let dir = 0;
+        if (clientY < r.top + EDGE) dir = -1;
+        else if (clientY > r.bottom - EDGE) dir = 1;
+        ridePicker.autoDir = dir;
+        if (dir && !ridePicker.autoTimer) {
+            const step = () => {
+                if (!ridePicker || !ridePicker.dragging || !ridePicker.autoDir) { stopRideAutoScroll(); return; }
+                list.scrollTop += ridePicker.autoDir * 8;
+                const cur = rideIdxFromPoint(ridePicker.lastX, ridePicker.lastY);
+                if (cur != null) applyRideRange(cur);
+                ridePicker.autoTimer = requestAnimationFrame(step);
+            };
+            ridePicker.autoTimer = requestAnimationFrame(step);
+        } else if (!dir) {
+            stopRideAutoScroll();
+        }
+    };
+
+    const setupRideModal = () => {
+        const overlay = document.getElementById('ride-modal-overlay');
+        const list    = document.getElementById('ride-station-list');
+
+        list.addEventListener('pointerdown', (e) => {
+            if (!ridePicker) return;
+            const idx = rideIdxFromPoint(e.clientX, e.clientY);
+            if (idx == null) return;
+            e.preventDefault();
+            list.setPointerCapture(e.pointerId);
+            ridePicker.dragging = true;
+            ridePicker.start = idx;
+            ridePicker.base  = new Set(ridePicker.sel);
+            ridePicker.mode  = ridePicker.sel.has(idx) ? 'remove' : 'add';
+            ridePicker.lastX = e.clientX; ridePicker.lastY = e.clientY;
+            applyRideRange(idx);
+        });
+
+        list.addEventListener('pointermove', (e) => {
+            if (!ridePicker || !ridePicker.dragging) return;
+            ridePicker.lastX = e.clientX; ridePicker.lastY = e.clientY;
+            const idx = rideIdxFromPoint(e.clientX, e.clientY);
+            if (idx != null) applyRideRange(idx);
+            rideAutoScroll(e.clientY);
+        });
+
+        const endDrag = (e) => {
+            if (!ridePicker || !ridePicker.dragging) return;
+            ridePicker.dragging = false;
+            stopRideAutoScroll();
+            try { list.releasePointerCapture(e.pointerId); } catch { /* ignore */ }
+        };
+        list.addEventListener('pointerup', endDrag);
+        list.addEventListener('pointercancel', endDrag);
+
+        const saveRide = () => {
+            if (!ridePicker) { closeRideModal(); return; }
+            const { name, geom, sel } = ridePicker;
+            const codes = [...sel].sort((a, b) => a - b).map(i => geom.stations[i].code);
+            if (codes.length) state.rides[name] = codes; else delete state.rides[name];
+            renderRideOverlays(name);
+            scheduleSave();
+            closeRideModal();
+            showToast(codes.length ? 'Ride saved' : 'Ride cleared');
+        };
+
+        document.getElementById('ride-save').addEventListener('click', saveRide);
+        document.getElementById('ride-cancel').addEventListener('click', closeRideModal);
+        document.getElementById('ride-close').addEventListener('click', closeRideModal);
+        overlay.addEventListener('click', (e) => { if (e.target === overlay) closeRideModal(); });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !overlay.classList.contains('hidden')) closeRideModal();
+        });
     };
 
     // ── 8. MARKER MANAGEMENT ──────────────────────────────────────────────────
@@ -1552,6 +2035,13 @@
             // Funakiya's properly spaced English line names take precedence over
             // ekidata's run-together romaji (e.g. "Jrtokaidohonsen(Tokyo~Atami)").
             Object.assign(lineEnMap, lineNames || {});
+
+            // Retain a flat list of every ekidata station with coordinates — the
+            // pool the ride picker snaps onto a clicked line's geometry.
+            allStations.length = 0;
+            stations.forEach(g => g.stations.forEach(s => {
+                if (s.lat && s.lon) allStations.push({ code: s.code, name_kanji: s.name_kanji, name_en: s.name_en, lat: s.lat, lon: s.lon });
+            }));
 
             // A stamp belongs to a physical station, not a single line. Funakiya
             // matches each stamp to one ekidata row, but an interchange (Tokyo,
@@ -1821,6 +2311,7 @@
             showToast(`Loading ${name}…`);
             await loadFromGist(name);
             refreshAllMarkerStates();
+            renderAllRideOverlays();
             showToast(`Session loaded: ${name}`);
         });
 
@@ -1834,7 +2325,7 @@
 
         // Export JSON
         document.getElementById('session-export').addEventListener('click', () => {
-            const payload = { user: state.user, stamps: [...state.stamps] };
+            const payload = { user: state.user, stamps: [...state.stamps], rides: state.rides };
             const url = URL.createObjectURL(new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' }));
             const a   = Object.assign(document.createElement('a'), {
                 href: url,
@@ -1861,11 +2352,13 @@
                     const data = JSON.parse(ev.target.result);
                     if (!Array.isArray(data.stamps)) throw new Error('Missing stamps array');
                     state.stamps = new Set(data.stamps.filter(s => typeof s === 'string'));
+                    state.rides  = (data.rides && typeof data.rides === 'object') ? data.rides : {};
                     if (data.user && !state.user) {
                         setState('user', data.user);
                         updateSessionUI();
                     }
                     refreshAllMarkerStates();
+                    renderAllRideOverlays();
                     showToast(`Imported ${state.stamps.size} stamps`);
                     await syncToGist();
                 } catch (err) {
@@ -1939,6 +2432,7 @@
             updateSessionUI();
             await loadFromGist(name);
             refreshAllMarkerStates();
+            renderAllRideOverlays();
             showToast(`Welcome, ${name}!`);
         };
 
@@ -1957,6 +2451,18 @@
         setupLanguageToggle(map);
         setupSessionPanel(map);
         setupModal(map);
+        setupRideModal();
+
+        // Event delegation for the line popup's "add a ride" button
+        document.addEventListener('click', (e) => {
+            const btn = e.target.closest('.popup-line-ride-btn');
+            if (!btn) return;
+            e.stopPropagation();
+            const name = decodeURIComponent(btn.dataset.line || '') || currentPopupLine;
+            if (!name) return;
+            map.closePopup();
+            openRideModal(name);
+        });
 
         // Event delegation for popup collect button
         // Reliable alternative to popupopen+getElement (which returns null in Leaflet)
@@ -1993,6 +2499,7 @@
         if (state.user) {
             await loadFromGist(state.user);
             refreshAllMarkerStates();
+            renderAllRideOverlays();
         }
     });
     </script>
