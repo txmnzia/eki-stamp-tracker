@@ -59,10 +59,12 @@ data/
   funakiya-raw.json             raw Funakiya scrape (source for the above)
   railroad-section.geojson      track geometry: one LineString per segment, keyed by 路線名
   rail-graph.json               precomputed national routing graph (for future track work)
+  shinkansen.json               curated Shinkansen lines (ordered stops + coords)
 scripts/
   scrape_funakiya*.py           scrapers for the Funakiya stamp catalogue
   build_stamp_stations.py       builds data/stamp-stations.json
   build_rail_graph.py           builds data/rail-graph.json from the GeoJSON
+  build_shinkansen.py           builds data/shinkansen.json (curated Shinkansen stops)
 docs/
   HANDOVER-line-highlight.md    investigation notes on line↔station association
 ```
@@ -180,6 +182,15 @@ Two different sources are combined, each used for what it's actually good at:
 The overlay is therefore always a slice of the already-drawn geometry (plus the
 sub-`RIDE_STITCH_M` joins that close holes in one continuous line); nothing is
 synthesized across real distances.
+
+**Shinkansen are a curated exception.** The bundled rail geometry has almost no
+Shinkansen track and `stations.json` has no Shinkansen lines, so the geometry
+approach can't work for them. Instead `data/shinkansen.json` (built by
+`scripts/build_shinkansen.py`) lists each Shinkansen's ordered stops with
+coordinates resolved from the station data. The app **skips the broken geojson
+Shinkansen fragments** and draws a clean polyline through these stops; the ride
+picker and overlays use the stops directly (no corridor/merge). Stop coordinates
+match the conventional-station records, so collected-stamp badges still light up.
 
 **Known limitations (acceptable for now):**
 - Where a `路線名` has parallel rapid/local alignments, the best-fit group is one
