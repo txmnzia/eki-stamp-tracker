@@ -144,6 +144,9 @@ keys to `localStorage`). Map data is cached in **IndexedDB** (`eki-cache`, keyed
 - **Save** writes the selection and paints the ridden stretches onto the map,
   following the real track geometry. Branches and multiple separate stretches are
   supported because each segment is independent.
+- **Focus:** while editing, every other line is faded right down, other lines'
+  ride overlays are faded, and hover-highlight is suppressed, so only the line
+  being edited stands out.
 
 Rides are stored as **segment keys** `"codeA|codeB"` (the two stations of a ridden
 inter-station segment). `renderRideOverlays` also still understands the older
@@ -196,9 +199,13 @@ Shinkansen track and `stations.json` has no Shinkansen lines, so the geometry
 approach can't work for them. Instead `data/shinkansen.json` (built by
 `scripts/build_shinkansen.py`) lists each Shinkansen's ordered stops with
 coordinates resolved from the station data. The app **skips the broken geojson
-Shinkansen fragments** and draws a clean polyline through these stops; the ride
-picker and overlays use the stops directly (no corridor/merge). Stop coordinates
-match the conventional-station records, so collected-stamp badges still light up.
+Shinkansen fragments** and draws a **smooth curve** through these stops
+(centripetal Catmull-Rom in `shinkansenPath`, so corners are rounded and the
+ride overlays follow the same curve); Shinkansen also render a touch more
+prominently (`SHINKANSEN_BASE`). The ride logic uses the stops directly (no
+corridor/merge). Stop coordinates match the conventional-station records, so
+collected-stamp badges still light up. (Still an approximation of the real
+track, not exact curvature — see issue #15.)
 
 **Known limitations (acceptable for now):**
 - Where a `路線名` has parallel rapid/local alignments, the best-fit group is one
