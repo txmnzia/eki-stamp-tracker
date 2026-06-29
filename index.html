@@ -1062,7 +1062,7 @@
     // App version — shown discreetly on the welcome modal. Bump on every merge
     // to main. It is also part of the station-cache key, so each release
     // invalidates the 7-day IndexedDB cache and users immediately get fresh data.
-    const APP_VERSION       = 'v1.1.6';
+    const APP_VERSION       = 'v1.1.7';
     const CACHE_TTL         = 7 * 24 * 60 * 60 * 1000;  // 7 days
     const BATCH_SIZE        = 150;      // features per animation frame (line rendering)
     const SYNC_DEBOUNCE_MS  = 2000;     // ms after last stamp change before auto-save
@@ -1836,6 +1836,7 @@
         rideOverlays[name] = [];
         const codes = state.rides[name];
         if (!codes || !codes.length || !linesByName[name]) return;
+        if (name.includes('新幹線')) return;   // Shinkansen rides are unsupported (no station data)
 
         // Seed = centroid of the saved ridden stations' coordinates.
         let sLat = 0, sLng = 0, n = 0;
@@ -1905,8 +1906,14 @@
         list.style.setProperty('--ride-color', color);
 
         const footer = document.getElementById('ride-footer');
-        if (geom.stations.length < 2) {
-            list.innerHTML = `<div id="ride-empty">No track data is available to log a ride on this line yet.</div>`;
+        // Shinkansen lines aren't in the station dataset, so the only stations near
+        // the track are the parallel conventional lines — which would be wrong. Don't
+        // pretend; show an honest message instead of a misleading list.
+        const isShinkansen = name.includes('新幹線');
+        if (isShinkansen || geom.stations.length < 2) {
+            list.innerHTML = `<div id="ride-empty">${isShinkansen
+                ? 'Ride logging isn’t available for Shinkansen lines yet — the dataset doesn’t include Shinkansen stations.'
+                : 'No track data is available to log a ride on this line yet.'}</div>`;
             footer.classList.add('hidden');
             ridePicker = null;
             overlay.classList.remove('hidden');
