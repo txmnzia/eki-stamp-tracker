@@ -333,82 +333,24 @@
         .popup-line-ride-btn:hover { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
         .popup-line-ride-btn.has-rides { background: rgba(126,184,247,0.12); border-color: rgba(126,184,247,0.35); color: var(--accent); }
 
-        /* ── Ride-selection modal (vertical line / swipe to pick) ─────────── */
-        #ride-modal-overlay {
-            position: fixed; inset: 0; z-index: var(--z-modal);
-            background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
-            display: flex; align-items: center; justify-content: center;
-        }
-        #ride-modal {
-            display: flex; flex-direction: column;
+        /* ── Ride edit mode toolbar (selection happens on the map) ────────── */
+        #ride-edit-bar {
+            position: fixed; left: 50%; transform: translateX(-50%);
+            bottom: max(20px, calc(env(safe-area-inset-bottom, 0px) + 14px));
+            z-index: var(--z-modal);
+            width: min(440px, calc(100vw - 24px));
+            display: flex; align-items: center; gap: 12px;
+            padding: 12px 14px;
             background: var(--surface); border: 1px solid var(--border);
-            border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,0.7);
-            width: min(420px, calc(100vw - 24px));
-            max-height: min(80vh, 760px); overflow: hidden;
+            border-radius: 12px; box-shadow: 0 12px 40px rgba(0,0,0,0.6);
         }
-        #ride-modal-header {
-            display: flex; align-items: flex-start; justify-content: space-between; gap: 10px;
-            padding: 18px 20px 12px; border-bottom: 1px solid var(--border);
-        }
-        #ride-modal-title { font-family: var(--jp-font); font-size: 17px; font-weight: 700; color: var(--text); line-height: 1.3; }
-        #ride-modal-sub   { font-size: 11px; color: var(--muted); letter-spacing: 0.04em; margin-top: 2px; }
-        #ride-close {
-            flex-shrink: 0; width: 30px; height: 30px; border-radius: 6px; cursor: pointer;
-            background: var(--surface2); border: 1px solid var(--border); color: var(--muted);
-            font-size: 15px; line-height: 1; display: flex; align-items: center; justify-content: center;
-        }
-        #ride-close:hover { color: var(--text); border-color: var(--accent); }
-        #ride-hint { padding: 10px 20px; font-size: 11px; color: var(--muted); line-height: 1.5; background: rgba(126,184,247,0.05); }
-        #ride-station-list {
-            flex: 1; overflow-y: auto; padding: 8px 16px 12px;
-            touch-action: pan-y;           /* names area scrolls normally; the rail grip selects */
-            -webkit-user-select: none; user-select: none;
-        }
-        .ride-row {
-            position: relative; display: flex; align-items: center;
-            min-height: 38px; padding: 0 8px 0 40px; cursor: pointer;
-        }
-        /* faint full-height rail behind every node */
-        .ride-row::before {
-            content: ''; position: absolute; left: 20px; top: 0; bottom: 0;
-            width: 2px; transform: translateX(-50%); background: var(--border);
-        }
-        .ride-row:first-child::before { top: 50%; }
-        .ride-row:last-child::before  { bottom: 50%; }
-        /* coloured connector for ridden stretches */
-        .ride-row::after {
-            content: ''; position: absolute; left: 20px; width: 3px;
-            transform: translateX(-50%); background: var(--ride-color, var(--accent)); display: none;
-        }
-        .ride-row.link-up::after   { display: block; top: 0;   height: 50%; }
-        .ride-row.link-down::after { display: block; top: 50%; height: 50%; }
-        .ride-row.link-up.link-down::after { display: block; top: 0; height: 100%; }
-        .ride-node {
-            position: absolute; left: 20px; top: 50%; transform: translate(-50%, -50%);
-            width: 11px; height: 11px; border-radius: 50%; z-index: 1;
-            background: var(--surface); border: 2px solid var(--border); transition: background 0.1s, border-color 0.1s;
-        }
-        .ride-row.sel .ride-node { background: var(--ride-color, var(--accent)); border-color: var(--ride-color, var(--accent)); }
-        /* Transparent drag-handle over the rail/node column: selecting only starts here. */
-        .ride-grip {
-            position: absolute; left: 0; top: 0; bottom: 0; width: 40px; z-index: 2;
-            touch-action: none;            /* a drag that starts here selects instead of scrolling */
-            cursor: grab;
-        }
-        .ride-grip:active { cursor: grabbing; }
-        /* Stamp badge shown to the left of the dot when this station's stamp is collected. */
-        .ride-stamp {
-            position: absolute; left: 0; top: 50%; transform: translateY(-50%);
-            width: 13px; height: 13px; z-index: 1; color: var(--stamp-on); pointer-events: none;
-            display: flex; align-items: center; justify-content: center;
-        }
-        .ride-stamp svg { width: 13px; height: 13px; display: block; }
-        .ride-row-name { display: flex; flex-direction: column; gap: 1px; line-height: 1.25; padding: 8px 0; }
-        .ride-jp { font-family: var(--jp-font); font-size: 14px; color: var(--text); }
-        .ride-row.sel .ride-jp { color: var(--text); }
-        .ride-en { font-size: 10px; color: var(--muted); letter-spacing: 0.03em; }
-        #ride-footer { display: flex; gap: 8px; padding: 12px 16px; border-top: 1px solid var(--border); }
-        #ride-empty { padding: 28px 20px; text-align: center; font-size: 12px; color: var(--muted); line-height: 1.6; }
+        #ride-edit-info { flex: 1; min-width: 0; }
+        #ride-edit-title { font-family: var(--jp-font); font-size: 15px; font-weight: 700; color: var(--text); line-height: 1.25; }
+        #ride-edit-sub   { font-size: 10px; color: var(--muted); letter-spacing: 0.04em; }
+        #ride-edit-hint  { font-size: 10px; color: var(--muted); line-height: 1.4; margin-top: 4px; }
+        #ride-edit-actions { display: flex; gap: 8px; flex-shrink: 0; }
+        #ride-edit-actions .modal-btn { padding: 10px 14px; }
+        @media (max-width: 480px) { #ride-edit-hint { display: none; } }
     </style>
 </head>
 <body>
@@ -505,21 +447,15 @@
         </div>
     </div>
 
-    <div id="ride-modal-overlay" class="hidden" role="dialog" aria-modal="true" aria-labelledby="ride-modal-title">
-        <div id="ride-modal">
-            <div id="ride-modal-header">
-                <div>
-                    <div id="ride-modal-title"></div>
-                    <div id="ride-modal-sub"></div>
-                </div>
-                <button id="ride-close" aria-label="Close ride editor">✕</button>
-            </div>
-            <div id="ride-hint"></div>
-            <div id="ride-station-list" role="listbox" aria-label="Stations on this line"></div>
-            <div id="ride-footer">
-                <button class="modal-btn secondary" id="ride-cancel">Cancel</button>
-                <button class="modal-btn confirm" id="ride-save">Save ride</button>
-            </div>
+    <div id="ride-edit-bar" class="hidden" role="region" aria-label="Ride editor">
+        <div id="ride-edit-info">
+            <div id="ride-edit-title"></div>
+            <div id="ride-edit-sub"></div>
+            <div id="ride-edit-hint">Tap a segment, or drag along the line, to mark the stretch you rode. Drag again to remove.</div>
+        </div>
+        <div id="ride-edit-actions">
+            <button class="modal-btn secondary" id="ride-edit-cancel">Cancel</button>
+            <button class="modal-btn confirm" id="ride-edit-save">Save ride</button>
         </div>
     </div>
 
@@ -1062,7 +998,7 @@
     // App version — shown discreetly on the welcome modal. Bump on every merge
     // to main. It is also part of the station-cache key, so each release
     // invalidates the 7-day IndexedDB cache and users immediately get fresh data.
-    const APP_VERSION       = 'v1.2.0';
+    const APP_VERSION       = 'v1.3.0';
     const CACHE_TTL         = 7 * 24 * 60 * 60 * 1000;  // 7 days
     const BATCH_SIZE        = 150;      // features per animation frame (line rendering)
     const SYNC_DEBOUNCE_MS  = 2000;     // ms after last stamp change before auto-save
@@ -1394,9 +1330,7 @@
         const { primary, secondary } = orderLineNames(name);
         const color   = lineColorMap[name] || '#6b6b7a';
         const ridden  = state.rides[name]?.length || 0;
-        const summary = ridden
-            ? `${ridden} station${ridden > 1 ? 's' : ''} on your ridden sections`
-            : 'No ride logged yet';
+        const summary = ridden ? 'Ride logged — edit it on the map' : 'No ride logged yet';
         const label   = ridden ? 'Edit ride' : 'Add a ride';
         const btnCls  = 'popup-line-ride-btn' + (ridden ? ' has-rides' : '');
         const nameHtml = secondary
@@ -1872,27 +1806,30 @@
         const codes = state.rides[name];
         if (!codes || !codes.length || !linesByName[name]) return;
 
-        // Seed = centroid of the saved ridden stations' coordinates.
+        // Seed = centroid of the saved stations (codes, or codes inside segment keys).
+        const stCodes = codes.flatMap(c => c.split('|'));
         let sLat = 0, sLng = 0, n = 0;
-        codes.forEach(c => { const s = stationByCode[c]; if (s) { sLat += s.lat; sLng += s.lon; n++; } });
+        stCodes.forEach(c => { const s = stationByCode[c]; if (s) { sLat += s.lat; sLng += s.lon; n++; } });
         const seed = n ? { lat: sLat / n, lng: sLng / n } : undefined;
 
         const geom  = buildLineGeometry(name, seed);
         const byCode = {};
         geom.stations.forEach(s => { byCode[s.code] = s; });
-        const ridden = codes.map(c => byCode[c]).filter(Boolean).sort((a, b) => a.idx - b.idx);
-        if (ridden.length < 2) return;
-
         const color = lineColorMap[name] || '#7eb8f7';
-        // Highlight each contiguous pair using ONLY the existing drawn geometry
-        // between them. Cross-chain pairs (data gaps) return null and are skipped —
-        // we never draw a synthetic connector.
-        for (let i = 1; i < ridden.length; i++) {
-            if (ridden[i].idx !== ridden[i - 1].idx + 1) continue;
-            const pts = trackBetween(geom, ridden[i - 1], ridden[i]);
-            if (!pts) continue;
-            const pl = L.polyline(pts, { color, ...RIDE_OVERLAY, renderer: canvasRenderer, interactive: false }).addTo(mapInstance);
-            rideOverlays[name].push(pl);
+        const draw = (a, b) => {
+            const pts = a && b && trackBetween(geom, a, b);
+            if (pts) rideOverlays[name].push(L.polyline(pts, { color, ...RIDE_OVERLAY, renderer: canvasRenderer, interactive: false }).addTo(mapInstance));
+        };
+
+        if (codes.some(c => c.includes('|'))) {
+            // Segment-based: each key is a ridden inter-station segment.
+            codes.forEach(k => { const [x, y] = k.split('|'); draw(byCode[x], byCode[y]); });
+        } else {
+            // Legacy station-code rides: colour between consecutive ridden stations.
+            const ridden = codes.map(c => byCode[c]).filter(Boolean).sort((a, b) => a.idx - b.idx);
+            for (let i = 1; i < ridden.length; i++) {
+                if (ridden[i].idx === ridden[i - 1].idx + 1) draw(ridden[i - 1], ridden[i]);
+            }
         }
         bringStationsToFront();   // keep station markers tappable above overlays
     };
@@ -1904,193 +1841,171 @@
         Object.keys(state.rides).forEach(renderRideOverlays);
     };
 
-    // ── 7c. RIDE-SELECTION MODAL (swipe to pick a stretch) ─────────────────────
+    // ── 7c. RIDE EDIT MODE (select stretches directly on the map) ──────────────
+    // Branched/looping lines can't be shown as one list, so rides are selected on
+    // the map itself: each inter-station segment is individually paintable. Tap a
+    // segment to toggle it; drag along the line to paint a stretch. A drag that
+    // starts ON the line paints (map pan locked for that gesture); a drag that
+    // starts off the line pans normally. Selection is stored as segment keys.
 
-    let ridePicker = null;   // { name, geom, sel:Set<idx>, ... } while modal is open
+    let rideEdit = null;   // active edit session (or null)
 
-    const rideRowName = (st) => {
-        const jp = st.name_kanji || '';
-        const en = st.name_en || '';
-        const primary   = state.lang === 'jp' ? (jp || en) : (en || jp);
-        const secondary = state.lang === 'jp' ? en : jp;
-        return { primary, secondary: secondary && secondary !== primary ? secondary : '' };
-    };
+    const segStyle = (color, on) => on
+        ? { color, weight: 6, opacity: 0.95, lineCap: 'round', renderer: canvasRenderer, interactive: false }
+        : { color, weight: 3, opacity: 0.4,  lineCap: 'round', renderer: canvasRenderer, interactive: false };
 
-    // Repaint selected nodes + the coloured connectors between adjacent picks.
-    const paintRideRows = () => {
-        const { sel, rows } = ridePicker;
-        rows.forEach((row, i) => {
-            const on = sel.has(i);
-            row.classList.toggle('sel', on);
-            row.setAttribute('aria-selected', on ? 'true' : 'false');
-            row.classList.toggle('link-up',   on && sel.has(i - 1));
-            row.classList.toggle('link-down', on && sel.has(i + 1));
+    // Selectable inter-station segments = consecutive stations within each chain.
+    const buildRideSegments = (geom) => {
+        const byChain = {};
+        geom.stations.forEach(s => (byChain[s.chainIdx] = byChain[s.chainIdx] || []).push(s));
+        const segs = [];
+        Object.values(byChain).forEach(list => {
+            list.sort((a, b) => a.pos - b.pos);
+            for (let i = 1; i < list.length; i++) {
+                const pts = trackBetween(geom, list[i - 1], list[i]);
+                if (pts) segs.push({ a: list[i - 1], b: list[i], key: [list[i - 1].code, list[i].code].sort().join('|'), pts });
+            }
         });
+        return segs;
     };
 
-    const openRideModal = (name) => {
-        const overlay = document.getElementById('ride-modal-overlay');
-        const list    = document.getElementById('ride-station-list');
-        const geom    = buildLineGeometry(name, linePopupSeed);
-        const { primary, secondary } = orderLineNames(name);
-        const color   = lineColorMap[name] || '#7eb8f7';
+    // Initial selection from saved state (segment keys, or legacy station codes).
+    const initialRideSelection = (name, segs) => {
+        const sel = new Set();
+        const saved = state.rides[name] || [];
+        if (saved.some(c => c.includes('|'))) {
+            const keys = new Set(saved);
+            segs.forEach(s => { if (keys.has(s.key)) sel.add(s.key); });
+        } else {
+            const ridden = new Set(saved);
+            segs.forEach(s => { if (ridden.has(s.a.code) && ridden.has(s.b.code)) sel.add(s.key); });
+        }
+        return sel;
+    };
 
-        document.getElementById('ride-modal-title').textContent = primary;
-        document.getElementById('ride-modal-sub').textContent   = secondary || '';
-        list.style.setProperty('--ride-color', color);
+    const paintSeg = (seg) => seg.pl.setStyle(segStyle(rideEdit.color, rideEdit.selected.has(seg.key)));
 
-        const footer = document.getElementById('ride-footer');
-        // A Shinkansen with no curated data (none expected) or a line with too little
-        // track can't be logged — show an honest message instead of a wrong list.
+    const refreshRideEditCache = () => {
+        if (!rideEdit) return;
+        rideEdit.segs.forEach(seg => { seg._cp = seg.pts.map(p => mapInstance.latLngToContainerPoint([p[0], p[1]])); });
+    };
+
+    const ptSegDist = (px, py, a, b) => {
+        const dx = b.x - a.x, dy = b.y - a.y, L2 = dx * dx + dy * dy;
+        let t = L2 ? ((px - a.x) * dx + (py - a.y) * dy) / L2 : 0;
+        t = t < 0 ? 0 : t > 1 ? 1 : t;
+        return Math.hypot(px - (a.x + t * dx), py - (a.y + t * dy));
+    };
+
+    const rideHitTest = (x, y) => {
+        let best = null, bd = IS_TOUCH ? 24 : 14;
+        for (const seg of rideEdit.segs) {
+            const cp = seg._cp;
+            for (let i = 1; i < cp.length; i++) {
+                const d = ptSegDist(x, y, cp[i - 1], cp[i]);
+                if (d < bd) { bd = d; best = seg; }
+            }
+        }
+        return best;
+    };
+
+    const applyRidePaint = (seg) => {
+        if (!seg) return;
+        if (rideEdit.mode === 'add') rideEdit.selected.add(seg.key); else rideEdit.selected.delete(seg.key);
+        paintSeg(seg);
+    };
+
+    const enterRideEditMode = (name) => {
+        if (rideEdit) exitRideEditMode(false);
+        const geom = buildLineGeometry(name, linePopupSeed);
         const unsupported = name.includes('新幹線') && !shinkansenData[name];
         if (unsupported || geom.stations.length < 2) {
-            list.innerHTML = `<div id="ride-empty">${unsupported
-                ? 'Ride logging isn’t available for this Shinkansen line yet.'
-                : 'No track data is available to log a ride on this line yet.'}</div>`;
-            footer.classList.add('hidden');
-            ridePicker = null;
-            overlay.classList.remove('hidden');
+            showToast(unsupported ? 'Ride logging isn’t available for this Shinkansen line yet.'
+                                  : 'No track data to log a ride on this line yet.', 3000);
             return;
         }
-        footer.classList.remove('hidden');
-        document.getElementById('ride-hint').textContent =
-            'Drag along the line on the left to select the stretch you rode (drag over a highlighted stretch to remove it). Scroll the names to move through the line.';
+        mapInstance.closePopup();
+        const color = lineColorMap[name] || '#7eb8f7';
+        const segs  = buildRideSegments(geom);
+        (rideOverlays[name] || []).forEach(p => p.remove()); rideOverlays[name] = [];   // hide existing overlay while editing
 
-        // Physical stations whose stamp is already collected (matched by location,
-        // since a line's per-station code may differ from the stamp's code).
         const collectedKeys = new Set();
         markers.forEach(m => { if (m._isCollected && m._stationData) collectedKeys.add(dedupeKey(m._stationData)); });
 
-        // Build rows
-        list.innerHTML = '';
-        const rows = geom.stations.map((st, i) => {
-            const { primary: p, secondary: s } = rideRowName(st);
-            const collected = collectedKeys.has(dedupeKey(st));
-            const row = document.createElement('div');
-            row.className = 'ride-row';
-            row.dataset.idx = i;
-            row.setAttribute('role', 'option');
-            const stamp = collected ? `<span class="ride-stamp" title="Stamp collected" aria-label="stamp collected">${ICON_STAMP_FILLED}</span>` : '';
-            row.innerHTML = `<span class="ride-node"></span><span class="ride-grip" aria-hidden="true"></span>${stamp}<span class="ride-row-name"><span class="ride-jp">${p}</span>${s ? `<span class="ride-en">${s}</span>` : ''}</span>`;
-            list.appendChild(row);
-            return row;
+        const layer = L.layerGroup().addTo(mapInstance);
+        segs.forEach(seg => { seg.pl = L.polyline(seg.pts, segStyle(color, false)).addTo(layer); });
+        geom.stations.forEach(s => {
+            const coll = collectedKeys.has(dedupeKey(s));
+            L.circleMarker([s.lat, s.lon], { radius: 4, weight: 2, color: coll ? '#f7c948' : '#ffffff',
+                fillColor: coll ? '#f7c948' : color, fillOpacity: 1, interactive: false, renderer: canvasRenderer }).addTo(layer);
         });
 
-        const sel = new Set();
-        const ridden = new Set(state.rides[name] || []);
-        geom.stations.forEach((st, i) => { if (ridden.has(st.code)) sel.add(i); });
+        rideEdit = { name, color, geom, segs, selected: initialRideSelection(name, segs), layer, dragging: false, mode: 'add' };
+        segs.forEach(paintSeg);
+        mapInstance.on('moveend zoomend', refreshRideEditCache);
+        try { mapInstance.fitBounds(L.latLngBounds(geom.chains.flatMap(c => c.coords)).pad(0.18)); } catch { /* ignore */ }
+        refreshRideEditCache();
 
-        ridePicker = { name, geom, rows, sel, list, dragging: false, mode: 'add', start: 0, base: null, autoTimer: null, autoDir: 0 };
-        paintRideRows();
-        overlay.classList.remove('hidden');
+        const { primary, secondary } = orderLineNames(name);
+        document.getElementById('ride-edit-title').textContent = primary;
+        document.getElementById('ride-edit-sub').textContent   = secondary || '';
+        document.getElementById('ride-edit-bar').classList.remove('hidden');
+        mapInstance.getContainer().style.cursor = 'crosshair';
     };
 
-    const closeRideModal = () => {
-        if (ridePicker) stopRideAutoScroll();
-        ridePicker = null;
-        document.getElementById('ride-modal-overlay').classList.add('hidden');
-    };
-
-    const rideIdxFromPoint = (x, y) => {
-        const el = document.elementFromPoint(x, y);
-        const row = el && el.closest('.ride-row');
-        return row ? +row.dataset.idx : null;
-    };
-
-    const applyRideRange = (cur) => {
-        const { start, mode, base, sel, geom } = ridePicker;
-        const lo = Math.min(start, cur), hi = Math.max(start, cur);
-        sel.clear(); base.forEach(i => sel.add(i));
-        for (let i = lo; i <= hi; i++) { if (mode === 'add') sel.add(i); else sel.delete(i); }
-        paintRideRows();
-    };
-
-    const stopRideAutoScroll = () => {
-        if (ridePicker && ridePicker.autoTimer) { cancelAnimationFrame(ridePicker.autoTimer); ridePicker.autoTimer = null; }
-    };
-
-    // Auto-scroll the list when dragging near its top/bottom edge (long lines).
-    const rideAutoScroll = (clientY) => {
-        if (!ridePicker) return;
-        const { list } = ridePicker;
-        const r = list.getBoundingClientRect();
-        const EDGE = 44;
-        let dir = 0;
-        if (clientY < r.top + EDGE) dir = -1;
-        else if (clientY > r.bottom - EDGE) dir = 1;
-        ridePicker.autoDir = dir;
-        if (dir && !ridePicker.autoTimer) {
-            const step = () => {
-                if (!ridePicker || !ridePicker.dragging || !ridePicker.autoDir) { stopRideAutoScroll(); return; }
-                list.scrollTop += ridePicker.autoDir * 8;
-                const cur = rideIdxFromPoint(ridePicker.lastX, ridePicker.lastY);
-                if (cur != null) applyRideRange(cur);
-                ridePicker.autoTimer = requestAnimationFrame(step);
-            };
-            ridePicker.autoTimer = requestAnimationFrame(step);
-        } else if (!dir) {
-            stopRideAutoScroll();
-        }
-    };
-
-    const setupRideModal = () => {
-        const overlay = document.getElementById('ride-modal-overlay');
-        const list    = document.getElementById('ride-station-list');
-
-        list.addEventListener('pointerdown', (e) => {
-            if (!ridePicker) return;
-            // Only the left rail/node column starts a selection drag; a press on the
-            // station names (or anywhere else) is left alone so the list scrolls.
-            const grip = e.target.closest && e.target.closest('.ride-grip');
-            if (!grip) return;
-            const row = grip.closest('.ride-row');
-            const idx = row ? +row.dataset.idx : null;
-            if (idx == null) return;
-            e.preventDefault();
-            try { list.setPointerCapture(e.pointerId); } catch { /* ignore */ }
-            ridePicker.dragging = true;
-            ridePicker.start = idx;
-            ridePicker.base  = new Set(ridePicker.sel);
-            ridePicker.mode  = ridePicker.sel.has(idx) ? 'remove' : 'add';
-            ridePicker.lastX = e.clientX; ridePicker.lastY = e.clientY;
-            applyRideRange(idx);
-        });
-
-        list.addEventListener('pointermove', (e) => {
-            if (!ridePicker || !ridePicker.dragging) return;
-            ridePicker.lastX = e.clientX; ridePicker.lastY = e.clientY;
-            const idx = rideIdxFromPoint(e.clientX, e.clientY);
-            if (idx != null) applyRideRange(idx);
-            rideAutoScroll(e.clientY);
-        });
-
-        const endDrag = (e) => {
-            if (!ridePicker || !ridePicker.dragging) return;
-            ridePicker.dragging = false;
-            stopRideAutoScroll();
-            try { list.releasePointerCapture(e.pointerId); } catch { /* ignore */ }
-        };
-        list.addEventListener('pointerup', endDrag);
-        list.addEventListener('pointercancel', endDrag);
-
-        const saveRide = () => {
-            if (!ridePicker) { closeRideModal(); return; }
-            const { name, geom, sel } = ridePicker;
-            const codes = [...sel].sort((a, b) => a - b).map(i => geom.stations[i].code);
-            if (codes.length) state.rides[name] = codes; else delete state.rides[name];
-            renderRideOverlays(name);
+    const exitRideEditMode = (save) => {
+        if (!rideEdit) return;
+        const { name, selected, layer } = rideEdit;
+        mapInstance.off('moveend zoomend', refreshRideEditCache);
+        layer.remove();
+        mapInstance.dragging.enable();
+        const c = mapInstance.getContainer(); c.style.cursor = ''; c.style.touchAction = '';
+        document.getElementById('ride-edit-bar').classList.add('hidden');
+        rideEdit = null;
+        if (save) {
+            const keys = [...selected];
+            if (keys.length) state.rides[name] = keys; else delete state.rides[name];
             scheduleSave();
-            closeRideModal();
-            showToast(codes.length ? 'Ride saved' : 'Ride cleared');
-        };
+            showToast(keys.length ? 'Ride saved' : 'Ride cleared');
+        }
+        renderRideOverlays(name);
+    };
 
-        document.getElementById('ride-save').addEventListener('click', saveRide);
-        document.getElementById('ride-cancel').addEventListener('click', closeRideModal);
-        document.getElementById('ride-close').addEventListener('click', closeRideModal);
-        overlay.addEventListener('click', (e) => { if (e.target === overlay) closeRideModal(); });
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && !overlay.classList.contains('hidden')) closeRideModal();
+    const setupRideEdit = () => {
+        const container = mapInstance.getContainer();
+        const cancel = () => exitRideEditMode(false);
+        document.getElementById('ride-edit-save').addEventListener('click', () => exitRideEditMode(true));
+        document.getElementById('ride-edit-cancel').addEventListener('click', cancel);
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && rideEdit) cancel(); });
+
+        const xy = (e) => { const r = container.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; };
+        container.addEventListener('pointerdown', (e) => {
+            if (!rideEdit) return;
+            const [x, y] = xy(e);
+            const seg = rideHitTest(x, y);
+            if (!seg) return;                       // off the line → let the map pan
+            e.preventDefault();
+            mapInstance.dragging.disable();         // lock pan for this paint gesture
+            container.style.touchAction = 'none';
+            try { container.setPointerCapture(e.pointerId); } catch { /* ignore */ }
+            rideEdit.dragging = true;
+            rideEdit.mode = rideEdit.selected.has(seg.key) ? 'remove' : 'add';
+            applyRidePaint(seg);
         });
+        container.addEventListener('pointermove', (e) => {
+            if (!rideEdit || !rideEdit.dragging) return;
+            const [x, y] = xy(e);
+            applyRidePaint(rideHitTest(x, y));
+        });
+        const end = (e) => {
+            if (!rideEdit || !rideEdit.dragging) return;
+            rideEdit.dragging = false;
+            mapInstance.dragging.enable();
+            container.style.touchAction = '';
+            try { container.releasePointerCapture(e.pointerId); } catch { /* ignore */ }
+        };
+        container.addEventListener('pointerup', end);
+        container.addEventListener('pointercancel', end);
     };
 
     // ── 8. MARKER MANAGEMENT ──────────────────────────────────────────────────
@@ -2738,9 +2653,9 @@
         setupLanguageToggle(map);
         setupSessionPanel(map);
         setupModal(map);
-        setupRideModal();
+        setupRideEdit();
 
-        // Event delegation for the line popup's "add a ride" button
+        // Event delegation for the line popup's "add a ride" button → map edit mode
         document.addEventListener('click', (e) => {
             const btn = e.target.closest('.popup-line-ride-btn');
             if (!btn) return;
@@ -2748,7 +2663,7 @@
             const name = decodeURIComponent(btn.dataset.line || '') || currentPopupLine;
             if (!name) return;
             map.closePopup();
-            openRideModal(name);
+            enterRideEditMode(name);
         });
 
         // Event delegation for popup collect button
