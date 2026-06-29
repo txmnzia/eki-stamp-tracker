@@ -164,6 +164,12 @@
         .popup-collect-btn:hover { background: var(--border); }
         .popup-collect-btn.collected { background: rgba(247,201,72,0.15); border-color: rgba(247,201,72,0.35); color: var(--stamp-on); }
         .popup-collect-btn.collected:hover { background: rgba(247,201,72,0.08); border-color: rgba(247,201,72,0.2); color: #d4a830; }
+        .popup-nostamp {
+            margin-top: 10px; padding: 8px 12px; text-align: center;
+            font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase;
+            color: var(--muted); background: var(--surface2);
+            border: 1px dashed var(--border); border-radius: var(--radius);
+        }
 
         /* ── Session panel ────────────────────────────────────────────────── */
         #session-panel {
@@ -1003,7 +1009,7 @@
     // App version — shown discreetly on the welcome modal. Bump on every merge
     // to main. It is also part of the station-cache key, so each release
     // invalidates the 7-day IndexedDB cache and users immediately get fresh data.
-    const APP_VERSION       = 'v1.3.17';
+    const APP_VERSION       = 'v1.3.18';
     const CACHE_TTL         = 7 * 24 * 60 * 60 * 1000;  // 7 days
     const BATCH_SIZE        = 150;      // features per animation frame (line rendering)
     const SYNC_DEBOUNCE_MS  = 2000;     // ms after last stamp change before auto-save
@@ -1073,7 +1079,8 @@
     let syncDebounce  = null;
 
     // Markers
-    const markers       = [];
+    const markers       = [];  // STAMP stations only (drive stats + search)
+    const plainMarkers  = [];  // every other ekidata station — discreet, clickable, no stamp
     const dedupeMarkers = {};
 
     // Lines
@@ -1605,8 +1612,12 @@
         markers.forEach(m => { if (m._isCollected) m.bringToFront(); });
     };
 
-    const bringStationsToFront = () => {
+    // Re-add markers so they draw above the lines. Stamp markers are restacked every
+    // call (cheap, ~2.3k); the ~6.7k plain markers are only restacked when asked
+    // (includePlain, once after lines load) to avoid churning them on every overlay.
+    const bringStationsToFront = (includePlain = false) => {
         if (!mapInstance) return;
+        if (includePlain) plainMarkers.forEach(m => { m.removeFrom(mapInstance); m.addTo(mapInstance); });
         markers.forEach(m => { m.removeFrom(mapInstance); m.addTo(mapInstance); });
         bringCollectedToFront();
     };
@@ -1621,7 +1632,7 @@
     const loadLines = async (map) => {
         await loadShinkansen();   // ready before onLinesReady draws them
         // After lines are drawn, restack markers, draw Shinkansen, paint ride overlays.
-        const onLinesReady = () => { bringStationsToFront(); drawShinkansen(map); renderAllRideOverlays(); };
+        const onLinesReady = () => { bringStationsToFront(true); drawShinkansen(map); renderAllRideOverlays(); };
         try {
             const cached = await cacheGet('eki_lines');
             if (cached && Date.now() - cached.ts < CACHE_TTL) {
@@ -2324,9 +2335,18 @@
 
     const circleStyle = (collected, zoom) => collected
         ? { radius: markerRadius(true,  zoom), fillColor: '#f7c948', fillOpacity: 1,    color: 'rgba(247,201,72,0.4)', weight: 2, renderer: canvasRenderer }
-        // Uncollected: visible but much more discreet — soft grey, semi-transparent,
-        // no border — so the gold collected markers clearly stand out against them.
+        // Uncollected stamp: visible but discreet — soft grey, semi-transparent, no
+        // border — so the gold collected markers clearly stand out against them.
         : { radius: markerRadius(false, zoom), fillColor: '#9aa0ac', fillOpacity: 0.5,  color: '#9aa0ac',              weight: 0, renderer: canvasRenderer };
+
+    // Non-stamp stations: a third, even more discreet tier — smaller and a dimmer,
+    // cooler grey — so they read as "minor station, no stamp" without competing with
+    // the stamp dots. Still clickable for a name/lines popup.
+    const plainStyle = (zoom) => ({
+        radius: Math.max(MARKER_ABS_MIN * 0.85, markerRadius(false, zoom) * 0.6),
+        fillColor: '#6b7280', fillOpacity: 0.4, color: '#6b7280', weight: 0, renderer: canvasRenderer,
+    });
+    const styleFor = (marker, zoom) => marker._noStamp ? plainStyle(zoom) : circleStyle(marker._isCollected, zoom);
 
     // ── 9. POPUP ──────────────────────────────────────────────────────────────
 
@@ -2353,17 +2373,24 @@
             return `<div class="popup-line"><span class="popup-line-dot" style="background:${color}"></span>${label}</div>`;
         }).join('');
 
-        const collected = marker._isCollected;
-        const btnIcon   = collected ? ICON_STAMP_FILLED : ICON_STAMP_OUTLINE;
-        const btnLabel  = collected ? 'Collected' : 'Collect stamp';
-        const btnClass  = 'popup-collect-btn' + (collected ? ' collected' : '');
-        const btnAria   = `${collected ? 'Remove stamp' : 'Collect stamp'} for ${primary}`;
+        // Non-stamp station: same popup, but no collect action (there's no stamp).
+        let action;
+        if (marker._noStamp) {
+            action = `<div class="popup-nostamp">No stamp at this station</div>`;
+        } else {
+            const collected = marker._isCollected;
+            const btnIcon   = collected ? ICON_STAMP_FILLED : ICON_STAMP_OUTLINE;
+            const btnLabel  = collected ? 'Collected' : 'Collect stamp';
+            const btnClass  = 'popup-collect-btn' + (collected ? ' collected' : '');
+            const btnAria   = `${collected ? 'Remove stamp' : 'Collect stamp'} for ${primary}`;
+            action = `<button class="${btnClass}" aria-label="${btnAria}">${btnIcon} ${btnLabel}</button>`;
+        }
 
         return `<div class="popup-inner">
             <div class="popup-name">${primary}</div>
             ${secondary ? `<div class="popup-name-secondary">${secondary}</div>` : ''}
             ${lineBadges}
-            <button class="${btnClass}" aria-label="${btnAria}">${btnIcon} ${btnLabel}</button>
+            ${action}
         </div>`;
     };
 
@@ -2374,7 +2401,7 @@
      * Stations sharing name + ~1km grid cell are collapsed into one marker
      * with a multi-line badge popup.
      */
-    const createMarker = (station, map) => {
+    const createMarker = (station, map, plain = false) => {
         const { code, line_code } = station;
         if (!code || !line_code) return;
 
@@ -2389,11 +2416,12 @@
             return;
         }
 
-        const collected = state.stamps.has(code);
-        const marker    = L.circleMarker([station.lat, station.lon], circleStyle(collected, map.getZoom()));
+        const collected = !plain && state.stamps.has(code);
+        const marker    = L.circleMarker([station.lat, station.lon], plain ? plainStyle(map.getZoom()) : circleStyle(collected, map.getZoom()));
 
         marker._stationData  = station;
         marker._isCollected  = collected;
+        marker._noStamp      = plain;
         marker._lineCodes    = [line_code];
         marker.stationName   = getDisplayName(station, code);
         marker.stationNameJP = station.name_kanji || '';
@@ -2461,7 +2489,7 @@
         });
 
         dedupeMarkers[key] = marker;
-        markers.push(marker);
+        (plain ? plainMarkers : markers).push(marker);
         marker.addTo(map);
     };
 
@@ -2540,6 +2568,19 @@
                 if (!(k in stampedLoc)) stampedLoc[k] = en || null;
             }));
 
+            // Pass C: every OTHER station (nowhere stamped at its location) as a
+            // discreet, clickable non-stamp marker. Created BEFORE the stamp passes so
+            // the gold/grey stamp dots draw on top of these. Same name resolver so the
+            // romaji is decent. These live in plainMarkers (excluded from stats/search).
+            stations.forEach(g => {
+                if (g.line_name_en && !lineEnMap[g.line_name]) lineEnMap[g.line_name] = g.line_name_en;
+                g.stations.forEach(s => {
+                    if (!s.lat || !s.lon || dedupeKey(s) in stampedLoc) return;
+                    s.name_en = resolveEn(s);
+                    createMarker(s, map, true);
+                });
+            });
+
             // Pass A: create markers from the matched rows first, so each
             // marker's identity (its stamp code) is the matched ekidata code —
             // keeps saved progress lighting up correctly.
@@ -2566,6 +2607,7 @@
                 clearTimeout(zoomDebounce);
                 zoomDebounce = setTimeout(() => {
                     const zoom = map.getZoom();
+                    plainMarkers.forEach(m => m.setStyle(plainStyle(zoom)));
                     markers.forEach(m => m.setStyle(circleStyle(m._isCollected, zoom)));
                     bringCollectedToFront();
                 }, 150);
@@ -2694,7 +2736,7 @@
             if (title) title.textContent = state.lang === 'jp' ? 'ようこそ！' : 'Welcome!';
 
             // Rebuild all marker names + popup content in new language
-            markers.forEach(m => {
+            [...markers, ...plainMarkers].forEach(m => {
                 if (!m._stationData) return;
                 m.stationName = getDisplayName(m._stationData, m._stationData.code);
                 m.setPopupContent(buildPopupHtml(m));
