@@ -230,32 +230,38 @@ conventional-station records, so collected-stamp badges still light up.
 
 #### Ride gaps (chain holes) and the audit
 
-The bundled geojson splits a line into one or more stitched **chains**; a ride is
-coloured by slicing the chain between consecutive ridden stations. Where two
-ekidata-**adjacent** stations land on *different* chains (a hole the
-`RIDE_STITCH_M` stitch couldn't close), the stretch would show a gap. Two
-mechanisms keep rides continuous: `bridgeChains`/`RIDE_STITCH_M` joins chains
-across tiny holes during geometry build, and `buildRideSegments` adds a short
-straight **bridge** segment between adjacent cross-chain stations up to
-`RIDE_GAP_BRIDGE_M` (10km) — capped so we never invent a long line.
-`renderRideOverlays` renders through the same segments and back-fills internal
-gaps for rides saved before bridging existed.
+The base map draws *every* geojson segment of a line, so the faint line looks
+continuous. The ride overlay must follow that same track. The bundled geojson is
+split into stitched **chains** (only segments with matching endpoints join), but
+the track as a whole is almost always one connected graph — the chains just break
+at junctions and T-joins. So `trackBetween` doesn't slice a single chain; it
+routes the **shortest path along a graph of all the corridor's track vertices**
+(`buildLineGraph`, keyed by rounded coordinate so shared junction points
+reconnect). A ride segment between two ekidata-adjacent stations therefore follows
+the real drawn line across chain boundaries — no straight chord, no chain-break
+gap. `buildRideSegments` builds one segment per consecutive station pair this way.
+Only when the graph genuinely *can't* connect them (no track in the geojson) does
+it fall back to a short straight bridge ≤ `RIDE_GAP_BRIDGE_M`; a route longer than
+`RIDE_ROUTE_MAX_M` is treated as a data anomaly and dropped. `renderRideOverlays`
+renders through the same segments (and back-fills for older saves).
 
 Don't chase gaps one screenshot at a time — run the audit, which drives the real
 app (so it uses the exact same geometry code) and lists every line's remaining
-gaps, classified as `HOLE` (no track nearby) or `SPLIT-TRACK` (track exists but
-split; a straight bridge barely diverges):
+gaps, classified as `HOLE` (graph can't connect them — no track there, the base
+line is gapped too) or `SPLIT-TRACK` (track exists; with graph routing these are
+now followed, so any left are beyond `RIDE_ROUTE_MAX_M`):
 
 ```sh
 python3 -m http.server 8097 &                 # serve the repo
 BASE_URL=http://127.0.0.1:8097 node scripts/audit-ride-gaps.mjs   # exits 1 if any gap
 ```
 
-At the current 10km cap the only residual gaps are remote rural stretches (e.g.
-予讃線's Shimonada seaside section) and two **data anomalies** the audit
-deliberately won't bridge: a branch terminus threaded into the station order
-(成田線 Matsugishi→Abiko, 72km) and a duplicate `路線名` spanning regions
-(京都線, 23km). Those need a station-list/corridor fix, not a bridge.
+With graph routing the only residual gaps are remote rural stretches where the
+geojson genuinely lacks track (e.g. 予讃線's Shimonada seaside section, 函館本線's
+Komagatake parallel routes) and two **data anomalies** the audit deliberately
+won't draw: a branch terminus threaded into the station order (成田線
+Matsugishi→Abiko, 72km) and a duplicate `路線名` spanning regions (京都線, 23km).
+Those need a station-list/corridor fix, not a bridge.
 
 ### Persistence shape
 

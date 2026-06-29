@@ -1001,7 +1001,7 @@
     // App version — shown discreetly on the welcome modal. Bump on every merge
     // to main. It is also part of the station-cache key, so each release
     // invalidates the 7-day IndexedDB cache and users immediately get fresh data.
-    const APP_VERSION       = 'v1.3.13';
+    const APP_VERSION       = 'v1.3.14';
     const CACHE_TTL         = 7 * 24 * 60 * 60 * 1000;  // 7 days
     const BATCH_SIZE        = 150;      // features per animation frame (line rendering)
     const SYNC_DEBOUNCE_MS  = 2000;     // ms after last stamp change before auto-save
@@ -1039,15 +1039,14 @@
     const RIDE_STITCH_M = 850;          // join the line's OWN fragmented chains across data gaps up
                                         // to this size (central-Tokyo track is often labelled under
                                         // another line name, leaving ~500m holes in a continuous line).
-    const RIDE_GAP_BRIDGE_M = 10000;    // when two ekidata-adjacent stations still land on different
-                                        // chains (a hole the stitch above couldn't close), bridge them
-                                        // with a short straight connector up to this size, so a ridden
-                                        // stretch stays continuous instead of showing a gap. 10km covers
-                                        // every commuter/suburban adjacency (mostly split track where a
-                                        // straight line barely diverges). Beyond it: remote rural holes or
-                                        // data anomalies (branch terminus threaded into the order, or a
-                                        // duplicate line name spanning regions). Run scripts/audit-ride-
-                                        // gaps.mjs to list every line's remaining gaps.
+    const RIDE_GAP_BRIDGE_M = 10000;    // fallback only: if the track graph has NO path between two
+                                        // ekidata-adjacent stations (a genuine hole, no geojson track),
+                                        // join them with a straight connector up to this size. With graph
+                                        // routing this rarely fires — most "gaps" are connected track that
+                                        // now follows the real line. Run scripts/audit-ride-gaps.mjs.
+    const RIDE_ROUTE_MAX_M = 22000;     // cap a single inter-station track route; longer ⇒ treat as a data
+                                        // anomaly (branch terminus threaded into the order / duplicate line
+                                        // name spanning regions) and don't draw it.
     const SHK_BRIDGE_M  = 20000;        // Shinkansen: join the line's OWN track fragments across larger
                                         // gaps (tunnels split the bundled geometry into pieces) so a line
                                         // becomes one ordered chain we can slice along.
@@ -1958,18 +1957,65 @@
         return [a[0] + (b[0] - a[0]) * rec.t, a[1] + (b[1] - a[1]) * rec.t];
     };
 
-    // The EXISTING track sub-path between two adjacent ridden stations — exact
-    // vertices of the already-drawn line geometry. Returns null when the two
-    // stations are on different chains (a data gap): we never invent a connecting
-    // line, we only highlight geometry that is actually drawn.
+    // Build (and cache) an undirected graph of ALL the corridor's track vertices.
+    // The base map draws every geojson segment, so the track is fully connected
+    // even where stitchChains split it into separate chains (junctions, T-joins).
+    // Keying vertices by rounded coordinate reconnects those shared points, so a
+    // ride can follow the real drawn track rather than break at a chain boundary.
+    const buildLineGraph = (geom) => {
+        if (geom._graph) return geom._graph;
+        const key = (p) => p[0].toFixed(5) + ',' + p[1].toFixed(5);
+        const adj = new Map(), pt = new Map();
+        const add = (p, q) => {
+            const kp = key(p), kq = key(q); if (kp === kq) return;
+            pt.set(kp, p); pt.set(kq, q);
+            const w = ptDist(p, q);
+            (adj.get(kp) || adj.set(kp, []).get(kp)).push({ k: kq, w });
+            (adj.get(kq) || adj.set(kq, []).get(kq)).push({ k: kp, w });
+        };
+        geom.chains.forEach(ch => { const c = ch.coords; for (let i = 1; i < c.length; i++) add(c[i - 1], c[i]); });
+        return (geom._graph = { adj, pt, key });
+    };
+
+    // The real track sub-path between two ridden stations: the SHORTEST path along
+    // the connected track graph (so it follows the actual drawn line, across chain
+    // boundaries, never a straight chord). Returns null when the graph has no path
+    // between them (a genuine hole) or the route is implausibly long (a data
+    // anomaly, e.g. a branch terminus mis-ordered as adjacent). Endpoints are the
+    // exact projected station positions.
     const trackBetween = (geom, a, b) => {
-        if (a.chainIdx !== b.chainIdx) return null;
-        const lo = a.pos <= b.pos ? a : b, hi = a.pos <= b.pos ? b : a;
-        const coords = geom.chains[lo.chainIdx].coords;
-        const pts = [snappedPoint(geom, lo)];
-        for (let i = lo.segIdx + 1; i <= hi.segIdx; i++) pts.push(coords[i]);
-        pts.push(snappedPoint(geom, hi));
-        return pts;
+        const Pa = snappedPoint(geom, a), Pb = snappedPoint(geom, b);
+        if (a.chainIdx === b.chainIdx && a.segIdx === b.segIdx) return [Pa, Pb];
+        const G = buildLineGraph(geom);
+        const ca = geom.chains[a.chainIdx].coords, cb = geom.chains[b.chainIdx].coords;
+        const exit = new Map();   // b's two bounding vertices, with the cost to reach Pb
+        exit.set(G.key(cb[b.segIdx]),     ptDist(Pb, cb[b.segIdx]));
+        exit.set(G.key(cb[b.segIdx + 1]), ptDist(Pb, cb[b.segIdx + 1]));
+
+        const dist = new Map(), prev = new Map(), heap = [];
+        const push = (d, k) => { heap.push([d, k]); let i = heap.length - 1;
+            while (i > 0) { const p = (i - 1) >> 1; if (heap[p][0] <= heap[i][0]) break; [heap[p], heap[i]] = [heap[i], heap[p]]; i = p; } };
+        const pop = () => { const top = heap[0], last = heap.pop();
+            if (heap.length) { heap[0] = last; let i = 0; for (;;) { let l = 2*i+1, r = 2*i+2, s = i;
+                if (l < heap.length && heap[l][0] < heap[s][0]) s = l;
+                if (r < heap.length && heap[r][0] < heap[s][0]) s = r;
+                if (s === i) break; [heap[s], heap[i]] = [heap[i], heap[s]]; i = s; } } return top; };
+        const seed = (k, d) => { if (G.pt.has(k) && d < (dist.get(k) ?? Infinity)) { dist.set(k, d); prev.set(k, null); push(d, k); } };
+        seed(G.key(ca[a.segIdx]),     ptDist(Pa, ca[a.segIdx]));
+        seed(G.key(ca[a.segIdx + 1]), ptDist(Pa, ca[a.segIdx + 1]));
+
+        let bestK = null, bestTotal = Infinity;
+        while (heap.length) {
+            const [d, k] = pop();
+            if (d > dist.get(k)) continue;
+            if (d >= bestTotal || d > RIDE_ROUTE_MAX_M) break;     // no unpopped node can do better
+            if (exit.has(k)) { const t = d + exit.get(k); if (t < bestTotal) { bestTotal = t; bestK = k; } }
+            for (const { k: nk, w } of G.adj.get(k)) { const nd = d + w; if (nd < (dist.get(nk) ?? Infinity)) { dist.set(nk, nd); prev.set(nk, k); push(nd, nk); } }
+        }
+        if (bestK === null || bestTotal > RIDE_ROUTE_MAX_M) return null;
+        const mid = []; for (let k = bestK; k != null; k = prev.get(k)) mid.push(G.pt.get(k));
+        mid.reverse();
+        return [Pa, ...mid, Pb];
     };
 
     // Redraw the bright "ridden stretch" overlays for one line from state.rides.
@@ -2044,30 +2090,22 @@
         ? { color, weight: 6, opacity: 0.95, lineCap: 'round', renderer: canvasRenderer, interactive: false }
         : { color, weight: 3, opacity: 0.4,  lineCap: 'round', renderer: canvasRenderer, interactive: false };
 
-    // Selectable inter-station segments. Within a chain, each consecutive pair is a
-    // real-track segment. Across a chain boundary, if two ekidata-adjacent stations
-    // fell on different chains (a hole in the geojson the stitch couldn't close), add
-    // a short straight BRIDGE segment so the gap is still selectable and a ridden
-    // stretch renders continuously (capped at RIDE_GAP_BRIDGE_M so we never invent a
-    // long line). Bridges and real segments share the same {a,b,key,pts} shape.
+    // Selectable inter-station segments, one per consecutive pair in ekidata order.
+    // Each follows the REAL track (shortest path on the connected track graph), so
+    // it crosses chain boundaries the same way the base map line does. Only when the
+    // graph genuinely can't connect them (no track there) do we fall back to a short
+    // straight BRIDGE, capped at RIDE_GAP_BRIDGE_M so we never invent a long line.
     const buildRideSegments = (geom) => {
-        const byChain = {};
-        geom.stations.forEach(s => (byChain[s.chainIdx] = byChain[s.chainIdx] || []).push(s));
+        const list = [...geom.stations].sort((a, b) => a.idx - b.idx);
         const segs = [];
-        Object.values(byChain).forEach(list => {
-            list.sort((a, b) => a.pos - b.pos);
-            for (let i = 1; i < list.length; i++) {
-                const pts = trackBetween(geom, list[i - 1], list[i]);
-                if (pts) segs.push({ a: list[i - 1], b: list[i], key: [list[i - 1].code, list[i].code].sort().join('|'), pts });
+        for (let i = 1; i < list.length; i++) {
+            const a = list[i - 1], b = list[i];
+            let pts = trackBetween(geom, a, b), bridge = false;
+            if (!pts) {
+                const pa = snappedPoint(geom, a), pb = snappedPoint(geom, b);
+                if (ptDist(pa, pb) <= RIDE_GAP_BRIDGE_M) { pts = [pa, pb]; bridge = true; }
             }
-        });
-        const byIdx = [...geom.stations].sort((a, b) => a.idx - b.idx);
-        for (let i = 1; i < byIdx.length; i++) {
-            const a = byIdx[i - 1], b = byIdx[i];
-            if (a.chainIdx === b.chainIdx) continue;          // handled within-chain above
-            const pa = snappedPoint(geom, a), pb = snappedPoint(geom, b);
-            if (ptDist(pa, pb) <= RIDE_GAP_BRIDGE_M)
-                segs.push({ a, b, key: [a.code, b.code].sort().join('|'), pts: [pa, pb], bridge: true });
+            if (pts) segs.push({ a, b, key: [a.code, b.code].sort().join('|'), pts, bridge });
         }
         return segs;
     };
