@@ -1,14 +1,16 @@
 #!/usr/bin/env python3
 """Build data/shinkansen.json — a curated Shinkansen layer for the ride feature.
 
-The bundled rail geometry (railroad-section.geojson) has almost no Shinkansen
-track, and ekidata's stations.json has no Shinkansen lines at all, so the app
-can't derive Shinkansen stops or draw a complete line. This script curates each
-Shinkansen's ordered stops, resolves their coordinates from the station data
-(falling back to a small manual table for Shinkansen-only stations), and writes
-a clean per-line list. The app draws a polyline through these stops and uses
-them for the ride picker. Station coordinates match the conventional-station
-records, so collected-stamp matching (by name+location) just works.
+ekidata's stations.json has no Shinkansen lines at all, so the app can't derive
+Shinkansen stops the normal way. This script curates each Shinkansen's ordered
+stops, resolves their coordinates from the station data (falling back to a small
+manual table for Shinkansen-only stations), and writes a clean per-line list.
+The app uses these stops for the ride picker and as anchors for the drawn line;
+to draw it the app FOLLOWS the bundled track geometry (railroad-section.geojson)
+where it exists — fragmented per line but present for most of each route — and
+snaps these curated stops onto it (see shinkansenPath in index.html). Station
+coordinates match the conventional-station records, so collected-stamp matching
+(by name+location) just works.
 
 Run: python3 scripts/build_shinkansen.py
 """
