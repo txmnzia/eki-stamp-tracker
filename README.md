@@ -230,38 +230,42 @@ conventional-station records, so collected-stamp badges still light up.
 
 #### Ride gaps (chain holes) and the audit
 
-The base map draws *every* geojson segment of a line, so the faint line looks
-continuous. The ride overlay must follow that same track. The bundled geojson is
-split into stitched **chains** (only segments with matching endpoints join), but
-the track as a whole is almost always one connected graph — the chains just break
-at junctions and T-joins. So `trackBetween` doesn't slice a single chain; it
-routes the **shortest path along a graph of all the corridor's track vertices**
-(`buildLineGraph`, keyed by rounded coordinate so shared junction points
-reconnect). A ride segment between two ekidata-adjacent stations therefore follows
-the real drawn line across chain boundaries — no straight chord, no chain-break
-gap. `buildRideSegments` builds one segment per consecutive station pair this way.
-Only when the graph genuinely *can't* connect them (no track in the geojson) does
-it fall back to a short straight bridge ≤ `RIDE_GAP_BRIDGE_M`; a route longer than
-`RIDE_ROUTE_MAX_M` is treated as a data anomaly and dropped. `renderRideOverlays`
-renders through the same segments (and back-fills for older saves).
+The base map draws *every* geojson segment of a line, so the ride overlay must
+follow exactly that — **one source for both**. `trackBetween` routes the shortest
+path along a graph of **all** the line's track vertices (`buildLineGraph` over
+`geom.allChains` — every stitched chain, *before* the corridor filter drops far
+same-name regions — keyed by rounded coordinate so junction/T-join points
+reconnect). So a ride segment between two ekidata-adjacent stations follows the
+real drawn line across chain boundaries. `buildRideSegments` builds one segment
+per consecutive pair this way and **never invents a straight connector**: if the
+graph can't link two stations, the geojson has no track there (the base line is
+gapped too), so the ride shows the same gap. A route over `RIDE_ROUTE_MAX_M` is a
+data anomaly and is dropped. The corridor filter still limits which *stations* a
+ride lists (so the Ōsaka 山手 stops don't appear in a Tōkyō ride), but never which
+track it can follow. `renderRideOverlays` renders through the same segments.
+
+> Why no straight bridges? An earlier version filled gaps with short straight
+> connectors, but that drew bogus lines across bare-name corridors like `本線`
+> (which merges 京成 / 相鉄 / 京急 main lines). Routing on the real graph instead
+> means unrelated railways stay disconnected (a gap, not a diagonal), and genuinely
+> connected track is always followed — edit mode and view mode look identical.
 
 Don't chase gaps one screenshot at a time — run the audit, which drives the real
-app (so it uses the exact same geometry code) and lists every line's remaining
-gaps, classified as `HOLE` (graph can't connect them — no track there, the base
-line is gapped too) or `SPLIT-TRACK` (track exists; with graph routing these are
-now followed, so any left are beyond `RIDE_ROUTE_MAX_M`):
+app (exact same geometry code) and lists every line's remaining gaps, classified
+`HOLE` (no track there — the base line is gapped too) or `SPLIT-TRACK` (track
+nearby but the route was absent/over `RIDE_ROUTE_MAX_M`):
 
 ```sh
 python3 -m http.server 8097 &                 # serve the repo
 BASE_URL=http://127.0.0.1:8097 node scripts/audit-ride-gaps.mjs   # exits 1 if any gap
 ```
 
-With graph routing the only residual gaps are remote rural stretches where the
-geojson genuinely lacks track (e.g. 予讃線's Shimonada seaside section, 函館本線's
-Komagatake parallel routes) and two **data anomalies** the audit deliberately
-won't draw: a branch terminus threaded into the station order (成田線
-Matsugishi→Abiko, 72km) and a duplicate `路線名` spanning regions (京都線, 23km).
-Those need a station-list/corridor fix, not a bridge.
+(The audit waits for all line features to finish rendering first — building
+geometry mid-render caches an incomplete graph and reports false gaps.) The ~13
+residual gaps are all genuine: remote rural stretches the geojson lacks (予讃線
+Shimonada, 上越線 Gala-Yuzawa, 筑肥線 Yamamoto branch) and bare/duplicate `路線名`
+anomalies that merge unrelated railways (成田線 Abiko branch, 京都線, 奈良線). Those
+need a station-list/corridor fix, not a faked line.
 
 ### Persistence shape
 

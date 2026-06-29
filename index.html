@@ -1001,7 +1001,7 @@
     // App version — shown discreetly on the welcome modal. Bump on every merge
     // to main. It is also part of the station-cache key, so each release
     // invalidates the 7-day IndexedDB cache and users immediately get fresh data.
-    const APP_VERSION       = 'v1.3.14';
+    const APP_VERSION       = 'v1.3.16';
     const CACHE_TTL         = 7 * 24 * 60 * 60 * 1000;  // 7 days
     const BATCH_SIZE        = 150;      // features per animation frame (line rendering)
     const SYNC_DEBOUNCE_MS  = 2000;     // ms after last stamp change before auto-save
@@ -1039,11 +1039,6 @@
     const RIDE_STITCH_M = 850;          // join the line's OWN fragmented chains across data gaps up
                                         // to this size (central-Tokyo track is often labelled under
                                         // another line name, leaving ~500m holes in a continuous line).
-    const RIDE_GAP_BRIDGE_M = 10000;    // fallback only: if the track graph has NO path between two
-                                        // ekidata-adjacent stations (a genuine hole, no geojson track),
-                                        // join them with a straight connector up to this size. With graph
-                                        // routing this rarely fires — most "gaps" are connected track that
-                                        // now follows the real line. Run scripts/audit-ride-gaps.mjs.
     const RIDE_ROUTE_MAX_M = 22000;     // cap a single inter-station track route; longer ⇒ treat as a data
                                         // anomaly (branch terminus threaded into the order / duplicate line
                                         // name spanning regions) and don't draw it.
@@ -1795,7 +1790,7 @@
                 return { code: s.code, name_kanji: s.name_kanji, name_en: s.name_en, lat: s.lat, lon: s.lon,
                     chainIdx: 0, segIdx: v >= lastV ? lastV - 1 : v, t: v >= lastV ? 1 : 0, pos: ch.arc[v], idx: i };
             });
-            return (lineGeomCache[name] = { chains: [ch], stations });
+            return (lineGeomCache[name] = { chains: [ch], allChains: [ch], stations });
         }
 
         const cacheKey = name + '|' + seedBucket(seed);
@@ -1947,7 +1942,13 @@
                 .map((s, i) => (s.idx = i, s));
         }
 
-        return (lineGeomCache[cacheKey] = { chains, stations });
+        // allChains = every stitched chain of the line (before the corridor filter
+        // drops far same-name regions). The ride graph routes on THIS so it matches
+        // the base map line's connectivity exactly — the corridor filter only limits
+        // which STATIONS are listed, never which track a ride can follow. (Far
+        // duplicate-name regions stay separate components, so routing can't jump to
+        // them; RIDE_ROUTE_MAX_M caps any stray long route.)
+        return (lineGeomCache[cacheKey] = { chains, allChains: all, stations });
     };
 
     // Exact projected [lat,lng] of a snapped station on its chain.
@@ -1973,7 +1974,7 @@
             (adj.get(kp) || adj.set(kp, []).get(kp)).push({ k: kq, w });
             (adj.get(kq) || adj.set(kq, []).get(kq)).push({ k: kp, w });
         };
-        geom.chains.forEach(ch => { const c = ch.coords; for (let i = 1; i < c.length; i++) add(c[i - 1], c[i]); });
+        (geom.allChains || geom.chains).forEach(ch => { const c = ch.coords; for (let i = 1; i < c.length; i++) add(c[i - 1], c[i]); });
         return (geom._graph = { adj, pt, key });
     };
 
@@ -2091,21 +2092,20 @@
         : { color, weight: 3, opacity: 0.4,  lineCap: 'round', renderer: canvasRenderer, interactive: false };
 
     // Selectable inter-station segments, one per consecutive pair in ekidata order.
-    // Each follows the REAL track (shortest path on the connected track graph), so
-    // it crosses chain boundaries the same way the base map line does. Only when the
-    // graph genuinely can't connect them (no track there) do we fall back to a short
-    // straight BRIDGE, capped at RIDE_GAP_BRIDGE_M so we never invent a long line.
+    // Each follows the REAL track (shortest path on the connected track graph), so it
+    // crosses chain boundaries exactly the way the base map line does. We deliberately
+    // do NOT invent a straight connector when the graph can't link two stations: if
+    // the bundled geojson has no track there, the base line is gapped too, so the ride
+    // shows the same gap — both views stay faithful to the one source. (A missing
+    // segment is therefore a genuine data hole, or a bare-name corridor like "本線"
+    // that merges unrelated railways — see scripts/audit-ride-gaps.mjs.)
     const buildRideSegments = (geom) => {
         const list = [...geom.stations].sort((a, b) => a.idx - b.idx);
         const segs = [];
         for (let i = 1; i < list.length; i++) {
             const a = list[i - 1], b = list[i];
-            let pts = trackBetween(geom, a, b), bridge = false;
-            if (!pts) {
-                const pa = snappedPoint(geom, a), pb = snappedPoint(geom, b);
-                if (ptDist(pa, pb) <= RIDE_GAP_BRIDGE_M) { pts = [pa, pb]; bridge = true; }
-            }
-            if (pts) segs.push({ a, b, key: [a.code, b.code].sort().join('|'), pts, bridge });
+            const pts = trackBetween(geom, a, b);
+            if (pts) segs.push({ a, b, key: [a.code, b.code].sort().join('|'), pts });
         }
         return segs;
     };

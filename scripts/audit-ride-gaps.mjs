@@ -2,34 +2,32 @@
 /**
  * audit-ride-gaps.mjs — find ride-overlay discontinuities across EVERY line.
  *
- * A line's track is stitched from the bundled geojson into one or more "chains".
- * A ride is coloured by slicing the chain between consecutive ridden stations, so
- * a gap appears wherever two ekidata-ADJACENT stations end up on different chains
- * and are too far apart to bridge (> RIDE_GAP_BRIDGE_M). This script drives the
- * real app (so it uses the exact same buildLineGeometry / buildRideSegments — no
- * reimplementation that can drift) and reports every such gap, classified as:
- *   - HOLE         : no geojson track near the straight line  → a straight bridge
- *                    is the only/honest option (and looks fine).
- *   - SPLIT-TRACK  : real track exists between them but is split into chains → the
- *                    straight bridge diverges from the visible base line by `div`.
+ * A ride is coloured by following the connected track graph between consecutive
+ * stations (the same track the base map line draws). A gap therefore appears only
+ * where the geojson genuinely can't connect two ekidata-ADJACENT stations — the
+ * base line is gapped there too. This script drives the real app (so it uses the
+ * exact same buildLineGeometry / buildRideSegments — no reimplementation that can
+ * drift) and reports every such gap, classified as:
+ *   - HOLE         : no geojson track near the straight line (the base line is
+ *                    gapped here too — a genuine data hole).
+ *   - SPLIT-TRACK  : track exists nearby but the graph route was too long / absent
+ *                    (a route over RIDE_ROUTE_MAX_M, i.e. a data anomaly).
  *
- * Use it to (a) see all gaps at once instead of finding them one screenshot at a
- * time, (b) pick RIDE_GAP_BRIDGE_M from data, (c) gate CI (exits 1 if gaps remain
- * above --max). Anomalies (tens of km — branch termini threaded into the order, or
- * duplicate line names spanning regions) surface as the largest HOLEs.
+ * Use it to (a) see all gaps at once instead of one screenshot at a time, (b) gate
+ * CI (exits 1 if any gap remains). The largest gaps are data anomalies — branch
+ * termini threaded into the station order, or bare/duplicate line names ("本線")
+ * that merge unrelated railways.
  *
  * Usage:
  *   # serve the repo somewhere first, e.g.  python3 -m http.server 8097
- *   BASE_URL=http://127.0.0.1:8097 node scripts/audit-ride-gaps.mjs [--max=8000]
+ *   BASE_URL=http://127.0.0.1:8097 node scripts/audit-ride-gaps.mjs
  *
  * Env:
  *   BASE_URL      app origin (default http://127.0.0.1:8097)
  *   PW_MODULE     playwright module specifier (default "playwright")
  *   PW_CHROMIUM   chromium executablePath (default: playwright's bundled one)
  */
-const arg = (k, d) => { const a = process.argv.find(s => s.startsWith(`--${k}=`)); return a ? a.split('=')[1] : d; };
 const BASE_URL = process.env.BASE_URL || 'http://127.0.0.1:8097';
-const MAX = Number(arg('max', '0')) || 0;   // 0 = use the app's RIDE_GAP_BRIDGE_M
 
 const pw = await import(process.env.PW_MODULE || 'playwright');
 const chromium = pw.chromium || pw.default?.chromium;
@@ -37,13 +35,22 @@ const browser = await chromium.launch({ executablePath: process.env.PW_CHROMIUM 
 const page = await browser.newPage();
 await page.goto(`${BASE_URL}/index.html`, { waitUntil: 'load' });
 await page.waitForFunction(
-  () => typeof linesByName !== 'undefined' && Object.keys(linesByName).length > 100 &&
-        typeof buildLineGeometry === 'function' && typeof buildRideSegments === 'function',
+  () => typeof buildLineGeometry === 'function' && typeof buildRideSegments === 'function' &&
+        typeof allLineSegs !== 'undefined',
   null, { timeout: 60000 });
-await page.waitForTimeout(2500);
+// IMPORTANT: line features render batched over many frames. Building geometry before
+// rendering finishes caches an INCOMPLETE graph (false gaps). Wait until the polyline
+// count stops growing, then settle.
+await page.waitForFunction(() => {
+  window.__n = window.__n || { last: -1, stable: 0 };
+  const n = allLineSegs.length;
+  window.__n.stable = (n === window.__n.last) ? window.__n.stable + 1 : 0;
+  window.__n.last = n;
+  return window.__n.stable >= 5;
+}, null, { timeout: 60000, polling: 250 });
+await page.waitForTimeout(500);
 
-const report = await page.evaluate((forcedMax) => {
-  const cap = forcedMax || (typeof RIDE_GAP_BRIDGE_M !== 'undefined' ? RIDE_GAP_BRIDGE_M : 8000);
+const report = await page.evaluate(() => {
   const md = (a, b) => { const sx = 111320 * Math.cos((a[0] + b[0]) / 2 * Math.PI / 180), sy = 110540;
                          return Math.hypot((a[1] - b[1]) * sx, (a[0] - b[0]) * sy); };
   const lines = Object.keys(linesByName);
@@ -77,10 +84,10 @@ const report = await page.evaluate((forcedMax) => {
     if (gaps.length) { totalGaps += gaps.length; out.push({ name, gaps }); }
   }
   out.sort((x, y) => Math.max(...y.gaps.map(g => g.m)) - Math.max(...x.gaps.map(g => g.m)));
-  return { cap, totalLines: lines.length, linesWithGaps: out.length, totalGaps, lines: out };
-}, MAX);
+  return { totalLines: lines.length, linesWithGaps: out.length, totalGaps, lines: out };
+});
 
-console.log(`ride-gap audit @ cap ${report.cap}m — ${report.totalLines} lines, ${report.linesWithGaps} with gaps, ${report.totalGaps} gaps total\n`);
+console.log(`ride-gap audit — ${report.totalLines} lines, ${report.linesWithGaps} with gaps, ${report.totalGaps} gaps total\n`);
 for (const l of report.lines) {
   console.log(l.name);
   for (const g of l.gaps) console.log(`  ${g.kind.padEnd(11)} ${String(g.m).padStart(6)}m  ${g.pair}${g.kind === 'SPLIT-TRACK' ? `  (diverges ~${g.div}m)` : ''}`);
