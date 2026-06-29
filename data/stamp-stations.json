@@ -1,6 +1,6 @@
 {
  "source": "stamp.funakiya.com",
- "count": 2408,
+ "count": 2409,
  "line_names": {
   "JR千歳線": "JR Chitose Line / Airport Branch Line",
   "JR石勝線": "JR Sekisho Line(Yubari Branch Line)",
@@ -1066,6 +1066,20 @@
   "4号線丸ノ内線分岐線": "Marunouchi Line (Branch)"
  },
  "stations": [
+  {
+   "slug": "keio-takaosanguchi",
+   "name_kanji": "高尾山口",
+   "name_en": "Takaosanguchi",
+   "yomi": null,
+   "lat": 35.632377,
+   "lon": 139.269856,
+   "lines": [
+    "Keio Takao Line"
+   ],
+   "eki_code": "eki_2400307",
+   "eki_line": "京王高尾線",
+   "code": "eki_2400307"
+  },
   {
    "slug": "abukyu-fukushima,iizaka-fukushima",
    "name_kanji": "福島",
