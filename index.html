@@ -1009,7 +1009,7 @@
     // App version — shown discreetly on the welcome modal. Bump on every merge
     // to main. It is also part of the station-cache key, so each release
     // invalidates the 7-day IndexedDB cache and users immediately get fresh data.
-    const APP_VERSION       = 'v1.3.19';
+    const APP_VERSION       = 'v1.3.20';
     const CACHE_TTL         = 7 * 24 * 60 * 60 * 1000;  // 7 days
     const BATCH_SIZE        = 150;      // features per animation frame (line rendering)
     const SYNC_DEBOUNCE_MS  = 2000;     // ms after last stamp change before auto-save
@@ -2224,6 +2224,9 @@
             p.options.interactive = false;
         });
         Object.entries(rideOverlays).forEach(([ln, arr]) => { if (ln !== name) arr.forEach(pl => pl.setStyle({ opacity: 0.1 })); });
+        // Station markers sit right on the line; make them non-interactive too so a tap
+        // paints the ride segment instead of opening a station popup (restored on exit).
+        [...markers, ...plainMarkers].forEach(m => { m.options.interactive = false; });
 
         mapInstance.on('moveend zoomend', refreshRideEditCache);
         try { mapInstance.fitBounds(L.latLngBounds(geom.chains.flatMap(c => c.coords)).pad(0.18)); } catch { /* ignore */ }
@@ -2248,6 +2251,7 @@
         rideEdit = null;
         // Restore focus: re-enable interactivity, un-fade all lines and other overlays.
         allLineSegs.forEach(p => { p.options.interactive = true; });
+        [...markers, ...plainMarkers].forEach(m => { m.options.interactive = true; });
         resetAllLines();
         Object.values(rideOverlays).forEach(arr => arr.forEach(pl => pl.setStyle({ opacity: RIDE_OVERLAY.opacity })));
         if (save) {
