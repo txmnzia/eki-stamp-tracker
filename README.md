@@ -65,6 +65,7 @@ scripts/
   build_stamp_stations.py       builds data/stamp-stations.json
   build_rail_graph.py           builds data/rail-graph.json from the GeoJSON
   build_shinkansen.py           builds data/shinkansen.json (curated Shinkansen stops)
+  audit-ride-gaps.mjs           audits EVERY line for ride-overlay gaps (see "Ride gaps")
 docs/
   HANDOVER-line-highlight.md    investigation notes on line↔station association
 ```
@@ -224,10 +225,37 @@ conventional-station records, so collected-stamp badges still light up.
   of them; a few stops on the other alignment may not snap (e.g. the central
   Tōkyō Chūō stations Tokyo/Kanda/Ochanomizu sit on relabelled track and don't
   appear). The handover documents this as a genuinely hard case.
-- At *large* chain gaps within a corridor, the stretch isn't coloured (we won't
-  draw a synthetic connector — only sub-`RIDE_STITCH_M` holes are joined).
 - A national track-accurate version (`data/rail-graph.json` + Dijkstra) is
   documented in `docs/HANDOVER-line-highlight.md` as a future option.
+
+#### Ride gaps (chain holes) and the audit
+
+The bundled geojson splits a line into one or more stitched **chains**; a ride is
+coloured by slicing the chain between consecutive ridden stations. Where two
+ekidata-**adjacent** stations land on *different* chains (a hole the
+`RIDE_STITCH_M` stitch couldn't close), the stretch would show a gap. Two
+mechanisms keep rides continuous: `bridgeChains`/`RIDE_STITCH_M` joins chains
+across tiny holes during geometry build, and `buildRideSegments` adds a short
+straight **bridge** segment between adjacent cross-chain stations up to
+`RIDE_GAP_BRIDGE_M` (10km) — capped so we never invent a long line.
+`renderRideOverlays` renders through the same segments and back-fills internal
+gaps for rides saved before bridging existed.
+
+Don't chase gaps one screenshot at a time — run the audit, which drives the real
+app (so it uses the exact same geometry code) and lists every line's remaining
+gaps, classified as `HOLE` (no track nearby) or `SPLIT-TRACK` (track exists but
+split; a straight bridge barely diverges):
+
+```sh
+python3 -m http.server 8097 &                 # serve the repo
+BASE_URL=http://127.0.0.1:8097 node scripts/audit-ride-gaps.mjs   # exits 1 if any gap
+```
+
+At the current 10km cap the only residual gaps are remote rural stretches (e.g.
+予讃線's Shimonada seaside section) and two **data anomalies** the audit
+deliberately won't bridge: a branch terminus threaded into the station order
+(成田線 Matsugishi→Abiko, 72km) and a duplicate `路線名` spanning regions
+(京都線, 23km). Those need a station-list/corridor fix, not a bridge.
 
 ### Persistence shape
 
