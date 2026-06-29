@@ -998,7 +998,7 @@
     // App version — shown discreetly on the welcome modal. Bump on every merge
     // to main. It is also part of the station-cache key, so each release
     // invalidates the 7-day IndexedDB cache and users immediately get fresh data.
-    const APP_VERSION       = 'v1.3.1';
+    const APP_VERSION       = 'v1.3.2';
     const CACHE_TTL         = 7 * 24 * 60 * 60 * 1000;  // 7 days
     const BATCH_SIZE        = 150;      // features per animation frame (line rendering)
     const SYNC_DEBOUNCE_MS  = 2000;     // ms after last stamp change before auto-save
@@ -1035,6 +1035,11 @@
     const RIDE_STITCH_M = 850;          // join the line's OWN fragmented chains across data gaps up
                                         // to this size (central-Tokyo track is often labelled under
                                         // another line name, leaving ~500m holes in a continuous line).
+    const SHK_BRIDGE_M  = 20000;        // Shinkansen: join the line's OWN track fragments across larger
+                                        // gaps (tunnels split the bundled geometry into pieces) so a line
+                                        // becomes one ordered chain we can slice along.
+    const SHK_SNAP_M    = 3500;         // a curated Shinkansen stop is "on real track" if within this of
+                                        // the bundled geometry; otherwise that span is a straight connector.
 
     // ── 3. APP STATE ──────────────────────────────────────────────────────────
     // All mutable app state lives here. Read via state.*, write via setState().
@@ -1077,6 +1082,7 @@
     const lineGeomCache = {};  // cacheKey(name|bucket) → { chains, stations } computed lazily
     const rideOverlays  = {};  // lineName → [polyline, ...] bright "ridden stretch" overlays
     const shinkansenData = {}; // 路線名 → { name_en, color, stations:[ordered] } curated Shinkansen
+    const shinkansenGeo  = {}; // 路線名 → [ [lat,lng]... ] bundled track fragments (captured in renderLines)
     let   currentPopupLine = null;  // line whose popup is open (for the ride button)
     let   linePopupSeed    = null;  // {lat,lng} where the open line popup was clicked (corridor seed)
 
@@ -1378,12 +1384,8 @@
 
     // Smooth a Shinkansen's stop sequence into a curved path via centripetal
     // Catmull-Rom (passes through every stop, rounds the corners, no overshoot).
-    // Returns the dense coords plus the index of each original stop within them,
-    // so the same path drives both the drawn line and the ride geometry. Cached.
-    const shinkansenPath = (name) => {
-        const info = shinkansenData[name];
-        if (info._path) return info._path;
-        const pts = info.stations.map(s => [s.lat, s.lon]);
+    // Only used as a fallback when the bundled track geometry is missing.
+    const shinkansenSmooth = (pts) => {
         const K = 16;                                   // points generated per inter-stop span
         const at = (i) => pts[Math.max(0, Math.min(pts.length - 1, i))];
         const coords = [], anchorIdx = [];
@@ -1402,6 +1404,68 @@
         }
         anchorIdx.push(coords.length);
         coords.push(pts[pts.length - 1].slice());
+        return { coords, anchorIdx };
+    };
+
+    // Build a Shinkansen's drawn path by FOLLOWING the bundled real track geometry,
+    // not straight (or smoothed) hops between stops. The track is stitched/bridged
+    // into ordered chain(s); each curated stop is snapped onto it; the path slices
+    // the real vertices between consecutive on-track stops. Spans the bundled data
+    // doesn't cover (shared Tokyo corridors, tunnels, newer extensions) fall back to
+    // a straight connector. Returns dense coords + the index of each stop within
+    // them (anchorIdx), so the same path drives both the drawn line and the ride
+    // geometry. Cached on the line's info. (Lines with no usable geometry: smooth.)
+    const shinkansenPath = (name) => {
+        const info = shinkansenData[name];
+        if (info._path) return info._path;
+        const pts = info.stations.map(s => [s.lat, s.lon]);
+
+        const segs = (shinkansenGeo[name] || []).filter(s => s.length >= 2);
+        if (segs.length < 1) return (info._path = shinkansenSmooth(pts));
+
+        const chains = bridgeChains(stitchChains(segs).filter(c => c.length >= 2), SHK_BRIDGE_M).map(describeChain);
+        if (!chains.length) return (info._path = shinkansenSmooth(pts));
+
+        // Snap a stop to the nearest point on any chain (returns projection + d²).
+        const snapStop = (lat, lon) => {
+            const p = [lat, lon];
+            let bd2 = Infinity, bc = -1, bseg = 0, bt = 0;
+            for (let ci = 0; ci < chains.length; ci++) {
+                const { coords, sx, sy } = chains[ci];
+                for (let i = 1; i < coords.length; i++) {
+                    const { d2, t } = projToSeg(p, coords[i - 1], coords[i], sx, sy);
+                    if (d2 < bd2) { bd2 = d2; bc = ci; bseg = i - 1; bt = t; }
+                }
+            }
+            if (bc < 0) return null;
+            const ch = chains[bc];
+            return { chainIdx: bc, segIdx: bseg, t: bt, pos: ch.arc[bseg] + bt * (ch.arc[bseg + 1] - ch.arc[bseg]), d2: bd2 };
+        };
+        const snaps   = pts.map(p => snapStop(p[0], p[1]));
+        const onTrack = snaps.map(s => s && s.d2 <= SHK_SNAP_M * SHK_SNAP_M);
+        // If almost nothing snaps, the geometry is unusable for this line — smooth.
+        if (onTrack.filter(Boolean).length < 2) return (info._path = shinkansenSmooth(pts));
+
+        const projOf = (s) => { const c = chains[s.chainIdx].coords, a = c[s.segIdx], b = c[s.segIdx + 1];
+                                return [a[0] + (b[0] - a[0]) * s.t, a[1] + (b[1] - a[1]) * s.t]; };
+        const anchorPt = (i) => onTrack[i] ? projOf(snaps[i]) : pts[i].slice();
+
+        const coords = [], anchorIdx = [];
+        for (let i = 0; i < pts.length; i++) {
+            anchorIdx.push(coords.length);
+            coords.push(anchorPt(i));
+            if (i === pts.length - 1) break;
+            // Real-track vertices between stop i and i+1 when both sit on the same chain.
+            if (onTrack[i] && onTrack[i + 1] && snaps[i].chainIdx === snaps[i + 1].chainIdx) {
+                const ch = chains[snaps[i].chainIdx], A = snaps[i], B = snaps[i + 1];
+                const fwd = A.pos <= B.pos, lo = fwd ? A : B, hi = fwd ? B : A;
+                const verts = [];
+                for (let k = lo.segIdx + 1; k <= hi.segIdx; k++) verts.push(ch.coords[k].slice());
+                if (!fwd) verts.reverse();
+                for (const v of verts) coords.push(v);
+            }
+            // else: straight connector (the next anchor closes the gap).
+        }
         return (info._path = { coords, anchorIdx });
     };
 
@@ -1439,7 +1503,12 @@
             for (; i < end; i++) {
                 const { properties, geometry } = features[i];
                 const name  = properties.路線名;
-                if (name.includes('新幹線')) continue;   // drawn from curated data instead
+                if (name.includes('新幹線')) {           // not drawn here (curated layer draws it),
+                    // but keep its real track fragments so the curated line can follow them.
+                    (shinkansenGeo[name] = shinkansenGeo[name] || []).push(
+                        geometry.coordinates.map(([lng, lat]) => [lat, lng]));
+                    continue;
+                }
                 const color = getLineColor(name);
                 lineColorMap[name] = color;
 

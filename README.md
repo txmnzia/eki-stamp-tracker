@@ -194,18 +194,27 @@ The overlay is therefore always a slice of the already-drawn geometry (plus the
 sub-`RIDE_STITCH_M` joins that close holes in one continuous line); nothing is
 synthesized across real distances.
 
-**Shinkansen are a curated exception.** The bundled rail geometry has almost no
-Shinkansen track and `stations.json` has no Shinkansen lines, so the geometry
-approach can't work for them. Instead `data/shinkansen.json` (built by
-`scripts/build_shinkansen.py`) lists each Shinkansen's ordered stops with
-coordinates resolved from the station data. The app **skips the broken geojson
-Shinkansen fragments** and draws a **smooth curve** through these stops
-(centripetal Catmull-Rom in `shinkansenPath`, so corners are rounded and the
-ride overlays follow the same curve); Shinkansen also render a touch more
-prominently (`SHINKANSEN_BASE`). The ride logic uses the stops directly (no
-corridor/merge). Stop coordinates match the conventional-station records, so
-collected-stamp badges still light up. (Still an approximation of the real
-track, not exact curvature — see issue #15.)
+**Shinkansen are a curated exception.** `stations.json` has no Shinkansen lines
+at all, so we can't derive their stops the normal way. Instead
+`data/shinkansen.json` (built by `scripts/build_shinkansen.py`) lists each
+Shinkansen's ordered stops with coordinates resolved from the station data. The
+app doesn't draw the raw geojson Shinkansen fragments directly (they're
+disjoint and unordered), but it **does follow them**: `shinkansenPath` stitches
+each line's bundled track fragments into ordered chain(s) (`SHK_BRIDGE_M` joins
+pieces split by tunnels), snaps every curated stop onto that real track
+(`SHK_SNAP_M`), and builds the drawn path by **slicing the real track vertices
+between consecutive on-track stops** — so the line follows the actual curvature.
+Spans the bundled data doesn't cover (the shared Tokyo corridors stored under a
+sibling line's name, long tunnels, the newer Kanazawa–Tsuruga extension) fall
+back to a straight connector, and a line with no usable geometry falls back to a
+centripetal Catmull-Rom smooth (`shinkansenSmooth`). The same path drives both
+the drawn line and the ride overlays (stops are anchor vertices in it), and
+Shinkansen render a touch more prominently (`SHINKANSEN_BASE`). The ride logic
+uses the stops directly (no corridor/merge). Stop coordinates match the
+conventional-station records, so collected-stamp badges still light up.
+Coverage today: 東海道/東北/北海道 follow real track end-to-end; 山陽/九州/上越 ~85–95%;
+北陸's curvy Takasaki–Kanazawa core is real track, its ends are straight (the
+bundled data predates the extension and stores the Tokyo corridor elsewhere).
 
 **Known limitations (acceptable for now):**
 - Where a `路線名` has parallel rapid/local alignments, the best-fit group is one
