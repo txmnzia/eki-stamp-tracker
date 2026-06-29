@@ -1001,7 +1001,7 @@
     // App version — shown discreetly on the welcome modal. Bump on every merge
     // to main. It is also part of the station-cache key, so each release
     // invalidates the 7-day IndexedDB cache and users immediately get fresh data.
-    const APP_VERSION       = 'v1.3.7';
+    const APP_VERSION       = 'v1.3.8';
     const CACHE_TTL         = 7 * 24 * 60 * 60 * 1000;  // 7 days
     const BATCH_SIZE        = 150;      // features per animation frame (line rendering)
     const SYNC_DEBOUNCE_MS  = 2000;     // ms after last stamp change before auto-save
@@ -2125,10 +2125,15 @@
 
         // Focus mode: fade every other line right down and fade other lines' ride
         // overlays, so only the line being edited stands out. Hide this line's own
-        // faint base (the bright editable segments replace it).
+        // faint base (the bright editable segments replace it). Also make EVERY line
+        // non-interactive so hovering another line shows no tooltip/highlight — focus
+        // stays fully on the line being edited (restored on exit).
         const own = new Set(linesByName[name] || []);
-        allLineSegs.forEach(p => { if (!own.has(p)) p.setStyle(LINE_EDIT_DIM); });
-        own.forEach(p => p.setStyle({ opacity: 0 }));
+        allLineSegs.forEach(p => {
+            if (!own.has(p)) p.setStyle(LINE_EDIT_DIM); else p.setStyle({ opacity: 0 });
+            p.closeTooltip();
+            p.options.interactive = false;
+        });
         Object.entries(rideOverlays).forEach(([ln, arr]) => { if (ln !== name) arr.forEach(pl => pl.setStyle({ opacity: 0.1 })); });
 
         mapInstance.on('moveend zoomend', refreshRideEditCache);
@@ -2152,7 +2157,8 @@
         const c = mapInstance.getContainer(); c.style.cursor = ''; c.style.touchAction = '';
         document.getElementById('ride-edit-bar').classList.add('hidden');
         rideEdit = null;
-        // Restore focus: un-fade all lines and other ride overlays.
+        // Restore focus: re-enable interactivity, un-fade all lines and other overlays.
+        allLineSegs.forEach(p => { p.options.interactive = true; });
         resetAllLines();
         Object.values(rideOverlays).forEach(arr => arr.forEach(pl => pl.setStyle({ opacity: RIDE_OVERLAY.opacity })));
         if (save) {
