@@ -1055,7 +1055,7 @@
     // App version — shown discreetly on the welcome modal. Bump on every merge
     // to main. It is also part of the station-cache key, so each release
     // invalidates the 7-day IndexedDB cache and users immediately get fresh data.
-    const APP_VERSION       = 'v1.1.3';
+    const APP_VERSION       = 'v1.1.4';
     const CACHE_TTL         = 7 * 24 * 60 * 60 * 1000;  // 7 days
     const BATCH_SIZE        = 150;      // features per animation frame (line rendering)
     const SYNC_DEBOUNCE_MS  = 2000;     // ms after last stamp change before auto-save
@@ -2239,22 +2239,35 @@
 
             // Retain a flat list of every ekidata station with coordinates — the
             // pool the ride picker snaps onto a clicked line's geometry.
-            // Funakiya's curated English names (keyed by physical location) override
-            // ekidata's auto-romaji (e.g. 四ツ谷 "Shitsutani" → "Yotsuya") for the ride
-            // picker, the same way station markers already get them.
-            const curatedEn = {};
+            // Resolve a good English name for every station, since ekidata's raw
+            // auto-romaji is often wrong (四ツ谷 "Shitsutani", 新高円寺 "Niitakaentera").
+            // 1) Funakiya curated names (stamp stations) are the source of truth, with
+            //    the network qualifier stripped (中野坂上 "Toei Subway Nakano-sakaue" →
+            //    "Nakano-sakaue"). 2) For an un-curated compound station, compose from a
+            //    known directional prefix + a curated base (新高円寺 → Shin-Kōenji).
+            //    3) ekidata romaji only as a last resort.
+            const normK   = (k) => (k || '').replace(/ヶ/g, 'ケ');
+            const cleanEn = (en) => (en || '').replace(/^(Toei Subway|Tokyo Metro)\s+/, '');
+            const curatedByKanji = {};
             stations.forEach(g => g.stations.forEach(s => {
                 const en = stampNames[s.code];
-                if (en && s.lat && s.lon) { const k = dedupeKey(s); if (!(k in curatedEn)) curatedEn[k] = en; }
+                if (en) { const k = normK(s.name_kanji); if (!curatedByKanji[k]) curatedByKanji[k] = cleanEn(en); }
             }));
+            const PREFIX = { '新': 'Shin', '西': 'Nishi', '東': 'Higashi', '南': 'Minami', '北': 'Kita', '上': 'Kami', '下': 'Shimo', '元': 'Moto', '本': 'Hon' };
+            const resolveEn = (s) => {
+                const k = normK(s.name_kanji);
+                if (curatedByKanji[k]) return curatedByKanji[k];                       // curated, cleaned
+                const p = PREFIX[k[0]], base = curatedByKanji[k.slice(1)];
+                if (p && base) return p + '-' + base;                                  // composed (Shin-…)
+                return s.name_en;                                                      // ekidata fallback
+            };
 
             allStations.length = 0; lineGroups.length = 0;
             stations.forEach(g => {
                 const ordered = [];
                 g.stations.forEach(s => {
                     if (s.lat && s.lon) {
-                        const en = curatedEn[dedupeKey(s)] || s.name_en;
-                        const rec = { code: s.code, name_kanji: s.name_kanji, name_en: en, lat: s.lat, lon: s.lon };
+                        const rec = { code: s.code, name_kanji: s.name_kanji, name_en: resolveEn(s), lat: s.lat, lon: s.lon };
                         allStations.push(rec);
                         stationByCode[s.code] = rec;
                         ordered.push(rec);

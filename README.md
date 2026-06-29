@@ -236,8 +236,11 @@ IndexedDB cache key, so bumping it forces every client to pick up fresh data.
   on toggle.
 - **Always use the curated names, never ekidata's raw romaji.** Funakiya's curated
   English station names and the curated line names (`stamp-stations.json`,
-  `funakiya-lines.json`, surfaced via `lineEnMap` and the per-location curated
-  lookup) are the source of truth for display. ekidata's auto-romaji is frequently
-  wrong (e.g. 米原 → "Yonehara", 四ツ谷 → "Shitsutani") and must only ever be a
-  last-resort fallback when no curated name exists. Any new UI that shows a station
-  or line name must prefer the curated name.
+  `funakiya-lines.json`, surfaced via `lineEnMap` and the curated-by-kanji lookup)
+  are the source of truth for display. ekidata's auto-romaji is frequently wrong
+  (e.g. 米原 → "Yonehara", 四ツ谷 → "Shitsutani", 新高円寺 → "Niitakaentera"). The
+  ride picker resolves names in this order: (1) curated name, with the network
+  qualifier stripped (中野坂上 "Toei Subway Nakano-sakaue" → "Nakano-sakaue"); (2)
+  for an un-curated compound, a directional prefix + curated base (新中野 →
+  Shin-Nakano); (3) ekidata romaji only as a last resort. Any new name-showing UI
+  must follow the same precedence.
