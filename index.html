@@ -45,9 +45,9 @@
             background: rgba(15,15,18,0.85) !important; color: var(--muted) !important; font-size: 10px;
         }
         .leaflet-control-attribution a { color: var(--accent) !important; }
-        /* Push the zoom control below the search bar so they never overlap (mobile + web).
-           The search bar sits at top:12 and is ~33px tall; clear it with room to spare. */
-        .leaflet-top.leaflet-left .leaflet-control-zoom { margin-top: 60px; }
+        /* Bottom-left zoom control, lifted above the centred stats bar (which spans
+           nearly the full width on mobile) so the two never overlap. */
+        .leaflet-bottom.leaflet-left { bottom: max(72px, calc(env(safe-area-inset-bottom, 0px) + 64px)); }
         .leaflet-control-zoom a { background: var(--surface) !important; color: var(--text) !important; border-color: var(--border) !important; }
         .leaflet-control-zoom a:hover { background: var(--surface2) !important; }
 
@@ -1001,7 +1001,7 @@
     // App version — shown discreetly on the welcome modal. Bump on every merge
     // to main. It is also part of the station-cache key, so each release
     // invalidates the 7-day IndexedDB cache and users immediately get fresh data.
-    const APP_VERSION       = 'v1.3.8';
+    const APP_VERSION       = 'v1.3.9';
     const CACHE_TTL         = 7 * 24 * 60 * 60 * 1000;  // 7 days
     const BATCH_SIZE        = 150;      // features per animation frame (line rendering)
     const SYNC_DEBOUNCE_MS  = 2000;     // ms after last stamp change before auto-save
@@ -1279,6 +1279,7 @@
 
     const initMap = () => {
         const map = L.map('map', { zoomControl: true, preferCanvas: true }).setView([35.682839, 139.759455], 13);
+        map.zoomControl.setPosition('bottomleft');   // bottom-left, clear of the top search bar
         // `tolerance` extends the clickable area around thin lines (and markers)
         // so they're easy to hit — the 2.5px lines were nearly impossible to tap,
         // especially on touch. Single shared renderer (see PR #8) so events work.
