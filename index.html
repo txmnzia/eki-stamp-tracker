@@ -998,12 +998,13 @@
     // App version — shown discreetly on the welcome modal. Bump on every merge
     // to main. It is also part of the station-cache key, so each release
     // invalidates the 7-day IndexedDB cache and users immediately get fresh data.
-    const APP_VERSION       = 'v1.3.4';
+    const APP_VERSION       = 'v1.3.5';
     const CACHE_TTL         = 7 * 24 * 60 * 60 * 1000;  // 7 days
     const BATCH_SIZE        = 150;      // features per animation frame (line rendering)
     const SYNC_DEBOUNCE_MS  = 2000;     // ms after last stamp change before auto-save
     const HOVER_RESET_MS    = 60;       // ms debounce on line mouseout
-    const POPUP_GRACE_MS    = 250;      // ms grace period before hover-opened popup auto-closes
+    const POPUP_GRACE_MS    = 600;      // ms grace period before hover-opened popup auto-closes
+                                        // (long enough to move the cursor onto the popup's button)
     const SEARCH_JUMP_MS    = 300;      // ms before popup opens after search jump
     const FOCUS_DELAY_MS    = 100;      // ms before focusing modal input (after paint)
     const MARKER_BASE_R     = 4;        // circle radius at ZOOM_BASE on desktop
@@ -1324,7 +1325,12 @@
     const highlightLine = (name, map) => {
         if (rideEdit) return;   // no hover-highlight while editing a ride (distracting)
         clearTimeout(hoverTimer);
-        if (map) { map.closePopup(); currentPopupMarker = null; }
+        // Dismiss a hover-opened station popup when moving onto a line, but never a
+        // click-pinned popup (line "add a ride" / clicked station) — the user may be
+        // crossing a line on the way to its button, and that must not close it.
+        if (map && currentPopupMarker && currentPopupMarker._hoverOpened) {
+            map.closePopup(); currentPopupMarker = null;
+        }
         if (hoveredLine === name) return;
         const prev = hoveredLine;
         hoveredLine = name;
@@ -2071,6 +2077,21 @@
         paintSeg(seg);
     };
 
+    // Station label shown on hover while editing a ride — so lines whose stations
+    // have no stamp marker are still identifiable. Shows the segment under the
+    // cursor as "A – B" (the two stations it would toggle).
+    const rideNodeName = (s) => (state.lang === 'en' ? (s.name_en || s.name_kanji) : (s.name_kanji || s.name_en)) || s.code;
+    const hideRideHover = () => { if (rideEdit && rideEdit.tipShown) { rideEdit.tip.remove(); rideEdit.tipShown = false; } };
+    const updateRideHover = (x, y) => {
+        if (!rideEdit) return;
+        const seg = rideHitTest(x, y);
+        if (!seg) { hideRideHover(); return; }
+        if (!rideEdit.tip) rideEdit.tip = L.tooltip({ direction: 'top', offset: [0, -6], className: 'line-tooltip', permanent: true, interactive: false });
+        rideEdit.tip.setLatLng(mapInstance.containerPointToLatLng(L.point(x, y)))
+                    .setContent(`${rideNodeName(seg.a)} – ${rideNodeName(seg.b)}`);
+        if (!rideEdit.tipShown) { rideEdit.tip.addTo(mapInstance); rideEdit.tipShown = true; }
+    };
+
     const enterRideEditMode = (name) => {
         if (rideEdit) exitRideEditMode(false);
         const geom = buildLineGeometry(name, linePopupSeed);
@@ -2121,6 +2142,7 @@
     const exitRideEditMode = (save) => {
         if (!rideEdit) return;
         const { name, selected, layer } = rideEdit;
+        hideRideHover();
         mapInstance.off('moveend zoomend', refreshRideEditCache);
         layer.remove();
         mapInstance.dragging.enable();
@@ -2153,6 +2175,7 @@
             const seg = rideHitTest(x, y);
             if (!seg) return;                       // off the line → let the map pan
             e.preventDefault();
+            hideRideHover();                        // don't keep the label up while painting
             mapInstance.dragging.disable();         // lock pan for this paint gesture
             container.style.touchAction = 'none';
             try { container.setPointerCapture(e.pointerId); } catch { /* ignore */ }
@@ -2161,10 +2184,12 @@
             applyRidePaint(seg);
         });
         container.addEventListener('pointermove', (e) => {
-            if (!rideEdit || !rideEdit.dragging) return;
+            if (!rideEdit) return;
             const [x, y] = xy(e);
-            applyRidePaint(rideHitTest(x, y));
+            if (rideEdit.dragging) { applyRidePaint(rideHitTest(x, y)); return; }
+            if (!IS_TOUCH) updateRideHover(x, y);   // hover label (desktop only; touch has no hover)
         });
+        container.addEventListener('pointerleave', hideRideHover);
         const end = (e) => {
             if (!rideEdit || !rideEdit.dragging) return;
             rideEdit.dragging = false;
@@ -2211,8 +2236,10 @@
     };
 
     const circleStyle = (collected, zoom) => collected
-        ? { radius: markerRadius(true,  zoom), fillColor: '#f7c948', fillOpacity: 1, color: 'rgba(247,201,72,0.4)', weight: 2,   renderer: canvasRenderer }
-        : { radius: markerRadius(false, zoom), fillColor: '#3a3a48', fillOpacity: 1, color: '#4a4a5a',             weight: 1.5, renderer: canvasRenderer };
+        ? { radius: markerRadius(true,  zoom), fillColor: '#f7c948', fillOpacity: 1,    color: 'rgba(247,201,72,0.4)', weight: 2, renderer: canvasRenderer }
+        // Uncollected: visible but much more discreet — soft grey, semi-transparent,
+        // no border — so the gold collected markers clearly stand out against them.
+        : { radius: markerRadius(false, zoom), fillColor: '#9aa0ac', fillOpacity: 0.5,  color: '#9aa0ac',              weight: 0, renderer: canvasRenderer };
 
     // ── 9. POPUP ──────────────────────────────────────────────────────────────
 
