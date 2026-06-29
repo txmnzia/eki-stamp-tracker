@@ -1009,7 +1009,7 @@
     // App version — shown discreetly on the welcome modal. Bump on every merge
     // to main. It is also part of the station-cache key, so each release
     // invalidates the 7-day IndexedDB cache and users immediately get fresh data.
-    const APP_VERSION       = 'v1.3.18';
+    const APP_VERSION       = 'v1.3.19';
     const CACHE_TTL         = 7 * 24 * 60 * 60 * 1000;  // 7 days
     const BATCH_SIZE        = 150;      // features per animation frame (line rendering)
     const SYNC_DEBOUNCE_MS  = 2000;     // ms after last stamp change before auto-save
@@ -2339,12 +2339,12 @@
         // border — so the gold collected markers clearly stand out against them.
         : { radius: markerRadius(false, zoom), fillColor: '#9aa0ac', fillOpacity: 0.5,  color: '#9aa0ac',              weight: 0, renderer: canvasRenderer };
 
-    // Non-stamp stations: a third, even more discreet tier — smaller and a dimmer,
-    // cooler grey — so they read as "minor station, no stamp" without competing with
+    // Non-stamp stations: SAME size as an uncollected stamp dot but much LIGHTER (far
+    // lower opacity), so they read as "minor station, no stamp" without competing with
     // the stamp dots. Still clickable for a name/lines popup.
     const plainStyle = (zoom) => ({
-        radius: Math.max(MARKER_ABS_MIN * 0.85, markerRadius(false, zoom) * 0.6),
-        fillColor: '#6b7280', fillOpacity: 0.4, color: '#6b7280', weight: 0, renderer: canvasRenderer,
+        radius: markerRadius(false, zoom),
+        fillColor: '#9aa0ac', fillOpacity: 0.18, color: '#9aa0ac', weight: 0, renderer: canvasRenderer,
     });
     const styleFor = (marker, zoom) => marker._noStamp ? plainStyle(zoom) : circleStyle(marker._isCollected, zoom);
 
