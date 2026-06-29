@@ -1,0 +1,807 @@
+{
+ "東海道新幹線": {
+  "name_en": "Tokaido Shinkansen",
+  "color": "#0072BC",
+  "stations": [
+   {
+    "name_kanji": "東京",
+    "name_en": "Tokyo",
+    "lat": 35.681753,
+    "lon": 139.764708,
+    "code": "eki_2800209"
+   },
+   {
+    "name_kanji": "品川",
+    "name_en": "Shinagawa",
+    "lat": 35.628284,
+    "lon": 139.73809,
+    "code": "eki_2700102"
+   },
+   {
+    "name_kanji": "新横浜",
+    "name_en": "Shin-Yokohama",
+    "lat": 35.509056,
+    "lon": 139.617472,
+    "code": "eki_2600901"
+   },
+   {
+    "name_kanji": "小田原",
+    "name_en": "Odawara",
+    "lat": 35.25658,
+    "lon": 139.156474,
+    "code": "eki_9931401"
+   },
+   {
+    "name_kanji": "熱海",
+    "name_en": "Atami",
+    "lat": 35.103573,
+    "lon": 139.077679,
+    "code": "eki_1130121"
+   },
+   {
+    "name_kanji": "三島",
+    "name_en": "Mishima",
+    "lat": 35.125946,
+    "lon": 138.911369,
+    "code": "eki_9950201"
+   },
+   {
+    "name_kanji": "新富士",
+    "name_en": "Shin-Fuji",
+    "lat": 35.1424,
+    "lon": 138.6607,
+    "code": "shk_新富士"
+   },
+   {
+    "name_kanji": "静岡",
+    "name_en": "Shizuoka",
+    "lat": 34.971629,
+    "lon": 138.388579,
+    "code": "eki_1150118"
+   },
+   {
+    "name_kanji": "掛川",
+    "name_en": "Kakegawa",
+    "lat": 34.769568,
+    "lon": 138.014256,
+    "code": "eki_9950501"
+   },
+   {
+    "name_kanji": "浜松",
+    "name_en": "Hamamatsu",
+    "lat": 34.703866,
+    "lon": 137.734759,
+    "code": "eki_1150134"
+   },
+   {
+    "name_kanji": "豊橋",
+    "name_en": "Toyohashi",
+    "lat": 34.762734,
+    "lon": 137.382128,
+    "code": "eki_1141301"
+   },
+   {
+    "name_kanji": "三河安城",
+    "name_en": "Mikawa-Anjo",
+    "lat": 34.96968,
+    "lon": 137.060918,
+    "code": "eki_1150222"
+   },
+   {
+    "name_kanji": "名古屋",
+    "name_en": "Nagoya",
+    "lat": 35.168733,
+    "lon": 136.882417,
+    "code": "eki_9950901"
+   },
+   {
+    "name_kanji": "岐阜羽島",
+    "name_en": "Gifu-Hashima",
+    "lat": 35.3155,
+    "lon": 136.6866,
+    "code": "shk_岐阜羽島"
+   },
+   {
+    "name_kanji": "米原",
+    "name_en": "Maibara",
+    "lat": 35.314578,
+    "lon": 136.291097,
+    "code": "eki_9960101"
+   },
+   {
+    "name_kanji": "京都",
+    "name_en": "Kyoto",
+    "lat": 34.986836,
+    "lon": 135.759768,
+    "code": "eki_9961011"
+   },
+   {
+    "name_kanji": "新大阪",
+    "name_en": "Shin-Osaka",
+    "lat": 34.734136,
+    "lon": 135.501852,
+    "code": "eki_1160213"
+   }
+  ]
+ },
+ "山陽新幹線": {
+  "name_en": "Sanyo Shinkansen",
+  "color": "#0072BC",
+  "stations": [
+   {
+    "name_kanji": "新大阪",
+    "name_en": "Shin-Osaka",
+    "lat": 34.732919,
+    "lon": 135.498558,
+    "code": "eki_9961803"
+   },
+   {
+    "name_kanji": "新神戸",
+    "name_en": "Shin-Kobe",
+    "lat": 34.705379,
+    "lon": 135.195823,
+    "code": "eki_9964601"
+   },
+   {
+    "name_kanji": "西明石",
+    "name_en": "Nishi-Akashi",
+    "lat": 34.66591,
+    "lon": 134.960151,
+    "code": "eki_1160811"
+   },
+   {
+    "name_kanji": "姫路",
+    "name_en": "Himeji",
+    "lat": 34.827659,
+    "lon": 134.690769,
+    "code": "eki_1160821"
+   },
+   {
+    "name_kanji": "相生",
+    "name_en": "Aioi",
+    "lat": 34.818052,
+    "lon": 134.47341,
+    "code": "eki_1160905"
+   },
+   {
+    "name_kanji": "岡山",
+    "name_en": "Okayama",
+    "lat": 34.666572,
+    "lon": 133.918552,
+    "code": "eki_1160917"
+   },
+   {
+    "name_kanji": "新倉敷",
+    "name_en": "Shin-Kurashiki",
+    "lat": 34.56509,
+    "lon": 133.678344,
+    "code": "eki_1161007"
+   },
+   {
+    "name_kanji": "福山",
+    "name_en": "Fukuyama",
+    "lat": 34.489291,
+    "lon": 133.361429,
+    "code": "eki_1161014"
+   },
+   {
+    "name_kanji": "新尾道",
+    "name_en": "Shin-Onomichi",
+    "lat": 34.4351,
+    "lon": 133.2179,
+    "code": "shk_新尾道"
+   },
+   {
+    "name_kanji": "三原",
+    "name_en": "Mihara",
+    "lat": 34.400486,
+    "lon": 133.083049,
+    "code": "eki_1161020"
+   },
+   {
+    "name_kanji": "東広島",
+    "name_en": "Higashi-Hiroshima",
+    "lat": 34.4268,
+    "lon": 132.743,
+    "code": "shk_東広島"
+   },
+   {
+    "name_kanji": "広島",
+    "name_en": "Hiroshima",
+    "lat": 34.397446,
+    "lon": 132.475593,
+    "code": "eki_1161115"
+   },
+   {
+    "name_kanji": "新岩国",
+    "name_en": "Shin-Iwakuni",
+    "lat": 34.151,
+    "lon": 132.169,
+    "code": "shk_新岩国"
+   },
+   {
+    "name_kanji": "徳山",
+    "name_en": "Tokuyama",
+    "lat": 34.051555,
+    "lon": 131.8029,
+    "code": "eki_1161216"
+   },
+   {
+    "name_kanji": "新山口",
+    "name_en": "Shin-Yamaguchi",
+    "lat": 34.093255,
+    "lon": 131.39657,
+    "code": "eki_1161224"
+   },
+   {
+    "name_kanji": "厚狭",
+    "name_en": "Asa",
+    "lat": 34.053361,
+    "lon": 131.159965,
+    "code": "eki_1161230"
+   },
+   {
+    "name_kanji": "新下関",
+    "name_en": "Shin-Shimonoseki",
+    "lat": 34.005651,
+    "lon": 130.948021,
+    "code": "eki_1161234"
+   },
+   {
+    "name_kanji": "小倉",
+    "name_en": "Kokura",
+    "lat": 33.88674,
+    "lon": 130.882141,
+    "code": "eki_9990801"
+   },
+   {
+    "name_kanji": "博多",
+    "name_en": "Hakata",
+    "lat": 33.590204,
+    "lon": 130.42085,
+    "code": "eki_9990503"
+   }
+  ]
+ },
+ "東北新幹線": {
+  "name_en": "Tohoku Shinkansen",
+  "color": "#22B14C",
+  "stations": [
+   {
+    "name_kanji": "東京",
+    "name_en": "Tokyo",
+    "lat": 35.681391,
+    "lon": 139.766103,
+    "code": "eki_1130101"
+   },
+   {
+    "name_kanji": "上野",
+    "name_en": "Ueno",
+    "lat": 35.711482,
+    "lon": 139.777122,
+    "code": "eki_2800104"
+   },
+   {
+    "name_kanji": "大宮",
+    "name_en": "Omiya",
+    "lat": 35.907599,
+    "lon": 139.624458,
+    "code": "eki_2100401"
+   },
+   {
+    "name_kanji": "小山",
+    "name_en": "Oyama",
+    "lat": 36.312747,
+    "lon": 139.806241,
+    "code": "eki_1131918"
+   },
+   {
+    "name_kanji": "宇都宮",
+    "name_en": "Utsunomiya",
+    "lat": 36.559246,
+    "lon": 139.898389,
+    "code": "eki_1131923"
+   },
+   {
+    "name_kanji": "那須塩原",
+    "name_en": "Nasu-Shiobara",
+    "lat": 36.931956,
+    "lon": 140.020694,
+    "code": "eki_1131932"
+   },
+   {
+    "name_kanji": "新白河",
+    "name_en": "Shin-Shirakawa",
+    "lat": 37.12331,
+    "lon": 140.188969,
+    "code": "eki_1123106"
+   },
+   {
+    "name_kanji": "郡山",
+    "name_en": "Koriyama",
+    "lat": 37.398187,
+    "lon": 140.389363,
+    "code": "eki_1122501"
+   },
+   {
+    "name_kanji": "福島",
+    "name_en": "Fukushima",
+    "lat": 37.754239,
+    "lon": 140.460012,
+    "code": "eki_9921501"
+   },
+   {
+    "name_kanji": "白石蔵王",
+    "name_en": "Shiroishi-Zao",
+    "lat": 38.0023,
+    "lon": 140.6157,
+    "code": "shk_白石蔵王"
+   },
+   {
+    "name_kanji": "仙台",
+    "name_en": "Sendai",
+    "lat": 38.259901,
+    "lon": 140.879928,
+    "code": "eki_9921410"
+   },
+   {
+    "name_kanji": "古川",
+    "name_en": "Furukawa",
+    "lat": 38.571192,
+    "lon": 140.967876,
+    "code": "eki_1122104"
+   },
+   {
+    "name_kanji": "くりこま高原",
+    "name_en": "Kurikoma-Kogen",
+    "lat": 38.7003,
+    "lon": 141.0664,
+    "code": "shk_くりこま高原"
+   },
+   {
+    "name_kanji": "一ノ関",
+    "name_en": "Ichinoseki",
+    "lat": 38.926514,
+    "lon": 141.138177,
+    "code": "eki_1120801"
+   },
+   {
+    "name_kanji": "水沢江刺",
+    "name_en": "Mizusawa-Esashi",
+    "lat": 39.123,
+    "lon": 141.183,
+    "code": "shk_水沢江刺"
+   },
+   {
+    "name_kanji": "北上",
+    "name_en": "Kitakami",
+    "lat": 39.281196,
+    "lon": 141.121221,
+    "code": "eki_1121001"
+   },
+   {
+    "name_kanji": "新花巻",
+    "name_en": "Shin-Hanamaki",
+    "lat": 39.405839,
+    "lon": 141.17302,
+    "code": "eki_1120903"
+   },
+   {
+    "name_kanji": "盛岡",
+    "name_en": "Morioka",
+    "lat": 39.701547,
+    "lon": 141.136599,
+    "code": "eki_1121101"
+   },
+   {
+    "name_kanji": "いわて沼宮内",
+    "name_en": "Iwate-Numakunai",
+    "lat": 39.960155,
+    "lon": 141.216955,
+    "code": "eki_9920509"
+   },
+   {
+    "name_kanji": "二戸",
+    "name_en": "Ninohe",
+    "lat": 40.25997,
+    "lon": 141.286211,
+    "code": "eki_9920515"
+   },
+   {
+    "name_kanji": "八戸",
+    "name_en": "Hachinohe",
+    "lat": 40.5092,
+    "lon": 141.431499,
+    "code": "eki_1120601"
+   },
+   {
+    "name_kanji": "七戸十和田",
+    "name_en": "Shichinohe-Towada",
+    "lat": 40.7061,
+    "lon": 141.169,
+    "code": "shk_七戸十和田"
+   },
+   {
+    "name_kanji": "新青森",
+    "name_en": "Shin-Aomori",
+    "lat": 40.8275,
+    "lon": 140.693472,
+    "code": "eki_1120265"
+   }
+  ]
+ },
+ "上越新幹線": {
+  "name_en": "Joetsu Shinkansen",
+  "color": "#F7941E",
+  "stations": [
+   {
+    "name_kanji": "東京",
+    "name_en": "Tokyo",
+    "lat": 35.681391,
+    "lon": 139.766103,
+    "code": "eki_1130101"
+   },
+   {
+    "name_kanji": "上野",
+    "name_en": "Ueno",
+    "lat": 35.711482,
+    "lon": 139.777122,
+    "code": "eki_2800104"
+   },
+   {
+    "name_kanji": "大宮",
+    "name_en": "Omiya",
+    "lat": 35.90751,
+    "lon": 139.62254,
+    "code": "eki_9932101"
+   },
+   {
+    "name_kanji": "熊谷",
+    "name_en": "Kumagaya",
+    "lat": 36.139313,
+    "lon": 139.389542,
+    "code": "eki_9930608"
+   },
+   {
+    "name_kanji": "本庄早稲田",
+    "name_en": "Honjo-Waseda",
+    "lat": 36.2127,
+    "lon": 139.1463,
+    "code": "shk_本庄早稲田"
+   },
+   {
+    "name_kanji": "高崎",
+    "name_en": "Takasaki",
+    "lat": 36.322239,
+    "lon": 139.012354,
+    "code": "eki_1131816"
+   },
+   {
+    "name_kanji": "上毛高原",
+    "name_en": "Jomo-Kogen",
+    "lat": 36.6772,
+    "lon": 138.999,
+    "code": "shk_上毛高原"
+   },
+   {
+    "name_kanji": "越後湯沢",
+    "name_en": "Echigo-Yuzawa",
+    "lat": 36.935799,
+    "lon": 138.809227,
+    "code": "eki_1134220"
+   },
+   {
+    "name_kanji": "浦佐",
+    "name_en": "Urasa",
+    "lat": 37.167488,
+    "lon": 138.922798,
+    "code": "eki_1134227"
+   },
+   {
+    "name_kanji": "長岡",
+    "name_en": "Nagaoka",
+    "lat": 37.447787,
+    "lon": 138.853927,
+    "code": "eki_1134236"
+   },
+   {
+    "name_kanji": "燕三条",
+    "name_en": "Tsubame-Sanjo",
+    "lat": 37.648824,
+    "lon": 138.939274,
+    "code": "eki_1141006"
+   },
+   {
+    "name_kanji": "新潟",
+    "name_en": "Niigata",
+    "lat": 37.912299,
+    "lon": 139.060869,
+    "code": "eki_1140442"
+   }
+  ]
+ },
+ "北陸新幹線": {
+  "name_en": "Hokuriku Shinkansen",
+  "color": "#E4007F",
+  "stations": [
+   {
+    "name_kanji": "東京",
+    "name_en": "Tokyo",
+    "lat": 35.681391,
+    "lon": 139.766103,
+    "code": "eki_1130101"
+   },
+   {
+    "name_kanji": "上野",
+    "name_en": "Ueno",
+    "lat": 35.711482,
+    "lon": 139.777122,
+    "code": "eki_2800104"
+   },
+   {
+    "name_kanji": "大宮",
+    "name_en": "Omiya",
+    "lat": 35.90751,
+    "lon": 139.62254,
+    "code": "eki_9932101"
+   },
+   {
+    "name_kanji": "高崎",
+    "name_en": "Takasaki",
+    "lat": 36.320826,
+    "lon": 139.012225,
+    "code": "eki_9932701"
+   },
+   {
+    "name_kanji": "安中榛名",
+    "name_en": "Annaka-Haruna",
+    "lat": 36.343,
+    "lon": 138.857,
+    "code": "shk_安中榛名"
+   },
+   {
+    "name_kanji": "軽井沢",
+    "name_en": "Karuizawa",
+    "lat": 36.342889,
+    "lon": 138.635096,
+    "code": "eki_9940301"
+   },
+   {
+    "name_kanji": "佐久平",
+    "name_en": "Sakudaira",
+    "lat": 36.277929,
+    "lon": 138.464367,
+    "code": "eki_1140125"
+   },
+   {
+    "name_kanji": "上田",
+    "name_en": "Ueda",
+    "lat": 36.396579,
+    "lon": 138.249298,
+    "code": "eki_9940311"
+   },
+   {
+    "name_kanji": "長野",
+    "name_en": "Nagano",
+    "lat": 36.643307,
+    "lon": 138.189101,
+    "code": "eki_1140305"
+   },
+   {
+    "name_kanji": "飯山",
+    "name_en": "Iiyama",
+    "lat": 36.847642,
+    "lon": 138.359335,
+    "code": "eki_1140710"
+   },
+   {
+    "name_kanji": "上越妙高",
+    "name_en": "Joetsumyoko",
+    "lat": 37.081813,
+    "lon": 138.249476,
+    "code": "eki_1140317"
+   },
+   {
+    "name_kanji": "糸魚川",
+    "name_en": "Itoigawa",
+    "lat": 37.043631,
+    "lon": 137.861311,
+    "code": "eki_1140942"
+   },
+   {
+    "name_kanji": "黒部宇奈月温泉",
+    "name_en": "Kurobe-Unazuki-Onsen",
+    "lat": 36.846,
+    "lon": 137.434,
+    "code": "shk_黒部宇奈月温泉"
+   },
+   {
+    "name_kanji": "富山",
+    "name_en": "Toyama",
+    "lat": 36.701384,
+    "lon": 137.213091,
+    "code": "eki_1141644"
+   },
+   {
+    "name_kanji": "新高岡",
+    "name_en": "Shin-Takaoka",
+    "lat": 36.727004,
+    "lon": 137.010459,
+    "code": "eki_1141714"
+   },
+   {
+    "name_kanji": "金沢",
+    "name_en": "Kanazawa",
+    "lat": 36.578117,
+    "lon": 136.648166,
+    "code": "eki_9942601"
+   },
+   {
+    "name_kanji": "小松",
+    "name_en": "Komatsu",
+    "lat": 36.402545,
+    "lon": 136.452926,
+    "code": "eki_1141534"
+   },
+   {
+    "name_kanji": "加賀温泉",
+    "name_en": "Kaga-Onsen",
+    "lat": 36.320562,
+    "lon": 136.350337,
+    "code": "eki_1141531"
+   },
+   {
+    "name_kanji": "芦原温泉",
+    "name_en": "Awara-Onsen",
+    "lat": 36.214542,
+    "lon": 136.235069,
+    "code": "eki_1141527"
+   },
+   {
+    "name_kanji": "福井",
+    "name_en": "Fukui",
+    "lat": 36.061711,
+    "lon": 136.223779,
+    "code": "eki_9941901"
+   },
+   {
+    "name_kanji": "越前たけふ",
+    "name_en": "Echizen-Takefu",
+    "lat": 35.872,
+    "lon": 136.218,
+    "code": "shk_越前たけふ"
+   },
+   {
+    "name_kanji": "敦賀",
+    "name_en": "Tsuruga",
+    "lat": 35.645161,
+    "lon": 136.076294,
+    "code": "eki_9942801"
+   }
+  ]
+ },
+ "九州新幹線": {
+  "name_en": "Kyushu Shinkansen",
+  "color": "#EE2737",
+  "stations": [
+   {
+    "name_kanji": "博多",
+    "name_en": "Hakata",
+    "lat": 33.590002,
+    "lon": 130.420622,
+    "code": "eki_1190101"
+   },
+   {
+    "name_kanji": "新鳥栖",
+    "name_en": "Shin-Tosu",
+    "lat": 33.370278,
+    "lon": 130.491111,
+    "code": "eki_1190542"
+   },
+   {
+    "name_kanji": "久留米",
+    "name_en": "Kurume",
+    "lat": 33.319778,
+    "lon": 130.501408,
+    "code": "eki_1190318"
+   },
+   {
+    "name_kanji": "筑後船小屋",
+    "name_en": "Chikugo-Funagoya",
+    "lat": 33.178023,
+    "lon": 130.491604,
+    "code": "eki_1190322"
+   },
+   {
+    "name_kanji": "新大牟田",
+    "name_en": "Shin-Omuta",
+    "lat": 33.012,
+    "lon": 130.448,
+    "code": "shk_新大牟田"
+   },
+   {
+    "name_kanji": "新玉名",
+    "name_en": "Shin-Tamana",
+    "lat": 32.916,
+    "lon": 130.594,
+    "code": "shk_新玉名"
+   },
+   {
+    "name_kanji": "熊本",
+    "name_en": "Kumamoto",
+    "lat": 32.789207,
+    "lon": 130.688499,
+    "code": "eki_1190341"
+   },
+   {
+    "name_kanji": "新八代",
+    "name_en": "Shin-Yatsushiro",
+    "lat": 32.517888,
+    "lon": 130.634919,
+    "code": "eki_1190348"
+   },
+   {
+    "name_kanji": "新水俣",
+    "name_en": "Shin-Minamata",
+    "lat": 32.210825,
+    "lon": 130.428893,
+    "code": "eki_9992112"
+   },
+   {
+    "name_kanji": "出水",
+    "name_en": "Izumi",
+    "lat": 32.089275,
+    "lon": 130.357803,
+    "code": "eki_9992116"
+   },
+   {
+    "name_kanji": "川内",
+    "name_en": "Sendai (Kagoshima)",
+    "lat": 31.813726,
+    "lon": 130.31213,
+    "code": "eki_1190401"
+   },
+   {
+    "name_kanji": "鹿児島中央",
+    "name_en": "Kagoshima-Chuo",
+    "lat": 31.583727,
+    "lon": 130.541789,
+    "code": "eki_1190411"
+   }
+  ]
+ },
+ "北海道新幹線": {
+  "name_en": "Hokkaido Shinkansen",
+  "color": "#9CDCF7",
+  "stations": [
+   {
+    "name_kanji": "新青森",
+    "name_en": "Shin-Aomori",
+    "lat": 40.8275,
+    "lon": 140.693472,
+    "code": "eki_1120265"
+   },
+   {
+    "name_kanji": "奥津軽いまべつ",
+    "name_en": "Oku-Tsugaru-Imabetsu",
+    "lat": 41.145083,
+    "lon": 140.515444,
+    "code": "eki_1111802"
+   },
+   {
+    "name_kanji": "木古内",
+    "name_en": "Kikonai",
+    "lat": 41.677642,
+    "lon": 140.434004,
+    "code": "eki_1111806"
+   },
+   {
+    "name_kanji": "新函館北斗",
+    "name_en": "Shin-Hakodate-Hokuto",
+    "lat": 41.9054,
+    "lon": 140.646525,
+    "code": "eki_1110106"
+   }
+  ]
+ }
+}

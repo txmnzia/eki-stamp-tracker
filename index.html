@@ -1062,7 +1062,7 @@
     // App version — shown discreetly on the welcome modal. Bump on every merge
     // to main. It is also part of the station-cache key, so each release
     // invalidates the 7-day IndexedDB cache and users immediately get fresh data.
-    const APP_VERSION       = 'v1.1.7';
+    const APP_VERSION       = 'v1.2.0';
     const CACHE_TTL         = 7 * 24 * 60 * 60 * 1000;  // 7 days
     const BATCH_SIZE        = 150;      // features per animation frame (line rendering)
     const SYNC_DEBOUNCE_MS  = 2000;     // ms after last stamp change before auto-save
@@ -1138,6 +1138,7 @@
     const stationByCode = {};  // ekidata code → station record (for seeding overlays from saved rides)
     const lineGeomCache = {};  // cacheKey(name|bucket) → { chains, stations } computed lazily
     const rideOverlays  = {};  // lineName → [polyline, ...] bright "ridden stretch" overlays
+    const shinkansenData = {}; // 路線名 → { name_en, color, stations:[ordered] } curated Shinkansen
     let   currentPopupLine = null;  // line whose popup is open (for the ride button)
     let   linePopupSeed    = null;  // {lat,lng} where the open line popup was clicked (corridor seed)
 
@@ -1408,6 +1409,52 @@
         </div>`;
     };
 
+    // Wire the shared hover/tap/popup behaviour onto a line polyline (used by both
+    // the GeoJSON lines and the curated Shinkansen polylines, so they feel identical).
+    const attachLineInteractions = (polyline, name, map) => {
+        polyline.bindTooltip(
+            () => {
+                const { primary, secondary } = orderLineNames(name);
+                return `<div class="line-tip"><b>${primary}</b>${secondary ? `<br><span>${secondary}</span>` : ''}</div>`;
+            },
+            { sticky: true, direction: 'top', offset: [0, -8], className: 'line-tooltip' }
+        );
+        polyline.bindPopup(() => buildLinePopupHtml(name),
+            { offset: L.point(0, -4), closeButton: true, maxWidth: 260, className: 'line-popup' });
+        polyline.on('mouseover', () => highlightLine(name, map));
+        polyline.on('mouseout', () => {
+            hoverTimer = setTimeout(() => { hoveredLine = null; resetAllLines(); }, HOVER_RESET_MS);
+        });
+        polyline.on('click', (e) => {
+            if (suppressTap) { suppressTap = false; return; }   // ignore long-press
+            L.DomEvent.stopPropagation(e);
+            highlightLine(name, map);
+            currentPopupLine = name;
+            linePopupSeed = e.latlng;   // remember where on the corridor we clicked
+            polyline.closeTooltip();
+            polyline.openPopup(e.latlng);
+        });
+        polyline.on('popupclose', () => { if (currentPopupLine === name) currentPopupLine = null; });
+    };
+
+    // Draw the curated Shinkansen lines (polyline through their real stops). The
+    // bundled rail geometry has almost no Shinkansen track, so its broken fragments
+    // are skipped in renderLines and replaced by these complete, clean lines.
+    const drawShinkansen = (map) => {
+        Object.entries(shinkansenData).forEach(([name, info]) => {
+            if (linesByName[name]) return;
+            const color = info.color || '#888';
+            lineColorMap[name] = color;
+            if (info.name_en) lineEnMap[name] = info.name_en;
+            const pl = L.polyline(info.stations.map(s => [s.lat, s.lon]),
+                { color, ...LINE_BASE, renderer: canvasRenderer, interactive: true }).addTo(map);
+            linesByName[name] = [pl];
+            allLineSegs.push(pl);
+            attachLineInteractions(pl, name, map);
+        });
+        resetAllLines();
+    };
+
     /**
      * Render GeoJSON line features onto the map using RAF batching.
      * @param {L.Map} map
@@ -1423,6 +1470,7 @@
             for (; i < end; i++) {
                 const { properties, geometry } = features[i];
                 const name  = properties.路線名;
+                if (name.includes('新幹線')) continue;   // drawn from curated data instead
                 const color = getLineColor(name);
                 lineColorMap[name] = color;
 
@@ -1434,42 +1482,7 @@
                 if (!linesByName[name]) linesByName[name] = [];
                 linesByName[name].push(polyline);
                 allLineSegs.push(polyline);
-
-                // Function content so the tooltip follows the current UI language
-                // (it is bound once but the language can toggle afterwards).
-                polyline.bindTooltip(
-                    () => {
-                        const { primary, secondary } = orderLineNames(name);
-                        return `<div class="line-tip"><b>${primary}</b>${secondary ? `<br><span>${secondary}</span>` : ''}</div>`;
-                    },
-                    { sticky: true, direction: 'top', offset: [0, -8], className: 'line-tooltip' }
-                );
-
-                // Line popup with the "add a ride" entry point (built fresh each
-                // open so it reflects the current language + ride state).
-                polyline.bindPopup(() => buildLinePopupHtml(name),
-                    { offset: L.point(0, -4), closeButton: true, maxWidth: 260, className: 'line-popup' });
-
-                polyline.on('mouseover', () => highlightLine(name, map));
-
-                polyline.on('mouseout', () => {
-                    hoverTimer = setTimeout(() => { hoveredLine = null; resetAllLines(); }, HOVER_RESET_MS);
-                });
-
-                // Tap (touch) / click: highlight the line and open its popup
-                // (which holds the "add a ride" button). Lines are uninteractive
-                // on touch without this (no hover event fires).
-                polyline.on('click', (e) => {
-                    if (suppressTap) { suppressTap = false; return; }   // ignore long-press
-                    L.DomEvent.stopPropagation(e);
-                    highlightLine(name, map);
-                    currentPopupLine = name;
-                    linePopupSeed = e.latlng;   // remember where on the corridor we clicked
-                    polyline.closeTooltip();
-                    polyline.openPopup(e.latlng);
-                });
-
-                polyline.on('popupclose', () => { if (currentPopupLine === name) currentPopupLine = null; });
+                attachLineInteractions(polyline, name, map);
             }
 
             if (i < features.length) {
@@ -1497,9 +1510,17 @@
         bringCollectedToFront();
     };
 
+    const loadShinkansen = async () => {
+        try {
+            const d = await fetch('data/shinkansen.json').then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); });
+            Object.assign(shinkansenData, d);
+        } catch (err) { console.error('loadShinkansen:', err); }
+    };
+
     const loadLines = async (map) => {
-        // After lines are drawn, restack markers and paint any saved ride overlays.
-        const onLinesReady = () => { bringStationsToFront(); renderAllRideOverlays(); };
+        await loadShinkansen();   // ready before onLinesReady draws them
+        // After lines are drawn, restack markers, draw Shinkansen, paint ride overlays.
+        const onLinesReady = () => { bringStationsToFront(); drawShinkansen(map); renderAllRideOverlays(); };
         try {
             const cached = await cacheGet('eki_lines');
             if (cached && Date.now() - cached.ts < CACHE_TTL) {
@@ -1655,6 +1676,20 @@
      * @returns {{chains:Array, stations:Array}}
      */
     const buildLineGeometry = (name, seed) => {
+        // Curated Shinkansen: the line IS its ordered stops, so the geometry is the
+        // polyline through them and the station list is exact — no corridor/merge.
+        if (shinkansenData[name]) {
+            if (lineGeomCache[name]) return lineGeomCache[name];
+            const stops = shinkansenData[name].stations;
+            const ch = describeChain(stops.map(s => [s.lat, s.lon]));
+            const n = stops.length;
+            const stations = stops.map((s, i) => ({
+                code: s.code, name_kanji: s.name_kanji, name_en: s.name_en, lat: s.lat, lon: s.lon,
+                chainIdx: 0, segIdx: i === n - 1 ? n - 2 : i, t: i === n - 1 ? 1 : 0, pos: ch.arc[i], idx: i,
+            }));
+            return (lineGeomCache[name] = { chains: [ch], stations });
+        }
+
         const cacheKey = name + '|' + seedBucket(seed);
         if (lineGeomCache[cacheKey]) return lineGeomCache[cacheKey];
 
@@ -1836,7 +1871,6 @@
         rideOverlays[name] = [];
         const codes = state.rides[name];
         if (!codes || !codes.length || !linesByName[name]) return;
-        if (name.includes('新幹線')) return;   // Shinkansen rides are unsupported (no station data)
 
         // Seed = centroid of the saved ridden stations' coordinates.
         let sLat = 0, sLng = 0, n = 0;
@@ -1906,13 +1940,12 @@
         list.style.setProperty('--ride-color', color);
 
         const footer = document.getElementById('ride-footer');
-        // Shinkansen lines aren't in the station dataset, so the only stations near
-        // the track are the parallel conventional lines — which would be wrong. Don't
-        // pretend; show an honest message instead of a misleading list.
-        const isShinkansen = name.includes('新幹線');
-        if (isShinkansen || geom.stations.length < 2) {
-            list.innerHTML = `<div id="ride-empty">${isShinkansen
-                ? 'Ride logging isn’t available for Shinkansen lines yet — the dataset doesn’t include Shinkansen stations.'
+        // A Shinkansen with no curated data (none expected) or a line with too little
+        // track can't be logged — show an honest message instead of a wrong list.
+        const unsupported = name.includes('新幹線') && !shinkansenData[name];
+        if (unsupported || geom.stations.length < 2) {
+            list.innerHTML = `<div id="ride-empty">${unsupported
+                ? 'Ride logging isn’t available for this Shinkansen line yet.'
                 : 'No track data is available to log a ride on this line yet.'}</div>`;
             footer.classList.add('hidden');
             ridePicker = null;
