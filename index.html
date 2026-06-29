@@ -998,7 +998,7 @@
     // App version — shown discreetly on the welcome modal. Bump on every merge
     // to main. It is also part of the station-cache key, so each release
     // invalidates the 7-day IndexedDB cache and users immediately get fresh data.
-    const APP_VERSION       = 'v1.3.3';
+    const APP_VERSION       = 'v1.3.4';
     const CACHE_TTL         = 7 * 24 * 60 * 60 * 1000;  // 7 days
     const BATCH_SIZE        = 150;      // features per animation frame (line rendering)
     const SYNC_DEBOUNCE_MS  = 2000;     // ms after last stamp change before auto-save
@@ -1083,6 +1083,8 @@
     const rideOverlays  = {};  // lineName → [polyline, ...] bright "ridden stretch" overlays
     const shinkansenData = {}; // 路線名 → { name_en, color, stations:[ordered] } curated Shinkansen
     const shinkansenGeo  = {}; // 路線名 → [ [lat,lng]... ] bundled track fragments (captured in renderLines)
+    let   shinkansenPool = null; // all Shinkansen fragments stitched together — used to fill a line's gaps
+                                 // with the physically-shared track stored under a sibling line's name
     let   currentPopupLine = null;  // line whose popup is open (for the ride button)
     let   linePopupSeed    = null;  // {lat,lng} where the open line popup was clicked (corridor seed)
 
@@ -1407,14 +1409,70 @@
         return { coords, anchorIdx };
     };
 
+    // Snap a point onto ONE described chain (nearest projection + d²).
+    const snapOnChain = (ch, lat, lon) => {
+        const p = [lat, lon], { coords, sx, sy } = ch;
+        let bd2 = Infinity, bseg = 0, bt = 0;
+        for (let i = 1; i < coords.length; i++) {
+            const { d2, t } = projToSeg(p, coords[i - 1], coords[i], sx, sy);
+            if (d2 < bd2) { bd2 = d2; bseg = i - 1; bt = t; }
+        }
+        return { segIdx: bseg, t: bt, pos: ch.arc[bseg] + bt * (ch.arc[bseg + 1] - ch.arc[bseg]), d2: bd2 };
+    };
+    // Snap onto a SET of chains; returns the best with its chain index.
+    const snapToChains = (chains, lat, lon) => {
+        let best = null;
+        for (let ci = 0; ci < chains.length; ci++) {
+            const s = snapOnChain(chains[ci], lat, lon);
+            if (!best || s.d2 < best.d2) best = { ...s, chainIdx: ci };
+        }
+        return best;
+    };
+    const chainProj = (ch, s) => { const c = ch.coords, a = c[s.segIdx], b = c[s.segIdx + 1];
+                                   return [a[0] + (b[0] - a[0]) * s.t, a[1] + (b[1] - a[1]) * s.t]; };
+    // Interior vertices of `ch` strictly between two snapped points, in A→B order.
+    const sliceVerts = (ch, A, B) => {
+        const fwd = A.pos <= B.pos, lo = fwd ? A : B, hi = fwd ? B : A, verts = [];
+        for (let k = lo.segIdx + 1; k <= hi.segIdx; k++) verts.push(ch.coords[k].slice());
+        if (!fwd) verts.reverse();
+        return verts;
+    };
+    // All Shinkansen track stitched into one set of chains (built once, cached). A
+    // line's own gaps are filled from here because shared corridors (e.g. Tokyo–
+    // Takasaki) are stored under whichever Shinkansen the geojson happened to label.
+    const buildShinkansenPool = () => {
+        if (shinkansenPool) return shinkansenPool;
+        const all = [];
+        Object.values(shinkansenGeo).forEach(arr => arr.forEach(s => { if (s.length >= 2) all.push(s); }));
+        return (shinkansenPool = bridgeChains(stitchChains(all).filter(c => c.length >= 2), SHK_BRIDGE_M).map(describeChain));
+    };
+    // Real track between two stops borrowed from the shared pool: both must land on
+    // the SAME pooled chain within SHK_SNAP_M, and the sliced length must be close to
+    // the straight chord (0.7–1.7×) so a stitched branch can never add a detour.
+    const borrowSlice = (pool, a, b) => {
+        const chord = ptDist(a, b), snap2 = SHK_SNAP_M * SHK_SNAP_M;
+        let best = null;
+        for (const ch of pool) {
+            const A = snapOnChain(ch, a[0], a[1]); if (A.d2 > snap2) continue;
+            const B = snapOnChain(ch, b[0], b[1]); if (B.d2 > snap2) continue;
+            const slen = Math.abs(A.pos - B.pos);
+            if (slen < 0.7 * chord || slen > 1.7 * chord) continue;
+            const cost = A.d2 + B.d2;
+            if (!best || cost < best.cost) best = { cost, ch, A, B };
+        }
+        return best ? { verts: sliceVerts(best.ch, best.A, best.B), endA: chainProj(best.ch, best.A), endB: chainProj(best.ch, best.B) } : null;
+    };
+
     // Build a Shinkansen's drawn path by FOLLOWING the bundled real track geometry,
-    // not straight (or smoothed) hops between stops. The track is stitched/bridged
-    // into ordered chain(s); each curated stop is snapped onto it; the path slices
-    // the real vertices between consecutive on-track stops. Spans the bundled data
-    // doesn't cover (shared Tokyo corridors, tunnels, newer extensions) fall back to
-    // a straight connector. Returns dense coords + the index of each stop within
-    // them (anchorIdx), so the same path drives both the drawn line and the ride
-    // geometry. Cached on the line's info. (Lines with no usable geometry: smooth.)
+    // not straight (or smoothed) hops between stops. The line's own track is stitched
+    // into ordered chain(s) and each stop snapped onto it; the path slices the real
+    // vertices between consecutive on-track stops. Where the line has no own track
+    // (shared Tokyo corridors stored under a sibling line, tunnels), it borrows the
+    // physically-shared track from the pooled Shinkansen geometry; only spans no
+    // Shinkansen covers (e.g. the newer Kanazawa–Tsuruga extension) stay straight.
+    // Returns dense coords + the index of each stop within them (anchorIdx), so the
+    // same path drives both the drawn line and the ride geometry. Cached on the
+    // line's info. (Lines with no usable geometry fall back to a smooth curve.)
     const shinkansenPath = (name) => {
         const info = shinkansenData[name];
         if (info._path) return info._path;
@@ -1426,45 +1484,35 @@
         const chains = bridgeChains(stitchChains(segs).filter(c => c.length >= 2), SHK_BRIDGE_M).map(describeChain);
         if (!chains.length) return (info._path = shinkansenSmooth(pts));
 
-        // Snap a stop to the nearest point on any chain (returns projection + d²).
-        const snapStop = (lat, lon) => {
-            const p = [lat, lon];
-            let bd2 = Infinity, bc = -1, bseg = 0, bt = 0;
-            for (let ci = 0; ci < chains.length; ci++) {
-                const { coords, sx, sy } = chains[ci];
-                for (let i = 1; i < coords.length; i++) {
-                    const { d2, t } = projToSeg(p, coords[i - 1], coords[i], sx, sy);
-                    if (d2 < bd2) { bd2 = d2; bc = ci; bseg = i - 1; bt = t; }
-                }
-            }
-            if (bc < 0) return null;
-            const ch = chains[bc];
-            return { chainIdx: bc, segIdx: bseg, t: bt, pos: ch.arc[bseg] + bt * (ch.arc[bseg + 1] - ch.arc[bseg]), d2: bd2 };
-        };
-        const snaps   = pts.map(p => snapStop(p[0], p[1]));
-        const onTrack = snaps.map(s => s && s.d2 <= SHK_SNAP_M * SHK_SNAP_M);
+        const snap2   = SHK_SNAP_M * SHK_SNAP_M;
+        const snaps   = pts.map(p => snapToChains(chains, p[0], p[1]));
+        const onTrack = snaps.map(s => s && s.d2 <= snap2);
         // If almost nothing snaps, the geometry is unusable for this line — smooth.
         if (onTrack.filter(Boolean).length < 2) return (info._path = shinkansenSmooth(pts));
 
-        const projOf = (s) => { const c = chains[s.chainIdx].coords, a = c[s.segIdx], b = c[s.segIdx + 1];
-                                return [a[0] + (b[0] - a[0]) * s.t, a[1] + (b[1] - a[1]) * s.t]; };
-        const anchorPt = (i) => onTrack[i] ? projOf(snaps[i]) : pts[i].slice();
+        // The pool is only needed when this line has gaps; build it lazily.
+        const pool = onTrack.every(Boolean) ? null : buildShinkansenPool();
+        const poolSnap = pool ? pts.map(p => snapToChains(pool, p[0], p[1])) : [];
+
+        // Anchor a stop on its own track, else on the shared pool, else its raw coord.
+        const anchorPt = (i) => onTrack[i] ? chainProj(chains[snaps[i].chainIdx], snaps[i])
+                              : (pool && poolSnap[i] && poolSnap[i].d2 <= snap2) ? chainProj(pool[poolSnap[i].chainIdx], poolSnap[i])
+                              : pts[i].slice();
 
         const coords = [], anchorIdx = [];
         for (let i = 0; i < pts.length; i++) {
             anchorIdx.push(coords.length);
             coords.push(anchorPt(i));
             if (i === pts.length - 1) break;
-            // Real-track vertices between stop i and i+1 when both sit on the same chain.
+            // 1) Own track when both stops sit on the same own chain.
             if (onTrack[i] && onTrack[i + 1] && snaps[i].chainIdx === snaps[i + 1].chainIdx) {
-                const ch = chains[snaps[i].chainIdx], A = snaps[i], B = snaps[i + 1];
-                const fwd = A.pos <= B.pos, lo = fwd ? A : B, hi = fwd ? B : A;
-                const verts = [];
-                for (let k = lo.segIdx + 1; k <= hi.segIdx; k++) verts.push(ch.coords[k].slice());
-                if (!fwd) verts.reverse();
-                for (const v of verts) coords.push(v);
+                for (const v of sliceVerts(chains[snaps[i].chainIdx], snaps[i], snaps[i + 1])) coords.push(v);
+            // 2) Otherwise borrow the shared real track from the pool (guarded).
+            } else if (pool) {
+                const b = borrowSlice(pool, pts[i], pts[i + 1]);
+                if (b) for (const v of b.verts) coords.push(v);
+                // 3) else: straight connector (the next anchor closes the gap).
             }
-            // else: straight connector (the next anchor closes the gap).
         }
         return (info._path = { coords, anchorIdx });
     };
