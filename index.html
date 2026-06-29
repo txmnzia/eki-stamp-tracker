@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Eki Stamp Tracker</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
@@ -83,7 +83,9 @@
 
         /* ── Top bar (search + controls) ──────────────────────────────────── */
         #topbar {
-            position: absolute; top: 12px; left: 12px; right: 12px;
+            /* Offset by the safe-area top inset so the bar clears the notch /
+               Dynamic Island (needs viewport-fit=cover on the viewport meta). */
+            position: absolute; top: calc(env(safe-area-inset-top, 0px) + 12px); left: 12px; right: 12px;
             z-index: var(--z-map-ui);
             display: flex; align-items: flex-start; gap: 8px;
         }
@@ -1001,7 +1003,7 @@
     // App version — shown discreetly on the welcome modal. Bump on every merge
     // to main. It is also part of the station-cache key, so each release
     // invalidates the 7-day IndexedDB cache and users immediately get fresh data.
-    const APP_VERSION       = 'v1.3.16';
+    const APP_VERSION       = 'v1.3.17';
     const CACHE_TTL         = 7 * 24 * 60 * 60 * 1000;  // 7 days
     const BATCH_SIZE        = 150;      // features per animation frame (line rendering)
     const SYNC_DEBOUNCE_MS  = 2000;     // ms after last stamp change before auto-save
