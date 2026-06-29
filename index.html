@@ -998,7 +998,7 @@
     // App version — shown discreetly on the welcome modal. Bump on every merge
     // to main. It is also part of the station-cache key, so each release
     // invalidates the 7-day IndexedDB cache and users immediately get fresh data.
-    const APP_VERSION       = 'v1.3.0';
+    const APP_VERSION       = 'v1.3.1';
     const CACHE_TTL         = 7 * 24 * 60 * 60 * 1000;  // 7 days
     const BATCH_SIZE        = 150;      // features per animation frame (line rendering)
     const SYNC_DEBOUNCE_MS  = 2000;     // ms after last stamp change before auto-save
@@ -1019,7 +1019,9 @@
 
     // Line prominence (AC0: lines are discreet by default; ridden stretches pop).
     const LINE_BASE     = { weight: 1.5, opacity: 0.20 };  // faint colour tint — default look
+    const SHINKANSEN_BASE = { weight: 2.6, opacity: 0.6 }; // Shinkansen sit a bit more prominent
     const LINE_DIM      = { weight: 1.2, opacity: 0.10 };  // other lines while one is focused
+    const LINE_EDIT_DIM = { weight: 1,   opacity: 0.05 };  // other lines while editing a ride
     const LINE_FOCUS    = { weight: 4,   opacity: 0.85 };  // hovered/tapped line
     const RIDE_OVERLAY  = { weight: 4.5, opacity: 0.95 };  // ridden-stretch overlay (full colour)
     const RIDE_SNAP_M   = 60;           // station must sit this close to the line to *score* a group
@@ -1306,12 +1308,13 @@
     // ── 7. LINE RENDERING ─────────────────────────────────────────────────────
 
     const resetAllLines = () => {
-        allLineSegs.forEach(p => p.setStyle(LINE_BASE));
+        allLineSegs.forEach(p => p.setStyle(p._baseStyle || LINE_BASE));
     };
 
     // Highlight every segment of a line (dim the rest). Shared by hover (desktop)
     // and tap (touch) so lines are usable without a mouse.
     const highlightLine = (name, map) => {
+        if (rideEdit) return;   // no hover-highlight while editing a ride (distracting)
         clearTimeout(hoverTimer);
         if (map) { map.closePopup(); currentPopupMarker = null; }
         if (hoveredLine === name) return;
@@ -1357,10 +1360,12 @@
             { offset: L.point(0, -4), closeButton: true, maxWidth: 260, className: 'line-popup' });
         polyline.on('mouseover', () => highlightLine(name, map));
         polyline.on('mouseout', () => {
+            if (rideEdit) return;
             hoverTimer = setTimeout(() => { hoveredLine = null; resetAllLines(); }, HOVER_RESET_MS);
         });
         polyline.on('click', (e) => {
             if (suppressTap) { suppressTap = false; return; }   // ignore long-press
+            if (rideEdit) return;   // ignore other lines while editing a ride
             L.DomEvent.stopPropagation(e);
             highlightLine(name, map);
             currentPopupLine = name;
@@ -1371,17 +1376,47 @@
         polyline.on('popupclose', () => { if (currentPopupLine === name) currentPopupLine = null; });
     };
 
-    // Draw the curated Shinkansen lines (polyline through their real stops). The
+    // Smooth a Shinkansen's stop sequence into a curved path via centripetal
+    // Catmull-Rom (passes through every stop, rounds the corners, no overshoot).
+    // Returns the dense coords plus the index of each original stop within them,
+    // so the same path drives both the drawn line and the ride geometry. Cached.
+    const shinkansenPath = (name) => {
+        const info = shinkansenData[name];
+        if (info._path) return info._path;
+        const pts = info.stations.map(s => [s.lat, s.lon]);
+        const K = 16;                                   // points generated per inter-stop span
+        const at = (i) => pts[Math.max(0, Math.min(pts.length - 1, i))];
+        const coords = [], anchorIdx = [];
+        const d = (a, b) => Math.sqrt(Math.hypot(a[0] - b[0], a[1] - b[1])) || 1e-6;   // centripetal knot spacing
+        for (let i = 0; i < pts.length - 1; i++) {
+            anchorIdx.push(coords.length);
+            const p0 = at(i - 1), p1 = at(i), p2 = at(i + 1), p3 = at(i + 2);
+            const t0 = 0, t1 = t0 + d(p0, p1), t2 = t1 + d(p1, p2), t3 = t2 + d(p2, p3);
+            const lerp = (ta, tb, pa, pb, t) => { const f = (t - ta) / (tb - ta); return [pa[0] + (pb[0] - pa[0]) * f, pa[1] + (pb[1] - pa[1]) * f]; };
+            for (let j = 0; j < K; j++) {
+                const t = t1 + (t2 - t1) * (j / K);
+                const A1 = lerp(t0, t1, p0, p1, t), A2 = lerp(t1, t2, p1, p2, t), A3 = lerp(t2, t3, p2, p3, t);
+                const B1 = lerp(t0, t2, A1, A2, t), B2 = lerp(t1, t3, A2, A3, t);
+                coords.push(lerp(t1, t2, B1, B2, t));
+            }
+        }
+        anchorIdx.push(coords.length);
+        coords.push(pts[pts.length - 1].slice());
+        return (info._path = { coords, anchorIdx });
+    };
+
+    // Draw the curated Shinkansen lines (smooth curve through their real stops). The
     // bundled rail geometry has almost no Shinkansen track, so its broken fragments
-    // are skipped in renderLines and replaced by these complete, clean lines.
+    // are skipped in renderLines and replaced by these complete, smooth lines.
     const drawShinkansen = (map) => {
         Object.entries(shinkansenData).forEach(([name, info]) => {
             if (linesByName[name]) return;
             const color = info.color || '#888';
             lineColorMap[name] = color;
             if (info.name_en) lineEnMap[name] = info.name_en;
-            const pl = L.polyline(info.stations.map(s => [s.lat, s.lon]),
-                { color, ...LINE_BASE, renderer: canvasRenderer, interactive: true }).addTo(map);
+            const pl = L.polyline(shinkansenPath(name).coords,
+                { color, ...SHINKANSEN_BASE, renderer: canvasRenderer, interactive: true }).addTo(map);
+            pl._baseStyle = SHINKANSEN_BASE;
             linesByName[name] = [pl];
             allLineSegs.push(pl);
             attachLineInteractions(pl, name, map);
@@ -1611,16 +1646,20 @@
      */
     const buildLineGeometry = (name, seed) => {
         // Curated Shinkansen: the line IS its ordered stops, so the geometry is the
-        // polyline through them and the station list is exact — no corridor/merge.
+        // smoothed (Catmull-Rom) curve through them and the station list is exact —
+        // no corridor/merge. Stops are anchor vertices in the smoothed path, so the
+        // ride overlays/segments follow the same smooth curve as the drawn line.
         if (shinkansenData[name]) {
             if (lineGeomCache[name]) return lineGeomCache[name];
             const stops = shinkansenData[name].stations;
-            const ch = describeChain(stops.map(s => [s.lat, s.lon]));
-            const n = stops.length;
-            const stations = stops.map((s, i) => ({
-                code: s.code, name_kanji: s.name_kanji, name_en: s.name_en, lat: s.lat, lon: s.lon,
-                chainIdx: 0, segIdx: i === n - 1 ? n - 2 : i, t: i === n - 1 ? 1 : 0, pos: ch.arc[i], idx: i,
-            }));
+            const path  = shinkansenPath(name);
+            const ch    = describeChain(path.coords);
+            const lastV = path.coords.length - 1;
+            const stations = stops.map((s, i) => {
+                const v = path.anchorIdx[i];
+                return { code: s.code, name_kanji: s.name_kanji, name_en: s.name_en, lat: s.lat, lon: s.lon,
+                    chainIdx: 0, segIdx: v >= lastV ? lastV - 1 : v, t: v >= lastV ? 1 : 0, pos: ch.arc[v], idx: i };
+            });
             return (lineGeomCache[name] = { chains: [ch], stations });
         }
 
@@ -1942,6 +1981,15 @@
 
         rideEdit = { name, color, geom, segs, selected: initialRideSelection(name, segs), layer, dragging: false, mode: 'add' };
         segs.forEach(paintSeg);
+
+        // Focus mode: fade every other line right down and fade other lines' ride
+        // overlays, so only the line being edited stands out. Hide this line's own
+        // faint base (the bright editable segments replace it).
+        const own = new Set(linesByName[name] || []);
+        allLineSegs.forEach(p => { if (!own.has(p)) p.setStyle(LINE_EDIT_DIM); });
+        own.forEach(p => p.setStyle({ opacity: 0 }));
+        Object.entries(rideOverlays).forEach(([ln, arr]) => { if (ln !== name) arr.forEach(pl => pl.setStyle({ opacity: 0.1 })); });
+
         mapInstance.on('moveend zoomend', refreshRideEditCache);
         try { mapInstance.fitBounds(L.latLngBounds(geom.chains.flatMap(c => c.coords)).pad(0.18)); } catch { /* ignore */ }
         refreshRideEditCache();
@@ -1962,6 +2010,9 @@
         const c = mapInstance.getContainer(); c.style.cursor = ''; c.style.touchAction = '';
         document.getElementById('ride-edit-bar').classList.add('hidden');
         rideEdit = null;
+        // Restore focus: un-fade all lines and other ride overlays.
+        resetAllLines();
+        Object.values(rideOverlays).forEach(arr => arr.forEach(pl => pl.setStyle({ opacity: RIDE_OVERLAY.opacity })));
         if (save) {
             const keys = [...selected];
             if (keys.length) state.rides[name] = keys; else delete state.rides[name];
