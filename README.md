@@ -112,7 +112,7 @@ All logic is one inline `<script>`. It is organised into numbered sections:
 | 6. Map init | Leaflet map, canvas renderer, custom touch gestures |
 | 7. Line rendering | draws GeoJSON lines (faint by default), hover/tap highlight, **line popup** |
 | 7b. Ride sections | stitching, station snapping, **ridden-stretch overlays** (see below) |
-| 7c. Ride modal | the vertical **swipe-to-pick** station selector |
+| 7c. Ride edit mode | select ridden stretches **on the map** (handles branches) |
 | 8. Marker management | builds/merges station markers, collect toggle |
 | 9. Popup | station popup HTML (collect button) |
 | 10–15 | search, language toggle, stats, session panel, welcome modal, **init** |
@@ -132,14 +132,22 @@ keys to `localStorage`). Map data is cached in **IndexedDB** (`eki-cache`, keyed
 - **All lines are discreet by default** — a faint tint of their own colour
   (`LINE_BASE`). The stretch you rode is drawn over them at full colour
   (`RIDE_OVERLAY`).
-- **Tap a line → popup → "Add a ride".** Opens the *ride picker*: a vertical
-  diagram of every station on that line.
-- **Swipe** (click-drag) along the stations to select the stretch you rode, like
-  selecting multiple photos on iOS. The first station you touch decides the mode:
-  starting on an un-selected station **adds**; starting on a selected one
-  **removes** (de-highlights). Edge auto-scroll handles long lines.
-- **Save** paints the selected stretch onto the map, following the real track
-  geometry. Multiple, non-contiguous sections per line are supported.
+- **Tap a line → popup → "Add a ride"** puts the map into **ride edit mode** for
+  that line (section 7c). Selection happens *on the map* — the right model for
+  branched/looping lines, which a single list can't represent. Each inter-station
+  segment is drawn individually with a node at each station (collected stamps are
+  gold). A floating toolbar shows the line name + Save / Cancel.
+- **Tap a segment** to toggle it; **drag along the line** to paint a stretch (the
+  first segment touched decides add-vs-remove). A drag that starts *on* the line
+  paints and locks map-panning for that gesture; a drag that starts *off* the line
+  still pans. The map auto-fits the line on entry.
+- **Save** writes the selection and paints the ridden stretches onto the map,
+  following the real track geometry. Branches and multiple separate stretches are
+  supported because each segment is independent.
+
+Rides are stored as **segment keys** `"codeA|codeB"` (the two stations of a ridden
+inter-station segment). `renderRideOverlays` also still understands the older
+station-code arrays, so previously-saved rides keep rendering.
 
 ### How a clicked line maps to its stations (the important bit)
 
@@ -209,7 +217,7 @@ Rides are stored on `state.rides` and saved in the same Gist as stamps:
 ```jsonc
 {
   "stamps": ["eki_1130223", ...],
-  "rides":  { "いすみ線": ["eki_xxx", "eki_yyy", ...], ... }  // ridden station codes per line
+  "rides":  { "いすみ線": ["eki_xxx|eki_yyy", ...], ... }  // ridden inter-station segment keys
 }
 ```
 
