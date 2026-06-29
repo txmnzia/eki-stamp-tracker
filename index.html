@@ -998,7 +998,7 @@
     // App version — shown discreetly on the welcome modal. Bump on every merge
     // to main. It is also part of the station-cache key, so each release
     // invalidates the 7-day IndexedDB cache and users immediately get fresh data.
-    const APP_VERSION       = 'v1.3.2';
+    const APP_VERSION       = 'v1.3.3';
     const CACHE_TTL         = 7 * 24 * 60 * 60 * 1000;  // 7 days
     const BATCH_SIZE        = 150;      // features per animation frame (line rendering)
     const SYNC_DEBOUNCE_MS  = 2000;     // ms after last stamp change before auto-save
@@ -1019,7 +1019,7 @@
 
     // Line prominence (AC0: lines are discreet by default; ridden stretches pop).
     const LINE_BASE     = { weight: 1.5, opacity: 0.20 };  // faint colour tint — default look
-    const SHINKANSEN_BASE = { weight: 2.6, opacity: 0.6 }; // Shinkansen sit a bit more prominent
+    const SHINKANSEN_BASE = { ...LINE_BASE };              // Shinkansen fade exactly like every other line
     const LINE_DIM      = { weight: 1.2, opacity: 0.10 };  // other lines while one is focused
     const LINE_EDIT_DIM = { weight: 1,   opacity: 0.05 };  // other lines while editing a ride
     const LINE_FOCUS    = { weight: 4,   opacity: 0.85 };  // hovered/tapped line

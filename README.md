@@ -208,9 +208,9 @@ Spans the bundled data doesn't cover (the shared Tokyo corridors stored under a
 sibling line's name, long tunnels, the newer Kanazawa–Tsuruga extension) fall
 back to a straight connector, and a line with no usable geometry falls back to a
 centripetal Catmull-Rom smooth (`shinkansenSmooth`). The same path drives both
-the drawn line and the ride overlays (stops are anchor vertices in it), and
-Shinkansen render a touch more prominently (`SHINKANSEN_BASE`). The ride logic
-uses the stops directly (no corridor/merge). Stop coordinates match the
+the drawn line and the ride overlays (stops are anchor vertices in it). Shinkansen
+fade exactly like every other line when not ridden (`SHINKANSEN_BASE` mirrors
+`LINE_BASE`). The ride logic uses the stops directly (no corridor/merge). Stop coordinates match the
 conventional-station records, so collected-stamp badges still light up.
 Coverage today: 東海道/東北/北海道 follow real track end-to-end; 山陽/九州/上越 ~85–95%;
 北陸's curvy Takasaki–Kanazawa core is real track, its ends are straight (the
