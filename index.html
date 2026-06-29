@@ -396,6 +396,13 @@
             cursor: grab;
         }
         .ride-grip:active { cursor: grabbing; }
+        /* Stamp badge shown to the left of the dot when this station's stamp is collected. */
+        .ride-stamp {
+            position: absolute; left: 0; top: 50%; transform: translateY(-50%);
+            width: 13px; height: 13px; z-index: 1; color: var(--stamp-on); pointer-events: none;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .ride-stamp svg { width: 13px; height: 13px; display: block; }
         .ride-row-name { display: flex; flex-direction: column; gap: 1px; line-height: 1.25; padding: 8px 0; }
         .ride-jp { font-family: var(--jp-font); font-size: 14px; color: var(--text); }
         .ride-row.sel .ride-jp { color: var(--text); }
@@ -1055,7 +1062,7 @@
     // App version — shown discreetly on the welcome modal. Bump on every merge
     // to main. It is also part of the station-cache key, so each release
     // invalidates the 7-day IndexedDB cache and users immediately get fresh data.
-    const APP_VERSION       = 'v1.1.5';
+    const APP_VERSION       = 'v1.1.6';
     const CACHE_TTL         = 7 * 24 * 60 * 60 * 1000;  // 7 days
     const BATCH_SIZE        = 150;      // features per animation frame (line rendering)
     const SYNC_DEBOUNCE_MS  = 2000;     // ms after last stamp change before auto-save
@@ -1909,15 +1916,22 @@
         document.getElementById('ride-hint').textContent =
             'Drag along the line on the left to select the stretch you rode (drag over a highlighted stretch to remove it). Scroll the names to move through the line.';
 
+        // Physical stations whose stamp is already collected (matched by location,
+        // since a line's per-station code may differ from the stamp's code).
+        const collectedKeys = new Set();
+        markers.forEach(m => { if (m._isCollected && m._stationData) collectedKeys.add(dedupeKey(m._stationData)); });
+
         // Build rows
         list.innerHTML = '';
         const rows = geom.stations.map((st, i) => {
             const { primary: p, secondary: s } = rideRowName(st);
+            const collected = collectedKeys.has(dedupeKey(st));
             const row = document.createElement('div');
             row.className = 'ride-row';
             row.dataset.idx = i;
             row.setAttribute('role', 'option');
-            row.innerHTML = `<span class="ride-node"></span><span class="ride-grip" aria-hidden="true"></span><span class="ride-row-name"><span class="ride-jp">${p}</span>${s ? `<span class="ride-en">${s}</span>` : ''}</span>`;
+            const stamp = collected ? `<span class="ride-stamp" title="Stamp collected" aria-label="stamp collected">${ICON_STAMP_FILLED}</span>` : '';
+            row.innerHTML = `<span class="ride-node"></span><span class="ride-grip" aria-hidden="true"></span>${stamp}<span class="ride-row-name"><span class="ride-jp">${p}</span>${s ? `<span class="ride-en">${s}</span>` : ''}</span>`;
             list.appendChild(row);
             return row;
         });
