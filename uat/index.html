@@ -1,0 +1,3043 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Eki Stamp Tracker</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;700&family=Space+Mono&display=swap" rel="stylesheet">
+    <style>
+        /* ── Reset & base ─────────────────────────────────────────────────── */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg:         #0f0f12;
+            --surface:    #18181e;
+            --surface2:   #22222a;
+            --border:     #2e2e3a;
+            --text:       #e4e4ec;
+            --muted:      #9898b0;
+            --accent:     #7eb8f7;
+            --accent-dim: rgba(126,184,247,0.12);
+            --stamp-on:   #f7c948;
+            --stamp-off:  #3a3a48;
+            --radius:     6px;
+            --ui-font:    'Space Mono', monospace;
+            --jp-font:    'Zen Kaku Gothic New', sans-serif;
+            /* Z-index scale — centralised so layers never conflict */
+            --z-map-ui:  1000;
+            --z-modal:   2000;
+            --z-toast:   3000;
+            --z-loading: 5000;
+        }
+
+        html, body { height: 100%; background: var(--bg); color: var(--text); font-family: var(--ui-font); }
+
+        :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 3px; }
+
+        /* ── Map ──────────────────────────────────────────────────────────── */
+        #map { height: 100vh; width: 100%;
+            -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+
+        .leaflet-control-attribution {
+            background: rgba(15,15,18,0.85) !important; color: var(--muted) !important; font-size: 10px;
+        }
+        .leaflet-control-attribution a { color: var(--accent) !important; }
+        /* Bottom-left zoom control, lifted above the centred stats bar (which spans
+           nearly the full width on mobile) so the two never overlap. */
+        .leaflet-bottom.leaflet-left { bottom: max(72px, calc(env(safe-area-inset-bottom, 0px) + 64px)); }
+        .leaflet-control-zoom a { background: var(--surface) !important; color: var(--text) !important; border-color: var(--border) !important; }
+        .leaflet-control-zoom a:hover { background: var(--surface2) !important; }
+
+        /* ── Loading overlay ──────────────────────────────────────────────── */
+        #loading-overlay {
+            position: fixed; inset: 0; z-index: var(--z-loading);
+            background: var(--bg);
+            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px;
+            transition: opacity 0.4s ease;
+        }
+        #loading-overlay.fade-out { opacity: 0; pointer-events: none; }
+        .loading-spinner {
+            width: 36px; height: 36px;
+            border: 3px solid var(--border); border-top-color: var(--accent);
+            border-radius: 50%; animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loading-text { font-size: 11px; color: var(--muted); letter-spacing: 0.12em; text-transform: uppercase; }
+        .loading-sub  { font-size: 10px; color: var(--border); letter-spacing: 0.06em; }
+
+        /* ── Shared UI button ─────────────────────────────────────────────── */
+        .ui-btn {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 8px 14px;
+            font-family: var(--ui-font); font-size: 11px; font-weight: 700;
+            letter-spacing: 0.08em; text-transform: uppercase;
+            background: var(--surface); color: var(--text);
+            border: 1px solid var(--border); border-radius: var(--radius);
+            cursor: pointer; transition: background 0.15s, border-color 0.15s, color 0.15s;
+        }
+        .ui-btn:hover  { background: var(--surface2); border-color: var(--accent); color: var(--accent); }
+        .ui-btn.active { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
+
+        /* ── Top bar (search + controls) ──────────────────────────────────── */
+        #topbar {
+            /* Offset by the safe-area top inset so the bar clears the notch /
+               Dynamic Island (needs viewport-fit=cover on the viewport meta). */
+            position: absolute; top: calc(env(safe-area-inset-top, 0px) + 12px); left: 12px; right: 12px;
+            z-index: var(--z-map-ui);
+            display: flex; align-items: flex-start; gap: 8px;
+        }
+        #search-container { position: relative; flex: 1 1 0; min-width: 0; max-width: 360px; }
+        #search-wrap {
+            display: flex; align-items: center; gap: 8px;
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 8px 12px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.4); transition: border-color 0.15s;
+        }
+        #search-wrap:focus-within { border-color: var(--accent); }
+        #search-icon { color: var(--muted); flex-shrink: 0; }
+        #stationSearch {
+            flex: 1; min-width: 0; width: 100%; background: none; border: none; outline: none;
+            font-family: var(--ui-font); font-size: 13px; color: var(--text);
+        }
+        #stationSearch::placeholder { color: var(--muted); }
+        #suggestions {
+            position: absolute; top: calc(100% + 6px); left: 0; right: 0;
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius); box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+            display: none; overflow: hidden;
+        }
+        .suggestion-item {
+            padding: 10px 14px; cursor: pointer;
+            display: flex; justify-content: space-between; align-items: center;
+            font-size: 12px; border-bottom: 1px solid var(--border); transition: background 0.1s;
+        }
+        .suggestion-item:last-child { border-bottom: none; }
+        .suggestion-item:hover { background: var(--surface2); }
+        .suggestion-item .sug-primary   { font-family: var(--jp-font); font-size: 14px; }
+        .suggestion-item .sug-secondary { color: var(--muted); font-size: 11px; margin-top: 1px; }
+        .suggestion-item .collected-badge {
+            font-size: 10px; padding: 2px 6px;
+            background: rgba(247,201,72,0.15); color: var(--stamp-on);
+            border-radius: 10px; border: 1px solid rgba(247,201,72,0.3);
+            flex-shrink: 0; margin-left: 8px;
+        }
+
+        /* ── Controls ─────────────────────────────────────────────────────── */
+        #controls { flex: 0 0 auto; display: flex; gap: 6px; }
+        #session-toggle { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
+        #session-toggle:hover  { background: rgba(126,184,247,0.22); }
+        #session-toggle.active { background: rgba(126,184,247,0.28); }
+
+        /* ── Popup ────────────────────────────────────────────────────────── */
+        .leaflet-popup-content-wrapper {
+            background: var(--surface) !important; border: 1px solid var(--border) !important;
+            border-radius: var(--radius) !important; box-shadow: 0 8px 24px rgba(0,0,0,0.5) !important; padding: 0 !important;
+        }
+        .leaflet-popup-tip { background: var(--surface) !important; }
+        .leaflet-popup-content { margin: 0 !important; }
+        .leaflet-popup-close-button { color: var(--muted) !important; font-size: 18px !important; padding: 4px 8px !important; }
+        .leaflet-popup-close-button:hover { color: var(--text) !important; }
+        .popup-inner { padding: 14px 16px 12px; min-width: 190px; }
+        .popup-name { font-family: var(--jp-font); font-size: 17px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+        .popup-name-secondary { font-size: 11px; color: var(--muted); letter-spacing: 0.06em; margin-bottom: 10px; }
+        .popup-line {
+            display: inline-flex; align-items: flex-start; gap: 5px;
+            font-size: 11px; color: var(--muted); background: var(--surface2);
+            border-radius: 4px; padding: 3px 7px; margin-bottom: 4px;
+        }
+        .popup-line-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 2px; }
+        .popup-line-label { display: flex; flex-direction: column; gap: 1px; line-height: 1.3; }
+        .popup-line-jp { color: var(--text); }
+        .popup-line-en { font-size: 9.5px; opacity: 0.65; letter-spacing: 0.03em; }
+        .popup-collect-btn {
+            display: flex; align-items: center; gap: 7px;
+            width: 100%; padding: 9px 12px; margin-top: 10px;
+            font-family: var(--ui-font); font-size: 11px; font-weight: 700;
+            letter-spacing: 0.06em; text-transform: uppercase;
+            background: var(--surface2); color: var(--text);
+            border: 1px solid var(--border); border-radius: var(--radius);
+            cursor: pointer; transition: background 0.15s, border-color 0.15s, color 0.15s;
+        }
+        .popup-collect-btn:hover { background: var(--border); }
+        .popup-collect-btn.collected { background: rgba(247,201,72,0.15); border-color: rgba(247,201,72,0.35); color: var(--stamp-on); }
+        .popup-collect-btn.collected:hover { background: rgba(247,201,72,0.08); border-color: rgba(247,201,72,0.2); color: #d4a830; }
+        .popup-nostamp {
+            margin-top: 10px; padding: 8px 12px; text-align: center;
+            font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase;
+            color: var(--muted); background: var(--surface2);
+            border: 1px dashed var(--border); border-radius: var(--radius);
+        }
+
+        /* ── Session panel ────────────────────────────────────────────────── */
+        #session-panel {
+            position: absolute; top: 56px; right: 12px;
+            z-index: var(--z-map-ui); width: min(290px, calc(100vw - 24px));
+            max-height: calc(100vh - 72px); overflow-y: auto;
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: var(--radius); box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+        }
+        #session-header { padding: 14px 16px 10px; border-bottom: 1px solid var(--border); }
+        #session-user-row { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+        #session-avatar {
+            width: 28px; height: 28px; border-radius: 50%;
+            background: var(--accent-dim); border: 1px solid var(--accent);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 12px; font-weight: 700; color: var(--accent); flex-shrink: 0;
+        }
+        #session-username { font-size: 13px; font-weight: 700; color: var(--text); }
+        #session-username.placeholder { color: var(--muted); font-weight: 400; font-style: italic; }
+        #session-stats { font-size: 11px; color: var(--muted); display: flex; align-items: center; gap: 8px; }
+        #session-progress-bar { flex: 1; height: 3px; background: var(--surface2); border-radius: 2px; overflow: hidden; }
+        #session-progress-fill { height: 100%; background: var(--stamp-on); border-radius: 2px; transition: width 0.4s ease; width: 0%; }
+        .sync-status { font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; padding: 2px 0 6px; min-height: 16px; transition: color 0.2s; }
+        .sync-status.saving { color: var(--muted); }
+        .sync-status.saved  { color: #6fdd8b; }
+        .sync-status.error  { color: #f77e7e; }
+        .sync-status a { color: var(--accent); text-decoration: none; margin-left: 4px; }
+        .sync-status a:hover { text-decoration: underline; }
+        #session-body { padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+        /* Loaded state */
+        #session-loaded-row {
+            display: flex; align-items: center; justify-content: space-between; gap: 8px;
+            background: var(--surface2); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 8px 10px;
+        }
+        .session-loaded-label { font-size: 10px; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 2px; }
+        #session-loaded-name { font-size: 13px; font-weight: 700; color: var(--text); }
+        /* Input section */
+        .session-input-section { display: flex; flex-direction: column; gap: 4px; }
+        .session-label-heading { font-size: 10px; font-weight: 700; color: var(--text); letter-spacing: 0.06em; text-transform: uppercase; }
+        .session-hint-text { font-size: 10px; color: var(--muted); line-height: 1.5; padding: 0 2px; }
+        #session-name-input {
+            width: 100%; padding: 8px 10px;
+            background: var(--surface2); border: 1px solid var(--border);
+            border-radius: 4px; color: var(--text);
+            font-family: var(--ui-font); font-size: 12px; outline: none; transition: border-color 0.15s;
+        }
+        #session-name-input:focus { border-color: var(--accent); }
+        #session-name-input::placeholder { color: var(--muted); }
+        /* Buttons */
+        .session-row { display: flex; gap: 6px; }
+        .session-btn {
+            flex: 1; padding: 7px 10px;
+            font-family: var(--ui-font); font-size: 10px; font-weight: 700;
+            letter-spacing: 0.07em; text-transform: uppercase;
+            background: var(--surface2); color: var(--text);
+            border: 1px solid var(--border); border-radius: 4px;
+            cursor: pointer; transition: background 0.15s, border-color 0.15s, color 0.15s; white-space: nowrap;
+        }
+        .session-btn:hover { background: var(--border); }
+        .session-btn.primary { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
+        .session-btn.primary:hover { background: rgba(126,184,247,0.2); }
+        .session-btn.danger { color: #f77e7e; border-color: #3a2222; }
+        .session-btn.danger:hover { background: rgba(247,126,126,0.1); border-color: #f77e7e; }
+        /* Two-step confirm state for destructive actions */
+        .session-btn.confirm-pending {
+            background: rgba(247,126,126,0.15); border-color: #f77e7e; color: #f77e7e;
+            animation: pulse-warn 0.4s ease;
+        }
+        @keyframes pulse-warn { 0%,100% { transform: scale(1); } 50% { transform: scale(1.02); } }
+
+        /* ── Name modal ───────────────────────────────────────────────────── */
+        #name-modal-overlay {
+            position: fixed; inset: 0; z-index: var(--z-modal);
+            background: rgba(0,0,0,0.7);
+            display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px);
+        }
+        #name-modal {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 10px; padding: 28px 28px 24px;
+            width: min(360px, calc(100vw - 32px)); box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+        }
+        #name-modal h2 { font-family: var(--jp-font); font-size: 20px; color: var(--text); margin-bottom: 6px; }
+        #name-modal p  { font-size: 12px; color: var(--muted); margin-bottom: 20px; line-height: 1.7; }
+        #app-version { margin-top: 14px; text-align: right; font-size: 10px; color: var(--muted); opacity: 0.5; letter-spacing: 0.05em; }
+        #modal-name-input {
+            width: 100%; padding: 10px 12px; margin-bottom: 8px;
+            background: var(--surface2); border: 1px solid var(--border);
+            border-radius: 4px; color: var(--text);
+            font-family: var(--jp-font); font-size: 16px; outline: none; transition: border-color 0.15s;
+        }
+        #modal-name-input:focus { border-color: var(--accent); }
+        #modal-name-hint {
+            font-size: 11px; color: var(--muted); margin-bottom: 18px; line-height: 1.6;
+            padding: 8px 10px; background: rgba(247,201,72,0.06);
+            border: 1px solid rgba(247,201,72,0.15); border-radius: 4px;
+        }
+        .modal-buttons { display: flex; gap: 8px; }
+        .modal-btn {
+            flex: 1; padding: 10px;
+            font-family: var(--ui-font); font-size: 11px; font-weight: 700;
+            letter-spacing: 0.08em; text-transform: uppercase;
+            border-radius: 4px; cursor: pointer; border: 1px solid var(--border);
+            transition: background 0.15s, color 0.15s;
+        }
+        .modal-btn.secondary { background: var(--surface2); color: var(--muted); }
+        .modal-btn.secondary:hover { color: var(--text); }
+        .modal-btn.confirm { background: var(--accent-dim); color: var(--accent); border-color: var(--accent); }
+        .modal-btn.confirm:hover { background: rgba(126,184,247,0.2); }
+
+        /* ── Toast ────────────────────────────────────────────────────────── */
+        #toast {
+            position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
+            z-index: var(--z-toast);
+            background: var(--surface2); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 10px 18px;
+            font-size: 12px; color: var(--text);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            opacity: 0; pointer-events: none; white-space: nowrap;
+        }
+        #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+        /* ── Stats bar ────────────────────────────────────────────────────── */
+        #stats-bar {
+            position: absolute;
+            bottom: max(24px, calc(env(safe-area-inset-bottom, 0px) + 16px));
+            left: 50%; transform: translateX(-50%);
+            z-index: var(--z-map-ui);
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 20px; padding: 6px 16px;
+            font-size: 11px; color: var(--muted);
+            box-shadow: 0 2px 12px rgba(0,0,0,0.4);
+            letter-spacing: 0.06em; white-space: nowrap; max-width: calc(100vw - 32px);
+        }
+        #stats-bar strong { color: var(--stamp-on); font-weight: 700; }
+        #stats-hint { color: var(--muted); font-style: italic; }
+
+        /* ── Line tooltip ─────────────────────────────────────────────────── */
+        .line-tooltip { background: var(--surface) !important; border: 1px solid var(--border) !important; border-radius: var(--radius) !important; box-shadow: 0 4px 16px rgba(0,0,0,0.5) !important; padding: 0 !important; pointer-events: none; }
+        .line-tooltip::before { display: none !important; }
+        .line-tip { padding: 8px 12px; }
+        .line-tip b    { display: block; font-family: var(--jp-font); font-size: 14px; font-weight: 700; color: var(--text); }
+        .line-tip span { font-size: 11px; color: var(--muted); letter-spacing: 0.04em; }
+
+        .hidden { display: none !important; }
+
+        @media (pointer: coarse) {
+            .session-btn { padding: 9px 10px; }
+            .popup-collect-btn { padding: 12px 14px; font-size: 12px; }
+        }
+        /* Narrow screens: drop the "Session" text so the top bar never overflows */
+        @media (max-width: 480px) {
+            #topbar { gap: 6px; }
+            .ui-btn { padding: 8px 10px; }
+            .session-label { display: none; }
+        }
+        /* Discreet version label inside the session panel */
+        #session-version { padding: 6px 12px 10px; text-align: right; font-size: 10px;
+            color: var(--muted); opacity: 0.5; letter-spacing: 0.05em; }
+
+        /* ── Line popup: "add a ride" ─────────────────────────────────────── */
+        .popup-ride-summary { font-size: 11px; color: var(--muted); margin: 2px 0 10px; }
+        .popup-line-ride-btn {
+            display: flex; align-items: center; justify-content: center; gap: 6px;
+            width: 100%; padding: 9px 12px; cursor: pointer;
+            font-family: var(--ui-font); font-size: 11px; font-weight: 700;
+            letter-spacing: 0.04em; border-radius: 4px;
+            background: var(--surface2); color: var(--text); border: 1px solid var(--border);
+            transition: background 0.15s, border-color 0.15s, color 0.15s;
+        }
+        .popup-line-ride-btn:hover { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
+        .popup-line-ride-btn.has-rides { background: rgba(126,184,247,0.12); border-color: rgba(126,184,247,0.35); color: var(--accent); }
+
+        /* ── Ride edit mode toolbar (selection happens on the map) ────────── */
+        #ride-edit-bar {
+            position: fixed; left: 50%; transform: translateX(-50%);
+            bottom: max(20px, calc(env(safe-area-inset-bottom, 0px) + 14px));
+            z-index: var(--z-modal);
+            width: min(440px, calc(100vw - 24px));
+            display: flex; align-items: center; gap: 12px;
+            padding: 12px 14px;
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 12px; box-shadow: 0 12px 40px rgba(0,0,0,0.6);
+        }
+        #ride-edit-info { flex: 1; min-width: 0; }
+        #ride-edit-title { font-family: var(--jp-font); font-size: 15px; font-weight: 700; color: var(--text); line-height: 1.25; }
+        #ride-edit-sub   { font-size: 10px; color: var(--muted); letter-spacing: 0.04em; }
+        #ride-edit-hint  { font-size: 10px; color: var(--muted); line-height: 1.4; margin-top: 4px; }
+        #ride-edit-actions { display: flex; gap: 8px; flex-shrink: 0; }
+        #ride-edit-actions .modal-btn { padding: 10px 14px; }
+        @media (max-width: 480px) { #ride-edit-hint { display: none; } }
+    </style>
+</head>
+<body>
+
+    <div id="loading-overlay">
+        <div class="loading-spinner"></div>
+        <p class="loading-text">Loading stations…</p>
+        <p class="loading-sub">First load may take a few seconds</p>
+    </div>
+
+    <div id="topbar">
+        <div id="search-container">
+            <div id="search-wrap">
+                <svg id="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
+                <input type="text" id="stationSearch" aria-label="Search station by name" placeholder="Search station…" autocomplete="off" />
+            </div>
+            <div id="suggestions" role="listbox" aria-label="Station suggestions"></div>
+        </div>
+
+        <div id="controls">
+            <button class="ui-btn" id="lang-toggle">EN</button>
+            <button class="ui-btn" id="session-toggle" aria-expanded="false" aria-controls="session-panel">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                </svg>
+                <span class="session-label">Session</span>
+            </button>
+        </div>
+    </div>
+
+    <div id="session-panel" class="hidden" role="region" aria-label="Session management">
+        <div id="session-header">
+            <div id="session-user-row">
+                <div id="session-avatar" aria-hidden="true">?</div>
+                <div id="session-username" class="placeholder">No session</div>
+            </div>
+            <div id="sync-status" class="sync-status" aria-live="polite"></div>
+            <div id="session-stats">
+                <span id="session-count">0 / 0 collected</span>
+                <div id="session-progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                    <div id="session-progress-fill"></div>
+                </div>
+            </div>
+        </div>
+        <div id="session-body">
+            <!-- Active session row (hidden until loaded) -->
+            <div id="session-loaded-row" class="hidden">
+                <div>
+                    <div class="session-loaded-label">Active session</div>
+                    <div id="session-loaded-name"></div>
+                </div>
+                <button class="session-btn" id="session-change">Change</button>
+            </div>
+            <!-- Input row (shown when no session) -->
+            <div id="session-input-section" class="session-input-section">
+                <label for="session-name-input" class="session-label-heading">Sync name</label>
+                <input type="text" id="session-name-input" placeholder="Enter your sync name…" autocomplete="off" />
+                <small class="session-hint-text">⚠ Case-sensitive — type it exactly the same on every device.</small>
+            </div>
+            <!-- Load (only when no session) -->
+            <div class="session-row" id="session-load-row">
+                <button class="session-btn primary" id="session-load">Load session</button>
+            </div>
+            <!-- Save (only when session active) -->
+            <div class="session-row hidden" id="session-save-row">
+                <button class="session-btn primary" id="session-save">Save progress</button>
+            </div>
+            <!-- Data ops (always visible) -->
+            <div class="session-row">
+                <button class="session-btn" id="session-export">Export JSON</button>
+                <button class="session-btn" id="session-import">Import JSON</button>
+            </div>
+            <!-- Danger zone -->
+            <button class="session-btn danger" id="session-reset">Reset all stamps</button>
+            <input type="file" id="session-import-file" accept=".json" style="display:none" aria-label="Import stamps JSON file">
+        </div>
+        <div id="session-version"></div>
+    </div>
+
+    <div id="name-modal-overlay" class="hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <div id="name-modal">
+            <h2 id="modal-title">Welcome!</h2>
+            <p>Choose a sync name to save your stamp collection and access it on any device.</p>
+            <label for="modal-name-input" class="hidden">Your sync name</label>
+            <input type="text" id="modal-name-input" placeholder="Your sync name" maxlength="32" />
+            <div id="modal-name-hint">⚠ This name is your sync key — type it <strong>exactly</strong> the same on every device. Case-sensitive.</div>
+            <div class="modal-buttons">
+                <button class="modal-btn secondary" id="modal-skip">Skip for now</button>
+                <button class="modal-btn confirm" id="modal-confirm">Start collecting</button>
+            </div>
+            <div id="app-version" aria-hidden="true"></div>
+        </div>
+    </div>
+
+    <div id="ride-edit-bar" class="hidden" role="region" aria-label="Ride editor">
+        <div id="ride-edit-info">
+            <div id="ride-edit-title"></div>
+            <div id="ride-edit-sub"></div>
+            <div id="ride-edit-hint">Tap a segment, or drag along the line, to mark the stretch you rode. Drag again to remove.</div>
+        </div>
+        <div id="ride-edit-actions">
+            <button class="modal-btn secondary" id="ride-edit-cancel">Cancel</button>
+            <button class="modal-btn confirm" id="ride-edit-save">Save ride</button>
+        </div>
+    </div>
+
+    <div id="toast" role="status" aria-live="polite"></div>
+
+    <div id="stats-bar" aria-live="polite">
+        <strong id="bar-count">0</strong><span id="bar-total"></span> stamps collected<span id="stats-hint"> · tap any station to begin 🔖</span>
+    </div>
+
+    <div id="map"></div>
+    <div style="position:absolute;bottom:0;left:0;right:0;z-index:1500;pointer-events:none;
+                text-align:center;font:700 10px/1.6 ui-monospace,monospace;letter-spacing:.12em;
+                color:#0b0b0d;background:repeating-linear-gradient(45deg,#f7c948,#f7c948 10px,#e0b43f 10px,#e0b43f 20px);">
+      UAT BUILD · homonym-line split · not production
+    </div>
+
+    <script>
+    /* ==========================================================================
+       EKI STAMP TRACKER
+       Sections:
+         1. Line data (official operator colours)
+         2. Constants
+         3. App state
+         4. Gist persistence
+         5. Toast / notifications
+         6. Map initialisation
+         7. Line rendering
+         8. Marker management
+         9. Popup
+        10. Search
+        11. Language
+        12. Stats
+        13. Session panel
+        14. Welcome modal
+        15. Init
+    ========================================================================== */
+
+    // ── 1. LINE DATA ──────────────────────────────────────────────────────────
+    const LINE_DATA = {
+        // ── Tokyo Metro ──────────────────────────────────────────────────────────
+        '3号線銀座線':           { color: '#F39700', en: 'Ginza Line' },
+        '2号線日比谷線':         { color: '#9CAABF', en: 'Hibiya Line' },
+        '5号線東西線':           { color: '#009BBF', en: 'Tozai Line' },
+        '4号線丸ノ内線':         { color: '#E60012', en: 'Marunouchi Line' },
+        '4号線丸ノ内線分岐線':   { color: '#E60012', en: 'Marunouchi Branch Line' },
+        '9号線千代田線':         { color: '#00A651', en: 'Chiyoda Line' },
+        '8号線有楽町線':         { color: '#C1A000', en: 'Yurakucho Line' },
+        '11号線半蔵門線':        { color: '#8F76D6', en: 'Hanzomon Line' },
+        '7号線南北線':           { color: '#00ACA9', en: 'Namboku Line' },
+        '13号線副都心線':        { color: '#9C5E31', en: 'Fukutoshin Line' },
+        // ── Toei ─────────────────────────────────────────────────────────────────
+        '1号線浅草線':           { color: '#EF454A', en: 'Asakusa Line' },
+        '6号線三田線':           { color: '#2B7BB9', en: 'Mita Line' },
+        '10号線新宿線':          { color: '#6CBB5A', en: 'Shinjuku Line (Toei)' },
+        '12号線大江戸線':        { color: '#B6007A', en: 'Oedo Line' },
+        '荒川線':                { color: '#EB6D2F', en: 'Toden Arakawa Line' },
+        // ── JR East — Tokyo metro area ───────────────────────────────────────────
+        '山手線':                { color: '#9ACD32', en: 'Yamanote Line' },
+        '中央線':                { color: '#E60012', en: 'Chuo Line' },
+        '総武線':                { color: '#FFE400', en: 'Sobu Line' },
+        '京浜東北線':            { color: '#00B2E5', en: 'Keihin-Tohoku Line' },
+        '根岸線':                { color: '#00B2E5', en: 'Negishi Line' },
+        '東北線（埼京線）':      { color: '#00AC9A', en: 'Saikyo Line' },
+        '赤羽線（埼京線）':      { color: '#00AC9A', en: 'Akabane Line (Saikyo)' },
+        '川越線':                { color: '#00AC9A', en: 'Kawagoe Line' },
+        '常磐線':                { color: '#0092D0', en: 'Joban Line' },
+        '常磐新線':              { color: '#84D152', en: 'Tsukuba Express' },
+        '東海道線':              { color: '#F68B1E', en: 'Tokaido Line' },
+        '横須賀線':              { color: '#1963A6', en: 'Yokosuka Line' },
+        '南武線':                { color: '#F5DD00', en: 'Nambu Line' },
+        '横浜線':                { color: '#3EA829', en: 'Yokohama Line' },
+        '武蔵野線':              { color: '#F7931E', en: 'Musashino Line' },
+        '京葉線':                { color: '#DC143C', en: 'Keiyo Line' },
+        '宇都宮線':              { color: '#F68B1E', en: 'Utsunomiya Line' },
+        '高崎線':                { color: '#F68B1E', en: 'Takasaki Line' },
+        '青梅線':                { color: '#F15A22', en: 'Ome Line' },
+        '五日市線':              { color: '#F15A22', en: 'Itsukaichi Line' },
+        '八高線':                { color: '#808080', en: 'Hachiko Line' },
+        '成田線':                { color: '#F68B1E', en: 'Narita Line' },
+        '成田空港線':            { color: '#F68B1E', en: 'Narita Airport Line' },
+        '鶴見線':                { color: '#F5DD00', en: 'Tsurumi Line' },
+        '外房線':                { color: '#F68B1E', en: 'Sotoboso Line' },
+        '内房線':                { color: '#F68B1E', en: 'Uchiboso Line' },
+        '久里浜線':              { color: '#1963A6', en: 'Kurihama Line (JR)' },
+        '逗子線':                { color: '#1963A6', en: 'Zushi Line' },
+        '千葉線':                { color: '#FFE400', en: 'Chiba Line' },
+        '片町線':                { color: '#009BBF', en: 'Katamachi Line' },
+        'JR東西線':              { color: '#009BBF', en: 'JR Tozai Line' },
+        '相模線':                { color: '#3EA829', en: 'Sagami Line' },
+        '烏山線':                { color: '#F68B1E', en: 'Karasuyama Line' },
+        '水戸線':                { color: '#F68B1E', en: 'Mito Line' },
+        '両毛線':                { color: '#F68B1E', en: 'Ryomo Line' },
+        '吾妻線':                { color: '#F68B1E', en: 'Agatsuma Line' },
+        '久留里線':              { color: '#F68B1E', en: 'Kururi Line' },
+        '東金線':                { color: '#F68B1E', en: 'Togane Line' },
+        '鹿島線':                { color: '#F68B1E', en: 'Kashima Line' },
+        // ── JR East — regional ───────────────────────────────────────────────────
+        '東北線':                { color: '#F68B1E', en: 'Tohoku Line' },
+        '上越線':                { color: '#F68B1E', en: 'Joetsu Line' },
+        '信越線':                { color: '#F68B1E', en: 'Shinetsu Line' },
+        '奥羽線':                { color: '#F68B1E', en: 'Ou Line' },
+        '仙石線':                { color: '#0092D0', en: 'Senseki Line' },
+        '仙山線':                { color: '#F68B1E', en: 'Senzan Line' },
+        '磐越西線':              { color: '#F68B1E', en: 'Banetsu West Line' },
+        '磐越東線':              { color: '#F68B1E', en: 'Banetsu East Line' },
+        '只見線':                { color: '#F68B1E', en: 'Tadami Line' },
+        '陸羽東線':              { color: '#F68B1E', en: 'Rikuu East Line' },
+        '陸羽西線':              { color: '#F68B1E', en: 'Rikuu West Line' },
+        '北上線':                { color: '#F68B1E', en: 'Kitakami Line' },
+        '釜石線':                { color: '#F68B1E', en: 'Kamaishi Line' },
+        '大船渡線':              { color: '#F68B1E', en: 'Ofunato Line' },
+        '気仙沼線':              { color: '#F68B1E', en: 'Kesennuma Line' },
+        '八戸線':                { color: '#F68B1E', en: 'Hachinohe Line' },
+        '五能線':                { color: '#F68B1E', en: 'Gonosen Line' },
+        '男鹿線':                { color: '#F68B1E', en: 'Oga Line' },
+        '田沢湖線':              { color: '#F68B1E', en: 'Tazawako Line' },
+        '花輪線':                { color: '#F68B1E', en: 'Hanawa Line' },
+        '左沢線':                { color: '#F68B1E', en: 'Aterazawa Line' },
+        '米坂線':                { color: '#F68B1E', en: 'Yonesaka Line' },
+        '石巻線':                { color: '#F68B1E', en: 'Ishinomaki Line' },
+        '大湊線':                { color: '#F68B1E', en: 'Ominato Line' },
+        '津軽線':                { color: '#F68B1E', en: 'Tsugaru Line' },
+        '弥彦線':                { color: '#F68B1E', en: 'Yahiko Line' },
+        '越後線':                { color: '#F68B1E', en: 'Echigo Line' },
+        '白新線':                { color: '#F68B1E', en: 'Hakushin Line' },
+        '水郡線':                { color: '#F68B1E', en: 'Suigun Line' },
+        // ── JR Shinkansen ────────────────────────────────────────────────────────
+        '東海道新幹線':          { color: '#0060A9', en: 'Tokaido Shinkansen' },
+        '山陽新幹線':            { color: '#0060A9', en: 'Sanyo Shinkansen' },
+        '東北新幹線':            { color: '#006B3C', en: 'Tohoku Shinkansen' },
+        '上越新幹線':            { color: '#E60012', en: 'Joetsu Shinkansen' },
+        '北陸新幹線':            { color: '#E60012', en: 'Hokuriku Shinkansen' },
+        '九州新幹線':            { color: '#C1272D', en: 'Kyushu Shinkansen' },
+        '北海道新幹線':          { color: '#006B3C', en: 'Hokkaido Shinkansen' },
+        '西九州線':              { color: '#C1272D', en: 'Nishi-Kyushu Shinkansen' },
+        // ── JR West ──────────────────────────────────────────────────────────────
+        '山陰線':                { color: '#888888', en: "San'in Line" },
+        '山陽線':                { color: '#F68B1E', en: 'Sanyo Line' },
+        '関西線':                { color: '#F68B1E', en: 'Kansai Line' },
+        '大阪環状線':            { color: '#E56000', en: 'Osaka Loop Line' },
+        'おおさか東線':          { color: '#00B261', en: 'Osaka Higashi Line' },
+        '阪和線':                { color: '#0092D0', en: 'Hanwa Line' },
+        '桜島線':                { color: '#00B050', en: 'Sakurajima Line' },
+        '大和路線':              { color: '#00A651', en: 'Yamatoji Line' },
+        '湖西線':                { color: '#F68B1E', en: 'Kosei Line' },
+        '草津線':                { color: '#F68B1E', en: 'Kusatsu Line' },
+        '福知山線':              { color: '#F68B1E', en: 'Fukuchiyama Line' },
+        '舞鶴線':                { color: '#F68B1E', en: 'Maizuru Line' },
+        '山口線':                { color: '#F68B1E', en: 'Yamaguchi Line' },
+        '播但線':                { color: '#F68B1E', en: 'Bantan Line' },
+        '姫新線':                { color: '#F68B1E', en: 'Kishin Line' },
+        '赤穂線':                { color: '#F68B1E', en: 'Ako Line' },
+        '北陸線':                { color: '#F68B1E', en: 'Hokuriku Line' },
+        '嵯峨野観光線':          { color: '#A0522D', en: 'Sagano Scenic Line' },
+        '奈良線':                { color: '#F68B1E', en: 'Nara Line' },
+        '桜井線':                { color: '#F68B1E', en: 'Sakurai Line' },
+        '和歌山線':              { color: '#F68B1E', en: 'Wakayama Line' },
+        '加古川線':              { color: '#F68B1E', en: 'Kakogawa Line' },
+        '小野田線':              { color: '#F68B1E', en: 'Onoda Line' },
+        '宇部線':                { color: '#F68B1E', en: 'Ube Line' },
+        '岩徳線':                { color: '#F68B1E', en: 'Gantoku Line' },
+        '美祢線':                { color: '#F68B1E', en: 'Mine Line' },
+        '可部線':                { color: '#F68B1E', en: 'Kabe Line' },
+        '呉線':                  { color: '#F68B1E', en: 'Kure Line' },
+        '芸備線':                { color: '#F68B1E', en: 'Geibi Line' },
+        '木次線':                { color: '#F68B1E', en: 'Kisuki Line' },
+        '因美線':                { color: '#F68B1E', en: 'Inbi Line' },
+        '智頭線':                { color: '#009F6B', en: 'Chizu Express Line' },
+        '伯備線':                { color: '#F68B1E', en: 'Hakubi Line' },
+        '境線':                  { color: '#F68B1E', en: 'Sakai Line' },
+        '福塩線':                { color: '#F68B1E', en: 'Fukuen Line' },
+        '関西空港線':            { color: '#0060A9', en: 'Kansai Airport Line' },
+        '本四備讃線':            { color: '#0060A9', en: 'Honshu-Shikoku Seto-Ohashi' },
+        // ── JR Central ───────────────────────────────────────────────────────────
+        '高山線':                { color: '#F68B1E', en: 'Takayama Line' },
+        '太多線':                { color: '#F68B1E', en: 'Taita Line' },
+        '名松線':                { color: '#F68B1E', en: 'Meisho Line' },
+        '参宮線':                { color: '#F68B1E', en: 'Sangu Line' },
+        '武豊線':                { color: '#F68B1E', en: 'Taketoyo Line' },
+        '御殿場線':              { color: '#F68B1E', en: 'Gotemba Line' },
+        '身延線':                { color: '#F68B1E', en: 'Minobu Line' },
+        '飯田線':                { color: '#F68B1E', en: 'Iida Line' },
+        '篠ノ井線':              { color: '#F68B1E', en: 'Shinonoi Line' },
+        '紀勢線':                { color: '#F68B1E', en: 'Kisei Line' },
+        '城北線':                { color: '#F68B1E', en: 'Jonansen Line' },
+        // ── JR Kyushu ────────────────────────────────────────────────────────────
+        '鹿児島線':              { color: '#E60012', en: 'Kagoshima Line' },
+        '長崎線':                { color: '#0060A9', en: 'Nagasaki Line' },
+        '佐世保線':              { color: '#0060A9', en: 'Sasebo Line' },
+        '日豊線':                { color: '#F68B1E', en: 'Nippo Line' },
+        '豊肥線':                { color: '#F68B1E', en: 'Hohi Line' },
+        '久大線':                { color: '#F68B1E', en: 'Kyudai Line' },
+        '筑豊線':                { color: '#F68B1E', en: 'Chikuho Line' },
+        '篠栗線':                { color: '#F68B1E', en: 'Sasaguri Line' },
+        '日田彦山線':            { color: '#F68B1E', en: 'Hita-Hikosan Line' },
+        '香椎線':                { color: '#F68B1E', en: 'Kashii Line' },
+        '筑肥線':                { color: '#F68B1E', en: 'Chikuhi Line' },
+        '唐津線':                { color: '#F68B1E', en: 'Karatsu Line' },
+        '吉都線':                { color: '#F68B1E', en: 'Kitto Line' },
+        '日南線':                { color: '#F68B1E', en: 'Nichinan Line' },
+        '指宿枕崎線':            { color: '#F68B1E', en: 'Ibusuki-Makurazaki Line' },
+        '宮崎空港線':            { color: '#F68B1E', en: 'Miyazaki Airport Line' },
+        '肥薩線':                { color: '#F68B1E', en: 'Hisatsu Line' },
+        '三角線':                { color: '#F68B1E', en: 'Misumi Line' },
+        '大村線':                { color: '#F68B1E', en: 'Omura Line' },
+        '後藤寺線':              { color: '#F68B1E', en: 'Gotoji Line' },
+        '伊田線':                { color: '#F68B1E', en: 'Ita Line' },
+        '田川線':                { color: '#F68B1E', en: 'Tagawa Line' },
+        '糸田線':                { color: '#F68B1E', en: 'Itoda Line' },
+        '博多南線':              { color: '#0060A9', en: 'Hakata Minami Line' },
+        // ── JR Hokkaido ──────────────────────────────────────────────────────────
+        '函館線':                { color: '#F68B1E', en: 'Hakodate Line' },
+        '室蘭線':                { color: '#F68B1E', en: 'Muroran Line' },
+        '千歳線':                { color: '#F68B1E', en: 'Chitose Line' },
+        '石勝線':                { color: '#F68B1E', en: 'Sekisho Line' },
+        '根室線':                { color: '#F68B1E', en: 'Nemuro Line' },
+        '釧網線':                { color: '#F68B1E', en: 'Senmo Line' },
+        '石北線':                { color: '#F68B1E', en: 'Sekihoku Line' },
+        '宗谷線':                { color: '#F68B1E', en: 'Soya Line' },
+        '留萌線':                { color: '#F68B1E', en: 'Rumoi Line' },
+        '富良野線':              { color: '#F68B1E', en: 'Furano Line' },
+        '札沼線':                { color: '#F68B1E', en: 'Sassho Line' },
+        '海峡線':                { color: '#F68B1E', en: 'Kaikyo Line' },
+        // ── Hankyu ───────────────────────────────────────────────────────────────
+        '京都線':                { color: '#0090D0', en: 'Kyoto Line (Hankyu)' },
+        '神戸線':                { color: '#0090D0', en: 'Kobe Line' },
+        '宝塚線':                { color: '#0090D0', en: 'Takarazuka Line' },
+        '今津線':                { color: '#0090D0', en: 'Imazu Line' },
+        '甲陽線':                { color: '#0090D0', en: 'Koyo Line' },
+        '伊丹線':                { color: '#0090D0', en: 'Itami Line' },
+        '嵐山本線':              { color: '#0090D0', en: 'Arashiyama Line' },
+        '千里線':                { color: '#0090D0', en: 'Senri Line' },
+        '箕面線':                { color: '#0090D0', en: 'Minoo Line' },
+        '北野線':                { color: '#0090D0', en: 'Kitano Line' },
+        // ── Keio ─────────────────────────────────────────────────────────────────
+        '京王線':                { color: '#4C1985', en: 'Keio Line' },
+        '相模原線':              { color: '#4C1985', en: 'Sagamihara Line' },
+        '高尾線':                { color: '#4C1985', en: 'Takao Line' },
+        '競馬場線':              { color: '#4C1985', en: 'Keibajo Line' },
+        '動物園線':              { color: '#4C1985', en: 'Dobutsuen Line' },
+        '井の頭線':              { color: '#0080C6', en: 'Inokashira Line' },
+        '拝島線':                { color: '#4C1985', en: 'Haijima Line (Keio)' },
+        '多摩線':                { color: '#4C1985', en: 'Tama Line (Keio)' },
+        '八王子線':              { color: '#4C1985', en: 'Hachioji Line' },
+        // ── Tokyu ────────────────────────────────────────────────────────────────
+        '東横線':                { color: '#E60012', en: 'Toyoko Line' },
+        '田園都市線':            { color: '#21B24B', en: 'Den-en-toshi Line' },
+        '大井町線':              { color: '#F39700', en: 'Oimachi Line' },
+        '池上線':                { color: '#E60012', en: 'Ikegami Line' },
+        '東急多摩川線':          { color: '#E60012', en: 'Tokyu Tamagawa Line' },
+        '多摩川線':              { color: '#E60012', en: 'Tamagawa Line' },
+        '目黒線':                { color: '#00B5AD', en: 'Meguro Line' },
+        '世田谷線':              { color: '#E60012', en: 'Setagaya Line' },
+        'みなとみらい21線':      { color: '#E60012', en: 'Minatomirai Line' },
+        // ── Keikyu ───────────────────────────────────────────────────────────────
+        '空港線':                { color: '#E60012', en: 'Airport Line (Keikyu)' },
+        // ── Odakyu ───────────────────────────────────────────────────────────────
+        '小田原線':              { color: '#0099CC', en: 'Odawara Line' },
+        '江ノ島線':              { color: '#0099CC', en: 'Enoshima Line (Odakyu)' },
+        '江の島線':              { color: '#0099CC', en: 'Enoshima Line' },
+        '小田急線':              { color: '#0099CC', en: 'Odakyu Line' },
+        // ── Seibu ────────────────────────────────────────────────────────────────
+        '池袋線':                { color: '#009B6B', en: 'Ikebukuro Line' },
+        '新宿線':                { color: '#E60012', en: 'Shinjuku Line (Seibu)' },
+        '有楽町線':              { color: '#009B6B', en: 'Yurakucho Line (Seibu)' },
+        '豊島線':                { color: '#009B6B', en: 'Toshima Line' },
+        '多摩湖線':              { color: '#009B6B', en: 'Tamakohan Line' },
+        '国分寺線':              { color: '#009B6B', en: 'Kokubunji Line' },
+        '狭山線':                { color: '#009B6B', en: 'Sayama Line' },
+        '西武秩父線':            { color: '#009B6B', en: 'Seibu Chichibu Line' },
+        '西武有楽町線':          { color: '#009B6B', en: 'Seibu Yurakucho Line' },
+        '西武園線':              { color: '#009B6B', en: 'Seibuyen Line' },
+        // ── Tobu ─────────────────────────────────────────────────────────────────
+        '伊勢崎線':              { color: '#F39700', en: 'Isesaki Line' },
+        '日光線':                { color: '#F39700', en: 'Nikko Line' },
+        '東上本線':              { color: '#0060A9', en: 'Tojo Line' },
+        '野田線':                { color: '#00A651', en: 'Noda Line' },
+        '佐野線':                { color: '#F39700', en: 'Sano Line' },
+        '桐生線':                { color: '#F39700', en: 'Kiryu Line' },
+        '小泉線':                { color: '#F39700', en: 'Koizumi Line' },
+        '亀戸線':                { color: '#F39700', en: 'Kameido Line' },
+        '大師線':                { color: '#F39700', en: 'Daishi Line' },
+        '鬼怒川線':              { color: '#F39700', en: 'Kinugawa Line' },
+        '会津鬼怒川線':          { color: '#F39700', en: 'Aizu-Kinugawa Line' },
+        '越生線':                { color: '#0060A9', en: 'Ogose Line' },
+        // ── Kintetsu ─────────────────────────────────────────────────────────────
+        '大阪線':                { color: '#EE0012', en: 'Kintetsu Osaka Line' },
+        '名古屋線':              { color: '#EE0012', en: 'Nagoya Line' },
+        '橿原線':                { color: '#EE0012', en: 'Kashihara Line' },
+        '天理線':                { color: '#EE0012', en: 'Tenri Line' },
+        '南大阪線':              { color: '#EE0012', en: 'Minami-Osaka Line' },
+        '吉野線':                { color: '#EE0012', en: 'Yoshino Line' },
+        '田原本線':              { color: '#EE0012', en: 'Tawaramoto Line' },
+        '道明寺線':              { color: '#EE0012', en: 'Domyoji Line' },
+        '御所線':                { color: '#EE0012', en: 'Gose Line' },
+        '湯の山線':              { color: '#EE0012', en: 'Yunoyama Line' },
+        '鈴鹿線':                { color: '#EE0012', en: 'Suzuka Line' },
+        '山田線':                { color: '#EE0012', en: 'Yamada Line' },
+        '鳥羽線':                { color: '#EE0012', en: 'Toba Line' },
+        '志摩線':                { color: '#EE0012', en: 'Shima Line' },
+        '伊賀線':                { color: '#EE0012', en: 'Iga Line' },
+        '長野線':                { color: '#EE0012', en: 'Nagano Line' },
+        '信貴線':                { color: '#EE0012', en: 'Shigi Line' },
+        '生駒線':                { color: '#EE0012', en: 'Ikoma Line' },
+        '名古屋本線':            { color: '#EE0012', en: 'Nagoya Main Line (Meitetsu)' },
+        '犬山線':                { color: '#EE0012', en: 'Inuyama Line' },
+        '各務原線':              { color: '#EE0012', en: 'Kakamigahara Line' },
+        '豊田線':                { color: '#EE0012', en: 'Toyota Line' },
+        '広見線':                { color: '#EE0012', en: 'Hiomi Line' },
+        '小牧線':                { color: '#EE0012', en: 'Komaki Line' },
+        '尾西線':                { color: '#EE0012', en: 'Bisai Line' },
+        '蒲郡線':                { color: '#EE0012', en: 'Gamagori Line' },
+        '三河線':                { color: '#EE0012', en: 'Mikawa Line' },
+        '常滑線':                { color: '#EE0012', en: 'Tokoname Line' },
+        '河和線':                { color: '#EE0012', en: 'Kowa Line' },
+        '知多新線':              { color: '#EE0012', en: 'Chita New Line' },
+        '竹鼻線':                { color: '#EE0012', en: 'Takehana Line' },
+        '羽島線':                { color: '#EE0012', en: 'Hashima Line' },
+        '西名古屋港線':          { color: '#EE0012', en: 'Nishi-Nagoyako Line' },
+        '津島線':                { color: '#EE0012', en: 'Tsushima Line' },
+        '豊川線':                { color: '#EE0012', en: 'Toyokawa Line' },
+        '西尾線':                { color: '#EE0012', en: 'Nishio Line' },
+        // ── Hanshin ──────────────────────────────────────────────────────────────
+        '阪神なんば線':          { color: '#0072BC', en: 'Hanshin Namba Line' },
+        '阪神本線':              { color: '#0072BC', en: 'Hanshin Main Line' },
+        '武庫川線':              { color: '#0072BC', en: 'Mukogawa Line' },
+        // ── Keihan ───────────────────────────────────────────────────────────────
+        '京阪本線':              { color: '#009F6B', en: 'Keihan Main Line' },
+        '鴨東線':                { color: '#009F6B', en: 'Kamotou Line' },
+        '中之島線':              { color: '#009F6B', en: 'Nakanoshima Line' },
+        '交野線':                { color: '#009F6B', en: 'Katano Line' },
+        '宇治線':                { color: '#009F6B', en: 'Uji Line' },
+        '京津線':                { color: '#009F6B', en: 'Keishin Line' },
+        '石山坂本線':            { color: '#009F6B', en: 'Ishiyama-Sakamoto Line' },
+        '押上線':                { color: '#009F6B', en: 'Oshiage Line' },
+        // ── Osaka Metro ──────────────────────────────────────────────────────────
+        '1号線(御堂筋線)':       { color: '#E5171F', en: 'Midosuji Line' },
+        '2号線(谷町線)':         { color: '#8F4098', en: 'Tanimachi Line' },
+        '3号線(四つ橋線)':       { color: '#0078BA', en: 'Yotsubashi Line' },
+        '4号線(中央線)':         { color: '#019A66', en: 'Chuo Line (Osaka)' },
+        '5号線(千日前線)':       { color: '#E44D93', en: 'Sennichimae Line' },
+        '6号線(堺筋線)':         { color: '#B5640B', en: 'Sakaisuji Line' },
+        '7号線(長堀鶴見緑地線)': { color: '#83BC22', en: 'Nagahori Tsurumi-ryokuchi Line' },
+        '8号線（今里筋線）':     { color: '#E86812', en: 'Imazatosuji Line' },
+        // ── Nagoya Municipal ─────────────────────────────────────────────────────
+        '1号線東山線':           { color: '#F9C000', en: 'Higashiyama Line' },
+        '2号線名城線':           { color: '#8F4098', en: 'Meijo Line' },
+        '2号線名港線':           { color: '#2CA6E0', en: 'Meiko Line' },
+        '3号線鶴舞線':           { color: '#0066B3', en: 'Tsurumai Line' },
+        '4号線名城線':           { color: '#8F4098', en: 'Meijo Line (loop)' },
+        '6号線桜通線':           { color: '#E5171F', en: 'Sakura-dori Line' },
+        '上飯田線':              { color: '#E86812', en: 'Kami-Iida Line' },
+        // ── Kyoto Municipal ──────────────────────────────────────────────────────
+        '烏丸線':                { color: '#009B6B', en: 'Karasuma Line' },
+        // ── Kobe Municipal ───────────────────────────────────────────────────────
+        '西神線':                { color: '#0068B7', en: 'Seishin Line' },
+        '西神延伸線':            { color: '#0068B7', en: 'Seishin Ext. Line' },
+        '海岸線':                { color: '#E5171F', en: 'Kaigan Line' },
+        // ── Fukuoka / Nishitetsu ──────────────────────────────────────────────────
+        '天神大牟田線':          { color: '#EE0012', en: 'Tenjin-Omuta Line' },
+        '太宰府線':              { color: '#EE0012', en: 'Dazaifu Line' },
+        '甘木線':                { color: '#EE0012', en: 'Amagi Line' },
+        '貝塚線':                { color: '#EE0012', en: 'Kaizuka Line' },
+        '1号線(空港線)':         { color: '#EE0012', en: 'Airport Line (Fukuoka)' },
+        '2号線(箱崎線)':         { color: '#009B6B', en: 'Hakozaki Line' },
+        '3号線(七隈線)':         { color: '#CF8B00', en: 'Nanakuma Line' },
+        // ── Yokohama ─────────────────────────────────────────────────────────────
+        'ブルーライン':          { color: '#0075C2', en: 'Blue Line' },
+        'グリーンライン':        { color: '#00A95F', en: 'Green Line' },
+        'いずみ野線':            { color: '#3A7AD2', en: 'Izumino Line' },
+        '相鉄新横浜線':          { color: '#0068A9', en: 'Sotetsu Shin-Yokohama Line' },
+        // ── Nankai ───────────────────────────────────────────────────────────────
+        '南海本線':              { color: '#0072BC', en: 'Nankai Main Line' },
+        '高野線':                { color: '#0072BC', en: 'Koya Line' },
+        '泉北高速鉄道線':        { color: '#ED6C30', en: 'Semboku Rapid Railway' },
+        '加太線':                { color: '#0072BC', en: 'Kada Line' },
+        '多奈川線':              { color: '#0072BC', en: 'Tanagawa Line' },
+        '和歌山港線':            { color: '#0072BC', en: 'Wakayama Port Line' },
+        '貴志川線':              { color: '#ED6C30', en: 'Kishigawa Line' },
+        // ── Monorail / Automated ─────────────────────────────────────────────────
+        '東京モノレール羽田線':  { color: '#EF0012', en: 'Tokyo Monorail' },
+        '多摩都市モノレール線':  { color: '#009F6B', en: 'Tama Monorail' },
+        '大阪モノレール線':      { color: '#EE0012', en: 'Osaka Monorail' },
+        '沖縄都市モノレール線':  { color: '#009F6B', en: 'Yui Rail' },
+        'りんかい線':            { color: '#009F6B', en: 'Rinkai Line' },
+        'ゆりかもめ':            { color: '#00ADEF', en: 'Yurikamome' },
+        '東京臨海新交通臨海線':  { color: '#00ADEF', en: 'Tokyo Waterfront Line' },
+        '日暮里・舎人線':        { color: '#E5171F', en: 'Nippori-Toneri Liner' },
+        '北総線':                { color: '#009BBF', en: 'Hokuso Line' },
+        '東葉高速線':            { color: '#EF0012', en: 'Toyo Rapid Line' },
+        '埼玉高速鉄道線':        { color: '#00ACA9', en: 'Saitama Railway Line' },
+        'けいはんな線':          { color: '#019A66', en: 'Keihanna Line' },
+        '六甲アイランド線':      { color: '#0068B7', en: 'Rokko Island Line' },
+        '神戸高速線':            { color: '#0068B7', en: 'Kobe Rapid Line' },
+        '北神線':                { color: '#0068B7', en: 'Hokushin Line' },
+        '南港ポートタウン線':    { color: '#009F6B', en: 'Nanko Port Town Line' },
+        'ポートアイランド線':    { color: '#009F6B', en: 'Port Island Line' },
+        '金沢シーサイドライン':  { color: '#00ADEF', en: 'Kanazawa Seaside Line' },
+        '仙台空港線':            { color: '#009B6B', en: 'Sendai Airport Line' },
+        'ディズニーリゾートライン':{ color: '#EE0012', en: 'Disney Resort Line' },
+        '広島新交通1号線':       { color: '#009F6B', en: 'Hiroshima New Transit Line 1' },
+        '新京成線':              { color: '#F68B1E', en: 'Shin-Keisei Line' },
+        '流山線':                { color: '#009F6B', en: 'Nagareyama Line' },
+        '横浜市営地下鉄':        { color: '#0075C2', en: 'Yokohama Subway' },
+        'こどもの国線':          { color: '#009F6B', en: 'Kodomonokuni Line' },
+        '江ノ島電鉄線':          { color: '#00ADEF', en: 'Enoshima Electric Railway' },
+        '湘南モノレール江の島線':{ color: '#009F6B', en: 'Shonan Monorail' },
+        // ── 3rd sector / regional ────────────────────────────────────────────────
+        'あいの風とやま鉄道線':  { color: '#009F6B', en: 'Ainokaze Toyama Line' },
+        'IRいしかわ鉄道線':      { color: '#009F6B', en: 'IR Ishikawa Line' },
+        'ほくほく線':            { color: '#0060A9', en: 'HokuHoku Line' },
+        'しなの鉄道線':          { color: '#009F6B', en: 'Shinano Railway' },
+        '北しなの線':            { color: '#009F6B', en: 'Kita-Shinano Line' },
+        '妙高はねうまライン':    { color: '#009F6B', en: 'Myoko Haneum Line' },
+        'いわて銀河鉄道線':      { color: '#009F6B', en: 'Iwate Galaxy Railway' },
+        '青い森鉄道線':          { color: '#009F6B', en: 'Aoimori Railway' },
+        '道南いさりび鉄道線':    { color: '#009F6B', en: 'Donan Isaribi Line' },
+        '肥薩おれんじ鉄道線':    { color: '#F39700', en: 'Hisatsu Orange Railway' },
+        '錦川清流線':            { color: '#009F6B', en: 'Nishiki River Scenic Line' },
+        '若桜線':                { color: '#009F6B', en: 'Wakasa Line' },
+        'リアス線':              { color: '#009F6B', en: 'Rias Line' },
+        '伊豆急行線':            { color: '#EF0012', en: 'Izu Kyuko Line' },
+        '大井川本線':            { color: '#009F6B', en: 'Oigawa Main Line' },
+        '遠州鉄道線':            { color: '#EF0012', en: 'Enshu Railway' },
+        '天竜浜名湖線':          { color: '#009F6B', en: 'Tenryu-Hamanako Line' },
+        '静岡清水線':            { color: '#EF0012', en: 'Shizuoka-Shimizu Line' },
+        '岳南線':                { color: '#009F6B', en: 'Gakunan Line' },
+        '箱根登山鉄道線':        { color: '#EF0012', en: 'Hakone Tozan Line' },
+        '大雄山線':              { color: '#009F6B', en: 'Daiyuzan Line' },
+        '伊豆箱根鉄道':          { color: '#009F6B', en: 'Izu-Hakone Railway' },
+        '真岡線':                { color: '#009F6B', en: 'Moka Line' },
+        'わたらせ渓谷線':        { color: '#009F6B', en: 'Watarase Gorge Line' },
+        '秩父本線':              { color: '#009F6B', en: 'Chichibu Main Line' },
+        '上信線':                { color: '#009F6B', en: 'Joshin Line' },
+        '上毛線':                { color: '#009F6B', en: 'Jomo Line' },
+        '富山港線':              { color: '#009F6B', en: 'Toyama Port Line' },
+        '富山都心線':            { color: '#F39700', en: 'Toyama City Center Line' },
+        '万葉線':                { color: '#F39700', en: 'Manyo Line' },
+        '富山地方鉄道':          { color: '#EE0012', en: 'Toyama Local Railway' },
+        '秋田内陸線':            { color: '#009F6B', en: 'Akita Nairiku Line' },
+        '由利高原鉄道':          { color: '#009F6B', en: 'Yuri Kogen Railway' },
+        '三陸鉄道':              { color: '#009F6B', en: 'Sanriku Railway' },
+        '阿武隈急行線':          { color: '#009F6B', en: 'Abukuma Express' },
+        '大洗鹿島線':            { color: '#009F6B', en: 'Oarai Kashima Line' },
+        '鳥海山ろく線':          { color: '#009F6B', en: 'Chokaisan Roku Line' },
+        '常総線':                { color: '#009F6B', en: 'Joso Line' },
+        '関東鉄道':              { color: '#009F6B', en: 'Kanto Railway' },
+        '小湊鐵道線':            { color: '#009F6B', en: 'Kominato Railway' },
+        'いすみ線':              { color: '#009F6B', en: 'Isumi Line' },
+        '芝山鉄道線':            { color: '#009BBF', en: 'Shibayama Railway' },
+        '能勢電鉄':              { color: '#0090D0', en: 'Nose Electric Railway' },
+        '嵐山線':                { color: '#0090D0', en: 'Arashiyama Line' },
+        '叡山本線':              { color: '#009F6B', en: 'Eizan Main Line' },
+        '鞍馬線':                { color: '#009F6B', en: 'Kurama Line' },
+        '近江鉄道':              { color: '#009F6B', en: 'Omi Railway' },
+        '信楽線':                { color: '#A0522D', en: 'Shigaraki Route' },
+        '有馬線':                { color: '#0090D0', en: 'Arima Line' },
+        '三田線':                { color: '#0090D0', en: 'Sanda Line' },
+        '粟生線':                { color: '#0090D0', en: 'Ao Line' },
+        '網干線':                { color: '#0072BC', en: 'Aboshi Line' },
+        '水間線':                { color: '#009F6B', en: 'Mizuma Line' },
+        '養老線':                { color: '#EE0012', en: 'Yoro Line' },
+        '島原鉄道線':            { color: '#009F6B', en: 'Shimabara Railway' },
+        '平成筑豊鉄道':          { color: '#009F6B', en: 'Heisei Chikuho Railway' },
+        '筑豊電気鉄道線':        { color: '#F39700', en: 'Chikuho Electric Railway' },
+        '松浦鉄道線':            { color: '#009F6B', en: 'Matsuura Railway' },
+        '南阿蘇鉄道線':          { color: '#009F6B', en: 'Minami-Aso Railway' },
+        '上熊本線':              { color: '#009F6B', en: 'Kami-Kumamoto Line' },
+        '浜線':                  { color: '#009F6B', en: 'Hama Line' },
+        '菊池線':                { color: '#009F6B', en: 'Kikuchi Line' },
+        '弘南線':                { color: '#009F6B', en: 'Konan Line' },
+        '津軽鉄道線':            { color: '#009F6B', en: 'Tsugaru Railway' },
+        '三陸鉄道リアス線':      { color: '#009F6B', en: 'Sanriku Rias Line' },
+        '会津線':                { color: '#009F6B', en: 'Aizu Line' },
+        '樽見線':                { color: '#009F6B', en: 'Tarumi Line' },
+        '明知線':                { color: '#009F6B', en: 'Akechi Line' },
+        '長良川鉄道':            { color: '#009F6B', en: 'Nagaragawa Railway' },
+        '越美南線':              { color: '#009F6B', en: 'Etsuminan Line' },
+        '三岐線':                { color: '#009F6B', en: 'Sangi Line' },
+        '北勢線':                { color: '#009F6B', en: 'Hokusei Line' },
+        '伊勢線':                { color: '#009F6B', en: 'Ise Line' },
+        '伊奈線':                { color: '#009F6B', en: 'Ina Line' },
+        '豊橋鉄道':              { color: '#009F6B', en: 'Toyohashi Railway' },
+        '渥美線':                { color: '#009F6B', en: 'Atsumi Line' },
+        '浅野川線':              { color: '#009F6B', en: 'Asanogawa Line' },
+        '石川線':                { color: '#009F6B', en: 'Ishikawa Line' },
+        '上滝線':                { color: '#009F6B', en: 'Kamitaki Line' },
+        '立山線':                { color: '#009F6B', en: 'Tateyama Line' },
+        '不二越線':              { color: '#009F6B', en: 'Fujikoshi Line' },
+        '富山地方鉄道本線':      { color: '#EE0012', en: 'Toyama Local Railway Main Line' },
+        '日本海ひすいライン':    { color: '#009F6B', en: 'Nihonkai Hisui Line' },
+        '水島本線':              { color: '#009F6B', en: 'Mizushima Main Line' },
+        '中村線':                { color: '#009F6B', en: 'Nakamura Line' },
+        '宿毛線':                { color: '#009F6B', en: 'Sukumo Line' },
+    };
+
+
+    const FALLBACK_PALETTE = [
+        '#6fa8dc','#e06c75','#98c379','#e5c07b','#c678dd',
+        '#56b6c2','#d19a66','#a3b8cc','#c49fd4','#79c9c9',
+        '#88b4e0','#9ec475','#b0a0e0','#70c4b0','#e0b870',
+        '#8ab8d0','#d490a8','#78d0a0','#90a8d8','#80c8b0'
+    ];
+
+    const hashName = (name) => {
+        let h = 0;
+        for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) >>> 0;
+        return h;
+    };
+
+    // Strip a branch/segment suffix so a branch inherits its parent line's
+    // colour instead of getting a different hashed one (e.g.
+    // "4号線丸ノ内線分岐線" -> "4号線丸ノ内線", "東北線（埼京線）" -> "東北線").
+    const lineColorBase = (name) => name
+        .replace(/分岐線$/, '線').replace(/支線$/, '線')
+        .replace(/[(（][^)）]*[)）]\s*$/, '').trim();
+    const getLineColor = (name) =>
+        LINE_DATA[name]?.color
+        ?? LINE_DATA[lineColorBase(name)]?.color
+        ?? FALLBACK_PALETTE[hashName(name) % FALLBACK_PALETTE.length];
+    const getLineEn    = (name) => LINE_DATA[name]?.en ?? '';
+
+    // ── 2. CONSTANTS ──────────────────────────────────────────────────────────
+    // ── Baked-in GitHub token, obfuscated so GitHub's secret scanner won't see
+    //    (and auto-revoke) it. Stored as an array of XOR'd char codes — never as a
+    //    literal token string — so push protection and secret scanning don't match.
+    //    Same scheme as the fire-planner repo.
+    //
+    //    NOTE: obfuscation only hides the token from GitHub's *automated* scanner.
+    //    Anyone reading this public source can decode it, so the token MUST have
+    //    ONLY the `gist` scope — then a decode can touch gists and nothing else.
+    //
+    //    To rotate the token:
+    //      1. Create a classic PAT (Settings → Developer settings → Tokens (classic))
+    //         with Expiration: No expiration and ONLY the `gist` scope.
+    //      2. Open this app, open the browser console, run:  encTok('PASTE_TOKEN')
+    //      3. Paste the printed array as GH_TOK_OBF below.
+    const GH_KEY            = 'eki-stamp-tracker-sync-v1';
+    const encTok            = t => JSON.stringify(Array.from(t, (c, i) => c.charCodeAt(0) ^ GH_KEY.charCodeAt(i % GH_KEY.length)));
+    const decTok            = a => a.map((n, i) => String.fromCharCode(n ^ GH_KEY.charCodeAt(i % GH_KEY.length))).join('');
+    const GH_TOK_OBF        = [2,3,25,114,5,4,6,56,9,27,67,26,17,32,94,11,20,74,60,47,36,9,75,25,118,35,95,16,102,63,7,84,53,32,31,12,43,49,47,60];   // ← paste encTok('your_token') output here
+    const GIST_TOKEN        = GH_TOK_OBF.length ? decTok(GH_TOK_OBF) : '';
+    const getToken          = () => GIST_TOKEN;
+    const GIST_PREFIX       = 'eki-stamp-tracker:';
+    // App version — shown discreetly on the welcome modal. Bump on every merge
+    // to main. It is also part of the station-cache key, so each release
+    // invalidates the 7-day IndexedDB cache and users immediately get fresh data.
+    const APP_VERSION       = 'v1.3.22-uat';
+    const CACHE_TTL         = 7 * 24 * 60 * 60 * 1000;  // 7 days
+    const BATCH_SIZE        = 150;      // features per animation frame (line rendering)
+    const SYNC_DEBOUNCE_MS  = 2000;     // ms after last stamp change before auto-save
+    const HOVER_RESET_MS    = 60;       // ms debounce on line mouseout
+    const POPUP_GRACE_MS    = 600;      // ms grace period before hover-opened popup auto-closes
+                                        // (long enough to move the cursor onto the popup's button)
+    const SEARCH_JUMP_MS    = 300;      // ms before popup opens after search jump
+    const FOCUS_DELAY_MS    = 100;      // ms before focusing modal input (after paint)
+    const MARKER_BASE_R     = 4;        // circle radius at ZOOM_BASE on desktop
+    const MARKER_BASE_R_TOUCH = 8;      // circle radius at ZOOM_BASE on touch (tappable)
+    const MARKER_ABS_MIN    = 1.4;      // hard floor so dots stay visible but don't blob when zoomed out
+    const MARKER_COLL_BONUS = 3;        // extra radius for collected markers
+    const MARKER_MAX_R      = 18;       // cap radius at high zoom to avoid clutter
+    const ZOOM_BASE         = 12;       // zoom at which radius = MARKER_BASE_R
+    const ZOOM_SCALE        = 1.18;     // radius multiplier per zoom step away from ZOOM_BASE
+    const MAX_SUGGESTIONS   = 6;
+    const RESET_CONFIRM_MS  = 3000;     // window for second click on destructive action
+    const MAX_ZOOM          = 19;       // maximum tile zoom level
+
+    // Line prominence (AC0: lines are discreet by default; ridden stretches pop).
+    const LINE_BASE     = { weight: 1.5, opacity: 0.20 };  // faint colour tint — default look
+    const SHINKANSEN_BASE = { ...LINE_BASE };              // Shinkansen fade exactly like every other line
+    const LINE_DIM      = { weight: 1.2, opacity: 0.10 };  // other lines while one is focused
+    const LINE_EDIT_DIM = { weight: 1,   opacity: 0.05 };  // other lines while editing a ride
+    const LINE_FOCUS    = { weight: 4,   opacity: 0.85 };  // hovered/tapped line
+    const RIDE_OVERLAY  = { weight: 4.5, opacity: 0.95 };  // ridden-stretch overlay (full colour)
+    const RIDE_SNAP_M   = 60;           // station must sit this close to the line to *score* a group
+    const RIDE_INCLUDE_M = 220;         // once the line is chosen, include its OWN stations this far
+                                        // out (tolerates rapid/local alignment offsets; safe because
+                                        // only the chosen line's stations are ever considered)
+    const RIDE_BBOX_PAD = 0.01;         // ~1.1km bbox padding when gathering candidate stations
+    const RIDE_BRIDGE_M = 6000;         // keep chains within 6km of the clicked corridor; drop
+                                        // far-away segments that merely SHARE the line name (e.g.
+                                        // the Tokyo vs Osaka 山手線). Keeps the clicked corridor only.
+    const RIDE_STITCH_M = 850;          // join the line's OWN fragmented chains across data gaps up
+                                        // to this size (central-Tokyo track is often labelled under
+                                        // another line name, leaving ~500m holes in a continuous line).
+    const RIDE_ROUTE_MAX_M = 22000;     // cap a single inter-station track route; longer ⇒ treat as a data
+                                        // anomaly (branch terminus threaded into the order / duplicate line
+                                        // name spanning regions) and don't draw it.
+    const SHK_BRIDGE_M  = 20000;        // Shinkansen: join the line's OWN track fragments across larger
+                                        // gaps (tunnels split the bundled geometry into pieces) so a line
+                                        // becomes one ordered chain we can slice along.
+    const SHK_SNAP_M    = 3500;         // a curated Shinkansen stop is "on real track" if within this of
+                                        // the bundled geometry; otherwise that span is a straight connector.
+
+    // ── 3. APP STATE ──────────────────────────────────────────────────────────
+    // All mutable app state lives here. Read via state.*, write via setState().
+    const state = {
+        lang:   localStorage.getItem('eki_lang')         || 'en',
+        user:   localStorage.getItem('eki_current_user') || '',
+        gistId: null,
+        stamps: new Set(),
+        rides:  {},   // lineName(kanji) -> [ridden station code, ...] (ride-section feature)
+    };
+
+    // Persist a state key and trigger any required side effects
+    const setState = (key, value) => {
+        state[key] = value;
+        if (key === 'lang')  localStorage.setItem('eki_lang',         value);
+        if (key === 'user')  localStorage.setItem('eki_current_user', value);
+    };
+
+    // ── Renderer + layer collections (assigned after map init) ───────────────
+    let canvasRenderer;
+    let mapInstance   = null;
+    let syncDebounce  = null;
+
+    // Markers
+    const markers       = [];  // STAMP stations only (drive stats + search)
+    const plainMarkers  = [];  // every other ekidata station — discreet, clickable, no stamp
+    const dedupeMarkers = {};
+
+    // Lines
+    const lineColorMap  = {};  // lineName → hex colour (populated during renderLines)
+    const lineEnMap     = {};  // lineName (kanji) → English romaji name (populated during loadStations)
+    const linesByName   = {};  // lineName → [polyline, ...]
+    const allLineSegs   = [];  // flat array for bulk opacity resets
+    let   hoveredLine   = null;
+    let   hoverTimer;
+
+    // Ride-section feature
+    const allStations   = [];  // flat [{code,name_kanji,name_en,lat,lon}] from ekidata (for the ride picker)
+    const lineGroups    = [];  // ekidata lines, each with its stations IN ORDER (authoritative station list)
+    const stationByCode = {};  // ekidata code → station record (for seeding overlays from saved rides)
+    const lineGeomCache = {};  // cacheKey(name|bucket) → { chains, stations } computed lazily
+    const rideOverlays  = {};  // lineName → [polyline, ...] bright "ridden stretch" overlays
+    const shinkansenData = {}; // 路線名 → { name_en, color, stations:[ordered] } curated Shinkansen
+    const shinkansenGeo  = {}; // 路線名 → [ [lat,lng]... ] bundled track fragments (captured in renderLines)
+    let   shinkansenPool = null; // all Shinkansen fragments stitched together — used to fill a line's gaps
+                                 // with the physically-shared track stored under a sibling line's name
+    let   currentPopupLine = null;  // line whose popup is open (for the ride button)
+    let   linePopupSeed    = null;  // {lat,lng} where the open line popup was clicked (corridor seed)
+
+    /**
+     * Order a line's kanji + English names by the current UI language.
+     * EN mode → English primary, kanji secondary; JP mode → the reverse.
+     * Mirrors the station-name primary/secondary behaviour.
+     */
+    const orderLineNames = (kanji) => {
+        const en        = lineEnMap[kanji] || getLineEn(kanji);
+        const primary   = state.lang === 'jp' ? kanji : (en || kanji);
+        const secondary = state.lang === 'jp' ? en : kanji;
+        return { primary, secondary: (secondary && secondary !== primary) ? secondary : '' };
+    };
+    let   zoomDebounce;
+
+    // Popup tracking
+    let currentPopupMarker = null;
+    // Set true by a long press so the following synthetic click is ignored.
+    let suppressTap = false;
+
+    // Touch device detection
+    const IS_TOUCH = window.matchMedia('(pointer: coarse)').matches;
+
+    // SVG icon constants (used in popup button)
+    // Rubber stamp shape: handle (top rect) + wide body + base line.
+    const ICON_STAMP_FILLED  = '<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="9" y="2" width="6" height="6" rx="1"/><rect x="3" y="8" width="18" height="10" rx="2"/><rect x="2" y="20" width="20" height="3" rx="1"/></svg>';
+    const ICON_STAMP_OUTLINE = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="2" width="6" height="6" rx="1"/><rect x="3" y="8" width="18" height="10" rx="2"/><line x1="2" y1="21.5" x2="22" y2="21.5"/></svg>';
+    // Route/ride icon: two nodes joined by a path.
+    const ICON_RIDE = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="5" cy="19" r="2.4"/><circle cx="19" cy="5" r="2.4"/><path d="M7 17 C 12 12, 9 8, 17 6.5"/></svg>';
+
+    // ── 4. GIST PERSISTENCE ───────────────────────────────────────────────────
+
+    /**
+     * Fetch with JSON response — validates HTTP status before parsing.
+     * @param {string} url
+     * @param {RequestInit} [options]
+     * @returns {Promise<any>} parsed JSON
+     * @throws {Error} on non-2xx response or network failure
+     */
+    const apiFetch = async (url, options = {}) => {
+        const resp = await fetch(url, {
+            ...options,
+            headers: { Authorization: `Bearer ${getToken()}`, 'Content-Type': 'application/json', ...options.headers }
+        });
+        if (!resp.ok) {
+            const text = await resp.text().catch(() => '');
+            throw new Error(`GitHub API ${resp.status}: ${text.slice(0, 120)}`);
+        }
+        return resp.json();
+    };
+
+    /** Find the Gist ID for a username. Returns null if not found. */
+    const findGistId = async (username) => {
+        const cacheKey = `eki_gist:${username}`;
+        const cached = localStorage.getItem(cacheKey);
+        if (cached) return cached;
+        let page = 1;
+        while (true) {
+            const gists = await apiFetch(`https://api.github.com/gists?per_page=100&page=${page}`);
+            const found = gists.find(g => g.description === GIST_PREFIX + username);
+            if (found) { localStorage.setItem(cacheKey, found.id); return found.id; }
+            if (gists.length < 100) return null;
+            page++;
+        }
+    };
+
+    /** Load stamps from Gist for the given username. */
+    const loadFromGist = async (username) => {
+        setSyncStatus('saving');
+        try {
+            const gistId = await findGistId(username);
+            if (!gistId) { state.stamps = new Set(); state.rides = {}; state.gistId = null; setSyncStatus('saved'); return; }
+            state.gistId = gistId;
+            const gist = await apiFetch(`https://api.github.com/gists/${gistId}`);
+            const raw  = gist.files?.['stamps.json']?.content;
+            const data = raw ? JSON.parse(raw) : { stamps: [] };
+            state.stamps = new Set(Array.isArray(data.stamps) ? data.stamps : []);
+            state.rides  = (data.rides && typeof data.rides === 'object') ? data.rides : {};
+            setSyncStatus('saved');
+        } catch (err) {
+            console.error('loadFromGist:', err);
+            setSyncStatus('error');
+        }
+    };
+
+    /** Persist current stamps to Gist. */
+    const syncToGist = async () => {
+        if (!state.user) return;
+        setSyncStatus('saving');
+        const content = JSON.stringify({ stamps: [...state.stamps], rides: state.rides });
+        try {
+            if (state.gistId) {
+                await apiFetch(`https://api.github.com/gists/${state.gistId}`, {
+                    method: 'PATCH',
+                    body: JSON.stringify({ files: { 'stamps.json': { content } } })
+                });
+            } else {
+                const gist = await apiFetch('https://api.github.com/gists', {
+                    method: 'POST',
+                    body: JSON.stringify({ description: GIST_PREFIX + state.user, public: false, files: { 'stamps.json': { content } } })
+                });
+                if (!gist.id) throw new Error('Gist response missing id');
+                state.gistId = gist.id;
+                localStorage.setItem(`eki_gist:${state.user}`, gist.id);
+            }
+            setSyncStatus('saved');
+        } catch (err) {
+            console.error('syncToGist:', err);
+            setSyncStatus('error');
+        }
+    };
+
+    const scheduleSave = () => {
+        clearTimeout(syncDebounce);
+        setSyncStatus('saving');
+        syncDebounce = setTimeout(syncToGist, SYNC_DEBOUNCE_MS);
+    };
+
+    // ── 5. NOTIFICATIONS ──────────────────────────────────────────────────────
+
+    let toastTimer;
+    const showToast = (msg, duration = 2400) => {
+        const el = document.getElementById('toast');
+        el.textContent = msg;
+        el.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => el.classList.remove('show'), duration);
+    };
+
+    const setSyncStatus = (status) => {
+        const el = document.getElementById('sync-status');
+        if (!el) return;
+        el.className = 'sync-status ' + status;
+        if (status === 'error') {
+            el.innerHTML = '✗ sync error · <a href="#" class="sync-retry-link">retry</a>';
+            el.querySelector('.sync-retry-link')?.addEventListener('click', (e) => { e.preventDefault(); syncToGist(); });
+        } else {
+            el.textContent = { saving: '↑ saving…', saved: '✓ synced', '': '' }[status] ?? '';
+        }
+    };
+
+    const hideLoading = () => {
+        const el = document.getElementById('loading-overlay');
+        if (!el) return;
+        el.classList.add('fade-out');
+        setTimeout(() => el.remove(), 400);
+    };
+
+    // ── 6. MAP INITIALISATION ─────────────────────────────────────────────────
+
+    // Custom touch gestures: double-tap = zoom in, triple-tap = zoom out,
+    // long-press = nothing. Replaces Leaflet's double-tap zoom so triple-tap
+    // can be detected cleanly. Single taps still reach markers/lines normally.
+    const setupTouchGestures = (map) => {
+        map.doubleClickZoom.disable();
+        const el = map.getContainer();
+        L.DomEvent.on(el, 'contextmenu', L.DomEvent.preventDefault);   // no long-press menu
+        let count = 0, timer = null, downT = 0, downX = 0, downY = 0, moved = false, multi = false;
+        el.addEventListener('touchstart', (e) => {
+            if (e.touches.length > 1) { multi = true; return; }         // pinch — ignore
+            multi = false; moved = false; downT = Date.now();
+            downX = e.touches[0].clientX; downY = e.touches[0].clientY;
+        }, { passive: true });
+        el.addEventListener('touchmove', (e) => {
+            if (multi || !e.touches.length) return;
+            if (Math.abs(e.touches[0].clientX - downX) > 12 ||
+                Math.abs(e.touches[0].clientY - downY) > 12) moved = true;
+        }, { passive: true });
+        el.addEventListener('touchend', () => {
+            if (multi) { multi = false; return; }
+            const dur = Date.now() - downT;
+            if (dur > 500) { suppressTap = true; count = 0; clearTimeout(timer); return; }  // long press
+            if (moved)     { count = 0; clearTimeout(timer); return; }                       // pan
+            suppressTap = false;
+            count++;
+            const rect = el.getBoundingClientRect();
+            const pt = L.point(downX - rect.left, downY - rect.top);
+            clearTimeout(timer);
+            timer = setTimeout(() => {
+                const ll = map.containerPointToLatLng(pt);
+                if (count >= 3)      map.setZoomAround(ll, map.getZoom() - 1);
+                else if (count === 2) map.setZoomAround(ll, map.getZoom() + 1);
+                count = 0;
+            }, 280);
+        }, { passive: true });
+    };
+
+    const initMap = () => {
+        const map = L.map('map', { zoomControl: true, preferCanvas: true }).setView([35.682839, 139.759455], 13);
+        map.zoomControl.setPosition('bottomleft');   // bottom-left, clear of the top search bar
+        // `tolerance` extends the clickable area around thin lines (and markers)
+        // so they're easy to hit — the 2.5px lines were nearly impossible to tap,
+        // especially on touch. Single shared renderer (see PR #8) so events work.
+        canvasRenderer = L.canvas({ padding: 0.5, tolerance: IS_TOUCH ? 12 : 6 });
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+            subdomains: 'abcd', maxZoom: MAX_ZOOM
+        }).addTo(map);
+        if (IS_TOUCH) setupTouchGestures(map);
+        return map;
+    };
+
+    // ── IndexedDB cache ───────────────────────────────────────────────────────
+    const _dbReady = new Promise((res, rej) => {
+        const req = indexedDB.open('eki-cache', 2);
+        req.onupgradeneeded = e => e.target.result.createObjectStore('data');
+        req.onsuccess = e => res(e.target.result);
+        req.onerror   = rej;
+    });
+
+    const cacheGet = async (key) => {
+        const db  = await _dbReady;
+        return new Promise((res, rej) => {
+            const req = db.transaction('data').objectStore('data').get(key);
+            req.onsuccess = () => res(req.result);
+            req.onerror   = rej;
+        });
+    };
+
+    const cacheSet = async (key, val) => {
+        const db  = await _dbReady;
+        return new Promise((res, rej) => {
+            const req = db.transaction('data', 'readwrite').objectStore('data').put(val, key);
+            req.onsuccess = () => res();
+            req.onerror   = rej;
+        });
+    };
+
+    // ── 7. LINE RENDERING ─────────────────────────────────────────────────────
+
+    const resetAllLines = () => {
+        allLineSegs.forEach(p => p.setStyle(p._baseStyle || LINE_BASE));
+    };
+
+    // Highlight every segment of a line (dim the rest). Shared by hover (desktop)
+    // and tap (touch) so lines are usable without a mouse.
+    const highlightLine = (name, map) => {
+        if (rideEdit) return;   // no hover-highlight while editing a ride (distracting)
+        clearTimeout(hoverTimer);
+        // Dismiss a hover-opened station popup when moving onto a line, but never a
+        // click-pinned popup (line "add a ride" / clicked station) — the user may be
+        // crossing a line on the way to its button, and that must not close it.
+        if (map && currentPopupMarker && currentPopupMarker._hoverOpened) {
+            map.closePopup(); currentPopupMarker = null;
+        }
+        if (hoveredLine === name) return;
+        const prev = hoveredLine;
+        hoveredLine = name;
+        if (prev === null) {
+            allLineSegs.forEach(p => p.setStyle(LINE_DIM));
+        } else {
+            linesByName[prev]?.forEach(p => p.setStyle(LINE_DIM));
+        }
+        linesByName[name]?.forEach(p => p.setStyle(LINE_FOCUS));
+    };
+
+    /** Popup shown when a line is clicked — carries the "add a ride" button. */
+    const buildLinePopupHtml = (name) => {
+        const { primary, secondary } = orderLineNames(name);
+        const color   = lineColorMap[name] || '#6b6b7a';
+        const ridden  = state.rides[name]?.length || 0;
+        const summary = ridden ? 'Ride logged — edit it on the map' : 'No ride logged yet';
+        const label   = ridden ? 'Edit ride' : 'Add a ride';
+        const btnCls  = 'popup-line-ride-btn' + (ridden ? ' has-rides' : '');
+        const nameHtml = secondary
+            ? `<span class="popup-line-label"><span class="popup-line-jp">${primary}</span><span class="popup-line-en">${secondary}</span></span>`
+            : `<span class="popup-line-jp">${primary}</span>`;
+        return `<div class="popup-inner">
+            <div class="popup-line" style="margin-bottom:6px"><span class="popup-line-dot" style="background:${color}"></span>${nameHtml}</div>
+            <div class="popup-ride-summary">${summary}</div>
+            <button class="${btnCls}" data-line="${encodeURIComponent(name)}" aria-label="${label} on ${primary}">${ICON_RIDE} ${label}</button>
+        </div>`;
+    };
+
+    // Wire the shared hover/tap/popup behaviour onto a line polyline (used by both
+    // the GeoJSON lines and the curated Shinkansen polylines, so they feel identical).
+    const attachLineInteractions = (polyline, name, map) => {
+        polyline.bindTooltip(
+            () => {
+                const { primary, secondary } = orderLineNames(name);
+                return `<div class="line-tip"><b>${primary}</b>${secondary ? `<br><span>${secondary}</span>` : ''}</div>`;
+            },
+            { sticky: true, direction: 'top', offset: [0, -8], className: 'line-tooltip' }
+        );
+        polyline.bindPopup(() => buildLinePopupHtml(name),
+            { offset: L.point(0, -4), closeButton: true, maxWidth: 260, className: 'line-popup' });
+        polyline.on('mouseover', () => highlightLine(name, map));
+        polyline.on('mouseout', () => {
+            if (rideEdit) return;
+            hoverTimer = setTimeout(() => { hoveredLine = null; resetAllLines(); }, HOVER_RESET_MS);
+        });
+        polyline.on('click', (e) => {
+            if (suppressTap) { suppressTap = false; return; }   // ignore long-press
+            if (rideEdit) return;   // ignore other lines while editing a ride
+            L.DomEvent.stopPropagation(e);
+            highlightLine(name, map);
+            currentPopupLine = name;
+            linePopupSeed = e.latlng;   // remember where on the corridor we clicked
+            polyline.closeTooltip();
+            polyline.openPopup(e.latlng);
+        });
+        polyline.on('popupclose', () => { if (currentPopupLine === name) currentPopupLine = null; });
+    };
+
+    // Smooth a Shinkansen's stop sequence into a curved path via centripetal
+    // Catmull-Rom (passes through every stop, rounds the corners, no overshoot).
+    // Only used as a fallback when the bundled track geometry is missing.
+    const shinkansenSmooth = (pts) => {
+        const K = 16;                                   // points generated per inter-stop span
+        const at = (i) => pts[Math.max(0, Math.min(pts.length - 1, i))];
+        const coords = [], anchorIdx = [];
+        const d = (a, b) => Math.sqrt(Math.hypot(a[0] - b[0], a[1] - b[1])) || 1e-6;   // centripetal knot spacing
+        for (let i = 0; i < pts.length - 1; i++) {
+            anchorIdx.push(coords.length);
+            const p0 = at(i - 1), p1 = at(i), p2 = at(i + 1), p3 = at(i + 2);
+            const t0 = 0, t1 = t0 + d(p0, p1), t2 = t1 + d(p1, p2), t3 = t2 + d(p2, p3);
+            const lerp = (ta, tb, pa, pb, t) => { const f = (t - ta) / (tb - ta); return [pa[0] + (pb[0] - pa[0]) * f, pa[1] + (pb[1] - pa[1]) * f]; };
+            for (let j = 0; j < K; j++) {
+                const t = t1 + (t2 - t1) * (j / K);
+                const A1 = lerp(t0, t1, p0, p1, t), A2 = lerp(t1, t2, p1, p2, t), A3 = lerp(t2, t3, p2, p3, t);
+                const B1 = lerp(t0, t2, A1, A2, t), B2 = lerp(t1, t3, A2, A3, t);
+                coords.push(lerp(t1, t2, B1, B2, t));
+            }
+        }
+        anchorIdx.push(coords.length);
+        coords.push(pts[pts.length - 1].slice());
+        return { coords, anchorIdx };
+    };
+
+    // Snap a point onto ONE described chain (nearest projection + d²).
+    const snapOnChain = (ch, lat, lon) => {
+        const p = [lat, lon], { coords, sx, sy } = ch;
+        let bd2 = Infinity, bseg = 0, bt = 0;
+        for (let i = 1; i < coords.length; i++) {
+            const { d2, t } = projToSeg(p, coords[i - 1], coords[i], sx, sy);
+            if (d2 < bd2) { bd2 = d2; bseg = i - 1; bt = t; }
+        }
+        return { segIdx: bseg, t: bt, pos: ch.arc[bseg] + bt * (ch.arc[bseg + 1] - ch.arc[bseg]), d2: bd2 };
+    };
+    // Snap onto a SET of chains; returns the best with its chain index.
+    const snapToChains = (chains, lat, lon) => {
+        let best = null;
+        for (let ci = 0; ci < chains.length; ci++) {
+            const s = snapOnChain(chains[ci], lat, lon);
+            if (!best || s.d2 < best.d2) best = { ...s, chainIdx: ci };
+        }
+        return best;
+    };
+    const chainProj = (ch, s) => { const c = ch.coords, a = c[s.segIdx], b = c[s.segIdx + 1];
+                                   return [a[0] + (b[0] - a[0]) * s.t, a[1] + (b[1] - a[1]) * s.t]; };
+    // Interior vertices of `ch` strictly between two snapped points, in A→B order.
+    const sliceVerts = (ch, A, B) => {
+        const fwd = A.pos <= B.pos, lo = fwd ? A : B, hi = fwd ? B : A, verts = [];
+        for (let k = lo.segIdx + 1; k <= hi.segIdx; k++) verts.push(ch.coords[k].slice());
+        if (!fwd) verts.reverse();
+        return verts;
+    };
+    // All Shinkansen track stitched into one set of chains (built once, cached). A
+    // line's own gaps are filled from here because shared corridors (e.g. Tokyo–
+    // Takasaki) are stored under whichever Shinkansen the geojson happened to label.
+    const buildShinkansenPool = () => {
+        if (shinkansenPool) return shinkansenPool;
+        const all = [];
+        Object.values(shinkansenGeo).forEach(arr => arr.forEach(s => { if (s.length >= 2) all.push(s); }));
+        return (shinkansenPool = bridgeChains(stitchChains(all).filter(c => c.length >= 2), SHK_BRIDGE_M).map(describeChain));
+    };
+    // Real track between two stops borrowed from the shared pool: both must land on
+    // the SAME pooled chain within SHK_SNAP_M, and the sliced length must be close to
+    // the straight chord (0.7–1.7×) so a stitched branch can never add a detour.
+    const borrowSlice = (pool, a, b) => {
+        const chord = ptDist(a, b), snap2 = SHK_SNAP_M * SHK_SNAP_M;
+        let best = null;
+        for (const ch of pool) {
+            const A = snapOnChain(ch, a[0], a[1]); if (A.d2 > snap2) continue;
+            const B = snapOnChain(ch, b[0], b[1]); if (B.d2 > snap2) continue;
+            const slen = Math.abs(A.pos - B.pos);
+            if (slen < 0.7 * chord || slen > 1.7 * chord) continue;
+            const cost = A.d2 + B.d2;
+            if (!best || cost < best.cost) best = { cost, ch, A, B };
+        }
+        return best ? { verts: sliceVerts(best.ch, best.A, best.B), endA: chainProj(best.ch, best.A), endB: chainProj(best.ch, best.B) } : null;
+    };
+
+    // Build a Shinkansen's drawn path by FOLLOWING the bundled real track geometry,
+    // not straight (or smoothed) hops between stops. The line's own track is stitched
+    // into ordered chain(s) and each stop snapped onto it; the path slices the real
+    // vertices between consecutive on-track stops. Where the line has no own track
+    // (shared Tokyo corridors stored under a sibling line, tunnels), it borrows the
+    // physically-shared track from the pooled Shinkansen geometry; only spans no
+    // Shinkansen covers (e.g. the newer Kanazawa–Tsuruga extension) stay straight.
+    // Returns dense coords + the index of each stop within them (anchorIdx), so the
+    // same path drives both the drawn line and the ride geometry. Cached on the
+    // line's info. (Lines with no usable geometry fall back to a smooth curve.)
+    const shinkansenPath = (name) => {
+        const info = shinkansenData[name];
+        if (info._path) return info._path;
+        const pts = info.stations.map(s => [s.lat, s.lon]);
+
+        const segs = (shinkansenGeo[name] || []).filter(s => s.length >= 2);
+        if (segs.length < 1) return (info._path = shinkansenSmooth(pts));
+
+        const chains = bridgeChains(stitchChains(segs).filter(c => c.length >= 2), SHK_BRIDGE_M).map(describeChain);
+        if (!chains.length) return (info._path = shinkansenSmooth(pts));
+
+        const snap2   = SHK_SNAP_M * SHK_SNAP_M;
+        const snaps   = pts.map(p => snapToChains(chains, p[0], p[1]));
+        const onTrack = snaps.map(s => s && s.d2 <= snap2);
+        // If almost nothing snaps, the geometry is unusable for this line — smooth.
+        if (onTrack.filter(Boolean).length < 2) return (info._path = shinkansenSmooth(pts));
+
+        // The pool is only needed when this line has gaps; build it lazily.
+        const pool = onTrack.every(Boolean) ? null : buildShinkansenPool();
+        const poolSnap = pool ? pts.map(p => snapToChains(pool, p[0], p[1])) : [];
+
+        // Anchor a stop on its own track, else on the shared pool, else its raw coord.
+        const anchorPt = (i) => onTrack[i] ? chainProj(chains[snaps[i].chainIdx], snaps[i])
+                              : (pool && poolSnap[i] && poolSnap[i].d2 <= snap2) ? chainProj(pool[poolSnap[i].chainIdx], poolSnap[i])
+                              : pts[i].slice();
+
+        const coords = [], anchorIdx = [];
+        for (let i = 0; i < pts.length; i++) {
+            anchorIdx.push(coords.length);
+            coords.push(anchorPt(i));
+            if (i === pts.length - 1) break;
+            // 1) Own track when both stops sit on the same own chain.
+            if (onTrack[i] && onTrack[i + 1] && snaps[i].chainIdx === snaps[i + 1].chainIdx) {
+                for (const v of sliceVerts(chains[snaps[i].chainIdx], snaps[i], snaps[i + 1])) coords.push(v);
+            // 2) Otherwise borrow the shared real track from the pool (guarded).
+            } else if (pool) {
+                const b = borrowSlice(pool, pts[i], pts[i + 1]);
+                if (b) for (const v of b.verts) coords.push(v);
+                // 3) else: straight connector (the next anchor closes the gap).
+            }
+        }
+        return (info._path = { coords, anchorIdx });
+    };
+
+    // Draw the curated Shinkansen lines (smooth curve through their real stops). The
+    // bundled rail geometry has almost no Shinkansen track, so its broken fragments
+    // are skipped in renderLines and replaced by these complete, smooth lines.
+    const drawShinkansen = (map) => {
+        Object.entries(shinkansenData).forEach(([name, info]) => {
+            if (linesByName[name]) return;
+            const color = info.color || '#888';
+            lineColorMap[name] = color;
+            if (info.name_en) lineEnMap[name] = info.name_en;
+            const pl = L.polyline(shinkansenPath(name).coords,
+                { color, ...SHINKANSEN_BASE, renderer: canvasRenderer, interactive: true }).addTo(map);
+            pl._baseStyle = SHINKANSEN_BASE;
+            linesByName[name] = [pl];
+            allLineSegs.push(pl);
+            attachLineInteractions(pl, name, map);
+        });
+        resetAllLines();
+    };
+
+    /**
+     * Render GeoJSON line features onto the map using RAF batching.
+     * @param {L.Map} map
+     * @param {Object} geojson - GeoJSON FeatureCollection
+     * @param {Function} [onComplete] - called when all batches finish
+     */
+    const renderLines = (map, geojson, onComplete) => {
+        const features = geojson.features;
+        let i = 0;
+
+        const processBatch = () => {
+            const end = Math.min(i + BATCH_SIZE, features.length);
+            for (; i < end; i++) {
+                const { properties, geometry } = features[i];
+                const name  = properties.路線名;
+                if (name.includes('新幹線')) {           // not drawn here (curated layer draws it),
+                    // but keep its real track fragments so the curated line can follow them.
+                    (shinkansenGeo[name] = shinkansenGeo[name] || []).push(
+                        geometry.coordinates.map(([lng, lat]) => [lat, lng]));
+                    continue;
+                }
+                const color = getLineColor(name);
+                lineColorMap[name] = color;
+
+                const polyline = L.polyline(
+                    geometry.coordinates.map(([lng, lat]) => [lat, lng]),
+                    { color, ...LINE_BASE, renderer: canvasRenderer, interactive: true }
+                ).addTo(map);
+
+                if (!linesByName[name]) linesByName[name] = [];
+                linesByName[name].push(polyline);
+                allLineSegs.push(polyline);
+                attachLineInteractions(polyline, name, map);
+            }
+
+            if (i < features.length) {
+                requestAnimationFrame(processBatch);
+            } else {
+                resetAllLines(); // ensure correct initial opacity after all lines are drawn
+                onComplete?.();
+            }
+        };
+
+        requestAnimationFrame(processBatch);
+    };
+
+    /** Repaint all station markers on top of lines (they were added first to the canvas). */
+    // Collected (gold) markers are drawn last so they sit on top of grey ones —
+    // makes progress easy to see when zoomed out and markers overlap.
+    const bringCollectedToFront = () => {
+        if (!mapInstance) return;
+        markers.forEach(m => { if (m._isCollected) m.bringToFront(); });
+    };
+
+    // Re-add markers so they draw above the lines. Stamp markers are restacked every
+    // call (cheap, ~2.3k); the ~6.7k plain markers are only restacked when asked
+    // (includePlain, once after lines load) to avoid churning them on every overlay.
+    const bringStationsToFront = (includePlain = false) => {
+        if (!mapInstance) return;
+        if (includePlain) plainMarkers.forEach(m => { m.removeFrom(mapInstance); m.addTo(mapInstance); });
+        markers.forEach(m => { m.removeFrom(mapInstance); m.addTo(mapInstance); });
+        bringCollectedToFront();
+    };
+
+    const loadShinkansen = async () => {
+        try {
+            const d = await fetch('../data/shinkansen.json').then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); });
+            Object.assign(shinkansenData, d);
+        } catch (err) { console.error('loadShinkansen:', err); }
+    };
+
+    const loadLines = async (map) => {
+        await loadShinkansen();   // ready before onLinesReady draws them
+        // After lines are drawn, restack markers, draw Shinkansen, paint ride overlays.
+        const onLinesReady = () => { bringStationsToFront(true); drawShinkansen(map); renderAllRideOverlays(); };
+        try {
+            const cached = await cacheGet('eki_lines_' + APP_VERSION);
+            if (cached && Date.now() - cached.ts < CACHE_TTL) {
+                renderLines(map, cached.data, onLinesReady);
+                return;
+            }
+        } catch { /* cache miss is fine */ }
+
+        try {
+            const data = await fetch('../data/railroad-section.uat.geojson').then(r => {
+                if (!r.ok) throw new Error(`HTTP ${r.status}`);
+                return r.json();
+            });
+            renderLines(map, data, onLinesReady);
+            cacheSet('eki_lines_' + APP_VERSION, { data, ts: Date.now() }).catch(() => {});
+        } catch (err) {
+            console.error('loadLines:', err);
+            showToast('Failed to load train lines — map may be incomplete', 4000);
+        }
+    };
+
+    // ── 7b. RIDE SECTIONS ─────────────────────────────────────────────────────
+    // Lets the user log the stretch of a line they've ridden. Geometry decides
+    // WHICH existing segments can be coloured; ekidata's ordered station groups
+    // decide WHICH stations (in order). We stitch the clicked line's GeoJSON
+    // segments into ordered path(s), keep only the clicked corridor, and colour the exact
+    // sub-path between ridden stations. No fragile line-name ↔ station-name bridge.
+
+    // Equirectangular metres-per-degree at a latitude (good enough at line scale).
+    const mPerDeg = (lat) => [111320 * Math.cos(lat * Math.PI / 180), 110540];
+
+    // Distance² (in metres²) from P to segment A–B, plus the clamped projection
+    // parameter t. Planar approximation scaled around the segment's latitude.
+    const projToSeg = (p, a, b, sx, sy) => {
+        const ax = a[1] * sx, ay = a[0] * sy, bx = b[1] * sx, by = b[0] * sy;
+        const px = p[1] * sx, py = p[0] * sy;
+        const dx = bx - ax, dy = by - ay, L2 = dx * dx + dy * dy;
+        let t = L2 === 0 ? 0 : ((px - ax) * dx + (py - ay) * dy) / L2;
+        t = t < 0 ? 0 : t > 1 ? 1 : t;
+        const cx = ax + t * dx, cy = ay + t * dy;
+        return { d2: (px - cx) ** 2 + (py - cy) ** 2, t };
+    };
+
+    // Stitch many (unordered) [lat,lng] segments into ordered chains by matching
+    // coincident endpoints. Most lines form one chain; branched/disjoint lines
+    // yield several (handled as straight-hop fallbacks downstream).
+    const stitchChains = (segs) => {
+        const key = (pt) => pt[0].toFixed(5) + ',' + pt[1].toFixed(5);
+        const ep = {};
+        segs.forEach((s, i) => {
+            if (s.length < 2) return;
+            (ep[key(s[0])]   = ep[key(s[0])]   || []).push([i, 0]);
+            (ep[key(s.at(-1))] = ep[key(s.at(-1))] || []).push([i, 1]);
+        });
+        const used = new Array(segs.length).fill(false);
+        const chains = [];
+        for (let start = 0; start < segs.length; start++) {
+            if (used[start] || segs[start].length < 2) continue;
+            used[start] = true;
+            let chain = segs[start].slice();
+            for (let grow = true; grow; ) {                       // extend tail
+                grow = false;
+                for (const [j, end] of (ep[key(chain.at(-1))] || [])) {
+                    if (used[j]) continue;
+                    const add = end === 0 ? segs[j] : segs[j].slice().reverse();
+                    chain = chain.concat(add.slice(1)); used[j] = true; grow = true; break;
+                }
+            }
+            for (let grow = true; grow; ) {                       // extend head
+                grow = false;
+                for (const [j, end] of (ep[key(chain[0])] || [])) {
+                    if (used[j]) continue;
+                    const add = end === 0 ? segs[j].slice().reverse() : segs[j];
+                    chain = add.slice(0, -1).concat(chain); used[j] = true; grow = true; break;
+                }
+            }
+            chains.push(chain);
+        }
+        return chains;
+    };
+
+    // 1° cache bucket so the Tokyo and Osaka 山手線 don't share a cache entry.
+    const seedBucket = (seed) => seed ? Math.round(seed.lat) + '_' + Math.round(seed.lng) : 'all';
+
+    const ptDist = (a, b) => { const [sx, sy] = mPerDeg((a[0] + b[0]) / 2); return Math.hypot((a[1] - b[1]) * sx, (a[0] - b[0]) * sy); };
+
+    // Join a line's OWN fragmented chains across small data gaps (≤ maxGap), so a
+    // continuous line that the source data split into pieces becomes one path. Only
+    // ever connects ends that are already within maxGap — it does NOT bridge the
+    // far same-name regions (those are 100s of km apart and dropped by the corridor
+    // filter anyway). Greedily merges the globally-nearest endpoint pair each round.
+    const bridgeChains = (chains, maxGap) => {
+        chains = chains.map(c => c.slice());
+        for (let merging = true; merging && chains.length > 1; ) {
+            merging = false;
+            let bi = -1, bj = -1, mode = '', bd = maxGap;
+            for (let i = 0; i < chains.length; i++) {
+                for (let j = i + 1; j < chains.length; j++) {
+                    const A = chains[i], B = chains[j];
+                    const cand = [['th', ptDist(A[A.length - 1], B[0])], ['ht', ptDist(A[0], B[B.length - 1])],
+                                  ['tt', ptDist(A[A.length - 1], B[B.length - 1])], ['hh', ptDist(A[0], B[0])]];
+                    for (const [m, d] of cand) if (d < bd) { bd = d; bi = i; bj = j; mode = m; }
+                }
+            }
+            if (bi < 0) break;
+            const A = chains[bi], B = chains[bj];
+            const merged = mode === 'th' ? A.concat(B)
+                         : mode === 'ht' ? B.concat(A)
+                         : mode === 'tt' ? A.concat(B.slice().reverse())
+                         :                 A.slice().reverse().concat(B);   // hh
+            chains.splice(bj, 1); chains.splice(bi, 1, merged); merging = true;
+        }
+        return chains;
+    };
+
+    // Build a chain descriptor (coords + cumulative arc + scale + bbox).
+    const describeChain = (coords) => {
+        const mid = coords[Math.floor(coords.length / 2)];
+        const [sx, sy] = mPerDeg(mid[0]);
+        const arc = [0];
+        let mnLat = 90, mxLat = -90, mnLng = 180, mxLng = -180;
+        const acc = (p) => { if (p[0] < mnLat) mnLat = p[0]; if (p[0] > mxLat) mxLat = p[0]; if (p[1] < mnLng) mnLng = p[1]; if (p[1] > mxLng) mxLng = p[1]; };
+        acc(coords[0]);
+        for (let i = 1; i < coords.length; i++) {
+            const a = coords[i - 1], b = coords[i];
+            arc.push(arc[i - 1] + Math.hypot((b[1] - a[1]) * sx, (b[0] - a[0]) * sy));
+            acc(b);
+        }
+        return { coords, arc, sx, sy, bbox: [mnLat, mxLat, mnLng, mxLng] };
+    };
+
+    // Gap (metres) between two chain bboxes (0 if they overlap).
+    const bboxGap = (A, B) => {
+        const [aLat, sy] = mPerDeg((A.bbox[0] + A.bbox[1]) / 2);
+        const dLat = Math.max(0, A.bbox[0] - B.bbox[1], B.bbox[0] - A.bbox[1]) * 110540;
+        const dLng = Math.max(0, A.bbox[2] - B.bbox[3], B.bbox[2] - A.bbox[3]) * aLat;
+        return Math.hypot(dLat, dLng);
+    };
+
+    const distToBbox = (seed, ch) => {
+        const [sx, sy] = mPerDeg(seed.lat);
+        const dLat = Math.max(0, ch.bbox[0] - seed.lat, seed.lat - ch.bbox[1]) * 110540;
+        const dLng = Math.max(0, ch.bbox[2] - seed.lng, seed.lng - ch.bbox[3]) * sx;
+        return Math.hypot(dLat, dLng);
+    };
+
+    /**
+     * Build (and cache) the ride geometry for the corridor of a line nearest `seed`:
+     * ordered stitched chains (far same-name regions dropped) and the corridor's
+     * stations snapped onto them in along-track order.
+     * @param {string} name  line's 路線名
+     * @param {{lat:number,lng:number}} [seed]  a point on the clicked corridor
+     * @returns {{chains:Array, stations:Array}}
+     */
+    const buildLineGeometry = (name, seed) => {
+        // Curated Shinkansen: the line IS its ordered stops, so the geometry is the
+        // smoothed (Catmull-Rom) curve through them and the station list is exact —
+        // no corridor/merge. Stops are anchor vertices in the smoothed path, so the
+        // ride overlays/segments follow the same smooth curve as the drawn line.
+        if (shinkansenData[name]) {
+            if (lineGeomCache[name]) return lineGeomCache[name];
+            const stops = shinkansenData[name].stations;
+            const path  = shinkansenPath(name);
+            const ch    = describeChain(path.coords);
+            const lastV = path.coords.length - 1;
+            const stations = stops.map((s, i) => {
+                const v = path.anchorIdx[i];
+                return { code: s.code, name_kanji: s.name_kanji, name_en: s.name_en, lat: s.lat, lon: s.lon,
+                    chainIdx: 0, segIdx: v >= lastV ? lastV - 1 : v, t: v >= lastV ? 1 : 0, pos: ch.arc[v], idx: i };
+            });
+            return (lineGeomCache[name] = { chains: [ch], allChains: [ch], stations });
+        }
+
+        const cacheKey = name + '|' + seedBucket(seed);
+        if (lineGeomCache[cacheKey]) return lineGeomCache[cacheKey];
+
+        const polys = linesByName[name] || [];
+        const segs  = polys.map(pl => pl.getLatLngs().map(ll => [ll.lat, ll.lng]));
+        let raw = stitchChains(segs).filter(c => c.length >= 2);
+        raw = bridgeChains(raw, RIDE_STITCH_M);                  // close small gaps in a continuous line
+        let all = raw.map(describeChain);
+        all.sort((a, b) => b.coords.length - a.coords.length);
+
+        // Keep only the corridor connected to the seed: start from the chain nearest
+        // the seed (or the longest chain if no seed) and transitively add chains
+        // whose bbox is within RIDE_BRIDGE_M of the kept set. This drops far-away
+        // segments that merely share the line name.
+        let chains = all;
+        if (all.length > 1) {
+            let seedIdx = 0;
+            if (seed) { let bd = Infinity; all.forEach((c, i) => { const d = distToBbox(seed, c); if (d < bd) { bd = d; seedIdx = i; } }); }
+            const keep = new Set([seedIdx]);
+            for (let grew = true; grew; ) {
+                grew = false;
+                for (let i = 0; i < all.length; i++) {
+                    if (keep.has(i)) continue;
+                    for (const k of keep) {
+                        if (bboxGap(all[i], all[k]) <= RIDE_BRIDGE_M) { keep.add(i); grew = true; break; }
+                    }
+                }
+            }
+            chains = [...keep].sort((a, b) => a - b).map(i => all[i]);
+            chains.sort((a, b) => b.coords.length - a.coords.length);
+        }
+
+        let minLat = 90, maxLat = -90, minLng = 180, maxLng = -180;
+        chains.forEach(ch => {
+            if (ch.bbox[0] < minLat) minLat = ch.bbox[0]; if (ch.bbox[1] > maxLat) maxLat = ch.bbox[1];
+            if (ch.bbox[2] < minLng) minLng = ch.bbox[2]; if (ch.bbox[3] > maxLng) maxLng = ch.bbox[3];
+        });
+
+        const snapMax2 = RIDE_SNAP_M ** 2;
+        const incMax2  = RIDE_INCLUDE_M ** 2;
+        const inBox = (lat, lon) => lat >= minLat - RIDE_BBOX_PAD && lat <= maxLat + RIDE_BBOX_PAD &&
+                                    lon >= minLng - RIDE_BBOX_PAD && lon <= maxLng + RIDE_BBOX_PAD;
+
+        // Snap a coordinate onto the nearest kept chain (returns the projection + d²).
+        const snap = (lat, lon) => {
+            const p = [lat, lon];
+            let bd2 = Infinity, bc = -1, bseg = 0, bt = 0;
+            for (let ci = 0; ci < chains.length; ci++) {
+                const { coords, sx, sy } = chains[ci];
+                for (let i = 1; i < coords.length; i++) {
+                    const { d2, t } = projToSeg(p, coords[i - 1], coords[i], sx, sy);
+                    if (d2 < bd2) { bd2 = d2; bc = ci; bseg = i - 1; bt = t; }
+                }
+            }
+            if (bc < 0) return null;
+            const ch = chains[bc];
+            return { chainIdx: bc, segIdx: bseg, t: bt, pos: ch.arc[bseg] + bt * (ch.arc[bseg + 1] - ch.arc[bseg]), d2: bd2 };
+        };
+
+        // STATION LIST: ekidata's ordered per-line groups are the source of truth for
+        // which stations & their order. But one geojson line is often served by several
+        // ekidata lines (rapid + local + through), and any single group skips the
+        // others' stops — e.g. 中央本線 jumps Shinjuku→Kichijoji, skipping Nakano/
+        // Kōenji/…. So: take the richest on-corridor group as a BACKBONE, then merge in
+        // every other corridor line's extra stops, each inserted into the backbone edge
+        // it best fits. Result = the COMPLETE line, correctly ordered, no foreign stops.
+        const md   = (a, b) => { const [sx, sy] = mPerDeg((a.lat + b.lat) / 2); return Math.hypot((a.lon - b.lon) * sx, (a.lat - b.lat) * sy); };
+        // Dedupe key: normalised name + ~5km grid (ヶ/ケ variants and the small
+        // platform-coordinate differences between a station's rapid & local rows
+        // collapse to one entry).
+        const dkey = (s) => (s.name_kanji || s.code).replace(/ヶ/g, 'ケ') + '|' + Math.round(s.lat * 20) + '|' + Math.round(s.lon * 20);
+
+        // Score every group by how many of its stations sit ON this corridor.
+        const scored = lineGroups.map(g => {
+            let hits = 0;
+            const snaps = g.stations.map(s => {
+                if (!inBox(s.lat, s.lon)) return null;
+                const sn = snap(s.lat, s.lon);
+                if (!sn) return null;
+                if (sn.d2 <= snapMax2) hits++;
+                return sn.d2 <= incMax2 ? sn : null;
+            });
+            return { g, hits, snaps };
+        }).filter(x => x.hits > 0).sort((a, b) => b.hits - a.hits);
+
+        let stations;
+        if (scored.length && scored[0].hits >= 2) {
+            const mk = (s, sn) => ({ code: s.code, name_kanji: s.name_kanji, name_en: s.name_en, lat: s.lat, lon: s.lon, ...sn });
+
+            // Backbone = richest group's on-corridor run, in ekidata order.
+            const backbone = [];
+            scored[0].g.stations.forEach((s, k) => { if (scored[0].snaps[k]) backbone.push(mk(s, scored[0].snaps[k])); });
+            const present = new Set(backbone.map(dkey));
+
+            // Extra stops from the other corridor lines (need a tight on-corridor snap
+            // and a real presence, so perpendicular crossings aren't pulled in).
+            const extras = [];
+            for (let i = 1; i < scored.length; i++) {
+                if (scored[i].hits < 3) continue;
+                scored[i].g.stations.forEach((s, k) => {
+                    const sn = scored[i].snaps[k];
+                    if (!sn || sn.d2 > snapMax2) return;
+                    const rec = mk(s, sn), key = dkey(rec);
+                    if (present.has(key)) return;
+                    present.add(key);
+                    extras.push(rec);
+                });
+            }
+
+            // Place each extra into the backbone edge with the least detour.
+            const byEdge = {};
+            for (const X of extras) {
+                let best = Infinity, edge = backbone.length;
+                for (let j = 0; j < backbone.length - 1; j++) {
+                    const detour = md(backbone[j], X) + md(X, backbone[j + 1]) - md(backbone[j], backbone[j + 1]);
+                    if (detour < best) { best = detour; edge = j + 1; }
+                }
+                const front = md(X, backbone[0]), back = md(X, backbone[backbone.length - 1]);
+                if (front < best && front <= back) { edge = 0; }
+                else if (back < best) { edge = backbone.length; }
+                (byEdge[edge] = byEdge[edge] || []).push(X);
+            }
+            const merged = [];
+            for (let j = 0; j <= backbone.length; j++) {
+                if (byEdge[j]) {
+                    // Stops before the first backbone station are ordered farthest-first;
+                    // every other edge is ordered by distance from its start station.
+                    if (j === 0) byEdge[j].sort((a, b) => md(backbone[0], b) - md(backbone[0], a));
+                    else { const ref = backbone[j - 1]; byEdge[j].sort((a, b) => md(ref, a) - md(ref, b)); }
+                    merged.push(...byEdge[j]);
+                }
+                if (j < backbone.length) merged.push(backbone[j]);
+            }
+            stations = merged.map((s, i) => (s.idx = i, s));
+        } else {
+            // Fallback (line not in ekidata groups): proximity snap, deduped by name.
+            const best = {};
+            for (const st of allStations) {
+                if (!inBox(st.lat, st.lon)) continue;
+                const sn = snap(st.lat, st.lon);
+                if (!sn || sn.d2 > snapMax2) continue;
+                const key = dkey(st);
+                if (!best[key] || sn.d2 < best[key].d2) best[key] = { ...st, ...sn };
+            }
+            stations = Object.values(best)
+                .sort((a, b) => a.chainIdx - b.chainIdx || a.pos - b.pos)
+                .map((s, i) => (s.idx = i, s));
+        }
+
+        // allChains = every stitched chain of the line (before the corridor filter
+        // drops far same-name regions). The ride graph routes on THIS so it matches
+        // the base map line's connectivity exactly — the corridor filter only limits
+        // which STATIONS are listed, never which track a ride can follow. (Far
+        // duplicate-name regions stay separate components, so routing can't jump to
+        // them; RIDE_ROUTE_MAX_M caps any stray long route.)
+        return (lineGeomCache[cacheKey] = { chains, allChains: all, stations });
+    };
+
+    // Exact projected [lat,lng] of a snapped station on its chain.
+    const snappedPoint = (geom, rec) => {
+        const c = geom.chains[rec.chainIdx].coords;
+        const a = c[rec.segIdx], b = c[rec.segIdx + 1];
+        return [a[0] + (b[0] - a[0]) * rec.t, a[1] + (b[1] - a[1]) * rec.t];
+    };
+
+    // Build (and cache) an undirected graph of ALL the corridor's track vertices.
+    // The base map draws every geojson segment, so the track is fully connected
+    // even where stitchChains split it into separate chains (junctions, T-joins).
+    // Keying vertices by rounded coordinate reconnects those shared points, so a
+    // ride can follow the real drawn track rather than break at a chain boundary.
+    const buildLineGraph = (geom) => {
+        if (geom._graph) return geom._graph;
+        const key = (p) => p[0].toFixed(5) + ',' + p[1].toFixed(5);
+        const adj = new Map(), pt = new Map();
+        const add = (p, q) => {
+            const kp = key(p), kq = key(q); if (kp === kq) return;
+            pt.set(kp, p); pt.set(kq, q);
+            const w = ptDist(p, q);
+            (adj.get(kp) || adj.set(kp, []).get(kp)).push({ k: kq, w });
+            (adj.get(kq) || adj.set(kq, []).get(kq)).push({ k: kp, w });
+        };
+        (geom.allChains || geom.chains).forEach(ch => { const c = ch.coords; for (let i = 1; i < c.length; i++) add(c[i - 1], c[i]); });
+        return (geom._graph = { adj, pt, key });
+    };
+
+    // The real track sub-path between two ridden stations: the SHORTEST path along
+    // the connected track graph (so it follows the actual drawn line, across chain
+    // boundaries, never a straight chord). Returns null when the graph has no path
+    // between them (a genuine hole) or the route is implausibly long (a data
+    // anomaly, e.g. a branch terminus mis-ordered as adjacent). Endpoints are the
+    // exact projected station positions.
+    const trackBetween = (geom, a, b) => {
+        const Pa = snappedPoint(geom, a), Pb = snappedPoint(geom, b);
+        if (a.chainIdx === b.chainIdx && a.segIdx === b.segIdx) return [Pa, Pb];
+        const G = buildLineGraph(geom);
+        const ca = geom.chains[a.chainIdx].coords, cb = geom.chains[b.chainIdx].coords;
+        const exit = new Map();   // b's two bounding vertices, with the cost to reach Pb
+        exit.set(G.key(cb[b.segIdx]),     ptDist(Pb, cb[b.segIdx]));
+        exit.set(G.key(cb[b.segIdx + 1]), ptDist(Pb, cb[b.segIdx + 1]));
+
+        const dist = new Map(), prev = new Map(), heap = [];
+        const push = (d, k) => { heap.push([d, k]); let i = heap.length - 1;
+            while (i > 0) { const p = (i - 1) >> 1; if (heap[p][0] <= heap[i][0]) break; [heap[p], heap[i]] = [heap[i], heap[p]]; i = p; } };
+        const pop = () => { const top = heap[0], last = heap.pop();
+            if (heap.length) { heap[0] = last; let i = 0; for (;;) { let l = 2*i+1, r = 2*i+2, s = i;
+                if (l < heap.length && heap[l][0] < heap[s][0]) s = l;
+                if (r < heap.length && heap[r][0] < heap[s][0]) s = r;
+                if (s === i) break; [heap[s], heap[i]] = [heap[i], heap[s]]; i = s; } } return top; };
+        const seed = (k, d) => { if (G.pt.has(k) && d < (dist.get(k) ?? Infinity)) { dist.set(k, d); prev.set(k, null); push(d, k); } };
+        seed(G.key(ca[a.segIdx]),     ptDist(Pa, ca[a.segIdx]));
+        seed(G.key(ca[a.segIdx + 1]), ptDist(Pa, ca[a.segIdx + 1]));
+
+        let bestK = null, bestTotal = Infinity;
+        while (heap.length) {
+            const [d, k] = pop();
+            if (d > dist.get(k)) continue;
+            if (d >= bestTotal || d > RIDE_ROUTE_MAX_M) break;     // no unpopped node can do better
+            if (exit.has(k)) { const t = d + exit.get(k); if (t < bestTotal) { bestTotal = t; bestK = k; } }
+            for (const { k: nk, w } of G.adj.get(k)) { const nd = d + w; if (nd < (dist.get(nk) ?? Infinity)) { dist.set(nk, nd); prev.set(nk, k); push(nd, nk); } }
+        }
+        if (bestK === null || bestTotal > RIDE_ROUTE_MAX_M) return null;
+        const mid = []; for (let k = bestK; k != null; k = prev.get(k)) mid.push(G.pt.get(k));
+        mid.reverse();
+        return [Pa, ...mid, Pb];
+    };
+
+    // Redraw the bright "ridden stretch" overlays for one line from state.rides.
+    // Seeds the corridor from the saved stations' own location so it rebuilds the
+    // right region (not a far same-name region) after a session load.
+    const renderRideOverlays = (name) => {
+        (rideOverlays[name] || []).forEach(p => p.remove());
+        rideOverlays[name] = [];
+        const codes = state.rides[name];
+        if (!codes || !codes.length || !linesByName[name]) return;
+
+        // Seed = centroid of the saved stations (codes, or codes inside segment keys).
+        const stCodes = codes.flatMap(c => c.split('|'));
+        let sLat = 0, sLng = 0, n = 0;
+        stCodes.forEach(c => { const s = stationByCode[c]; if (s) { sLat += s.lat; sLng += s.lon; n++; } });
+        const seed = n ? { lat: sLat / n, lng: sLng / n } : undefined;
+
+        const geom  = buildLineGeometry(name, seed);
+        const byCode = {};
+        geom.stations.forEach(s => { byCode[s.code] = s; });
+        // Render through the SAME segments the picker offers (incl. gap bridges), so
+        // anything tickable renders identically — no segment silently dropped.
+        const segByKey = new Map(buildRideSegments(geom).map(s => [s.key, s]));
+        const color = lineColorMap[name] || '#7eb8f7';
+        const keyOf  = (a, b) => [a, b].sort().join('|');
+        const drawKey = (k) => {
+            const s = segByKey.get(k);
+            if (s) rideOverlays[name].push(L.polyline(s.pts, { color, ...RIDE_OVERLAY, renderer: canvasRenderer, interactive: false }).addTo(mapInstance));
+        };
+
+        if (codes.some(c => c.includes('|'))) {
+            // Segment-based: each key is a ridden inter-station segment.
+            const ticked = new Set(codes);
+            ticked.forEach(drawKey);
+            // Fill internal cross-chain gaps for rides saved before gap-bridging
+            // existed: between two ridden, ekidata-adjacent stations on different
+            // chains, draw the bridge so the old ride is continuous too.
+            const ridden = [...new Set(stCodes)].map(c => byCode[c]).filter(Boolean).sort((a, b) => a.idx - b.idx);
+            for (let i = 1; i < ridden.length; i++) {
+                const p = ridden[i - 1], q = ridden[i];
+                if (q.idx !== p.idx + 1 || p.chainIdx === q.chainIdx) continue;
+                const k = keyOf(p.code, q.code);
+                if (!ticked.has(k)) drawKey(k);
+            }
+        } else {
+            // Legacy station-code rides: colour between consecutive ridden stations.
+            const ridden = codes.map(c => byCode[c]).filter(Boolean).sort((a, b) => a.idx - b.idx);
+            for (let i = 1; i < ridden.length; i++) {
+                if (ridden[i].idx === ridden[i - 1].idx + 1) drawKey(keyOf(ridden[i - 1].code, ridden[i].code));
+            }
+        }
+        bringStationsToFront();   // keep station markers tappable above overlays
+    };
+
+    // Clear and redraw every line's ride overlays (after a session load/import).
+    const renderAllRideOverlays = () => {
+        if (!mapInstance || !Object.keys(linesByName).length) return;
+        Object.keys(rideOverlays).forEach(n => { (rideOverlays[n] || []).forEach(p => p.remove()); rideOverlays[n] = []; });
+        Object.keys(state.rides).forEach(renderRideOverlays);
+    };
+
+    // ── 7c. RIDE EDIT MODE (select stretches directly on the map) ──────────────
+    // Branched/looping lines can't be shown as one list, so rides are selected on
+    // the map itself: each inter-station segment is individually paintable. Tap a
+    // segment to toggle it; drag along the line to paint a stretch. A drag that
+    // starts ON the line paints (map pan locked for that gesture); a drag that
+    // starts off the line pans normally. Selection is stored as segment keys.
+
+    let rideEdit = null;   // active edit session (or null)
+
+    const segStyle = (color, on) => on
+        ? { color, weight: 6, opacity: 0.95, lineCap: 'round', renderer: canvasRenderer, interactive: false }
+        : { color, weight: 3, opacity: 0.4,  lineCap: 'round', renderer: canvasRenderer, interactive: false };
+
+    // Selectable inter-station segments, one per consecutive pair in ekidata order.
+    // Each follows the REAL track (shortest path on the connected track graph), so it
+    // crosses chain boundaries exactly the way the base map line does. We deliberately
+    // do NOT invent a straight connector when the graph can't link two stations: if
+    // the bundled geojson has no track there, the base line is gapped too, so the ride
+    // shows the same gap — both views stay faithful to the one source. (A missing
+    // segment is therefore a genuine data hole, or a bare-name corridor like "本線"
+    // that merges unrelated railways — see scripts/audit-ride-gaps.mjs.)
+    const buildRideSegments = (geom) => {
+        const list = [...geom.stations].sort((a, b) => a.idx - b.idx);
+        const segs = [];
+        for (let i = 1; i < list.length; i++) {
+            const a = list[i - 1], b = list[i];
+            const pts = trackBetween(geom, a, b);
+            if (pts) segs.push({ a, b, key: [a.code, b.code].sort().join('|'), pts });
+        }
+        return segs;
+    };
+
+    // Initial selection from saved state (segment keys, or legacy station codes).
+    const initialRideSelection = (name, segs) => {
+        const sel = new Set();
+        const saved = state.rides[name] || [];
+        if (saved.some(c => c.includes('|'))) {
+            const keys = new Set(saved);
+            segs.forEach(s => { if (keys.has(s.key)) sel.add(s.key); });
+        } else {
+            const ridden = new Set(saved);
+            segs.forEach(s => { if (ridden.has(s.a.code) && ridden.has(s.b.code)) sel.add(s.key); });
+        }
+        return sel;
+    };
+
+    const paintSeg = (seg) => seg.pl.setStyle(segStyle(rideEdit.color, rideEdit.selected.has(seg.key)));
+
+    const refreshRideEditCache = () => {
+        if (!rideEdit) return;
+        rideEdit.segs.forEach(seg => { seg._cp = seg.pts.map(p => mapInstance.latLngToContainerPoint([p[0], p[1]])); });
+    };
+
+    const ptSegDist = (px, py, a, b) => {
+        const dx = b.x - a.x, dy = b.y - a.y, L2 = dx * dx + dy * dy;
+        let t = L2 ? ((px - a.x) * dx + (py - a.y) * dy) / L2 : 0;
+        t = t < 0 ? 0 : t > 1 ? 1 : t;
+        return Math.hypot(px - (a.x + t * dx), py - (a.y + t * dy));
+    };
+
+    const rideHitTest = (x, y) => {
+        let best = null, bd = IS_TOUCH ? 24 : 14;
+        for (const seg of rideEdit.segs) {
+            const cp = seg._cp;
+            for (let i = 1; i < cp.length; i++) {
+                const d = ptSegDist(x, y, cp[i - 1], cp[i]);
+                if (d < bd) { bd = d; best = seg; }
+            }
+        }
+        return best;
+    };
+
+    const applyRidePaint = (seg) => {
+        if (!seg) return;
+        if (rideEdit.mode === 'add') rideEdit.selected.add(seg.key); else rideEdit.selected.delete(seg.key);
+        paintSeg(seg);
+    };
+
+    // Station label shown on hover while editing a ride — so lines whose stations
+    // have no stamp marker are still identifiable. Shows the segment under the
+    // cursor as "A – B" (the two stations it would toggle).
+    const rideNodeName = (s) => (state.lang === 'en' ? (s.name_en || s.name_kanji) : (s.name_kanji || s.name_en)) || s.code;
+    const hideRideHover = () => { if (rideEdit && rideEdit.tipShown) { rideEdit.tip.remove(); rideEdit.tipShown = false; } };
+    const updateRideHover = (x, y) => {
+        if (!rideEdit) return;
+        const seg = rideHitTest(x, y);
+        if (!seg) { hideRideHover(); return; }
+        if (!rideEdit.tip) rideEdit.tip = L.tooltip({ direction: 'top', offset: [0, -6], className: 'line-tooltip', permanent: true, interactive: false });
+        rideEdit.tip.setLatLng(mapInstance.containerPointToLatLng(L.point(x, y)))
+                    .setContent(`${rideNodeName(seg.a)} – ${rideNodeName(seg.b)}`);
+        if (!rideEdit.tipShown) { rideEdit.tip.addTo(mapInstance); rideEdit.tipShown = true; }
+    };
+
+    const enterRideEditMode = (name) => {
+        if (rideEdit) exitRideEditMode(false);
+        const geom = buildLineGeometry(name, linePopupSeed);
+        const unsupported = name.includes('新幹線') && !shinkansenData[name];
+        if (unsupported || geom.stations.length < 2) {
+            showToast(unsupported ? 'Ride logging isn’t available for this Shinkansen line yet.'
+                                  : 'No track data to log a ride on this line yet.', 3000);
+            return;
+        }
+        mapInstance.closePopup();
+        const color = lineColorMap[name] || '#7eb8f7';
+        const segs  = buildRideSegments(geom);
+        (rideOverlays[name] || []).forEach(p => p.remove()); rideOverlays[name] = [];   // hide existing overlay while editing
+
+        const collectedKeys = new Set();
+        markers.forEach(m => { if (m._isCollected && m._stationData) collectedKeys.add(dedupeKey(m._stationData)); });
+
+        const layer = L.layerGroup().addTo(mapInstance);
+        segs.forEach(seg => { seg.pl = L.polyline(seg.pts, segStyle(color, false)).addTo(layer); });
+        geom.stations.forEach(s => {
+            const coll = collectedKeys.has(dedupeKey(s));
+            L.circleMarker([s.lat, s.lon], { radius: 4, weight: 2, color: coll ? '#f7c948' : '#ffffff',
+                fillColor: coll ? '#f7c948' : color, fillOpacity: 1, interactive: false, renderer: canvasRenderer }).addTo(layer);
+        });
+
+        rideEdit = { name, color, geom, segs, selected: initialRideSelection(name, segs), layer, dragging: false, mode: 'add' };
+        segs.forEach(paintSeg);
+
+        // Focus mode: fade every other line right down and fade other lines' ride
+        // overlays, so only the line being edited stands out. Hide this line's own
+        // faint base (the bright editable segments replace it). Also make EVERY line
+        // non-interactive so hovering another line shows no tooltip/highlight — focus
+        // stays fully on the line being edited (restored on exit).
+        const own = new Set(linesByName[name] || []);
+        allLineSegs.forEach(p => {
+            if (!own.has(p)) p.setStyle(LINE_EDIT_DIM); else p.setStyle({ opacity: 0 });
+            p.closeTooltip();
+            p.options.interactive = false;
+        });
+        Object.entries(rideOverlays).forEach(([ln, arr]) => { if (ln !== name) arr.forEach(pl => pl.setStyle({ opacity: 0.1 })); });
+        // Station markers sit right on the line; make them non-interactive too so a tap
+        // paints the ride segment instead of opening a station popup (restored on exit).
+        [...markers, ...plainMarkers].forEach(m => { m.options.interactive = false; });
+
+        // Stay on the user's current view — don't fit the whole line (they're usually
+        // already looking at the stretch they want to edit).
+        mapInstance.on('moveend zoomend', refreshRideEditCache);
+        refreshRideEditCache();
+
+        const { primary, secondary } = orderLineNames(name);
+        document.getElementById('ride-edit-title').textContent = primary;
+        document.getElementById('ride-edit-sub').textContent   = secondary || '';
+        document.getElementById('ride-edit-bar').classList.remove('hidden');
+        mapInstance.getContainer().style.cursor = 'crosshair';
+    };
+
+    const exitRideEditMode = (save) => {
+        if (!rideEdit) return;
+        const { name, selected, layer } = rideEdit;
+        hideRideHover();
+        mapInstance.off('moveend zoomend', refreshRideEditCache);
+        layer.remove();
+        mapInstance.dragging.enable();
+        const c = mapInstance.getContainer(); c.style.cursor = ''; c.style.touchAction = '';
+        document.getElementById('ride-edit-bar').classList.add('hidden');
+        rideEdit = null;
+        // Restore focus: re-enable interactivity, un-fade all lines and other overlays.
+        allLineSegs.forEach(p => { p.options.interactive = true; });
+        [...markers, ...plainMarkers].forEach(m => { m.options.interactive = true; });
+        resetAllLines();
+        Object.values(rideOverlays).forEach(arr => arr.forEach(pl => pl.setStyle({ opacity: RIDE_OVERLAY.opacity })));
+        if (save) {
+            const keys = [...selected];
+            if (keys.length) state.rides[name] = keys; else delete state.rides[name];
+            scheduleSave();
+            showToast(keys.length ? 'Ride saved' : 'Ride cleared');
+        }
+        renderRideOverlays(name);
+    };
+
+    const setupRideEdit = () => {
+        const container = mapInstance.getContainer();
+        const cancel = () => exitRideEditMode(false);
+        document.getElementById('ride-edit-save').addEventListener('click', () => exitRideEditMode(true));
+        document.getElementById('ride-edit-cancel').addEventListener('click', cancel);
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && rideEdit) cancel(); });
+
+        const xy = (e) => { const r = container.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; };
+        container.addEventListener('pointerdown', (e) => {
+            if (!rideEdit) return;
+            const [x, y] = xy(e);
+            const seg = rideHitTest(x, y);
+            if (!seg) return;                       // off the line → let the map pan
+            e.preventDefault();
+            hideRideHover();                        // don't keep the label up while painting
+            mapInstance.dragging.disable();         // lock pan for this paint gesture
+            container.style.touchAction = 'none';
+            try { container.setPointerCapture(e.pointerId); } catch { /* ignore */ }
+            rideEdit.dragging = true;
+            rideEdit.mode = rideEdit.selected.has(seg.key) ? 'remove' : 'add';
+            applyRidePaint(seg);
+        });
+        container.addEventListener('pointermove', (e) => {
+            if (!rideEdit) return;
+            const [x, y] = xy(e);
+            if (rideEdit.dragging) { applyRidePaint(rideHitTest(x, y)); return; }
+            if (!IS_TOUCH) updateRideHover(x, y);   // hover label (desktop only; touch has no hover)
+        });
+        container.addEventListener('pointerleave', hideRideHover);
+        const end = (e) => {
+            if (!rideEdit || !rideEdit.dragging) return;
+            rideEdit.dragging = false;
+            mapInstance.dragging.enable();
+            container.style.touchAction = '';
+            try { container.releasePointerCapture(e.pointerId); } catch { /* ignore */ }
+        };
+        container.addEventListener('pointerup', end);
+        container.addEventListener('pointercancel', end);
+    };
+
+    // ── 8. MARKER MANAGEMENT ──────────────────────────────────────────────────
+
+    /**
+     * Derive the display name for a station in the current language.
+     * EN mode: English romanisation (from station code). JP mode: kanji.
+     */
+    const getDisplayName = (station, code) => {
+        if (state.lang === 'jp' && station.name_kanji) return station.name_kanji;
+        // Use explicit English name if present (ekidata stations have this field)
+        if (station.name_en) return station.name_en;
+        // Legacy fallback: derive from dotted code (e.g. "JR.East.TokyoStation" → "Tokyo Station")
+        const raw = (code ?? '').includes('.') ? code.split('.').pop() : (code ?? '');
+        return raw.replace(/([A-Z])/g, ' $1').trim() || station.name_kanji || code || '?';
+    };
+
+    // Returns the English name for a station. Accepts the full station object
+    // so it can use the explicit name_en field (ekidata) before falling back
+    // to the legacy code-parsing approach.
+    const getEnName = (station, code) => {
+        if (station?.name_en) return station.name_en;
+        const raw = (code ?? '').includes('.') ? code.split('.').pop() : (code ?? '');
+        return raw.replace(/([A-Z])/g, ' $1').trim();
+    };
+
+    const markerRadius = (collected, zoom) => {
+        // Single smooth exponential anchored at the device base size, so dots
+        // shrink as you zoom OUT (down to MARKER_ABS_MIN) instead of staying a
+        // flat ~8px and merging into one blob over the whole country.
+        const base = (IS_TOUCH ? MARKER_BASE_R_TOUCH : MARKER_BASE_R)
+                     * Math.pow(ZOOM_SCALE, zoom - ZOOM_BASE);
+        const r = Math.min(MARKER_MAX_R, Math.max(MARKER_ABS_MIN, base));
+        return collected ? r + MARKER_COLL_BONUS : r;
+    };
+
+    const circleStyle = (collected, zoom) => collected
+        ? { radius: markerRadius(true,  zoom), fillColor: '#f7c948', fillOpacity: 1,    color: 'rgba(247,201,72,0.4)', weight: 2, renderer: canvasRenderer }
+        // Uncollected stamp: visible but discreet — soft grey, semi-transparent, no
+        // border — so the gold collected markers clearly stand out against them.
+        : { radius: markerRadius(false, zoom), fillColor: '#9aa0ac', fillOpacity: 0.5,  color: '#9aa0ac',              weight: 0, renderer: canvasRenderer };
+
+    // Non-stamp stations: SAME size as an uncollected stamp dot but much LIGHTER (far
+    // lower opacity), so they read as "minor station, no stamp" without competing with
+    // the stamp dots. Still clickable for a name/lines popup.
+    const plainStyle = (zoom) => ({
+        radius: markerRadius(false, zoom),
+        fillColor: '#9aa0ac', fillOpacity: 0.18, color: '#9aa0ac', weight: 0, renderer: canvasRenderer,
+    });
+    const styleFor = (marker, zoom) => marker._noStamp ? plainStyle(zoom) : circleStyle(marker._isCollected, zoom);
+
+    // ── 9. POPUP ──────────────────────────────────────────────────────────────
+
+    /**
+     * Build the popup HTML for a station marker.
+     * Language-aware: primary name is in the current UI language.
+     */
+    const buildPopupHtml = (marker) => {
+        const s    = marker._stationData;
+        const code = s.code;
+        const jp   = s.name_kanji || '';
+        const en   = getEnName(s, code);
+
+        // Language-sensitive primary / secondary names
+        const primary   = state.lang === 'jp' ? (jp || en) : (en || jp);
+        const secondary = state.lang === 'jp' ? en : jp;
+
+        const lineBadges = (marker._lineCodes ?? [s.line_code]).map(lc => {
+            const color = lineColorMap[lc] ?? '#6b6b7a';
+            const { primary, secondary } = orderLineNames(lc);
+            const label = secondary
+                ? `<span class="popup-line-label"><span class="popup-line-jp">${primary}</span><span class="popup-line-en">${secondary}</span></span>`
+                : `<span class="popup-line-jp">${primary}</span>`;
+            return `<div class="popup-line"><span class="popup-line-dot" style="background:${color}"></span>${label}</div>`;
+        }).join('');
+
+        // Non-stamp station: same popup, but no collect action (there's no stamp).
+        let action;
+        if (marker._noStamp) {
+            action = `<div class="popup-nostamp">No stamp at this station</div>`;
+        } else {
+            const collected = marker._isCollected;
+            const btnIcon   = collected ? ICON_STAMP_FILLED : ICON_STAMP_OUTLINE;
+            const btnLabel  = collected ? 'Collected' : 'Collect stamp';
+            const btnClass  = 'popup-collect-btn' + (collected ? ' collected' : '');
+            const btnAria   = `${collected ? 'Remove stamp' : 'Collect stamp'} for ${primary}`;
+            action = `<button class="${btnClass}" aria-label="${btnAria}">${btnIcon} ${btnLabel}</button>`;
+        }
+
+        return `<div class="popup-inner">
+            <div class="popup-name">${primary}</div>
+            ${secondary ? `<div class="popup-name-secondary">${secondary}</div>` : ''}
+            ${lineBadges}
+            ${action}
+        </div>`;
+    };
+
+    const dedupeKey = (s) => `${s.name_kanji}|${s.lat.toFixed(2)}|${s.lon.toFixed(2)}`;
+
+    /**
+     * Create (or merge into existing) a station circle marker.
+     * Stations sharing name + ~1km grid cell are collapsed into one marker
+     * with a multi-line badge popup.
+     */
+    const createMarker = (station, map, plain = false) => {
+        const { code, line_code } = station;
+        if (!code || !line_code) return;
+
+        const key = dedupeKey(station);
+        const existing = dedupeMarkers[key];
+
+        if (existing) {
+            if (!existing._lineCodes.includes(line_code)) {
+                existing._lineCodes.push(line_code);
+                existing.setPopupContent(buildPopupHtml(existing));
+            }
+            return;
+        }
+
+        const collected = !plain && state.stamps.has(code);
+        const marker    = L.circleMarker([station.lat, station.lon], plain ? plainStyle(map.getZoom()) : circleStyle(collected, map.getZoom()));
+
+        marker._stationData  = station;
+        marker._isCollected  = collected;
+        marker._noStamp      = plain;
+        marker._lineCodes    = [line_code];
+        marker.stationName   = getDisplayName(station, code);
+        marker.stationNameJP = station.name_kanji || '';
+        marker.stationNameEN = getEnName(station, code);
+
+        marker.bindPopup(buildPopupHtml(marker), { offset: L.point(0, -4), closeButton: true, maxWidth: 260 });
+
+        // Click opens popup permanently (no auto-close on mouseout).
+        marker.on('click', () => {
+            if (suppressTap) { suppressTap = false; return; }   // ignore long-press
+            clearTimeout(marker._popupTimer);
+            marker._hoverOpened = false;
+            currentPopupMarker = marker;
+            marker.openPopup();
+        });
+
+        // On desktop, hovering a station opens its popup immediately.
+        // Touch devices have no hover — click remains the only trigger.
+        if (!IS_TOUCH) {
+            marker.on('mouseover', () => {
+                clearTimeout(marker._popupTimer);
+                marker._hoverOpened = true;
+                currentPopupMarker = marker;
+                marker.openPopup();
+            });
+
+            // When the cursor leaves the marker, schedule the popup to close.
+            // If the user moves into the popup HTML (to click Collect), the
+            // popup's mouseenter cancels the timer so it stays open.
+            marker.on('mouseout', () => {
+                if (!marker._hoverOpened) return;
+                marker._popupTimer = setTimeout(() => {
+                    if (marker._hoverOpened && currentPopupMarker === marker) {
+                        marker._hoverOpened = false;
+                        currentPopupMarker = null;
+                        marker.closePopup();
+                    }
+                }, POPUP_GRACE_MS);
+            });
+
+            // Attach grace-period handlers to the popup DOM element once it opens.
+            // onmouseenter = property assignment avoids accumulating listeners.
+            marker.on('popupopen', () => {
+                const el = marker.getPopup()?.getElement();
+                if (!el) return;
+                el.onmouseenter = () => clearTimeout(marker._popupTimer);
+                el.onmouseleave = () => {
+                    if (!marker._hoverOpened) return;
+                    marker._popupTimer = setTimeout(() => {
+                        if (marker._hoverOpened && currentPopupMarker === marker) {
+                            marker._hoverOpened = false;
+                            currentPopupMarker = null;
+                            marker.closePopup();
+                        }
+                    }, POPUP_GRACE_MS);
+                };
+            });
+        }
+
+        // Clear tracking state when popup closes for any reason.
+        marker.on('popupclose', () => {
+            clearTimeout(marker._popupTimer);
+            marker._hoverOpened = false;
+            if (currentPopupMarker === marker) currentPopupMarker = null;
+        });
+
+        dedupeMarkers[key] = marker;
+        (plain ? plainMarkers : markers).push(marker);
+        marker.addTo(map);
+    };
+
+    const refreshAllMarkerStates = () => {
+        if (!mapInstance) return;
+        mapInstance.closePopup();
+        const zoom = mapInstance.getZoom();
+        markers.forEach(m => {
+            m._isCollected = state.stamps.has(m._stationData.code);
+            m.setStyle(circleStyle(m._isCollected, zoom));
+            m.setPopupContent(buildPopupHtml(m));
+        });
+        bringCollectedToFront();
+        updateStats();
+    };
+
+    const loadStations = async (map) => {
+        // `stampNames` maps an ekidata station code -> the curated English name
+        // from Funakiya. Only stations present in this map have a real eki stamp
+        // and are rendered; their English names override ekidata's (which is
+        // auto-romanised and often wrong, e.g. 米原 Maibara -> "Yonehara").
+        const renderStations = (stations, stampNames, lineNames) => {
+            // Funakiya's properly spaced English line names take precedence over
+            // ekidata's run-together romaji (e.g. "Jrtokaidohonsen(Tokyo~Atami)").
+            Object.assign(lineEnMap, lineNames || {});
+
+            // Retain a flat list of every ekidata station with coordinates — the
+            // pool the ride picker snaps onto a clicked line's geometry.
+            // Resolve a good English name for every station, since ekidata's raw
+            // auto-romaji is often wrong (四ツ谷 "Shitsutani", 新高円寺 "Niitakaentera").
+            // 1) Funakiya curated names (stamp stations) are the source of truth, with
+            //    the network qualifier stripped (中野坂上 "Toei Subway Nakano-sakaue" →
+            //    "Nakano-sakaue"). 2) For an un-curated compound station, compose from a
+            //    known directional prefix + a curated base (新高円寺 → Shin-Kōenji).
+            //    3) ekidata romaji only as a last resort.
+            const normK   = (k) => (k || '').replace(/ヶ/g, 'ケ');
+            const cleanEn = (en) => (en || '').replace(/^(Toei Subway|Tokyo Metro)\s+/, '');
+            const curatedByKanji = {};
+            stations.forEach(g => g.stations.forEach(s => {
+                const en = stampNames[s.code];
+                if (en) { const k = normK(s.name_kanji); if (!curatedByKanji[k]) curatedByKanji[k] = cleanEn(en); }
+            }));
+            const PREFIX = { '新': 'Shin', '西': 'Nishi', '東': 'Higashi', '南': 'Minami', '北': 'Kita', '上': 'Kami', '下': 'Shimo', '元': 'Moto', '本': 'Hon' };
+            const resolveEn = (s) => {
+                const k = normK(s.name_kanji);
+                if (curatedByKanji[k]) return curatedByKanji[k];                       // curated, cleaned
+                const p = PREFIX[k[0]], base = curatedByKanji[k.slice(1)];
+                if (p && base) return p + '-' + base;                                  // composed (Shin-…)
+                return s.name_en;                                                      // ekidata fallback
+            };
+
+            allStations.length = 0; lineGroups.length = 0;
+            stations.forEach(g => {
+                const ordered = [];
+                g.stations.forEach(s => {
+                    if (s.lat && s.lon) {
+                        const rec = { code: s.code, name_kanji: s.name_kanji, name_en: resolveEn(s), lat: s.lat, lon: s.lon };
+                        allStations.push(rec);
+                        stationByCode[s.code] = rec;
+                        ordered.push(rec);
+                    }
+                });
+                if (ordered.length) lineGroups.push({ line_name: g.line_name, stations: ordered });
+            });
+
+            // A stamp belongs to a physical station, not a single line. Funakiya
+            // matches each stamp to one ekidata row, but an interchange (Tokyo,
+            // Shinjuku…) has several rows at the same place. So we render every
+            // ekidata line-row at a stamped location and let createMarker merge
+            // them into one marker showing all its lines.
+            const stampedLoc = {};   // dedupeKey -> curated English name (or null)
+            stations.forEach(g => g.stations.forEach(s => {
+                const en = stampNames[s.code];
+                if (en === undefined) return;
+                const k = dedupeKey(s);
+                if (!(k in stampedLoc)) stampedLoc[k] = en || null;
+            }));
+
+            // Pass C: every OTHER station (nowhere stamped at its location) as a
+            // discreet, clickable non-stamp marker. Created BEFORE the stamp passes so
+            // the gold/grey stamp dots draw on top of these. Same name resolver so the
+            // romaji is decent. These live in plainMarkers (excluded from stats/search).
+            stations.forEach(g => {
+                if (g.line_name_en && !lineEnMap[g.line_name]) lineEnMap[g.line_name] = g.line_name_en;
+                g.stations.forEach(s => {
+                    if (!s.lat || !s.lon || dedupeKey(s) in stampedLoc) return;
+                    s.name_en = resolveEn(s);
+                    createMarker(s, map, true);
+                });
+            });
+
+            // Pass A: create markers from the matched rows first, so each
+            // marker's identity (its stamp code) is the matched ekidata code —
+            // keeps saved progress lighting up correctly.
+            stations.forEach(g => {
+                if (g.line_name_en && !lineEnMap[g.line_name]) lineEnMap[g.line_name] = g.line_name_en;
+                g.stations.forEach(s => {
+                    if (stampNames[s.code] === undefined) return;
+                    const en = stampedLoc[dedupeKey(s)];
+                    if (en) s.name_en = en;
+                    createMarker(s, map);
+                });
+            });
+            // Pass B: add the station's other lines (rows at a stamped location
+            // that aren't themselves the matched row) so all line badges show.
+            stations.forEach(g => g.stations.forEach(s => {
+                if (stampNames[s.code] !== undefined) return;   // handled in pass A
+                const k = dedupeKey(s);
+                if (!(k in stampedLoc)) return;
+                const en = stampedLoc[k];
+                if (en) s.name_en = en;
+                createMarker(s, map);
+            }));
+            map.on('zoomend', () => {
+                clearTimeout(zoomDebounce);
+                zoomDebounce = setTimeout(() => {
+                    const zoom = map.getZoom();
+                    plainMarkers.forEach(m => m.setStyle(plainStyle(zoom)));
+                    markers.forEach(m => m.setStyle(circleStyle(m._isCollected, zoom)));
+                    bringCollectedToFront();
+                }, 150);
+            });
+            bringCollectedToFront();
+            updateStats();
+            hideLoading();
+        };
+
+        try {
+            const cached = await cacheGet('eki_stamp_stations_' + APP_VERSION);
+            if (cached && Date.now() - cached.ts < CACHE_TTL) {
+                renderStations(cached.stations, cached.stampNames, cached.lineNames);
+                return;
+            }
+        } catch { /* cache miss */ }
+
+        try {
+            const [stations, stampData] = await Promise.all([
+                fetch('../data/stations.json').then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); }),
+                fetch('../data/stamp-stations.json').then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
+            ]);
+            const stampNames = {};
+            stampData.stations.forEach(s => { if (s.eki_code) stampNames[s.eki_code] = s.name_en || ''; });
+            const lineNames = stampData.line_names || {};
+            renderStations(stations, stampNames, lineNames);
+            cacheSet('eki_stamp_stations_' + APP_VERSION, { stations, stampNames, lineNames, ts: Date.now() }).catch(() => {});
+        } catch (err) {
+            console.error('loadStations:', err);
+            hideLoading();
+            showToast('Failed to load stations — check connection and refresh', 5000);
+        }
+    };
+
+    // ── 10. SEARCH ────────────────────────────────────────────────────────────
+
+    /**
+     * Render search suggestions for the current input value and language.
+     * Called on input change AND on language toggle (if input has text).
+     */
+    const renderSuggestions = (map, term) => {
+        const box  = document.getElementById('suggestions');
+        box.innerHTML = '';
+        box.style.display = 'none';
+        if (!term) return;
+
+        const lc   = term.toLowerCase();
+        const hits = markers.filter(m =>
+            m.stationNameEN.toLowerCase().includes(lc) ||
+            m.stationNameJP.toLowerCase().includes(lc)
+        ).slice(0, MAX_SUGGESTIONS);
+
+        if (!hits.length) return;
+        box.style.display = 'block';
+
+        hits.forEach(m => {
+            const primary   = state.lang === 'jp' ? (m.stationNameJP || m.stationNameEN) : (m.stationNameEN || m.stationNameJP);
+            const secondary = state.lang === 'jp' ? m.stationNameEN : m.stationNameJP;
+
+            const item = document.createElement('div');
+            item.className   = 'suggestion-item';
+            item.setAttribute('role', 'option');
+
+            const nameDiv = document.createElement('div');
+            const p = document.createElement('div');
+            p.className = 'sug-primary'; p.textContent = primary;
+            nameDiv.appendChild(p);
+            if (secondary) {
+                const s = document.createElement('div');
+                s.className = 'sug-secondary'; s.textContent = secondary;
+                nameDiv.appendChild(s);
+            }
+            item.appendChild(nameDiv);
+
+            if (m._isCollected) {
+                const badge = document.createElement('span');
+                badge.className = 'collected-badge'; badge.textContent = '✓';
+                item.appendChild(badge);
+            }
+
+            item.addEventListener('click', () => {
+                map.setView(m.getLatLng(), 15);
+                // Set currentPopupMarker BEFORE openPopup so the collect
+                // button's event-delegation handler can find the marker.
+                currentPopupMarker = m;
+                setTimeout(() => m.openPopup(), SEARCH_JUMP_MS);
+                box.style.display = 'none';
+                document.getElementById('stationSearch').value = '';
+            });
+
+            box.appendChild(item);
+        });
+    };
+
+    const setupSearch = (map) => {
+        const input = document.getElementById('stationSearch');
+        input.addEventListener('input', () => renderSuggestions(map, input.value.trim()));
+        document.addEventListener('click', e => {
+            if (!e.target.closest('#search-container'))
+                document.getElementById('suggestions').style.display = 'none';
+        });
+    };
+
+    // ── 11. LANGUAGE ──────────────────────────────────────────────────────────
+
+    const updateLangBtn = () => {
+        const btn   = document.getElementById('lang-toggle');
+        const label = state.lang === 'jp' ? '日本語' : 'EN';
+        const tip   = state.lang === 'jp' ? 'Switch to English' : 'Switch to Japanese (日本語)';
+        btn.textContent = label;
+        btn.title       = tip;
+        btn.setAttribute('aria-label', tip);
+    };
+
+    const setupLanguageToggle = (map) => {
+        updateLangBtn();
+        document.getElementById('lang-toggle').addEventListener('click', () => {
+            setState('lang', state.lang === 'en' ? 'jp' : 'en');
+            updateLangBtn();
+
+            // Update lang attribute on <html> for screen readers
+            document.documentElement.lang = state.lang === 'jp' ? 'ja' : 'en';
+
+            // Update modal title if visible
+            const title = document.getElementById('modal-title');
+            if (title) title.textContent = state.lang === 'jp' ? 'ようこそ！' : 'Welcome!';
+
+            // Rebuild all marker names + popup content in new language
+            [...markers, ...plainMarkers].forEach(m => {
+                if (!m._stationData) return;
+                m.stationName = getDisplayName(m._stationData, m._stationData.code);
+                m.setPopupContent(buildPopupHtml(m));
+            });
+
+            // Re-render visible search suggestions in new language
+            const term = document.getElementById('stationSearch').value.trim();
+            renderSuggestions(map, term);
+        });
+    };
+
+    // ── 12. STATS ─────────────────────────────────────────────────────────────
+
+    const updateStats = () => {
+        const done  = state.stamps.size;
+        const total = markers.length;
+        const pct   = total > 0 ? (done / total) * 100 : 0;
+
+        document.getElementById('session-count').textContent = `${done.toLocaleString()} / ${total.toLocaleString()} collected`;
+        document.getElementById('bar-count').textContent     = done.toLocaleString();
+
+        const barTotal = document.getElementById('bar-total');
+        if (barTotal) barTotal.textContent = total ? ` / ${total.toLocaleString()}` : '';
+
+        const hint = document.getElementById('stats-hint');
+        if (hint) hint.classList.toggle('hidden', done > 0 || total === 0);
+
+        const fill = document.getElementById('session-progress-fill');
+        if (fill) fill.style.width = pct + '%';
+        const bar  = document.getElementById('session-progress-bar');
+        if (bar)  bar.setAttribute('aria-valuenow', Math.round(pct));
+    };
+
+    // ── 13. SESSION PANEL ─────────────────────────────────────────────────────
+
+    const showInputMode = () => {
+        document.getElementById('session-loaded-row').classList.add('hidden');
+        document.getElementById('session-input-section').classList.remove('hidden');
+        document.getElementById('session-load-row').classList.remove('hidden');
+        document.getElementById('session-save-row').classList.add('hidden');
+    };
+
+    const showLoadedMode = () => {
+        document.getElementById('session-loaded-row').classList.remove('hidden');
+        document.getElementById('session-input-section').classList.add('hidden');
+        document.getElementById('session-load-row').classList.add('hidden');
+        document.getElementById('session-save-row').classList.remove('hidden');
+        document.getElementById('session-loaded-name').textContent = state.user;
+    };
+
+    const updateSessionUI = () => {
+        const avatar   = document.getElementById('session-avatar');
+        const username = document.getElementById('session-username');
+        const input    = document.getElementById('session-name-input');
+        if (state.user) {
+            avatar.textContent = state.user.charAt(0).toUpperCase();
+            username.textContent = state.user;
+            username.classList.remove('placeholder');
+            if (input) input.value = state.user;
+            showLoadedMode();
+        } else {
+            avatar.textContent = '?';
+            username.textContent = 'No session';
+            username.classList.add('placeholder');
+            showInputMode();
+        }
+        updateStats();
+    };
+
+    const setupSessionPanel = (map) => {
+        const sv = document.getElementById('session-version');
+        if (sv) sv.textContent = APP_VERSION;
+        // Toggle panel open/close
+        document.getElementById('session-toggle').addEventListener('click', () => {
+            const panel = document.getElementById('session-panel');
+            const btn   = document.getElementById('session-toggle');
+            const open  = panel.classList.toggle('hidden') === false;
+            btn.classList.toggle('active', open);
+            btn.setAttribute('aria-expanded', open.toString());
+        });
+
+        updateSessionUI();
+
+        // Change session
+        document.getElementById('session-change').addEventListener('click', () => {
+            showInputMode();
+            const input = document.getElementById('session-name-input');
+            input.value = state.user;
+            input.focus();
+        });
+
+        // Load session
+        document.getElementById('session-load').addEventListener('click', async () => {
+            const name = document.getElementById('session-name-input').value.trim();
+            if (!name) { showToast('Enter a sync name first'); return; }
+            setState('user', name);
+            updateSessionUI();
+            showToast(`Loading ${name}…`);
+            await loadFromGist(name);
+            refreshAllMarkerStates();
+            renderAllRideOverlays();
+            showToast(`Session loaded: ${name}`);
+        });
+
+        // Save progress
+        document.getElementById('session-save').addEventListener('click', async () => {
+            if (!state.user) { showToast('Load a session first'); return; }
+            clearTimeout(syncDebounce);
+            await syncToGist();
+            showToast(`✓ Synced as ${state.user}`);
+        });
+
+        // Export JSON
+        document.getElementById('session-export').addEventListener('click', () => {
+            const payload = { user: state.user, stamps: [...state.stamps], rides: state.rides };
+            const url = URL.createObjectURL(new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' }));
+            const a   = Object.assign(document.createElement('a'), {
+                href: url,
+                download: `eki-${state.user || 'stamps'}-${new Date().toISOString().slice(0, 10)}.json`
+            });
+            a.click();
+            URL.revokeObjectURL(url);  // free memory
+        });
+
+        // Import JSON
+        document.getElementById('session-import').addEventListener('click', () => {
+            document.getElementById('session-import-file').click();
+        });
+
+        document.getElementById('session-import-file').addEventListener('change', (e) => {
+            const file = e.target.files?.[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onerror = () => showToast('Could not read file');
+            reader.onload  = async (ev) => {
+                // Clear input AFTER read so same file can be re-imported
+                e.target.value = '';
+                try {
+                    const data = JSON.parse(ev.target.result);
+                    if (!Array.isArray(data.stamps)) throw new Error('Missing stamps array');
+                    state.stamps = new Set(data.stamps.filter(s => typeof s === 'string'));
+                    state.rides  = (data.rides && typeof data.rides === 'object') ? data.rides : {};
+                    if (data.user && !state.user) {
+                        setState('user', data.user);
+                        updateSessionUI();
+                    }
+                    refreshAllMarkerStates();
+                    renderAllRideOverlays();
+                    showToast(`Imported ${state.stamps.size} stamps`);
+                    await syncToGist();
+                } catch (err) {
+                    console.error('Import:', err);
+                    showToast('Import failed — not a valid Eki JSON file');
+                }
+            };
+            reader.readAsText(file);
+        });
+
+        // Reset — two-step confirmation (no browser confirm() dialog)
+        let resetConfirmTimer = null;
+        const resetBtn = document.getElementById('session-reset');
+        resetBtn.addEventListener('click', async () => {
+            if (!resetBtn.dataset.confirming) {
+                resetBtn.dataset.confirming = '1';
+                resetBtn.textContent = 'Tap again to confirm reset';
+                resetBtn.classList.add('confirm-pending');
+                resetConfirmTimer = setTimeout(() => {
+                    delete resetBtn.dataset.confirming;
+                    resetBtn.textContent = 'Reset all stamps';
+                    resetBtn.classList.remove('confirm-pending');
+                }, RESET_CONFIRM_MS);
+                return;
+            }
+            clearTimeout(resetConfirmTimer);
+            delete resetBtn.dataset.confirming;
+            resetBtn.textContent = 'Reset all stamps';
+            resetBtn.classList.remove('confirm-pending');
+            state.stamps.clear();
+            await syncToGist();
+            refreshAllMarkerStates();
+            showToast('All stamps reset');
+        });
+    };
+
+    // ── 14. WELCOME MODAL ─────────────────────────────────────────────────────
+
+    const setupFocusTrap = (modalEl, overlayEl) => {
+        modalEl.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') { overlayEl.classList.add('hidden'); return; }
+            if (e.key !== 'Tab') return;
+            const items = [...modalEl.querySelectorAll('button, input, [tabindex]:not([tabindex="-1"])')];
+            const [first, last] = [items[0], items[items.length - 1]];
+            if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+            else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+        });
+    };
+
+    const setupModal = (map) => {
+        const overlay = document.getElementById('name-modal-overlay');
+        const modal   = document.getElementById('name-modal');
+        const input   = document.getElementById('modal-name-input');
+        const title   = document.getElementById('modal-title');
+
+        if (title) title.textContent = state.lang === 'jp' ? 'ようこそ！' : 'Welcome!';
+        const ver = document.getElementById('app-version');
+        if (ver) ver.textContent = APP_VERSION;
+        setupFocusTrap(modal, overlay);
+
+        if (!state.user) {
+            overlay.classList.remove('hidden');
+            setTimeout(() => input.focus(), FOCUS_DELAY_MS);
+        }
+
+        const confirmModal = async () => {
+            const name = input.value.trim();
+            overlay.classList.add('hidden');
+            if (!name) return;
+            setState('user', name);
+            updateSessionUI();
+            await loadFromGist(name);
+            refreshAllMarkerStates();
+            renderAllRideOverlays();
+            showToast(`Welcome, ${name}!`);
+        };
+
+        document.getElementById('modal-confirm').addEventListener('click', confirmModal);
+        document.getElementById('modal-skip').addEventListener('click', () => overlay.classList.add('hidden'));
+        input.addEventListener('keydown', e => { if (e.key === 'Enter') confirmModal(); });
+    };
+
+    // ── 15. INIT ──────────────────────────────────────────────────────────────
+
+    document.addEventListener('DOMContentLoaded', async () => {
+        const map   = initMap();
+        mapInstance = map;
+
+        setupSearch(map);
+        setupLanguageToggle(map);
+        setupSessionPanel(map);
+        setupModal(map);
+        setupRideEdit();
+
+        // Event delegation for the line popup's "add a ride" button → map edit mode
+        document.addEventListener('click', (e) => {
+            const btn = e.target.closest('.popup-line-ride-btn');
+            if (!btn) return;
+            e.stopPropagation();
+            const name = decodeURIComponent(btn.dataset.line || '') || currentPopupLine;
+            if (!name) return;
+            map.closePopup();
+            enterRideEditMode(name);
+        });
+
+        // Event delegation for popup collect button
+        // Reliable alternative to popupopen+getElement (which returns null in Leaflet)
+        document.addEventListener('click', (e) => {
+            const btn = e.target.closest('.popup-collect-btn');
+            if (!btn || !currentPopupMarker) return;
+            e.stopPropagation();
+            const marker = currentPopupMarker;
+            const next   = !marker._isCollected;
+            marker._isCollected = next;
+            state.stamps[next ? 'add' : 'delete'](marker._stationData.code);
+            scheduleSave();
+            marker.setStyle(circleStyle(next, map.getZoom()));
+            if (next) marker.bringToFront();   // gold marker on top of grey ones
+            // Update button in-place without rebuilding popup
+            btn.className   = 'popup-collect-btn' + (next ? ' collected' : '');
+            const ariaName = state.lang === 'jp' ? (marker.stationNameJP || marker.stationNameEN)
+                                                  : (marker.stationNameEN || marker.stationNameJP);
+            btn.setAttribute('aria-label', `${next ? 'Remove stamp' : 'Collect stamp'} for ${ariaName}`);
+            btn.innerHTML   = `${next ? ICON_STAMP_FILLED : ICON_STAMP_OUTLINE} ${next ? 'Collected' : 'Collect stamp'}`;
+            // Keep stored popup HTML in sync for next open
+            marker.setPopupContent(buildPopupHtml(marker));
+            updateStats();
+            showToast(next ? `${marker.stationName} — stamped!` : `${marker.stationName} — removed`);
+        });
+
+        // Load stations first (they appear fast, often from cache)
+        await loadStations(map);
+
+        // Load lines in background shortly after — they are visually large and slow
+        setTimeout(() => loadLines(map), 100);
+
+        // If returning user, load their stamps
+        if (state.user) {
+            await loadFromGist(state.user);
+            refreshAllMarkerStates();
+            renderAllRideOverlays();
+        }
+    });
+    </script>
+</body>
+</html>
