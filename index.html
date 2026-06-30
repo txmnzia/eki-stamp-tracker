@@ -1009,7 +1009,7 @@
     // App version — shown discreetly on the welcome modal. Bump on every merge
     // to main. It is also part of the station-cache key, so each release
     // invalidates the 7-day IndexedDB cache and users immediately get fresh data.
-    const APP_VERSION       = 'v1.3.22';
+    const APP_VERSION       = 'v1.3.21';
     const CACHE_TTL         = 7 * 24 * 60 * 60 * 1000;  // 7 days
     const BATCH_SIZE        = 150;      // features per animation frame (line rendering)
     const SYNC_DEBOUNCE_MS  = 2000;     // ms after last stamp change before auto-save
@@ -1634,7 +1634,7 @@
         // After lines are drawn, restack markers, draw Shinkansen, paint ride overlays.
         const onLinesReady = () => { bringStationsToFront(true); drawShinkansen(map); renderAllRideOverlays(); };
         try {
-            const cached = await cacheGet('eki_lines_' + APP_VERSION);
+            const cached = await cacheGet('eki_lines');
             if (cached && Date.now() - cached.ts < CACHE_TTL) {
                 renderLines(map, cached.data, onLinesReady);
                 return;
@@ -1647,7 +1647,7 @@
                 return r.json();
             });
             renderLines(map, data, onLinesReady);
-            cacheSet('eki_lines_' + APP_VERSION, { data, ts: Date.now() }).catch(() => {});
+            cacheSet('eki_lines', { data, ts: Date.now() }).catch(() => {});
         } catch (err) {
             console.error('loadLines:', err);
             showToast('Failed to load train lines — map may be incomplete', 4000);

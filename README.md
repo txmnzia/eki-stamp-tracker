@@ -66,7 +66,6 @@ scripts/
   build_rail_graph.py           builds data/rail-graph.json from the GeoJSON
   build_shinkansen.py           builds data/shinkansen.json (curated Shinkansen stops)
   audit-ride-gaps.mjs           audits EVERY line for ride-overlay gaps (see "Ride gaps")
-  disambiguate_geojson_lines.py splits homonymous bare-name lines per operator (see below)
 docs/
   HANDOVER-line-highlight.md    investigation notes on line↔station association
 ```
@@ -264,22 +263,9 @@ BASE_URL=http://127.0.0.1:8097 node scripts/audit-ride-gaps.mjs   # exits 1 if a
 (The audit waits for all line features to finish rendering first — building
 geometry mid-render caches an incomplete graph and reports false gaps.) The ~13
 residual gaps are all genuine: remote rural stretches the geojson lacks (予讃線
-Shimonada, 上越線 Gala-Yuzawa, 筑肥線 Yamamoto branch).
-
-#### Homonymous lines (bare-name disambiguation)
-
-`railroad-section.geojson` originally labelled track with **bare** `路線名` that
-several railways share (`日光線` = JR + 東武; `本線` = 京急/京成/相鉄/阪神/…; `京都線` =
-阪急 + 近鉄; `東西線` = three different city subways). The app keys lines by `路線名`,
-so these merged unrelated railways into one tangled "line" with un-rideable
-cross-operator gaps. ekidata's `stations.json` is already operator-qualified, so
-`scripts/disambiguate_geojson_lines.py` uses it as the authority: for a reviewed
-allow-list of genuine homonyms it reassigns each feature to the ekidata line
-whose station sequence runs nearest it (then spatial-fills stragglers), editing
-only the `路線名` string in place — geometry and CRLF formatting untouched, so the
-diff is just the renamed features and non-homonyms can't regress. Re-run it after
-refreshing the raw geojson upstream; it's idempotent on already-split names. The
-bundled `data/railroad-section.geojson` is the disambiguated output.
+Shimonada, 上越線 Gala-Yuzawa, 筑肥線 Yamamoto branch) and bare/duplicate `路線名`
+anomalies that merge unrelated railways (成田線 Abiko branch, 京都線, 奈良線). Those
+need a station-list/corridor fix, not a faked line.
 
 ### Persistence shape
 
