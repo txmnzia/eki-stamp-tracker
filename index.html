@@ -1009,7 +1009,7 @@
     // App version — shown discreetly on the welcome modal. Bump on every merge
     // to main. It is also part of the station-cache key, so each release
     // invalidates the 7-day IndexedDB cache and users immediately get fresh data.
-    const APP_VERSION       = 'v1.3.21';
+    const APP_VERSION       = 'v1.3.23';
     const CACHE_TTL         = 7 * 24 * 60 * 60 * 1000;  // 7 days
     const BATCH_SIZE        = 150;      // features per animation frame (line rendering)
     const SYNC_DEBOUNCE_MS  = 2000;     // ms after last stamp change before auto-save
@@ -2000,6 +2000,14 @@
     const trackBetween = (geom, a, b) => {
         const Pa = snappedPoint(geom, a), Pb = snappedPoint(geom, b);
         if (a.chainIdx === b.chainIdx && a.segIdx === b.segIdx) return [Pa, Pb];
+        // Same chain: slice the chain's own vertices directly (no route cap). The
+        // graph route below is only needed to cross chain boundaries; capping it at
+        // RIDE_ROUTE_MAX_M would wrongly drop long same-chain hops (e.g. Shinkansen
+        // stations 50–60 km apart on one continuous chain), leaving those segments
+        // unbuilt and unclickable in edit mode even though the base line is drawn.
+        if (a.chainIdx === b.chainIdx) {
+            return [Pa, ...sliceVerts(geom.chains[a.chainIdx], a, b), Pb];
+        }
         const G = buildLineGraph(geom);
         const ca = geom.chains[a.chainIdx].coords, cb = geom.chains[b.chainIdx].coords;
         const exit = new Map();   // b's two bounding vertices, with the cost to reach Pb
