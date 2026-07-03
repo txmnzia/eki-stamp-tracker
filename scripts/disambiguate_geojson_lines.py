@@ -13,11 +13,13 @@ lines can't regress. Idempotent: already-split names no longer match a bare key.
 Workflow: refresh the raw geojson from upstream, then run this to re-disambiguate.
 Run: python3 scripts/disambiguate_geojson_lines.py
 """
-import json, math, os, re
+import json, math, os, re, sys
 from collections import defaultdict
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-GEO = os.path.join(ROOT, 'data', 'railroad-section.geojson')
+# In-place rewrite of the production geojson is the intended workflow now the
+# disambiguation is accepted; pass an explicit path to work on a copy instead.
+GEO = sys.argv[1] if len(sys.argv) > 1 else os.path.join(ROOT, 'data', 'railroad-section.geojson')
 st = json.load(open(os.path.join(ROOT, 'data', 'stations.json')))
 lines = open(GEO, encoding='utf-8', newline='').read().split('\n')
 
