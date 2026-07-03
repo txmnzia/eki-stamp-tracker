@@ -1,0 +1,39 @@
+name: data-audit
+
+on:
+  pull_request:
+    paths: ['data/**', 'index.html', 'scripts/**']
+  workflow_dispatch:
+
+jobs:
+  ride-gaps:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install Playwright Chromium
+        run: |
+          npm init -y >/dev/null
+          npm install playwright >/dev/null
+          npx playwright install --with-deps chromium
+      - name: Serve repo
+        run: python3 -m http.server 8097 &
+      - name: Ride-gap audit
+        # MAX_GAPS = accepted baseline of known-genuine data holes (remote rural
+        # stretches missing from the geojson). Update it deliberately when the
+        # baseline changes; any NEW gap beyond it fails the build.
+        env:
+          BASE_URL: http://127.0.0.1:8097
+          MAX_GAPS: '15'
+        run: node scripts/audit-ride-gaps.mjs
+
+  data-sanity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Structural checks on shipped data
+        run: python3 scripts/check_data.py
