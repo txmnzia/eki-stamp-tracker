@@ -803,5 +803,46 @@
     "code": "eki_1110106"
    }
   ]
+ },
+ "西九州新幹線": {
+  "name_en": "Nishi-Kyushu Shinkansen",
+  "color": "#EE2737",
+  "stations": [
+   {
+    "name_kanji": "武雄温泉",
+    "name_en": "Takeo-Onsen",
+    "lat": 33.196151,
+    "lon": 130.022322,
+    "code": "eki_1191805"
+   },
+   {
+    "name_kanji": "嬉野温泉",
+    "name_en": "Ureshino-Onsen",
+    "lat": 33.1067,
+    "lon": 129.999,
+    "code": "shk_嬉野温泉"
+   },
+   {
+    "name_kanji": "新大村",
+    "name_en": "Shin-Omura",
+    "lat": 32.932778,
+    "lon": 129.956944,
+    "code": "eki_1192215"
+   },
+   {
+    "name_kanji": "諫早",
+    "name_en": "Isahaya",
+    "lat": 32.851018,
+    "lon": 130.041596,
+    "code": "eki_1190527"
+   },
+   {
+    "name_kanji": "長崎",
+    "name_en": "Nagasaki",
+    "lat": 32.75275,
+    "lon": 129.869056,
+    "code": "eki_1190541"
+   }
+  ]
  }
 }

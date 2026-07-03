@@ -2568,7 +2568,7 @@
     "JR Hokuriku Shinkansen(Jōetsumyōkō - Tsuruga)",
     "JR Hokuriku Shinkansen(Takasaki - Jōetsumyōkō)",
     "JR Shin'etsu Main Line(Nagano - Naotsu)",
-    "JR北陸新幹線（高崎&#65374;上越妙高）"
+    "JR北陸新幹線（高崎～上越妙高）"
    ],
    "eki_code": "eki_1140317",
    "eki_line": "妙高はねうまライン",
@@ -5364,7 +5364,7 @@
     "JR Jōetsu Line(Takasaki - Minakami)",
     "JR Shin'etsu Main Line(Takasaki - Yokokawa)",
     "JR Takasaki Line",
-    "JR北陸新幹線（高崎&#65374;上越妙高）",
+    "JR北陸新幹線（高崎～上越妙高）",
     "Jōshin Dentetsu Jōshin Line"
    ],
    "eki_code": "eki_1131816",
@@ -6108,7 +6108,7 @@
    "lon": 138.849583,
    "lines": [
     "JR Hokuriku Shinkansen(Takasaki - Jōetsumyōkō)",
-    "JR北陸新幹線（高崎&#65374;上越妙高）"
+    "JR北陸新幹線（高崎～上越妙高）"
    ],
    "eki_code": null,
    "eki_line": null,
@@ -10598,7 +10598,7 @@
    "lines": [
     "JR Hokuriku Shinkansen(Takasaki - Jōetsumyōkō)",
     "JR Iiyama Line",
-    "JR北陸新幹線（高崎&#65374;上越妙高）"
+    "JR北陸新幹線（高崎～上越妙高）"
    ],
    "eki_code": "eki_1140710",
    "eki_line": "JR飯山線",
@@ -12586,8 +12586,8 @@
    "lon": 138.635096,
    "lines": [
     "JR Hokuriku Shinkansen(Takasaki - Jōetsumyōkō)",
-    "JR Shin&apos;etsu Main Line(Yokokawa - Shinonoi)",
-    "JR北陸新幹線（高崎&#65374;上越妙高）",
+    "JR Shin'etsu Main Line(Yokokawa - Shinonoi)",
+    "JR北陸新幹線（高崎～上越妙高）",
     "Shinano Railway Line"
    ],
    "eki_code": "eki_9940301",
@@ -14305,7 +14305,7 @@
    "lon": 138.421715,
    "lines": [
     "JR Koumi Line",
-    "JR Shin&apos;etsu Main Line(Yokokawa - Shinonoi)",
+    "JR Shin'etsu Main Line(Yokokawa - Shinonoi)",
     "Shinano Railway Line"
    ],
    "eki_code": "eki_9940306",
@@ -16583,7 +16583,7 @@
    "lat": 36.318986,
    "lon": 138.50619,
    "lines": [
-    "JR Shin&apos;etsu Main Line(Yokokawa - Shinonoi)",
+    "JR Shin'etsu Main Line(Yokokawa - Shinonoi)",
     "Shinano Railway Line"
    ],
    "eki_code": "eki_9940304",
@@ -17296,7 +17296,7 @@
     "JR Hokuriku Shinkansen(Takasaki - Jōetsumyōkō)",
     "JR Shin'etsu Main Line(Nagano - Naotsu)",
     "JR Shin'etsu Main Line(Shinonoi - Nagano)",
-    "JR北陸新幹線（高崎&#65374;上越妙高）",
+    "JR北陸新幹線（高崎～上越妙高）",
     "Nagano Electric Railway Nagano Line(Nagaden)"
    ],
    "eki_code": "eki_1140305",
@@ -17552,7 +17552,7 @@
    "lat": 36.347576,
    "lon": 138.593147,
    "lines": [
-    "JR Shin&apos;etsu Main Line(Yokokawa - Shinonoi)",
+    "JR Shin'etsu Main Line(Yokokawa - Shinonoi)",
     "Shinano Railway Line"
    ],
    "eki_code": "eki_9940302",
@@ -20965,7 +20965,7 @@
    "lines": [
     "JR Hokuriku Shinkansen(Takasaki - Jōetsumyōkō)",
     "JR Koumi Line",
-    "JR北陸新幹線（高崎&#65374;上越妙高）"
+    "JR北陸新幹線（高崎～上越妙高）"
    ],
    "eki_code": "eki_1140125",
    "eki_line": "小海線",
@@ -22820,7 +22820,7 @@
    "lat": 36.5771,
    "lon": 138.138046,
    "lines": [
-    "JR Shin&apos;etsu Main Line(Yokokawa - Shinonoi)",
+    "JR Shin'etsu Main Line(Yokokawa - Shinonoi)",
     "JR Shin'etsu Main Line(Shinonoi - Nagano)",
     "JR Shinonoi Line"
    ],
@@ -25058,7 +25058,7 @@
    "lat": 36.492913,
    "lon": 138.153017,
    "lines": [
-    "JR Shin&apos;etsu Main Line(Yokokawa - Shinonoi)",
+    "JR Shin'etsu Main Line(Yokokawa - Shinonoi)",
     "Shinano Railway Line"
    ],
    "eki_code": "eki_9940315",
@@ -26072,8 +26072,8 @@
    "lon": 138.249298,
    "lines": [
     "JR Hokuriku Shinkansen(Takasaki - Jōetsumyōkō)",
-    "JR Shin&apos;etsu Main Line(Yokokawa - Shinonoi)",
-    "JR北陸新幹線（高崎&#65374;上越妙高）",
+    "JR Shin'etsu Main Line(Yokokawa - Shinonoi)",
+    "JR北陸新幹線（高崎～上越妙高）",
     "Shinano Railway Line",
     "Uedadentetsu Bessho Line"
    ],
@@ -27358,7 +27358,7 @@
    "lat": 36.532062,
    "lon": 138.128191,
    "lines": [
-    "JR Shin&apos;etsu Main Line(Yokokawa - Shinonoi)",
+    "JR Shin'etsu Main Line(Yokokawa - Shinonoi)",
     "Shinano Railway Line"
    ],
    "eki_code": "eki_9940316",
@@ -27546,7 +27546,7 @@
    "lat": 36.336009,
    "lon": 138.737926,
    "lines": [
-    "JR Shin&apos;etsu Main Line(Yokokawa - Shinonoi)",
+    "JR Shin'etsu Main Line(Yokokawa - Shinonoi)",
     "JR Shin'etsu Main Line(Takasaki - Yokokawa)"
    ],
    "eki_code": "eki_1133708",
