@@ -39,9 +39,11 @@ Runtime dependencies are loaded from CDNs (no npm install needed to run):
    the stretch of stations you rode in a vertical line diagram → that stretch is
    painted onto the map in the line's colour, following the real track. See
    [Ride sections](#ride-sections-feature) below.
-4. **Sync.** Progress (stamps *and* rides) is saved to a private GitHub Gist keyed
-   by a user-chosen "sync name", so it follows you across devices. Also
-   importable/exportable as JSON.
+4. **Sync.** Progress (stamps *and* rides) is always saved locally
+   (`localStorage`). Optionally, the user adds their **own** GitHub token
+   (gist scope) in the Session panel and progress also syncs to a private Gist
+   on their account, keyed by a chosen "sync name", so it follows them across
+   devices. Also importable/exportable as JSON.
 5. **Bilingual.** Toggle EN / 日本語 for all station and line names.
 
 ---
@@ -91,12 +93,15 @@ markers appear). `eki_code` joins to a `stations.json` station `code`.
 
 `railroad-section.geojson` — `FeatureCollection`; each feature is a single
 `LineString` segment with `properties.路線名` (the line's kanji name). A line is
-**many** segments sharing the same `路線名`.
+**many** segments sharing the same `路線名`. Homonymous bare names that merged
+unrelated railways (`本線`, `日光線`, `京都線`…) have been **disambiguated to
+operator-qualified names** (`京急本線`, `東武日光線`, `近鉄京都線`…) by
+`scripts/disambiguate_geojson_lines.py`; re-run it after refreshing the raw
+geojson from upstream.
 
 > ⚠️ The line names in `railroad-section.geojson` (`路線名`) and in
-> `stations.json` (`line_name`) **do not match** reliably (only ~35% exact /
-> ~50% normalized). Do not join them by name — see
-> `docs/HANDOVER-line-highlight.md`.
+> `stations.json` (`line_name`) still **do not match** reliably. Do not join
+> them by name — see `docs/HANDOVER-line-highlight.md`.
 
 ---
 
@@ -217,8 +222,12 @@ line with no usable geometry falls back to a centripetal Catmull-Rom smooth
 (`shinkansenSmooth`). The same path drives both the drawn line and the ride
 overlays (stops are anchor vertices in it). Shinkansen fade exactly like every
 other line when not ridden (`SHINKANSEN_BASE` mirrors `LINE_BASE`). The ride
-logic uses the stops directly (no corridor/merge). Stop coordinates match the
-conventional-station records, so collected-stamp badges still light up.
+logic uses the stops directly (no corridor/merge). Stops that share a
+conventional station use that station's record, so collected-stamp badges
+light up there; the ~18 Shinkansen-only stations (新富士, 岐阜羽島, …) use
+synthetic `shk_*` codes and have no stamp linkage. The 西九州新幹線 has no
+track in the bundled geojson at all, so it draws as the smoothed curve until
+the upstream geometry is refreshed.
 
 **Known limitations (acceptable for now):**
 - Where a `路線名` has parallel rapid/local alignments, the best-fit group is one
@@ -257,15 +266,22 @@ nearby but the route was absent/over `RIDE_ROUTE_MAX_M`):
 
 ```sh
 python3 -m http.server 8097 &                 # serve the repo
-BASE_URL=http://127.0.0.1:8097 node scripts/audit-ride-gaps.mjs   # exits 1 if any gap
+BASE_URL=http://127.0.0.1:8097 node scripts/audit-ride-gaps.mjs   # exits 1 if gaps exceed MAX_GAPS (default 0)
 ```
 
+CI runs this on every PR touching `data/`, `index.html`, or `scripts/`
+(`.github/workflows/data-audit.yml`) with `MAX_GAPS` set to the accepted
+baseline of known-genuine data holes, so only regressions fail the build.
+
 (The audit waits for all line features to finish rendering first — building
-geometry mid-render caches an incomplete graph and reports false gaps.) The ~13
-residual gaps are all genuine: remote rural stretches the geojson lacks (予讃線
-Shimonada, 上越線 Gala-Yuzawa, 筑肥線 Yamamoto branch) and bare/duplicate `路線名`
-anomalies that merge unrelated railways (成田線 Abiko branch, 京都線, 奈良線). Those
-need a station-list/corridor fix, not a faked line.
+geometry mid-render caches an incomplete graph and reports false gaps; the app
+itself guards the same way via `linesReady`.) The 15 residual gaps (the CI
+baseline) are all genuine: remote rural stretches the geojson lacks (予讃線
+Shimonada, 上越線 Gala-Yuzawa, 筑肥線 Yamamoto branch), the 成田線 Abiko branch
+station-order anomaly, and a few small seams where the homonym split exposed
+that a corridor's central span is labelled under a different name (京急本線 at
+Yokohama, 富山地鉄本線, おおさか東線…). Those need a station-list/corridor or
+relabelling fix, not a faked line.
 
 ### Persistence shape
 
@@ -282,24 +298,52 @@ Rides are stored on `state.rides` and saved in the same Gist as stamps:
 
 ## Sync / accounts
 
-There is no server. "Accounts" are just a **sync name** the user types; the app
-finds (or creates) a private Gist whose description is `GIST_PREFIX + name` and
-reads/writes `stamps.json` in it. The Gist is updated on a short debounce after
-any change (`scheduleSave`). A GitHub token is required for the Gist API; see how
-`getToken()` is wired in `index.html`.
+There is no server. Progress is **local-first**: every change is mirrored to
+`localStorage` immediately, so the app works fully offline / anonymously.
+
+For cross-device sync, the user pastes their **own** GitHub token (create one
+with **only the `gist` scope**) into the Session panel. It is stored in
+`localStorage` on that device only. With a token set, the app finds (or
+creates) a private Gist **on the user's own account** whose description is
+`GIST_PREFIX + name` and reads/writes `stamps.json` in it, on a short debounce
+after any change (`scheduleSave`).
+
+> **Never embed a shared token in this file.** An earlier version shipped an
+> obfuscated account token; anyone could decode it and read/overwrite every
+> user's data through it, and all users shared one API rate limit. That token
+> must be treated as compromised and revoked. Users of the old version need to
+> **Export JSON** from a device that still has their data and re-import it.
 
 ---
 
 ## Regenerating data
 
+The full pipeline, in dependency order (all scripts are repo-root anchored and
+can be run from anywhere):
+
 ```bash
-python3 scripts/scrape_funakiya.py        # scrape the stamp catalogue
-python3 scripts/build_stamp_stations.py   # -> data/stamp-stations.json
-python3 scripts/build_rail_graph.py       # -> data/rail-graph.json
+python3 scripts/scrape_funakiya.py           # stage 1: line pages -> data/funakiya-raw.json
+python3 scripts/scrape_funakiya_jp.py        # stage 2: per-station kanji/coords -> data/funakiya-stations.json
+python3 scripts/scrape_funakiya_lines.py     # stage 3: line-name registry -> data/funakiya-lines.json
+python3 scripts/build_stamp_stations.py      # -> data/stamp-stations.json
+python3 scripts/build_rail_graph.py          # -> data/rail-graph.json
+python3 scripts/build_shinkansen.py          # -> data/shinkansen.json
 ```
 
-Bump `APP_VERSION` in `index.html` when shipping new data — it is part of the
-IndexedDB cache key, so bumping it forces every client to pick up fresh data.
+Notes:
+- The scrapers cache pages in `/tmp/funacache` with **no TTL** — delete that
+  directory to force a fresh scrape.
+- `build_stamp_stations.py` uses `pykakasi` (optional) for romanised fallback
+  names; without it installed, fallback romanisation silently degrades, so
+  install it before regenerating for real (`pip install pykakasi`).
+- After refreshing `railroad-section.geojson` from upstream, run
+  `python3 scripts/disambiguate_geojson_lines.py` to re-split the homonymous
+  bare line names (idempotent, in place).
+
+Bump `APP_VERSION` in `index.html` when shipping new data — it is part of
+**both** IndexedDB cache keys (stations *and* line geometry), so bumping it
+forces every client to pick up fresh data. Stale versions' caches are pruned
+automatically at startup.
 
 ---
 
@@ -308,6 +352,9 @@ IndexedDB cache key, so bumping it forces every client to pick up fresh data.
 - **Single file.** Keep markup, CSS, and JS in `index.html`; match the existing
   numbered-section structure and comment style.
 - **Touch-first.** Everything must work without a mouse (no hover-only actions).
+  The canvas map itself is pointer/touch-driven (markers aren't keyboard
+  focusable); panels, search, and modals must stay keyboard-accessible.
+- **Never embed credentials** — see "Sync / accounts".
 - **Language-aware.** Any user-facing name should respect `state.lang` and rebuild
   on toggle.
 - **Always use the curated names, never ekidata's raw romaji.** Funakiya's curated
