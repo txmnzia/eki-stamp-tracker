@@ -115,7 +115,7 @@
             font-size: 12px; border-bottom: 1px solid var(--border); transition: background 0.1s;
         }
         .suggestion-item:last-child { border-bottom: none; }
-        .suggestion-item:hover { background: var(--surface2); }
+        .suggestion-item:hover, .suggestion-item.active { background: var(--surface2); }
         .suggestion-item .sug-primary   { font-family: var(--jp-font); font-size: 14px; }
         .suggestion-item .sug-secondary { color: var(--muted); font-size: 11px; margin-top: 1px; }
         .suggestion-item .collected-badge {
@@ -173,9 +173,10 @@
 
         /* ── Session panel ────────────────────────────────────────────────── */
         #session-panel {
-            position: absolute; top: 56px; right: 12px;
+            /* Safe-area aware like the topbar, so it never overlaps it on notched phones. */
+            position: absolute; top: calc(env(safe-area-inset-top, 0px) + 56px); right: 12px;
             z-index: var(--z-map-ui); width: min(290px, calc(100vw - 24px));
-            max-height: calc(100vh - 72px); overflow-y: auto;
+            max-height: calc(100vh - env(safe-area-inset-top, 0px) - 72px); overflow-y: auto;
             background: var(--surface); border: 1px solid var(--border);
             border-radius: var(--radius); box-shadow: 0 8px 24px rgba(0,0,0,0.5);
         }
@@ -196,6 +197,7 @@
         .sync-status.saving { color: var(--muted); }
         .sync-status.saved  { color: #6fdd8b; }
         .sync-status.error  { color: #f77e7e; }
+        .sync-status.local  { color: var(--muted); }
         .sync-status a { color: var(--accent); text-decoration: none; margin-left: 4px; }
         .sync-status a:hover { text-decoration: underline; }
         #session-body { padding: 12px; display: flex; flex-direction: column; gap: 8px; }
@@ -378,7 +380,8 @@
                 <svg id="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                     <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
                 </svg>
-                <input type="text" id="stationSearch" aria-label="Search station by name" placeholder="Search station…" autocomplete="off" />
+                <input type="text" id="stationSearch" aria-label="Search stamp stations by name" placeholder="Search stamp stations…" autocomplete="off"
+                       role="combobox" aria-expanded="false" aria-controls="suggestions" aria-autocomplete="list" />
             </div>
             <div id="suggestions" role="listbox" aria-label="Station suggestions"></div>
         </div>
@@ -423,6 +426,15 @@
                 <input type="text" id="session-name-input" placeholder="Enter your sync name…" autocomplete="off" />
                 <small class="session-hint-text">⚠ Case-sensitive — type it exactly the same on every device.</small>
             </div>
+            <!-- Sync token (always visible): progress is stored in a private Gist on
+                 the USER'S OWN GitHub account, so each user supplies their own token. -->
+            <div class="session-input-section" id="session-token-section">
+                <label for="session-token-input" class="session-label-heading">GitHub token (cloud sync)</label>
+                <input type="password" id="session-token-input" placeholder="Paste a gist-scope token…" autocomplete="off" />
+                <small class="session-hint-text">Optional. Cloud sync saves progress to a private Gist on <em>your</em> GitHub account.
+                    Create a token with <strong>only the gist scope</strong> at github.com → Settings → Developer settings → Tokens.
+                    Without one, progress is saved on this device only.</small>
+            </div>
             <!-- Load (only when no session) -->
             <div class="session-row" id="session-load-row">
                 <button class="session-btn primary" id="session-load">Load session</button>
@@ -437,7 +449,7 @@
                 <button class="session-btn" id="session-import">Import JSON</button>
             </div>
             <!-- Danger zone -->
-            <button class="session-btn danger" id="session-reset">Reset all stamps</button>
+            <button class="session-btn danger" id="session-reset">Reset stamps &amp; rides</button>
             <input type="file" id="session-import-file" accept=".json" style="display:none" aria-label="Import stamps JSON file">
         </div>
         <div id="session-version"></div>
@@ -446,7 +458,8 @@
     <div id="name-modal-overlay" class="hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
         <div id="name-modal">
             <h2 id="modal-title">Welcome!</h2>
-            <p>Choose a sync name to save your stamp collection and access it on any device.</p>
+            <p>Choose a sync name for your stamp collection. Progress is saved on this device;
+               to sync it across devices, add a GitHub token in the Session panel.</p>
             <label for="modal-name-input" class="hidden">Your sync name</label>
             <input type="text" id="modal-name-input" placeholder="Your sync name" maxlength="32" />
             <div id="modal-name-hint">⚠ This name is your sync key — type it <strong>exactly</strong> the same on every device. Case-sensitive.</div>
@@ -588,15 +601,8 @@
         '越後線':                { color: '#F68B1E', en: 'Echigo Line' },
         '白新線':                { color: '#F68B1E', en: 'Hakushin Line' },
         '水郡線':                { color: '#F68B1E', en: 'Suigun Line' },
-        // ── JR Shinkansen ────────────────────────────────────────────────────────
-        '東海道新幹線':          { color: '#0060A9', en: 'Tokaido Shinkansen' },
-        '山陽新幹線':            { color: '#0060A9', en: 'Sanyo Shinkansen' },
-        '東北新幹線':            { color: '#006B3C', en: 'Tohoku Shinkansen' },
-        '上越新幹線':            { color: '#E60012', en: 'Joetsu Shinkansen' },
-        '北陸新幹線':            { color: '#E60012', en: 'Hokuriku Shinkansen' },
-        '九州新幹線':            { color: '#C1272D', en: 'Kyushu Shinkansen' },
-        '北海道新幹線':          { color: '#006B3C', en: 'Hokkaido Shinkansen' },
-        '西九州線':              { color: '#C1272D', en: 'Nishi-Kyushu Shinkansen' },
+        // ── JR Shinkansen: colours/names live in data/shinkansen.json (the curated
+        //    layer draws them — entries here would be dead and risk drifting). ────
         // ── JR West ──────────────────────────────────────────────────────────────
         '山陰線':                { color: '#888888', en: "San'in Line" },
         '山陽線':                { color: '#F68B1E', en: 'Sanyo Line' },
@@ -956,6 +962,42 @@
         '水島本線':              { color: '#009F6B', en: 'Mizushima Main Line' },
         '中村線':                { color: '#009F6B', en: 'Nakamura Line' },
         '宿毛線':                { color: '#009F6B', en: 'Sukumo Line' },
+        // ── Disambiguated homonyms (operator-qualified 路線名 in the geojson).
+        //    English names come from the data (lineEnMap); only colours live here. ──
+        'JR山手線':              { color: '#9ACD32' },
+        'JR成田線':              { color: '#F68B1E' },
+        'JR成田エクスプレス':    { color: '#DC143C' },
+        'JR鹿島線':              { color: '#F68B1E' },
+        'JR日光線':              { color: '#F68B1E' },
+        'JR山田線':              { color: '#F68B1E' },
+        'JR北陸本線(米原～敦賀)': { color: '#F68B1E' },
+        'JR神戸線(神戸～姫路)':  { color: '#0060A9' },
+        'JR関西空港線':          { color: '#0060A9' },
+        '東武日光線':            { color: '#F39700' },
+        '京急本線':              { color: '#E60012' },
+        '京成本線':              { color: '#005AAA' },
+        '京王高尾線':            { color: '#4C1985' },
+        '小田急江ノ島線':        { color: '#0099CC' },
+        '阪急京都本線':          { color: '#0090D0' },
+        '阪神本線':              { color: '#0072BC' },
+        '山陽電鉄本線':          { color: '#E60012' },
+        '相鉄本線':              { color: '#0068A9' },
+        '相鉄・JR直通線':        { color: '#0068A9' },
+        '近鉄京都線':            { color: '#EE0012' },
+        '近鉄奈良線':            { color: '#EE0012' },
+        '近鉄山田線':            { color: '#EE0012' },
+        '近鉄田原本線':          { color: '#EE0012' },
+        '近鉄長野線':            { color: '#EE0012' },
+        '西武国分寺線':          { color: '#009B6B' },
+        '南海空港線':            { color: '#0072BC' },
+        '西鉄甘木線':            { color: '#EE0012' },
+        '甘木鉄道甘木線':        { color: '#009F6B' },
+        '近江鉄道本線':          { color: '#009F6B' },
+        '富山地鉄本線':          { color: '#EE0012' },
+        '富山地鉄不二越・上滝線': { color: '#009F6B' },
+        '箱根登山鉄道鉄道線':    { color: '#EF0012' },
+        '遠州鉄道鉄道線':        { color: '#EF0012' },
+        '東海交通事業城北線':    { color: '#F68B1E' },
     };
 
 
@@ -985,31 +1027,21 @@
     const getLineEn    = (name) => LINE_DATA[name]?.en ?? '';
 
     // ── 2. CONSTANTS ──────────────────────────────────────────────────────────
-    // ── Baked-in GitHub token, obfuscated so GitHub's secret scanner won't see
-    //    (and auto-revoke) it. Stored as an array of XOR'd char codes — never as a
-    //    literal token string — so push protection and secret scanning don't match.
-    //    Same scheme as the fire-planner repo.
-    //
-    //    NOTE: obfuscation only hides the token from GitHub's *automated* scanner.
-    //    Anyone reading this public source can decode it, so the token MUST have
-    //    ONLY the `gist` scope — then a decode can touch gists and nothing else.
-    //
-    //    To rotate the token:
-    //      1. Create a classic PAT (Settings → Developer settings → Tokens (classic))
-    //         with Expiration: No expiration and ONLY the `gist` scope.
-    //      2. Open this app, open the browser console, run:  encTok('PASTE_TOKEN')
-    //      3. Paste the printed array as GH_TOK_OBF below.
-    const GH_KEY            = 'eki-stamp-tracker-sync-v1';
-    const encTok            = t => JSON.stringify(Array.from(t, (c, i) => c.charCodeAt(0) ^ GH_KEY.charCodeAt(i % GH_KEY.length)));
-    const decTok            = a => a.map((n, i) => String.fromCharCode(n ^ GH_KEY.charCodeAt(i % GH_KEY.length))).join('');
-    const GH_TOK_OBF        = [2,3,25,114,5,4,6,56,9,27,67,26,17,32,94,11,20,74,60,47,36,9,75,25,118,35,95,16,102,63,7,84,53,32,31,12,43,49,47,60];   // ← paste encTok('your_token') output here
-    const GIST_TOKEN        = GH_TOK_OBF.length ? decTok(GH_TOK_OBF) : '';
-    const getToken          = () => GIST_TOKEN;
+    // ── Sync token: each user supplies their OWN GitHub token (gist scope only),
+    //    stored in localStorage on their device. Progress then syncs to a private
+    //    Gist on the user's own account. No shared credential is ever embedded in
+    //    this file: a baked-in token — however obfuscated — is readable by anyone
+    //    and would give them access to every user's data (and one shared API rate
+    //    limit). Without a token the app is fully usable in local-only mode.
+    const TOKEN_KEY         = 'eki_gh_token';
+    const getToken          = () => localStorage.getItem(TOKEN_KEY) || '';
+    const setToken          = (t) => { const v = (t || '').trim();
+                                       if (v) localStorage.setItem(TOKEN_KEY, v); else localStorage.removeItem(TOKEN_KEY); };
     const GIST_PREFIX       = 'eki-stamp-tracker:';
     // App version — shown discreetly on the welcome modal. Bump on every merge
     // to main. It is also part of the station-cache key, so each release
     // invalidates the 7-day IndexedDB cache and users immediately get fresh data.
-    const APP_VERSION       = 'v1.3.23';
+    const APP_VERSION       = 'v1.4.0';
     const CACHE_TTL         = 7 * 24 * 60 * 60 * 1000;  // 7 days
     const BATCH_SIZE        = 150;      // features per animation frame (line rendering)
     const SYNC_DEBOUNCE_MS  = 2000;     // ms after last stamp change before auto-save
@@ -1057,14 +1089,44 @@
                                         // the bundled geometry; otherwise that span is a straight connector.
 
     // ── 3. APP STATE ──────────────────────────────────────────────────────────
+    // Drop anything that isn't a { lineName: [string keys] } map — malformed ride
+    // data (bad import, hand-edited gist) must never break overlay rendering.
+    const sanitizeRides = (r) => {
+        const out = {};
+        if (r && typeof r === 'object' && !Array.isArray(r)) {
+            Object.entries(r).forEach(([k, v]) => {
+                if (!Array.isArray(v)) return;
+                const a = v.filter(x => typeof x === 'string');
+                if (a.length) out[k] = a;
+            });
+        }
+        return out;
+    };
+
     // All mutable app state lives here. Read via state.*, write via setState().
     const state = {
         lang:   localStorage.getItem('eki_lang')         || 'en',
         user:   localStorage.getItem('eki_current_user') || '',
         gistId: null,
         stamps: new Set(),
-        rides:  {},   // lineName(kanji) -> [ridden station code, ...] (ride-section feature)
+        rides:  {},   // lineName(kanji) -> ["codeA|codeB", ...] ridden segment keys
     };
+
+    // ── Local-first persistence: progress always lives on the device too, so an
+    //    anonymous user's stamps survive a refresh and a synced user still has
+    //    their data when offline. The Gist (when a token is set) is a mirror.
+    const LOCAL_KEY = 'eki_local_progress';
+    const persistLocal = () => {
+        try { localStorage.setItem(LOCAL_KEY, JSON.stringify({ stamps: [...state.stamps], rides: state.rides })); }
+        catch { /* storage full/blocked — sync and export still work */ }
+    };
+    try {
+        const saved = JSON.parse(localStorage.getItem(LOCAL_KEY) || 'null');
+        if (saved) {
+            state.stamps = new Set(Array.isArray(saved.stamps) ? saved.stamps.filter(s => typeof s === 'string') : []);
+            state.rides  = sanitizeRides(saved.rides);
+        }
+    } catch { /* corrupt entry — start clean */ }
 
     // Persist a state key and trigger any required side effects
     const setState = (key, value) => {
@@ -1090,6 +1152,11 @@
     const allLineSegs   = [];  // flat array for bulk opacity resets
     let   hoveredLine   = null;
     let   hoverTimer;
+    // True once EVERY line feature has been drawn. Ride geometry must never be
+    // built (or cached) before then: a graph over a partially-rendered line gets
+    // cached in lineGeomCache and shows phantom overlay gaps for the whole
+    // session. (scripts/audit-ride-gaps.mjs documents the same failure mode.)
+    let   linesReady    = false;
 
     // Ride-section feature
     const allStations   = [];  // flat [{code,name_kanji,name_en,lat,lon}] from ekidata (for the ride picker)
@@ -1103,6 +1170,12 @@
                                  // with the physically-shared track stored under a sibling line's name
     let   currentPopupLine = null;  // line whose popup is open (for the ride button)
     let   linePopupSeed    = null;  // {lat,lng} where the open line popup was clicked (corridor seed)
+
+    // HTML-escape for every name interpolated into popup/tooltip markup. Names
+    // come from a SCRAPED external site, so a compromised upstream page must
+    // never become script running in users' browsers.
+    const esc = (s) => String(s ?? '').replace(/[&<>"']/g,
+        c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
     /**
      * Order a line's kanji + English names by the current UI language.
@@ -1142,22 +1215,28 @@
      * @throws {Error} on non-2xx response or network failure
      */
     const apiFetch = async (url, options = {}) => {
+        const token = getToken();
         const resp = await fetch(url, {
             ...options,
-            headers: { Authorization: `Bearer ${getToken()}`, 'Content-Type': 'application/json', ...options.headers }
+            headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                       'Content-Type': 'application/json', ...options.headers }
         });
         if (!resp.ok) {
             const text = await resp.text().catch(() => '');
-            throw new Error(`GitHub API ${resp.status}: ${text.slice(0, 120)}`);
+            const err  = new Error(`GitHub API ${resp.status}: ${text.slice(0, 120)}`);
+            err.status = resp.status;
+            throw err;
         }
         return resp.json();
     };
 
     /** Find the Gist ID for a username. Returns null if not found. */
-    const findGistId = async (username) => {
+    const findGistId = async (username, fresh = false) => {
         const cacheKey = `eki_gist:${username}`;
-        const cached = localStorage.getItem(cacheKey);
-        if (cached) return cached;
+        if (!fresh) {
+            const cached = localStorage.getItem(cacheKey);
+            if (cached) return cached;
+        }
         let page = 1;
         while (true) {
             const gists = await apiFetch(`https://api.github.com/gists?per_page=100&page=${page}`);
@@ -1168,18 +1247,57 @@
         }
     };
 
-    /** Load stamps from Gist for the given username. */
-    const loadFromGist = async (username) => {
+    // Track whether local changes exist that haven't reached the Gist yet, so a
+    // session switch can flush them first instead of dropping them.
+    let syncDirty = false;
+
+    /**
+     * Load stamps+rides from the Gist for the given username.
+     * @param {boolean} [opts.mergeLocal] union the current local progress into the
+     *   loaded data (used when an anonymous user claims a sync name, so their
+     *   local stamps are never wiped by the load).
+     */
+    const loadFromGist = async (username, { mergeLocal = false } = {}) => {
+        // A pending debounced save must never fire mid-load and write one
+        // session's data into another session's gist.
+        clearTimeout(syncDebounce);
+        if (!getToken()) {   // local-only mode: nothing remote to load, and the
+            state.gistId = null;   // device's own data is never cleared
+            persistLocal();
+            setSyncStatus('local');
+            return;
+        }
         setSyncStatus('saving');
+        const localStamps = mergeLocal ? new Set(state.stamps) : null;
+        const localRides  = mergeLocal ? state.rides : null;
         try {
-            const gistId = await findGistId(username);
-            if (!gistId) { state.stamps = new Set(); state.rides = {}; state.gistId = null; setSyncStatus('saved'); return; }
-            state.gistId = gistId;
-            const gist = await apiFetch(`https://api.github.com/gists/${gistId}`);
-            const raw  = gist.files?.['stamps.json']?.content;
-            const data = raw ? JSON.parse(raw) : { stamps: [] };
-            state.stamps = new Set(Array.isArray(data.stamps) ? data.stamps : []);
-            state.rides  = (data.rides && typeof data.rides === 'object') ? data.rides : {};
+            let gistId = await findGistId(username);
+            let data   = { stamps: [], rides: {} };
+            if (gistId) {
+                let gist;
+                try {
+                    gist = await apiFetch(`https://api.github.com/gists/${gistId}`);
+                } catch (err) {
+                    if (err.status !== 404) throw err;
+                    // Stale cached id (gist deleted elsewhere) — rediscover once.
+                    localStorage.removeItem(`eki_gist:${username}`);
+                    gistId = await findGistId(username, true);
+                    if (gistId) gist = await apiFetch(`https://api.github.com/gists/${gistId}`);
+                }
+                const raw = gist?.files?.['stamps.json']?.content;
+                if (raw) data = JSON.parse(raw);
+            }
+            state.stamps = new Set(Array.isArray(data.stamps) ? data.stamps.filter(s => typeof s === 'string') : []);
+            state.rides  = sanitizeRides(data.rides);
+            state.gistId = gistId;   // only set once the content fetch has succeeded
+            if (mergeLocal && (localStamps.size || Object.keys(localRides).length)) {
+                localStamps.forEach(c => state.stamps.add(c));
+                Object.entries(localRides).forEach(([ln, arr]) => {
+                    state.rides[ln] = [...new Set([...(state.rides[ln] || []), ...arr])];
+                });
+                scheduleSave();   // push the merged result back up
+            }
+            persistLocal();
             setSyncStatus('saved');
         } catch (err) {
             console.error('loadFromGist:', err);
@@ -1187,26 +1305,43 @@
         }
     };
 
-    /** Persist current stamps to Gist. */
+    /** Persist current stamps+rides (always locally; to the Gist when possible). */
     const syncToGist = async () => {
+        persistLocal();
         if (!state.user) return;
-        setSyncStatus('saving');
+        if (!getToken()) { setSyncStatus('local'); return; }
+        // Snapshot identity + payload NOW: if the user switches session while this
+        // request is in flight, we still write the OLD data to the OLD gist rather
+        // than cross-contaminating the new one.
+        const user    = state.user;
         const content = JSON.stringify({ stamps: [...state.stamps], rides: state.rides });
+        let   gistId  = state.gistId;
+        setSyncStatus('saving');
         try {
-            if (state.gistId) {
-                await apiFetch(`https://api.github.com/gists/${state.gistId}`, {
-                    method: 'PATCH',
-                    body: JSON.stringify({ files: { 'stamps.json': { content } } })
-                });
-            } else {
+            if (gistId) {
+                try {
+                    await apiFetch(`https://api.github.com/gists/${gistId}`, {
+                        method: 'PATCH',
+                        body: JSON.stringify({ files: { 'stamps.json': { content } } })
+                    });
+                } catch (err) {
+                    if (err.status !== 404) throw err;
+                    // Gist deleted elsewhere — forget it and fall through to create.
+                    localStorage.removeItem(`eki_gist:${user}`);
+                    if (state.gistId === gistId) state.gistId = null;
+                    gistId = null;
+                }
+            }
+            if (!gistId) {
                 const gist = await apiFetch('https://api.github.com/gists', {
                     method: 'POST',
-                    body: JSON.stringify({ description: GIST_PREFIX + state.user, public: false, files: { 'stamps.json': { content } } })
+                    body: JSON.stringify({ description: GIST_PREFIX + user, public: false, files: { 'stamps.json': { content } } })
                 });
                 if (!gist.id) throw new Error('Gist response missing id');
-                state.gistId = gist.id;
-                localStorage.setItem(`eki_gist:${state.user}`, gist.id);
+                if (state.user === user) state.gistId = gist.id;
+                localStorage.setItem(`eki_gist:${user}`, gist.id);
             }
+            syncDirty = false;
             setSyncStatus('saved');
         } catch (err) {
             console.error('syncToGist:', err);
@@ -1215,8 +1350,10 @@
     };
 
     const scheduleSave = () => {
+        persistLocal();
+        syncDirty = true;
         clearTimeout(syncDebounce);
-        setSyncStatus('saving');
+        setSyncStatus(getToken() ? 'saving' : 'local');
         syncDebounce = setTimeout(syncToGist, SYNC_DEBOUNCE_MS);
     };
 
@@ -1239,7 +1376,8 @@
             el.innerHTML = '✗ sync error · <a href="#" class="sync-retry-link">retry</a>';
             el.querySelector('.sync-retry-link')?.addEventListener('click', (e) => { e.preventDefault(); syncToGist(); });
         } else {
-            el.textContent = { saving: '↑ saving…', saved: '✓ synced', '': '' }[status] ?? '';
+            el.textContent = { saving: '↑ saving…', saved: '✓ synced',
+                               local: 'saved on this device · add a token to sync', '': '' }[status] ?? '';
         }
     };
 
@@ -1330,6 +1468,23 @@
         });
     };
 
+    // Drop cache entries from other APP_VERSIONs (incl. the legacy unversioned
+    // 'eki_lines' key) so the DB doesn't grow ~15 MB per release forever.
+    const cachePrune = async () => {
+        try {
+            const db    = await _dbReady;
+            const store = db.transaction('data', 'readwrite').objectStore('data');
+            const req   = store.getAllKeys();
+            req.onsuccess = () => {
+                const keep = new Set([`eki_lines_${APP_VERSION}`, `eki_stamp_stations_${APP_VERSION}`]);
+                req.result.forEach(k => {
+                    if (typeof k === 'string' && !keep.has(k) &&
+                        (k.startsWith('eki_lines') || k.startsWith('eki_stamp_stations_'))) store.delete(k);
+                });
+            };
+        } catch { /* cache is best-effort */ }
+    };
+
     // ── 7. LINE RENDERING ─────────────────────────────────────────────────────
 
     const resetAllLines = () => {
@@ -1367,12 +1522,12 @@
         const label   = ridden ? 'Edit ride' : 'Add a ride';
         const btnCls  = 'popup-line-ride-btn' + (ridden ? ' has-rides' : '');
         const nameHtml = secondary
-            ? `<span class="popup-line-label"><span class="popup-line-jp">${primary}</span><span class="popup-line-en">${secondary}</span></span>`
-            : `<span class="popup-line-jp">${primary}</span>`;
+            ? `<span class="popup-line-label"><span class="popup-line-jp">${esc(primary)}</span><span class="popup-line-en">${esc(secondary)}</span></span>`
+            : `<span class="popup-line-jp">${esc(primary)}</span>`;
         return `<div class="popup-inner">
-            <div class="popup-line" style="margin-bottom:6px"><span class="popup-line-dot" style="background:${color}"></span>${nameHtml}</div>
+            <div class="popup-line" style="margin-bottom:6px"><span class="popup-line-dot" style="background:${esc(color)}"></span>${nameHtml}</div>
             <div class="popup-ride-summary">${summary}</div>
-            <button class="${btnCls}" data-line="${encodeURIComponent(name)}" aria-label="${label} on ${primary}">${ICON_RIDE} ${label}</button>
+            <button class="${btnCls}" data-line="${encodeURIComponent(name)}" aria-label="${esc(label + ' on ' + primary)}">${ICON_RIDE} ${label}</button>
         </div>`;
     };
 
@@ -1382,7 +1537,7 @@
         polyline.bindTooltip(
             () => {
                 const { primary, secondary } = orderLineNames(name);
-                return `<div class="line-tip"><b>${primary}</b>${secondary ? `<br><span>${secondary}</span>` : ''}</div>`;
+                return `<div class="line-tip"><b>${esc(primary)}</b>${secondary ? `<br><span>${esc(secondary)}</span>` : ''}</div>`;
             },
             { sticky: true, direction: 'top', offset: [0, -8], className: 'line-tooltip' }
         );
@@ -1632,9 +1787,16 @@
     const loadLines = async (map) => {
         await loadShinkansen();   // ready before onLinesReady draws them
         // After lines are drawn, restack markers, draw Shinkansen, paint ride overlays.
-        const onLinesReady = () => { bringStationsToFront(true); drawShinkansen(map); renderAllRideOverlays(); };
+        const onLinesReady = () => {
+            linesReady = true;
+            // Anything built against a partial render is wrong — drop it.
+            Object.keys(lineGeomCache).forEach(k => delete lineGeomCache[k]);
+            bringStationsToFront(true); drawShinkansen(map); renderAllRideOverlays();
+        };
         try {
-            const cached = await cacheGet('eki_lines');
+            // Versioned like the station cache, so bumping APP_VERSION really does
+            // ship fresh track geometry to every client (README promises this).
+            const cached = await cacheGet(`eki_lines_${APP_VERSION}`);
             if (cached && Date.now() - cached.ts < CACHE_TTL) {
                 renderLines(map, cached.data, onLinesReady);
                 return;
@@ -1647,7 +1809,7 @@
                 return r.json();
             });
             renderLines(map, data, onLinesReady);
-            cacheSet('eki_lines', { data, ts: Date.now() }).catch(() => {});
+            cacheSet(`eki_lines_${APP_VERSION}`, { data, ts: Date.now() }).catch(() => {});
         } catch (err) {
             console.error('loadLines:', err);
             showToast('Failed to load train lines — map may be incomplete', 4000);
@@ -2040,10 +2202,67 @@
         return [Pa, ...mid, Pb];
     };
 
+    // Rides were historically keyed by the geojson's bare 路線名 (日光線, 本線…).
+    // Those homonyms are now operator-qualified (JR日光線, 東武日光線…), so saved
+    // rides under an old bare key are re-keyed to whichever qualified line runs
+    // nearest the ride's own stations. Exact old→new fan-out generated from the
+    // relabelling diff; runs once per load (no-op when nothing matches).
+    const RIDE_NAME_MIGRATION = {
+        '京都線': ['近鉄京都線', '阪急京都本線'],
+        '北陸線': ['IRいしかわ鉄道線', 'JR北陸本線(米原～敦賀)', 'ハピラインふくい線'],
+        '南北線': ['仙台市営地下鉄南北線', '北大阪急行電鉄', '札幌市営地下鉄南北線'],
+        '国分寺線': ['西武国分寺線'],
+        '城北線': ['伊予鉄道環状線（１系統）', '東海交通事業城北線'],
+        '奈良線': ['近鉄奈良線'],
+        '山手線': ['JR山手線', '神戸市営地下鉄山手線'],
+        '山田線': ['JR山田線', '近鉄山田線'],
+        '日光線': ['JR日光線', '東武日光線'],
+        '本線': ['JR成田エクスプレス', 'JR成田線', 'JR神戸線(神戸～姫路)', '京急本線', '京成本線',
+                 '函館市電２系統', '函館市電５系統', '富山地鉄不二越・上滝線', '富山地鉄市内線【１・２系統】',
+                 '富山地鉄本線', '山陽電鉄本線', '広電１号線(宇品線)', '広電２号線(宮島線)', '相鉄・JR直通線',
+                 '相鉄本線', '近江鉄道本線', '長崎電軌１系統', '阪神本線', '黒部峡谷鉄道本線'],
+        '東西線': ['京都市営地下鉄東西線', '仙台市営地下鉄東西線', '札幌市営地下鉄東西線'],
+        '江ノ島線': ['小田急江ノ島線'],
+        '甘木線': ['甘木鉄道甘木線', '西鉄甘木線'],
+        '田原本線': ['近鉄田原本線'],
+        '鉄道線': ['箱根登山鉄道鉄道線', '遠州鉄道鉄道線'],
+        '長野線': ['近鉄長野線', '長野電鉄長野線'],
+        '関西空港線': ['JR関西空港線', '南海空港線'],
+        '高尾線': ['京王高尾線'],
+        '鹿島線': ['JR鹿島線'],
+    };
+    const migrateRideKeys = () => {
+        let changed = false;
+        Object.keys(state.rides).forEach(oldName => {
+            if (linesByName[oldName] || shinkansenData[oldName]) return;
+            const candidates = (RIDE_NAME_MIGRATION[oldName] || []).filter(n => linesByName[n]);
+            if (!candidates.length) return;
+            // Centroid of the ride's own stations decides which qualified line it was.
+            const stCodes = state.rides[oldName].flatMap(c => c.split('|'));
+            let lat = 0, lng = 0, n = 0;
+            stCodes.forEach(c => { const s = stationByCode[c]; if (s) { lat += s.lat; lng += s.lon; n++; } });
+            if (!n) return;
+            const ctr = [lat / n, lng / n];
+            let best = null, bd = Infinity;
+            candidates.forEach(cand => {
+                linesByName[cand].forEach(pl => pl.getLatLngs().forEach(ll => {
+                    const d = ptDist(ctr, [ll.lat, ll.lng]);
+                    if (d < bd) { bd = d; best = cand; }
+                }));
+            });
+            if (!best || bd > 15000) return;
+            state.rides[best] = [...new Set([...(state.rides[best] || []), ...state.rides[oldName]])];
+            delete state.rides[oldName];
+            changed = true;
+        });
+        if (changed) scheduleSave();
+    };
+
     // Redraw the bright "ridden stretch" overlays for one line from state.rides.
     // Seeds the corridor from the saved stations' own location so it rebuilds the
     // right region (not a far same-name region) after a session load.
     const renderRideOverlays = (name) => {
+        if (!linesReady) return;   // building geometry mid-render caches a broken graph
         (rideOverlays[name] || []).forEach(p => p.remove());
         rideOverlays[name] = [];
         const codes = state.rides[name];
@@ -2093,8 +2312,11 @@
     };
 
     // Clear and redraw every line's ride overlays (after a session load/import).
+    // Deferred until every line feature is drawn (onLinesReady re-invokes it) so
+    // geometry is never built — and cached — against a partial render.
     const renderAllRideOverlays = () => {
-        if (!mapInstance || !Object.keys(linesByName).length) return;
+        if (!linesReady || !mapInstance || !Object.keys(linesByName).length) return;
+        migrateRideKeys();
         Object.keys(rideOverlays).forEach(n => { (rideOverlays[n] || []).forEach(p => p.remove()); rideOverlays[n] = []; });
         Object.keys(state.rides).forEach(renderRideOverlays);
     };
@@ -2188,11 +2410,12 @@
         if (!seg) { hideRideHover(); return; }
         if (!rideEdit.tip) rideEdit.tip = L.tooltip({ direction: 'top', offset: [0, -6], className: 'line-tooltip', permanent: true, interactive: false });
         rideEdit.tip.setLatLng(mapInstance.containerPointToLatLng(L.point(x, y)))
-                    .setContent(`${rideNodeName(seg.a)} – ${rideNodeName(seg.b)}`);
+                    .setContent(`${esc(rideNodeName(seg.a))} – ${esc(rideNodeName(seg.b))}`);
         if (!rideEdit.tipShown) { rideEdit.tip.addTo(mapInstance); rideEdit.tipShown = true; }
     };
 
     const enterRideEditMode = (name) => {
+        if (!linesReady) { showToast('Lines are still loading — try again in a moment.'); return; }
         if (rideEdit) exitRideEditMode(false);
         const geom = buildLineGeometry(name, linePopupSeed);
         const unsupported = name.includes('新幹線') && !shinkansenData[name];
@@ -2277,7 +2500,10 @@
         const cancel = () => exitRideEditMode(false);
         document.getElementById('ride-edit-save').addEventListener('click', () => exitRideEditMode(true));
         document.getElementById('ride-edit-cancel').addEventListener('click', cancel);
-        document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && rideEdit) cancel(); });
+        document.addEventListener('keydown', (e) => {
+            // Don't hijack Escape while the user is typing in an input elsewhere.
+            if (e.key === 'Escape' && rideEdit && !e.target.closest('input, textarea')) cancel();
+        });
 
         const xy = (e) => { const r = container.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; };
         container.addEventListener('pointerdown', (e) => {
@@ -2377,13 +2603,13 @@
         const primary   = state.lang === 'jp' ? (jp || en) : (en || jp);
         const secondary = state.lang === 'jp' ? en : jp;
 
-        const lineBadges = (marker._lineCodes ?? [s.line_code]).map(lc => {
+        const lineBadges = (marker._lineCodes ?? [s.line_code]).filter(Boolean).map(lc => {
             const color = lineColorMap[lc] ?? '#6b6b7a';
             const { primary, secondary } = orderLineNames(lc);
             const label = secondary
-                ? `<span class="popup-line-label"><span class="popup-line-jp">${primary}</span><span class="popup-line-en">${secondary}</span></span>`
-                : `<span class="popup-line-jp">${primary}</span>`;
-            return `<div class="popup-line"><span class="popup-line-dot" style="background:${color}"></span>${label}</div>`;
+                ? `<span class="popup-line-label"><span class="popup-line-jp">${esc(primary)}</span><span class="popup-line-en">${esc(secondary)}</span></span>`
+                : `<span class="popup-line-jp">${esc(primary)}</span>`;
+            return `<div class="popup-line"><span class="popup-line-dot" style="background:${esc(color)}"></span>${label}</div>`;
         }).join('');
 
         // Non-stamp station: same popup, but no collect action (there's no stamp).
@@ -2396,12 +2622,12 @@
             const btnLabel  = collected ? 'Collected' : 'Collect stamp';
             const btnClass  = 'popup-collect-btn' + (collected ? ' collected' : '');
             const btnAria   = `${collected ? 'Remove stamp' : 'Collect stamp'} for ${primary}`;
-            action = `<button class="${btnClass}" aria-label="${btnAria}">${btnIcon} ${btnLabel}</button>`;
+            action = `<button class="${btnClass}" aria-label="${esc(btnAria)}">${btnIcon} ${btnLabel}</button>`;
         }
 
         return `<div class="popup-inner">
-            <div class="popup-name">${primary}</div>
-            ${secondary ? `<div class="popup-name-secondary">${secondary}</div>` : ''}
+            <div class="popup-name">${esc(primary)}</div>
+            ${secondary ? `<div class="popup-name-secondary">${esc(secondary)}</div>` : ''}
             ${lineBadges}
             ${action}
         </div>`;
@@ -2416,13 +2642,15 @@
      */
     const createMarker = (station, map, plain = false) => {
         const { code, line_code } = station;
-        if (!code || !line_code) return;
+        // line_code may be empty for funakiya-only stamps (defunct lines with no
+        // ekidata row) — they still get a marker, just without a line badge.
+        if (!code) return;
 
         const key = dedupeKey(station);
         const existing = dedupeMarkers[key];
 
         if (existing) {
-            if (!existing._lineCodes.includes(line_code)) {
+            if (line_code && !existing._lineCodes.includes(line_code)) {
                 existing._lineCodes.push(line_code);
                 existing.setPopupContent(buildPopupHtml(existing));
             }
@@ -2435,7 +2663,7 @@
         marker._stationData  = station;
         marker._isCollected  = collected;
         marker._noStamp      = plain;
-        marker._lineCodes    = [line_code];
+        marker._lineCodes    = line_code ? [line_code] : [];
         marker.stationName   = getDisplayName(station, code);
         marker.stationNameJP = station.name_kanji || '';
         marker.stationNameEN = getEnName(station, code);
@@ -2524,7 +2752,7 @@
         // from Funakiya. Only stations present in this map have a real eki stamp
         // and are rendered; their English names override ekidata's (which is
         // auto-romanised and often wrong, e.g. 米原 Maibara -> "Yonehara").
-        const renderStations = (stations, stampNames, lineNames) => {
+        const renderStations = (stations, stampNames, lineNames, orphanStamps) => {
             // Funakiya's properly spaced English line names take precedence over
             // ekidata's run-together romaji (e.g. "Jrtokaidohonsen(Tokyo~Atami)").
             Object.assign(lineEnMap, lineNames || {});
@@ -2616,6 +2844,15 @@
                 if (en) s.name_en = en;
                 createMarker(s, map);
             }));
+            // Pass D: funakiya-only stamp stations (defunct JNR / third-sector
+            // lines with no ekidata row at all). They carry their own curated
+            // coords/names and an fk_* code, which works with state.stamps like
+            // any other — without this pass 84 real stamps could never be seen.
+            (orphanStamps || []).forEach(s => {
+                createMarker({ code: s.code, name_kanji: s.name_kanji, name_en: s.name_en,
+                               lat: s.lat, lon: s.lon,
+                               line_code: (s.lines && s.lines[0]) || '' }, map);
+            });
             map.on('zoomend', () => {
                 clearTimeout(zoomDebounce);
                 zoomDebounce = setTimeout(() => {
@@ -2633,7 +2870,7 @@
         try {
             const cached = await cacheGet('eki_stamp_stations_' + APP_VERSION);
             if (cached && Date.now() - cached.ts < CACHE_TTL) {
-                renderStations(cached.stations, cached.stampNames, cached.lineNames);
+                renderStations(cached.stations, cached.stampNames, cached.lineNames, cached.orphanStamps);
                 return;
             }
         } catch { /* cache miss */ }
@@ -2646,8 +2883,9 @@
             const stampNames = {};
             stampData.stations.forEach(s => { if (s.eki_code) stampNames[s.eki_code] = s.name_en || ''; });
             const lineNames = stampData.line_names || {};
-            renderStations(stations, stampNames, lineNames);
-            cacheSet('eki_stamp_stations_' + APP_VERSION, { stations, stampNames, lineNames, ts: Date.now() }).catch(() => {});
+            const orphanStamps = stampData.stations.filter(s => !s.eki_code && s.lat && s.lon);
+            renderStations(stations, stampNames, lineNames, orphanStamps);
+            cacheSet('eki_stamp_stations_' + APP_VERSION, { stations, stampNames, lineNames, orphanStamps, ts: Date.now() }).catch(() => {});
         } catch (err) {
             console.error('loadStations:', err);
             hideLoading();
@@ -2662,9 +2900,12 @@
      * Called on input change AND on language toggle (if input has text).
      */
     const renderSuggestions = (map, term) => {
-        const box  = document.getElementById('suggestions');
+        const box   = document.getElementById('suggestions');
+        const input = document.getElementById('stationSearch');
         box.innerHTML = '';
         box.style.display = 'none';
+        input.setAttribute('aria-expanded', 'false');
+        input.removeAttribute('aria-activedescendant');
         if (!term) return;
 
         const lc   = term.toLowerCase();
@@ -2675,13 +2916,15 @@
 
         if (!hits.length) return;
         box.style.display = 'block';
+        input.setAttribute('aria-expanded', 'true');
 
-        hits.forEach(m => {
+        hits.forEach((m, i) => {
             const primary   = state.lang === 'jp' ? (m.stationNameJP || m.stationNameEN) : (m.stationNameEN || m.stationNameJP);
             const secondary = state.lang === 'jp' ? m.stationNameEN : m.stationNameJP;
 
             const item = document.createElement('div');
             item.className   = 'suggestion-item';
+            item.id          = 'sug-' + i;
             item.setAttribute('role', 'option');
 
             const nameDiv = document.createElement('div');
@@ -2717,7 +2960,32 @@
 
     const setupSearch = (map) => {
         const input = document.getElementById('stationSearch');
-        input.addEventListener('input', () => renderSuggestions(map, input.value.trim()));
+        const box   = document.getElementById('suggestions');
+        let activeIdx = -1;
+        const setActive = (items, idx) => {
+            activeIdx = idx;
+            items.forEach((it, i) => it.classList.toggle('active', i === idx));
+            if (idx >= 0) input.setAttribute('aria-activedescendant', items[idx].id);
+            else input.removeAttribute('aria-activedescendant');
+        };
+        input.addEventListener('input', () => { activeIdx = -1; renderSuggestions(map, input.value.trim()); });
+        // Keyboard access to the suggestion list (it's mouse/touch-only otherwise).
+        input.addEventListener('keydown', (e) => {
+            const items = [...box.querySelectorAll('.suggestion-item')];
+            if (!items.length || box.style.display === 'none') return;
+            if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+                e.preventDefault();
+                setActive(items, (activeIdx + (e.key === 'ArrowDown' ? 1 : -1) + items.length) % items.length);
+            } else if (e.key === 'Enter' && activeIdx >= 0) {
+                e.preventDefault();
+                items[activeIdx].click();
+                setActive(items, -1);
+            } else if (e.key === 'Escape') {
+                box.style.display = 'none';
+                input.setAttribute('aria-expanded', 'false');
+                setActive(items, -1);
+            }
+        });
         document.addEventListener('click', e => {
             if (!e.target.closest('#search-container'))
                 document.getElementById('suggestions').style.display = 'none';
@@ -2744,9 +3012,8 @@
             // Update lang attribute on <html> for screen readers
             document.documentElement.lang = state.lang === 'jp' ? 'ja' : 'en';
 
-            // Update modal title if visible
-            const title = document.getElementById('modal-title');
-            if (title) title.textContent = state.lang === 'jp' ? 'ようこそ！' : 'Welcome!';
+            // (The toggle switches NAMES only — UI chrome stays English, so no
+            //  lone translated string like the old modal title.)
 
             // Rebuild all marker names + popup content in new language
             [...markers, ...plainMarkers].forEach(m => {
@@ -2841,14 +3108,38 @@
             input.focus();
         });
 
+        // Sync token (per-user; enables cloud sync)
+        const tokenInput = document.getElementById('session-token-input');
+        tokenInput.value = getToken();
+        tokenInput.addEventListener('change', async () => {
+            setToken(tokenInput.value);
+            // Cached gist ids may belong to a different account — forget them all.
+            Object.keys(localStorage).filter(k => k.startsWith('eki_gist:')).forEach(k => localStorage.removeItem(k));
+            if (getToken() && state.user) {
+                showToast('Token saved — syncing…');
+                await loadFromGist(state.user, { mergeLocal: true });   // never lose local progress
+                refreshAllMarkerStates();
+                renderAllRideOverlays();
+            } else {
+                setSyncStatus(getToken() ? '' : 'local');
+                showToast(getToken() ? 'Token saved' : 'Token removed — local-only mode');
+            }
+        });
+
         // Load session
         document.getElementById('session-load').addEventListener('click', async () => {
             const name = document.getElementById('session-name-input').value.trim();
             if (!name) { showToast('Enter a sync name first'); return; }
+            const prevUser = state.user;
+            // Flush any unsynced changes of the PREVIOUS session before switching,
+            // so they aren't dropped (or written into the new session's gist).
+            if (prevUser && prevUser !== name && syncDirty) { clearTimeout(syncDebounce); await syncToGist(); }
             setState('user', name);
             updateSessionUI();
             showToast(`Loading ${name}…`);
-            await loadFromGist(name);
+            // Anonymous progress being claimed under a name must be merged in,
+            // never wiped by whatever the (possibly empty) gist holds.
+            await loadFromGist(name, { mergeLocal: !prevUser });
             refreshAllMarkerStates();
             renderAllRideOverlays();
             showToast(`Session loaded: ${name}`);
@@ -2859,7 +3150,7 @@
             if (!state.user) { showToast('Load a session first'); return; }
             clearTimeout(syncDebounce);
             await syncToGist();
-            showToast(`✓ Synced as ${state.user}`);
+            showToast(getToken() ? `✓ Synced as ${state.user}` : 'Saved on this device (add a token to sync)');
         });
 
         // Export JSON
@@ -2874,8 +3165,27 @@
             URL.revokeObjectURL(url);  // free memory
         });
 
-        // Import JSON
-        document.getElementById('session-import').addEventListener('click', () => {
+        // Import JSON — replaces current data, so when data exists it uses the
+        // same two-step confirm as Reset (imports are rare; overwrites are not
+        // reversible once the sync fires).
+        let importArmTimer = null;
+        const importBtn = document.getElementById('session-import');
+        const disarmImport = () => {
+            clearTimeout(importArmTimer);
+            delete importBtn.dataset.confirming;
+            importBtn.textContent = 'Import JSON';
+            importBtn.classList.remove('confirm-pending');
+        };
+        importBtn.addEventListener('click', () => {
+            const hasData = state.stamps.size || Object.keys(state.rides).length;
+            if (hasData && !importBtn.dataset.confirming) {
+                importBtn.dataset.confirming = '1';
+                importBtn.textContent = 'Replace current data?';
+                importBtn.classList.add('confirm-pending');
+                importArmTimer = setTimeout(disarmImport, RESET_CONFIRM_MS);
+                return;
+            }
+            disarmImport();
             document.getElementById('session-import-file').click();
         });
 
@@ -2891,7 +3201,7 @@
                     const data = JSON.parse(ev.target.result);
                     if (!Array.isArray(data.stamps)) throw new Error('Missing stamps array');
                     state.stamps = new Set(data.stamps.filter(s => typeof s === 'string'));
-                    state.rides  = (data.rides && typeof data.rides === 'object') ? data.rides : {};
+                    state.rides  = sanitizeRides(data.rides);
                     if (data.user && !state.user) {
                         setState('user', data.user);
                         updateSessionUI();
@@ -2918,19 +3228,23 @@
                 resetBtn.classList.add('confirm-pending');
                 resetConfirmTimer = setTimeout(() => {
                     delete resetBtn.dataset.confirming;
-                    resetBtn.textContent = 'Reset all stamps';
+                    resetBtn.textContent = 'Reset stamps & rides';
                     resetBtn.classList.remove('confirm-pending');
                 }, RESET_CONFIRM_MS);
                 return;
             }
             clearTimeout(resetConfirmTimer);
             delete resetBtn.dataset.confirming;
-            resetBtn.textContent = 'Reset all stamps';
+            resetBtn.textContent = 'Reset stamps & rides';
             resetBtn.classList.remove('confirm-pending');
+            // Stamps and rides are one dataset everywhere else (export/import/
+            // sync), so reset clears both — the button says so.
             state.stamps.clear();
+            state.rides = {};
             await syncToGist();
             refreshAllMarkerStates();
-            showToast('All stamps reset');
+            renderAllRideOverlays();
+            showToast('All progress reset');
         });
     };
 
@@ -2938,7 +3252,11 @@
 
     const setupFocusTrap = (modalEl, overlayEl) => {
         modalEl.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') { overlayEl.classList.add('hidden'); return; }
+            if (e.key === 'Escape') {
+                overlayEl.classList.add('hidden');
+                document.getElementById('stationSearch')?.focus();   // return focus somewhere sensible
+                return;
+            }
             if (e.key !== 'Tab') return;
             const items = [...modalEl.querySelectorAll('button, input, [tabindex]:not([tabindex="-1"])')];
             const [first, last] = [items[0], items[items.length - 1]];
@@ -2951,9 +3269,7 @@
         const overlay = document.getElementById('name-modal-overlay');
         const modal   = document.getElementById('name-modal');
         const input   = document.getElementById('modal-name-input');
-        const title   = document.getElementById('modal-title');
 
-        if (title) title.textContent = state.lang === 'jp' ? 'ようこそ！' : 'Welcome!';
         const ver = document.getElementById('app-version');
         if (ver) ver.textContent = APP_VERSION;
         setupFocusTrap(modal, overlay);
@@ -2969,7 +3285,9 @@
             if (!name) return;
             setState('user', name);
             updateSessionUI();
-            await loadFromGist(name);
+            // The modal only shows for anonymous users — merge any progress they
+            // already collected rather than wiping it with the loaded gist.
+            await loadFromGist(name, { mergeLocal: true });
             refreshAllMarkerStates();
             renderAllRideOverlays();
             showToast(`Welcome, ${name}!`);
@@ -2983,8 +3301,10 @@
     // ── 15. INIT ──────────────────────────────────────────────────────────────
 
     document.addEventListener('DOMContentLoaded', async () => {
+        document.documentElement.lang = state.lang === 'jp' ? 'ja' : 'en';   // honour the stored preference
         const map   = initMap();
         mapInstance = map;
+        cachePrune();   // clear other versions' cached data (best-effort)
 
         setupSearch(map);
         setupLanguageToggle(map);
