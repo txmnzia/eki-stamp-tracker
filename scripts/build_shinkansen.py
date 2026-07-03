@@ -31,7 +31,6 @@ for g in stations:
     for s in g['stations']:
         if s.get('lat') and s.get('lon'):
             coord_all.setdefault(norm(s['name_kanji']), []).append((s['lat'], s['lon'], s['code']))
-coord = {k: v[0] for k, v in coord_all.items()}   # first occurrence (English lookup only)
 
 # curated English by kanji (network qualifier stripped) from stamp stations
 def clean_en(en): return re.sub(r'^(Toei Subway|Tokyo Metro)\s+', '', en or '')
@@ -61,6 +60,7 @@ MANUAL = {
  '新玉名':   (32.9160, 130.5940, 'Shin-Tamana'),
  '越前たけふ': (35.8720, 136.2180, 'Echizen-Takefu'),
  '黒部宇奈月温泉': (36.8460, 137.4340, 'Kurobe-Unazuki-Onsen'),
+ '嬉野温泉': (33.1067, 129.9990, 'Ureshino-Onsen'),
  # Shinkansen-only stations that ALSO have a same-named conventional station in a
  # different region (so the station data resolves to the wrong one) — pin them here.
  '新富士': (35.1424, 138.6607, 'Shin-Fuji'),   # Shizuoka (not the Hokkaidō 新富士)
@@ -85,6 +85,7 @@ EN_OVERRIDE = {
  '筑後船小屋':'Chikugo-Funagoya','熊本':'Kumamoto','新八代':'Shin-Yatsushiro','新水俣':'Shin-Minamata',
  '出水':'Izumi','川内':'Sendai (Kagoshima)','鹿児島中央':'Kagoshima-Chuo',
  '奥津軽いまべつ':'Oku-Tsugaru-Imabetsu','木古内':'Kikonai','新函館北斗':'Shin-Hakodate-Hokuto',
+ '武雄温泉':'Takeo-Onsen','嬉野温泉':'Ureshino-Onsen','新大村':'Shin-Omura','諫早':'Isahaya','長崎':'Nagasaki',
 }
 
 LINES = [
@@ -102,6 +103,8 @@ LINES = [
   "博多 新鳥栖 久留米 筑後船小屋 新大牟田 新玉名 熊本 新八代 新水俣 出水 川内 鹿児島中央"),
  ('北海道新幹線', 'Hokkaido Shinkansen', '#9CDCF7',
   "新青森 奥津軽いまべつ 木古内 新函館北斗"),
+ ('西九州新幹線', 'Nishi-Kyushu Shinkansen', '#EE2737',
+  "武雄温泉 嬉野温泉 新大村 諫早 長崎"),
 ]
 
 def resolve_en(k):
