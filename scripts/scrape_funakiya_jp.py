@@ -10,7 +10,11 @@ ekidata by KANJI, which requires fetching these pages.
 Reads:  data/funakiya-raw.json
 Writes: data/funakiya-stations.json   {slug: {kanji, yomi, lat, lon}}
 """
+import html as htmlmod
 import json, re, os, sys, time, urllib.request
+
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DATA = os.path.join(ROOT, "data")
 from concurrent.futures import ThreadPoolExecutor
 
 BASE="https://stamp.funakiya.com"; CACHE="/tmp/funacache"
@@ -34,6 +38,7 @@ def fetch(slug):
 
 def parse(slug,h):
     if not h: return None
+    h = htmlmod.unescape(h) if "&" in h else h
     kanji=None; yomi=None
     # detailed template: 駅名称：<kanji>（[operator]）（<yomi>）  yomi = last paren
     m=re.search(r'駅名称：([^（(<]+?駅)((?:[（(][^）)]*[）)])+)',h)
@@ -55,7 +60,7 @@ def parse(slug,h):
     return {"kanji":kanji,"yomi":yomi,"lat":lat,"lon":lon,"en":en}
 
 def main():
-    raw=json.load(open("data/funakiya-raw.json",encoding="utf-8"))
+    raw=json.load(open(os.path.join(DATA,"funakiya-raw.json"),encoding="utf-8"))
     slugs=sorted({s["jp_slug"] for l in raw["lines"] for s in l["stations"]
                   if s["status"]=="Found" and s["jp_slug"]})
     print(f"fetching {len(slugs)} JP pages ...")
@@ -69,7 +74,7 @@ def main():
         for slug,d in ex.map(work,slugs):
             if d: out[slug]=d
     miss=[s for s in slugs if not out.get(s) or not out[s].get("kanji")]
-    json.dump(out,open("data/funakiya-stations.json","w",encoding="utf-8"),ensure_ascii=False,indent=1)
+    json.dump(out,open(os.path.join(DATA,"funakiya-stations.json"),"w",encoding="utf-8"),ensure_ascii=False,indent=1)
     print(f"wrote data/funakiya-stations.json: {len(out)} stations; {len(miss)} missing kanji")
     if miss[:10]: print("  missing sample:",miss[:10])
 

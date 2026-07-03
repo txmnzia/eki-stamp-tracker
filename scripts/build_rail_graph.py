@@ -26,12 +26,14 @@ Output: data/rail-graph.json
     stations: { code: [node, snap_m], ...}        # station code -> nearest endpoint node + metres
     far:      [ [code, snap_m], ... ] }            # stations whose snap is > FAR_M (review these)
 """
-import json, math
+import json, math, os
+
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 from collections import defaultdict
 
-GEO   = "data/railroad-section.geojson"
-STAMP = "data/stamp-stations.json"
-OUT   = "data/rail-graph.json"
+GEO   = os.path.join(ROOT, "data", "railroad-section.geojson")
+STAMP = os.path.join(ROOT, "data", "stamp-stations.json")
+OUT   = os.path.join(ROOT, "data", "rail-graph.json")
 NDP   = 5          # node coordinate precision (~1.1 m): endpoints already coincide this tightly
 FAR_M = 200        # flag stations whose nearest endpoint is further than this
 
@@ -102,7 +104,6 @@ def main():
 
     snaps = [v[1] for v in stations.values()]
     snaps.sort()
-    import os
     print(f"wrote {OUT}: {len(nodes)} nodes, {len(edges)} edges, "
           f"{os.path.getsize(OUT)//1024} KB")
     print(f"stations snapped: {len(stations)}; with no nearby track: "

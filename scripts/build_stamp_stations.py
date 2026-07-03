@@ -14,7 +14,10 @@ display English name comes from Funakiya (properly spaced, operator stripped).
 Stations Funakiya knows but ekidata doesn't (minor private lines) are still
 included using Funakiya's own kanji/coords.
 """
-import json, re, math
+import json, os, re, math
+
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DATA = os.path.join(ROOT, "data")
 from collections import defaultdict, Counter
 
 # Operator names that appear as a leading word on Funakiya's English labels and
@@ -22,7 +25,7 @@ from collections import defaultdict, Counter
 # in use a hyphen, e.g. "Seibu-Shinjuku", so they are one token and unaffected).
 OP_PREFIX = {"JR","JNR","TX","IR","IGR","KTR","SR","ST","TKK","WKT","Watetsu",
              "Odakyu","Tobu","Keisei","Keikyu","Keio","Tokyu","Hankyu","Hanshin",
-             "Kintetsu","Nankai","Meitetsu","Nishitetsu","Sotetsu","Nankai"}
+             "Kintetsu","Nankai","Meitetsu","Nishitetsu","Sotetsu"}
 MACRON = {"ā":"a","ī":"i","ū":"u","ē":"e","ō":"o","Ā":"A","Ī":"I","Ū":"U","Ē":"E","Ō":"O",
           "â":"a","î":"i","û":"u","ê":"e","ô":"o","’":"'"}
 
@@ -117,9 +120,9 @@ def romaji_line(kanji):
     body = " ".join(w[:1].upper() + w[1:] for w in toks)
     return (re.sub(r"\s+", " ", body).strip() + suf + branch).strip()
 
-raw = json.load(open("data/funakiya-raw.json", encoding="utf-8"))
-jp  = json.load(open("data/funakiya-stations.json", encoding="utf-8"))
-eki = json.load(open("data/stations.json", encoding="utf-8"))
+raw = json.load(open(os.path.join(DATA, "funakiya-raw.json"), encoding="utf-8"))
+jp  = json.load(open(os.path.join(DATA, "funakiya-stations.json"), encoding="utf-8"))
+eki = json.load(open(os.path.join(DATA, "stations.json"), encoding="utf-8"))
 
 # ekidata spatial grid (0.01deg ~1.1km cells) + kanji index
 grid = defaultdict(list)
@@ -250,7 +253,7 @@ def normln(k):
     return re.sub(r"[ 　]", "", k.replace("地下鉄", "")) if k else k
 line_names = {}
 try:
-    reg = json.load(open("data/funakiya-lines.json", encoding="utf-8"))
+    reg = json.load(open(os.path.join(DATA, "funakiya-lines.json"), encoding="utf-8"))
     k2en = {normln(v["name_kanji"]): demacron(v["name_en"])
             for v in reg.values() if v.get("name_kanji") and v.get("name_en")}
     for g in eki:
@@ -289,7 +292,7 @@ for g in eki:
 # "4号線丸ノ内線"). Add English for those too so line hover tooltips are
 # translated everywhere: curated where the kanji matches, else romanised.
 try:
-    geo = json.load(open("data/railroad-section.geojson", encoding="utf-8"))
+    geo = json.load(open(os.path.join(DATA, "railroad-section.geojson"), encoding="utf-8"))
     geonames = {f["properties"].get("路線名", "") for f in geo["features"]}
     for n in geonames:
         if not n or n in line_names:
@@ -300,7 +303,7 @@ except FileNotFoundError:
 
 out={"source":"stamp.funakiya.com","count":len(stations),
      "line_names":line_names,"stations":stations}
-json.dump(out, open("data/stamp-stations.json","w",encoding="utf-8"),
+json.dump(out, open(os.path.join(DATA, "stamp-stations.json"),"w",encoding="utf-8"),
           ensure_ascii=False, indent=1)
 matched = sum(1 for s in stations if s["eki_code"])
 print(f"total stamp stations (deduped): {len(stations)}")

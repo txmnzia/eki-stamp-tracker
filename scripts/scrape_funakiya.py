@@ -17,10 +17,15 @@ lo02=Another station, lo03=Event Only), which is identical on EN and JP pages.
 
 Output: data/funakiya-raw.json
 """
+import html as htmlmod
 import json, re, time, os, sys, urllib.request
 
+# All data paths are anchored to the repo root so the script works from any CWD.
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DATA = os.path.join(ROOT, "data")
+
 BASE = "https://stamp.funakiya.com"
-CACHE = "/tmp/funacache"
+CACHE = "/tmp/funacache"   # page cache persists across runs; delete it to force a re-scrape
 REGIONS = ["hokkaido","tohoku","kanto","koshinetsu","hokuriku","tokai",
            "kinki","chugoku","shikoku","kyushu"]
 UA = {"User-Agent":"Mozilla/5.0 (eki-stamp-tracker scraper; +https://github.com/txmnzia/eki-stamp-tracker)"}
@@ -93,7 +98,7 @@ def enumerate_lines():
     """
     slugs = _crawl("/en")                     # fast, catches newly-added EN lines
     try:
-        slugs |= set(json.load(open("data/funakiya-lines.json", encoding="utf-8")))
+        slugs |= set(json.load(open(os.path.join(DATA, "funakiya-lines.json"), encoding="utf-8")))
     except FileNotFoundError:
         print("  WARNING: data/funakiya-lines.json missing; run "
               "scrape_funakiya_lines.py first for full coverage", file=sys.stderr)
@@ -122,7 +127,9 @@ def parse_stations(html, lang):
             h3 = re.search(r'<h3 class="title">([^<]*)</h\d>', inner)
             if not h3:
                 continue
-            name = h3.group(1).strip()
+            # Unescape HTML entities NOW so no literal "&apos;"/"&#65374;" ever
+            # reaches the data files (they used to render verbatim in the UI).
+            name = htmlmod.unescape(h3.group(1)).strip()
             if lang == "en":
                 m = re.match(r'(.*Station) stamp(?:\s*[（(][^）)]+[）)])?\s*$', name)
                 if not m:
@@ -145,7 +152,7 @@ def parse_stations(html, lang):
 
 def title_of(html):
     t = re.search(r'<title>([^<]*)</title>', html)
-    return (t.group(1) if t else "")
+    return htmlmod.unescape(t.group(1)) if t else ""
 
 def parse_line(slug):
     """Always prefer the English page (clean English names) when it exists;
@@ -176,8 +183,8 @@ def main():
             print(f"  {i}/{len(slugs)} ...")
     total = sum(s["status"] == "Found" for l in lines for s in l["stations"])
     out = {"source": "stamp.funakiya.com", "lines": lines}
-    os.makedirs("data", exist_ok=True)
-    json.dump(out, open("data/funakiya-raw.json","w",encoding="utf-8"),
+    os.makedirs(DATA, exist_ok=True)
+    json.dump(out, open(os.path.join(DATA, "funakiya-raw.json"),"w",encoding="utf-8"),
               ensure_ascii=False, indent=1)
     n_jp = sum(1 for l in lines if l["src"] == "jp")
     print(f"Wrote data/funakiya-raw.json: {len(lines)} lines "

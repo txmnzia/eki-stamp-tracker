@@ -9,7 +9,11 @@
 
 Writes: data/funakiya-lines.json  {slug: {name_en, name_kanji}}
 """
+import html as htmlmod
 import json, re, os, sys, time, urllib.request
+
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DATA = os.path.join(ROOT, "data")
 from concurrent.futures import ThreadPoolExecutor
 
 BASE="https://stamp.funakiya.com"; CACHE="/tmp/funacache"
@@ -31,8 +35,8 @@ def get(url, key=None):
 
 def jp_line_kanji(slug):
     h=get(f"{BASE}/{slug}.html", f"jpline-{slug}.html")
-    m=re.search(r'<meta property="og:title" content="([^"]+?線)(?:[（(][^"]*)?のスタンプ"',h)
-    return m.group(1).strip() if m else None
+    m=re.search(r'<meta property="og:title" content="([^"]+?)(?:[（(][^"]*)?のスタンプ"',h)
+    return htmlmod.unescape(m.group(1)).strip() if m else None
 
 def en_line_name(slug):
     """English line name from the EN line-page title (even for all-None lines
@@ -40,7 +44,7 @@ def en_line_name(slug):
     h=get(f"{BASE}/en/{slug}.html", f"line-{slug}.html")
     m=re.search(r'<title>([^<]*)</title>',h)
     if not m: return None
-    t=re.sub(r'\s*-\s*Funakiya.*$','',m.group(1)).replace(' Stamps','').strip()
+    t=re.sub(r'\s*-\s*Funakiya.*$','',htmlmod.unescape(m.group(1))).replace(' Stamps','').strip()
     return t or None
 
 def enumerate_jp_lines():
@@ -60,7 +64,7 @@ def enumerate_jp_lines():
     return lines
 
 def main():
-    raw=json.load(open("data/funakiya-raw.json",encoding="utf-8"))
+    raw=json.load(open(os.path.join(DATA,"funakiya-raw.json"),encoding="utf-8"))
     en_names={l["line_slug"]: l["line_name_en"] for l in raw["lines"]}
     print("enumerating JP line pages for completeness audit ...")
     jp_lines=enumerate_jp_lines()
@@ -81,7 +85,7 @@ def main():
     with ThreadPoolExecutor(max_workers=6) as ex:
         for sl,k,e in ex.map(work, all_slugs):
             out[sl]={"name_en": e, "name_kanji": k}
-    json.dump(out, open("data/funakiya-lines.json","w",encoding="utf-8"),
+    json.dump(out, open(os.path.join(DATA,"funakiya-lines.json"),"w",encoding="utf-8"),
               ensure_ascii=False, indent=1)
     miss=[s for s,v in out.items() if not v["name_kanji"]]
     print(f"wrote data/funakiya-lines.json: {len(out)} lines, {len(miss)} missing kanji")

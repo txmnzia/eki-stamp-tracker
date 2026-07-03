@@ -26,6 +26,10 @@
  *   BASE_URL      app origin (default http://127.0.0.1:8097)
  *   PW_MODULE     playwright module specifier (default "playwright")
  *   PW_CHROMIUM   chromium executablePath (default: playwright's bundled one)
+ *   CDN_LOCAL     dir with leaflet.js/leaflet.css — serve Leaflet from there
+ *                 instead of unpkg (for sandboxes/CI without CDN access; get the
+ *                 files from the npm "leaflet" package's dist/). Map tiles and
+ *                 fonts are stubbed out in this mode (geometry doesn't need them).
  */
 const BASE_URL = process.env.BASE_URL || 'http://127.0.0.1:8097';
 
@@ -33,6 +37,20 @@ const pw = await import(process.env.PW_MODULE || 'playwright');
 const chromium = pw.chromium || pw.default?.chromium;
 const browser = await chromium.launch({ executablePath: process.env.PW_CHROMIUM || undefined, headless: true });
 const page = await browser.newPage();
+if (process.env.CDN_LOCAL) {
+  const { readFileSync } = await import('node:fs');
+  const { join } = await import('node:path');
+  await page.route('https://unpkg.com/**', (route) => {
+    const url = route.request().url();
+    const file = url.endsWith('.css') ? 'leaflet.css' : url.endsWith('.js') ? 'leaflet.js' : null;
+    if (!file) return route.fulfill({ status: 404, body: '' });
+    route.fulfill({ status: 200,
+      contentType: file.endsWith('.css') ? 'text/css' : 'application/javascript',
+      body: readFileSync(join(process.env.CDN_LOCAL, file)) });
+  });
+  await page.route(/https:\/\/(fonts\.(googleapis|gstatic)\.com|[a-d]\.basemaps\.cartocdn\.com)\/.*/,
+    (route) => route.fulfill({ status: 200, contentType: 'text/plain', body: '' }));
+}
 await page.goto(`${BASE_URL}/index.html`, { waitUntil: 'load' });
 await page.waitForFunction(
   () => typeof buildLineGeometry === 'function' && typeof buildRideSegments === 'function' &&
@@ -93,4 +111,7 @@ for (const l of report.lines) {
   for (const g of l.gaps) console.log(`  ${g.kind.padEnd(11)} ${String(g.m).padStart(6)}m  ${g.pair}${g.kind === 'SPLIT-TRACK' ? `  (diverges ~${g.div}m)` : ''}`);
 }
 await browser.close();
-process.exit(report.totalGaps > 0 ? 1 : 0);
+// MAX_GAPS = accepted baseline of known-genuine data holes (see README).
+// CI fails only when NEW gaps appear beyond that baseline.
+const MAX_GAPS = Number(process.env.MAX_GAPS || 0);
+process.exit(report.totalGaps > MAX_GAPS ? 1 : 0);
