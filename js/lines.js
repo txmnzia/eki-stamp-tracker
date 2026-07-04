@@ -74,14 +74,24 @@ const attachLineInteractions = (polyline, name, map) => {
     );
     polyline.bindPopup(() => buildLinePopupHtml(name),
         { offset: L.point(0, -4), closeButton: true, maxWidth: 260, className: 'line-popup' });
-    polyline.on('mouseover', () => highlightLine(name, map));
+    polyline.on('mouseover', (e) => {
+        // In edit mode every line is editable: hovering one makes it the active
+        // paint target (its name tooltip still shows via bindTooltip). Otherwise
+        // fall through to the normal focus-highlight behaviour.
+        if (ui.rideEdit) { ui.rideEditActivate?.(name, e.latlng); return; }
+        highlightLine(name, map);
+    });
     polyline.on('mouseout', () => {
         if (ui.rideEdit) return;
         hoverTimer = setTimeout(() => { hoveredLine = null; resetAllLines(); }, HOVER_RESET_MS);
     });
     polyline.on('click', (e) => {
         if (ui.suppressTap) { ui.suppressTap = false; return; }   // ignore long-press
-        if (ui.rideEdit) return;   // ignore other lines while editing a ride
+        if (ui.rideEdit) {   // editing: tap picks the active line (touch has no hover), no popup
+            L.DomEvent.stopPropagation(e);
+            ui.rideEditActivate?.(name, e.latlng);
+            return;
+        }
         L.DomEvent.stopPropagation(e);
         highlightLine(name, map);
         ui.currentPopupLine = name;

@@ -18,7 +18,7 @@ import { buildLineGeometry, buildRideSegments } from './line-geometry.js';
 import { loadLines } from './lines.js';
 import { renderAllRideOverlays } from './rides.js';
 import { enterRideEditMode, setupRideEdit } from './ride-edit.js';
-import { circleStyle, buildPopupHtml, refreshAllMarkerStates, loadStations } from './markers.js';
+import { circleStyle, refreshAllMarkerStates, loadStations } from './markers.js';
 import { setupSearch } from './search.js';
 import { setupLanguageToggle } from './lang.js';
 import { updateStats } from './stats.js';
@@ -73,8 +73,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                                               : (marker.stationNameEN || marker.stationNameJP);
         btn.setAttribute('aria-label', `${next ? 'Remove stamp' : 'Collect stamp'} for ${ariaName}`);
         btn.innerHTML   = `${next ? ICON_STAMP_FILLED : ICON_STAMP_OUTLINE} ${next ? 'Collected' : 'Collect stamp'}`;
-        // Keep stored popup HTML in sync for next open
-        marker.setPopupContent(buildPopupHtml(marker));
+        // Popup content is a function (rebuilt on next open) — no manual sync needed.
         updateStats();
         showToast(next ? `${marker.stationName} — stamped!` : `${marker.stationName} — removed`);
     });

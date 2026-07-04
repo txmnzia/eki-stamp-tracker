@@ -1,8 +1,8 @@
 // ── 11. LANGUAGE ──────────────────────────────────────────────────────────
 
 import { state, setState } from './state.js';
-import { markers, plainMarkers } from './registry.js';
-import { getDisplayName, buildPopupHtml } from './markers.js';
+import { ui, markers, plainMarkers } from './registry.js';
+import { getDisplayName } from './markers.js';
 import { renderSuggestions } from './search.js';
 
 const updateLangBtn = () => {
@@ -26,12 +26,14 @@ export const setupLanguageToggle = (map) => {
         // (The toggle switches NAMES only — UI chrome stays English, so no
         //  lone translated string like the old modal title.)
 
-        // Rebuild all marker names + popup content in new language
+        // Refresh cached marker display names. Popup content is a function
+        // (rebuilt on open) so it picks up the new language automatically; only
+        // the popup that's already open needs a nudge to redraw now.
         [...markers, ...plainMarkers].forEach(m => {
             if (!m._stationData) return;
             m.stationName = getDisplayName(m._stationData, m._stationData.code);
-            m.setPopupContent(buildPopupHtml(m));
         });
+        if (ui.currentPopupMarker?.isPopupOpen?.()) ui.currentPopupMarker.openPopup();
 
         // Re-render visible search suggestions in new language
         const term = document.getElementById('stationSearch').value.trim();

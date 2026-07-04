@@ -153,12 +153,10 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .popup-collect-btn:hover { background: var(--border); }
 .popup-collect-btn.collected { background: rgba(247,201,72,0.15); border-color: rgba(247,201,72,0.35); color: var(--stamp-on); }
 .popup-collect-btn.collected:hover { background: rgba(247,201,72,0.08); border-color: rgba(247,201,72,0.2); color: #d4a830; }
-.popup-nostamp {
-    margin-top: 10px; padding: 8px 12px; text-align: center;
-    font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase;
-    color: var(--muted); background: var(--surface2);
-    border: 1px dashed var(--border); border-radius: var(--radius);
-}
+/* Non-stamp station: no button at all — the whole popup is muted so it's implicit
+   there's nothing to collect here (#20). */
+.popup-inner.nostamp .popup-name { color: var(--muted); font-weight: 400; }
+.popup-inner.nostamp .popup-line { opacity: 0.75; }
 
 /* ── Session panel ────────────────────────────────────────────────── */
 #session-panel {
@@ -335,21 +333,23 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .popup-line-ride-btn:hover { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
 .popup-line-ride-btn.has-rides { background: rgba(126,184,247,0.12); border-color: rgba(126,184,247,0.35); color: var(--accent); }
 
-/* ── Ride edit mode toolbar (selection happens on the map) ────────── */
-#ride-edit-bar {
+/* ── Ride edit mode (selection happens directly on the map) ────────── */
+/* Fade the base map + saved-ride overlays so the (brought-forward) lines are the
+   clear focus. Station dots are dimmed in JS (they share the lines' canvas). */
+#map.ride-editing .leaflet-tile-pane { opacity: 0.3; filter: grayscale(0.4); transition: opacity 0.25s, filter 0.25s; }
+
+/* A single discreet button: signals edit mode AND saves-and-exits on click (#19). */
+#ride-edit-close {
     position: fixed; left: 50%; transform: translateX(-50%);
     bottom: max(20px, calc(env(safe-area-inset-bottom, 0px) + 14px));
     z-index: var(--z-modal);
-    width: min(440px, calc(100vw - 24px));
-    display: flex; align-items: center; gap: 12px;
-    padding: 12px 14px;
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 12px; box-shadow: 0 12px 40px rgba(0,0,0,0.6);
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 10px 18px; cursor: pointer;
+    font-family: var(--ui-font); font-size: 11px; font-weight: 700;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--text); background: var(--surface);
+    border: 1px solid var(--border); border-radius: 999px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
 }
-#ride-edit-info { flex: 1; min-width: 0; }
-#ride-edit-title { font-family: var(--jp-font); font-size: 15px; font-weight: 700; color: var(--text); line-height: 1.25; }
-#ride-edit-sub   { font-size: 10px; color: var(--muted); letter-spacing: 0.04em; }
-#ride-edit-hint  { font-size: 10px; color: var(--muted); line-height: 1.4; margin-top: 4px; }
-#ride-edit-actions { display: flex; gap: 8px; flex-shrink: 0; }
-#ride-edit-actions .modal-btn { padding: 10px 14px; }
-@media (max-width: 480px) { #ride-edit-hint { display: none; } }
+#ride-edit-close:hover { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
