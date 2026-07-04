@@ -123,15 +123,23 @@ export const buildPopupHtml = (marker) => {
         return `<div class="popup-line"><span class="popup-line-dot" style="background:${esc(color)}"></span>${label}</div>`;
     }).join('');
 
-    // The collect action is shown only for a stamp station in normal mode.
-    //  · Non-stamp station (#20): never a button — just the name + lines, and the
-    //    whole popup is greyed (the `nostamp` class) so it's implicit there's
-    //    nothing to collect here.
-    //  · Ride edit mode (#17/#18): every station popup is read-only (no button) so
-    //    the station name still identifies the line without offering to stamp.
-    const editing = !!ui.rideEdit;
+    // Ride edit mode (#17/#18): stations aren't clickable — this popup is purely
+    // to identify what's under the cursor. Show just the station name and, if the
+    // stamp is already collected, a discreet indicator. No line badges, no button.
+    if (ui.rideEdit) {
+        const collected = !marker._noStamp && marker._isCollected;
+        return `<div class="popup-inner readonly">
+            <div class="popup-name">${esc(primary)}</div>
+            ${secondary ? `<div class="popup-name-secondary">${esc(secondary)}</div>` : ''}
+            ${collected ? `<div class="popup-collected">${ICON_STAMP_FILLED} Stamp collected</div>` : ''}
+        </div>`;
+    }
+
+    // Normal mode: the collect action shows only for a stamp station. A non-stamp
+    // station (#20) never gets a button — just the name + lines, greyed via the
+    // `nostamp` class so it's implicit there's nothing to collect here.
     let action = '';
-    if (!marker._noStamp && !editing) {
+    if (!marker._noStamp) {
         const collected = marker._isCollected;
         const btnIcon   = collected ? ICON_STAMP_FILLED : ICON_STAMP_OUTLINE;
         const btnLabel  = collected ? 'Collected' : 'Collect stamp';
@@ -191,6 +199,7 @@ const createMarker = (station, map, plain = false) => {
     // Click opens popup permanently (no auto-close on mouseout).
     marker.on('click', () => {
         if (ui.suppressTap) { ui.suppressTap = false; return; }   // ignore long-press
+        if (ui.rideEdit) return;   // stations aren't clickable while editing a ride
         clearTimeout(marker._popupTimer);
         marker._hoverOpened = false;
         ui.currentPopupMarker = marker;

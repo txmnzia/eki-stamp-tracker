@@ -74,6 +74,11 @@ const attachLineInteractions = (polyline, name, map) => {
     );
     polyline.bindPopup(() => buildLinePopupHtml(name),
         { offset: L.point(0, -4), closeButton: true, maxWidth: 260, className: 'line-popup' });
+    // bindPopup auto-opens the popup on EVERY click. We open it manually in the
+    // click handler below instead (and never while editing a ride), so remove
+    // Leaflet's auto-open — otherwise the "add a ride" popup still appears when
+    // clicking any line in edit mode.
+    polyline.off('click', polyline._openPopup, polyline);
     polyline.on('mouseover', (e) => {
         // In edit mode every line is editable: hovering one makes it the active
         // paint target (its name tooltip still shows via bindTooltip). Otherwise
