@@ -31,6 +31,8 @@ export const LINE_BASE     = { weight: 1.5, opacity: 0.20 };  // faint colour ti
 export const SHINKANSEN_BASE = { ...LINE_BASE };              // Shinkansen fade exactly like every other line
 export const LINE_DIM      = { weight: 1.2, opacity: 0.10 };  // other lines while one is focused
 export const LINE_EDIT_DIM = { weight: 1,   opacity: 0.05 };  // other lines while editing a ride
+export const LINE_EDIT_SHOW = { weight: 2.4, opacity: 0.75 }; // ALL lines while in (global) edit mode — brought
+                                    // forward over the dimmed base map so the network is the clear focus
 export const LINE_FOCUS    = { weight: 4,   opacity: 0.85 };  // hovered/tapped line
 export const RIDE_OVERLAY  = { weight: 4.5, opacity: 0.95 };  // ridden-stretch overlay (full colour)
 export const RIDE_SNAP_M   = 60;           // station must sit this close to the line to *score* a group

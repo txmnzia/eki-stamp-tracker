@@ -80,6 +80,24 @@ const plainStyle = (zoom) => ({
 });
 const styleFor = (marker, zoom) => marker._noStamp ? plainStyle(zoom) : circleStyle(marker._isCollected, zoom);
 
+// Ride edit mode fades every station dot right down so the lines (brought
+// forward) are the clear focus (#18). Markers stay interactive so hovering one
+// still shows its read-only name popup (#17). Restored to the normal zoom-based
+// style when editing ends.
+const EDIT_DIM_STAMP = { opacity: 0.35, fillOpacity: 0.18 };
+const EDIT_DIM_PLAIN = { opacity: 0.12, fillOpacity: 0.05 };
+export const setMarkersEditDim = (on) => {
+    if (!ui.map) return;
+    const zoom = ui.map.getZoom();
+    if (on) {
+        markers.forEach(m => m.setStyle(EDIT_DIM_STAMP));
+        plainMarkers.forEach(m => m.setStyle(EDIT_DIM_PLAIN));
+    } else {
+        markers.forEach(m => m.setStyle(circleStyle(m._isCollected, zoom)));
+        plainMarkers.forEach(m => m.setStyle(plainStyle(zoom)));
+    }
+};
+
 // ── 9. POPUP ──────────────────────────────────────────────────────────────
 
 /**
@@ -105,11 +123,15 @@ export const buildPopupHtml = (marker) => {
         return `<div class="popup-line"><span class="popup-line-dot" style="background:${esc(color)}"></span>${label}</div>`;
     }).join('');
 
-    // Non-stamp station: same popup, but no collect action (there's no stamp).
-    let action;
-    if (marker._noStamp) {
-        action = `<div class="popup-nostamp">No stamp at this station</div>`;
-    } else {
+    // The collect action is shown only for a stamp station in normal mode.
+    //  · Non-stamp station (#20): never a button — just the name + lines, and the
+    //    whole popup is greyed (the `nostamp` class) so it's implicit there's
+    //    nothing to collect here.
+    //  · Ride edit mode (#17/#18): every station popup is read-only (no button) so
+    //    the station name still identifies the line without offering to stamp.
+    const editing = !!ui.rideEdit;
+    let action = '';
+    if (!marker._noStamp && !editing) {
         const collected = marker._isCollected;
         const btnIcon   = collected ? ICON_STAMP_FILLED : ICON_STAMP_OUTLINE;
         const btnLabel  = collected ? 'Collected' : 'Collect stamp';
@@ -118,7 +140,7 @@ export const buildPopupHtml = (marker) => {
         action = `<button class="${btnClass}" aria-label="${esc(btnAria)}">${btnIcon} ${btnLabel}</button>`;
     }
 
-    return `<div class="popup-inner">
+    return `<div class="popup-inner${marker._noStamp ? ' nostamp' : ''}">
         <div class="popup-name">${esc(primary)}</div>
         ${secondary ? `<div class="popup-name-secondary">${esc(secondary)}</div>` : ''}
         ${lineBadges}
@@ -145,7 +167,7 @@ const createMarker = (station, map, plain = false) => {
     if (existing) {
         if (line_code && !existing._lineCodes.includes(line_code)) {
             existing._lineCodes.push(line_code);
-            existing.setPopupContent(buildPopupHtml(existing));
+            // Popup content is a function (rebuilt on open), so no sync needed here.
         }
         return;
     }
@@ -161,7 +183,10 @@ const createMarker = (station, map, plain = false) => {
     marker.stationNameJP = station.name_kanji || '';
     marker.stationNameEN = getEnName(station, code);
 
-    marker.bindPopup(buildPopupHtml(marker), { offset: L.point(0, -4), closeButton: true, maxWidth: 260 });
+    // Function content so the popup is rebuilt on each open — it then reflects the
+    // current stamp state AND whether we're in ride-edit mode (read-only) without
+    // having to re-push HTML into thousands of markers.
+    marker.bindPopup(() => buildPopupHtml(marker), { offset: L.point(0, -4), closeButton: true, maxWidth: 260 });
 
     // Click opens popup permanently (no auto-close on mouseout).
     marker.on('click', () => {
@@ -233,7 +258,7 @@ export const refreshAllMarkerStates = () => {
     markers.forEach(m => {
         m._isCollected = state.stamps.has(m._stationData.code);
         m.setStyle(circleStyle(m._isCollected, zoom));
-        m.setPopupContent(buildPopupHtml(m));
+        // Popup content is a function (rebuilt on open) — no need to re-push HTML.
     });
     bringCollectedToFront();
     updateStats();
