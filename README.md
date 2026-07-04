@@ -4,8 +4,9 @@ An interactive map of Japan for tracking **eki stamps** (駅スタンプ — the
 stamps collected at railway stations) and **logging the sections of train lines
 you've ridden**.
 
-The whole app is a single, dependency-light `index.html`. Open it in a browser
-(or serve the folder) and it works — no build step.
+The app is dependency-light static files — `index.html` + native ES modules in
+`js/` + one stylesheet — with **no build step, no npm, no bundler**. Serve the
+folder (GitHub Pages or any static server) and it works.
 
 ---
 
@@ -17,8 +18,9 @@ python3 -m http.server 8000
 # then open http://localhost:8000/index.html
 ```
 
-Opening `index.html` directly via `file://` mostly works but some browsers block
-`fetch()` of the local data files, so a static server is recommended.
+A static server is **required** (not just recommended): the app is ES modules,
+which browsers refuse to load over `file://`, and the data files are fetched
+over HTTP anyway.
 
 Runtime dependencies are loaded from CDNs (no npm install needed to run):
 
@@ -51,7 +53,10 @@ Runtime dependencies are loaded from CDNs (no npm install needed to run):
 ## File layout
 
 ```
-index.html                      The entire app (markup + CSS + JS in one file)
+index.html                      Markup only; loads css/app.css and js/main.js (type="module")
+css/app.css                     All styles
+js/                             The app, as native ES modules (see "Code map" below)
+tests/geometry.test.mjs         Unit tests for the pure geometry module (node --test)
 README.md                       This file
 data/
   stations.json                 ekidata: every line with its stations IN ORDER (lat/lon)
@@ -105,23 +110,30 @@ geojson from upstream.
 
 ---
 
-## Code map (`index.html`)
+## Code map (`js/`)
 
-All logic is one inline `<script>`. It is organised into numbered sections:
+The app is native ES modules, one per concern (the old single-file section
+numbers survive in the module headers; `docs/REFACTOR-2026-07.md` is the
+design of record for the split):
 
-| Section | What lives there |
+| Module | What lives there |
 |---|---|
-| 2. Constants | tunables: cache TTL, marker sizing, **line prominence styles**, **ride snap distance** |
-| 3. App state | `state` = `{ lang, user, gistId, stamps:Set, rides:{} }` |
-| 4. Gist persistence | `loadFromGist`, `syncToGist` (persists stamps **and** rides), `findGistId` |
-| 5. Notifications | toasts + sync-status indicator |
-| 6. Map init | Leaflet map, canvas renderer, custom touch gestures |
-| 7. Line rendering | draws GeoJSON lines (faint by default), hover/tap highlight, **line popup** |
-| 7b. Ride sections | stitching, station snapping, **ridden-stretch overlays** (see below) |
-| 7c. Ride edit mode | select ridden stretches **on the map** (handles branches) |
-| 8. Marker management | builds/merges station markers, collect toggle |
-| 9. Popup | station popup HTML (collect button) |
-| 10–15 | search, language toggle, stats, session panel, welcome modal, **init** |
+| `config.js` | tunables: cache TTL, marker sizing, **line prominence styles**, **ride snap distance**, `APP_VERSION` |
+| `line-colors.js` | official operator colour table (pure data) + `getLineColor` |
+| `state.js` | `state` = `{ lang, user, gistId, stamps:Set, rides:{} }`, `setState`, local-first persistence, token get/set |
+| `registry.js` | shared layer collections (`linesByName`, `markers`, caches…) + the `ui` runtime scalars + `esc()` |
+| `gist.js` | `loadFromGist`, `syncToGist` (persists stamps **and** rides), `findGistId` |
+| `notify.js` | toasts + sync-status indicator |
+| `map-setup.js` | Leaflet map, canvas renderer, custom touch gestures |
+| `idb-cache.js` | IndexedDB cache (get/set/prune) |
+| `geometry.js` | **pure** track geometry (stitching, bridging, projection) — no DOM/Leaflet/state; unit-tested via `node --test tests/` |
+| `line-geometry.js` | corridor building (`buildLineGeometry`), track routing (`trackBetween`), `buildRideSegments`, Shinkansen paths |
+| `lines.js` | draws GeoJSON lines (faint by default), hover/tap highlight, **line popup** |
+| `rides.js` | **ridden-stretch overlays** + saved-ride key migration (see below) |
+| `ride-edit.js` | select ridden stretches **on the map** (handles branches) |
+| `markers.js` | builds/merges station markers, station popup, `loadStations` |
+| `search.js` / `lang.js` / `stats.js` / `session.js` / `welcome.js` | search, language toggle, stats, session panel, welcome modal |
+| `main.js` | init, popup-button event delegation, and the **`window.__eki` test hook** that `scripts/audit-ride-gaps.mjs` drives the app through |
 
 State is read via `state.*` and written via `setState(...)` (which persists some
 keys to `localStorage`). Map data is cached in **IndexedDB** (`eki-cache`, keyed by
@@ -340,7 +352,7 @@ Notes:
   `python3 scripts/disambiguate_geojson_lines.py` to re-split the homonymous
   bare line names (idempotent, in place).
 
-Bump `APP_VERSION` in `index.html` when shipping new data — it is part of
+Bump `APP_VERSION` in `js/config.js` when shipping new data — it is part of
 **both** IndexedDB cache keys (stations *and* line geometry), so bumping it
 forces every client to pick up fresh data. Stale versions' caches are pruned
 automatically at startup.
@@ -349,8 +361,16 @@ automatically at startup.
 
 ## Conventions
 
-- **Single file.** Keep markup, CSS, and JS in `index.html`; match the existing
-  numbered-section structure and comment style.
+- **No build step.** The app is plain static files + native ES modules — no
+  npm, no bundler, no toolchain. Keep it that way: new code goes in a `js/`
+  module (match the existing header/comment style), styles in `css/app.css`.
+- **One module ≈ one concern.** Shared layer collections and cross-module
+  runtime scalars live in `js/registry.js` (`ui.*`); user progress lives on
+  `state`. `js/geometry.js` must stay pure (no DOM/Leaflet/app state) so its
+  unit tests keep running under plain `node --test tests/`.
+- **Tooling contract.** Anything CI/scripts need from inside the app is
+  exposed on `window.__eki` (set in `js/main.js`) — extend it, don't reshape
+  it.
 - **Touch-first.** Everything must work without a mouse (no hover-only actions).
   The canvas map itself is pointer/touch-driven (markers aren't keyboard
   focusable); panels, search, and modals must stay keyboard-accessible.
