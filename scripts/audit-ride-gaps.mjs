@@ -52,16 +52,18 @@ if (process.env.CDN_LOCAL) {
     (route) => route.fulfill({ status: 200, contentType: 'text/plain', body: '' }));
 }
 await page.goto(`${BASE_URL}/index.html`, { waitUntil: 'load' });
+// The app is ES modules; its internals are exposed to tooling through the
+// window.__eki hook (set in js/main.js — the public contract for this script).
 await page.waitForFunction(
-  () => typeof buildLineGeometry === 'function' && typeof buildRideSegments === 'function' &&
-        typeof allLineSegs !== 'undefined',
+  () => window.__eki && typeof __eki.buildLineGeometry === 'function' &&
+        typeof __eki.buildRideSegments === 'function' && Array.isArray(__eki.allLineSegs),
   null, { timeout: 60000 });
 // IMPORTANT: line features render batched over many frames. Building geometry before
 // rendering finishes caches an INCOMPLETE graph (false gaps). Wait until the polyline
 // count stops growing, then settle.
 await page.waitForFunction(() => {
   window.__n = window.__n || { last: -1, stable: 0 };
-  const n = allLineSegs.length;
+  const n = __eki.allLineSegs.length;
   window.__n.stable = (n === window.__n.last) ? window.__n.stable + 1 : 0;
   window.__n.last = n;
   return window.__n.stable >= 5;
@@ -69,6 +71,7 @@ await page.waitForFunction(() => {
 await page.waitForTimeout(500);
 
 const report = await page.evaluate(() => {
+  const { linesByName, buildLineGeometry, buildRideSegments } = window.__eki;
   const md = (a, b) => { const sx = 111320 * Math.cos((a[0] + b[0]) / 2 * Math.PI / 180), sy = 110540;
                          return Math.hypot((a[1] - b[1]) * sx, (a[0] - b[0]) * sy); };
   const lines = Object.keys(linesByName);
