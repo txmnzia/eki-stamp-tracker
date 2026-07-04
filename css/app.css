@@ -343,8 +343,9 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .popup-line-ride-btn.has-rides { background: rgba(126,184,247,0.12); border-color: rgba(126,184,247,0.35); color: var(--accent); }
 
 /* ── Ride edit mode (selection happens directly on the map) ────────── */
-/* Fade the base map + saved-ride overlays so the (brought-forward) lines are the
-   clear focus. Station dots are dimmed in JS (they share the lines' canvas). */
+/* Fade the base map tiles so the (brought-forward) lines stand out. Station dots
+   and saved-ride overlays stay fully visible — the user keeps seeing their
+   collected stamps and existing rides while editing. */
 #map.ride-editing .leaflet-tile-pane { opacity: 0.3; filter: grayscale(0.4); transition: opacity 0.25s, filter 0.25s; }
 
 /* A single discreet button: signals edit mode AND saves-and-exits on click (#19). */
