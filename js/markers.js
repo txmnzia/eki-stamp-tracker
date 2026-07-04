@@ -80,24 +80,6 @@ const plainStyle = (zoom) => ({
 });
 const styleFor = (marker, zoom) => marker._noStamp ? plainStyle(zoom) : circleStyle(marker._isCollected, zoom);
 
-// Ride edit mode fades every station dot right down so the lines (brought
-// forward) are the clear focus (#18). Markers stay interactive so hovering one
-// still shows its read-only name popup (#17). Restored to the normal zoom-based
-// style when editing ends.
-const EDIT_DIM_STAMP = { opacity: 0.35, fillOpacity: 0.18 };
-const EDIT_DIM_PLAIN = { opacity: 0.12, fillOpacity: 0.05 };
-export const setMarkersEditDim = (on) => {
-    if (!ui.map) return;
-    const zoom = ui.map.getZoom();
-    if (on) {
-        markers.forEach(m => m.setStyle(EDIT_DIM_STAMP));
-        plainMarkers.forEach(m => m.setStyle(EDIT_DIM_PLAIN));
-    } else {
-        markers.forEach(m => m.setStyle(circleStyle(m._isCollected, zoom)));
-        plainMarkers.forEach(m => m.setStyle(plainStyle(zoom)));
-    }
-};
-
 // ── 9. POPUP ──────────────────────────────────────────────────────────────
 
 /**

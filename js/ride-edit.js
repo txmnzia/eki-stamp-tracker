@@ -13,7 +13,7 @@
 // exits (#19). Station hover still shows a read-only name popup (#17), rendered
 // by markers.js off the ui.rideEdit flag.
 
-import { IS_TOUCH, LINE_EDIT_SHOW, RIDE_OVERLAY } from './config.js';
+import { IS_TOUCH, LINE_EDIT_SHOW } from './config.js';
 import { state } from './state.js';
 import { ui, allLineSegs, lineColorMap, rideOverlays } from './registry.js';
 import { buildLineGeometry, buildRideSegments } from './line-geometry.js';
@@ -21,7 +21,7 @@ import { scheduleSave } from './gist.js';
 import { showToast } from './notify.js';
 import { resetAllLines } from './lines.js';
 import { renderRideOverlays } from './rides.js';
-import { setMarkersEditDim, bringStationsToFront } from './markers.js';
+import { bringStationsToFront } from './markers.js';
 
 const segStyle = (color, on) => on
     ? { color, weight: 6, opacity: 0.95, lineCap: 'round', renderer: ui.canvasRenderer, interactive: false }
@@ -126,12 +126,12 @@ export const enterRideEditMode = (name) => {
     ui.map.closePopup();
     ui.rideEdit = { built: new Map(), active: null, dragging: false, mode: 'add', dirty: false };
 
-    // Edit-mode look (#18): bring every line forward and fade the base map + the
-    // station dots so the network is the clear focus. Lines stay interactive, so
-    // hovering one shows its name tooltip and makes it the active paint target.
+    // Edit-mode look: bring every line forward and fade the base MAP tiles so the
+    // network stands out. Station dots and saved-ride overlays stay fully visible —
+    // the user needs to keep seeing their collected stamps and existing rides while
+    // editing. Lines stay interactive, so hovering one shows its name tooltip and
+    // makes it the active paint target.
     allLineSegs.forEach(p => { p.closeTooltip(); p.setStyle(LINE_EDIT_SHOW); });
-    Object.values(rideOverlays).forEach(arr => arr.forEach(pl => pl.setStyle({ opacity: 0.25 })));
-    setMarkersEditDim(true);
     ui.map.getContainer().classList.add('ride-editing');
 
     // Pre-activate the clicked line, seeded from where its popup was opened.
@@ -173,10 +173,8 @@ const exitRideEditMode = () => {
     ui.rideEdit = null;
 
     // Restore the normal look, then redraw the saved-ride overlays for every line
-    // we touched (their overlays were hidden while their segments were editable).
+    // we touched (their overlays were removed while their segments were editable).
     resetAllLines();
-    setMarkersEditDim(false);
-    Object.values(rideOverlays).forEach(arr => arr.forEach(pl => pl.setStyle({ opacity: RIDE_OVERLAY.opacity })));
     built.forEach(renderRideOverlays);
 
     if (changed) { scheduleSave(); showToast('Ride changes saved'); }
