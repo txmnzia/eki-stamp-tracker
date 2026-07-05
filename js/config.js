@@ -3,7 +3,7 @@
 // single-file app (docs/REFACTOR-2026-07.md describes the split).
 
 export const GIST_PREFIX       = 'eki-stamp-tracker:';
-// App version — shown discreetly on the welcome modal. Bump on every merge
+// App version — shown discreetly in the session panel. Bump on every merge
 // to main. It is also part of the station-cache key, so each release
 // invalidates the 7-day IndexedDB cache and users immediately get fresh data.
 export const APP_VERSION       = 'v1.6.0';
@@ -25,6 +25,12 @@ export const ZOOM_SCALE        = 1.18;     // radius multiplier per zoom step aw
 export const MAX_SUGGESTIONS   = 6;
 export const RESET_CONFIRM_MS  = 3000;     // window for second click on destructive action
 export const MAX_ZOOM          = 19;       // maximum tile zoom level
+export const STAMP_TOGGLE_GUARD_MS = 350;  // ignore a repeat stamp toggle within this window — a
+                                    // desktop double-click otherwise collects then instantly
+                                    // un-collects (two click events fire before dblclick)
+export const PLAIN_MIN_ZOOM    = 11;       // touch only: hide the ~6.7k non-stamp dots below this
+                                    // zoom so they don't bury the stamp targets on phones
+                                    // (docs/AUDIT.md F-6); desktop always shows them
 
 // Line prominence (AC0: lines are discreet by default; ridden stretches pop).
 export const LINE_BASE     = { weight: 1.5, opacity: 0.20 };  // faint colour tint — default look

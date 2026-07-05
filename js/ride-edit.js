@@ -15,7 +15,7 @@
 
 import { IS_TOUCH, LINE_EDIT_SHOW } from './config.js';
 import { state } from './state.js';
-import { ui, allLineSegs, lineColorMap, rideOverlays } from './registry.js';
+import { ui, allLineSegs, lineColorMap, rideOverlays, uiColors } from './registry.js';
 import { buildLineGeometry, buildRideSegments } from './line-geometry.js';
 import { scheduleSave } from './gist.js';
 import { showToast } from './notify.js';
@@ -95,7 +95,7 @@ const ensureBuilt = (name, seed) => {
         const geom = buildLineGeometry(name, seed);
         const segs = buildRideSegments(geom);
         if (segs.length) {
-            const color = lineColorMap[name] || '#7eb8f7';
+            const color = lineColorMap[name] || uiColors.accent;
             const selected = initialRideSelection(name, segs);
             const layer = L.layerGroup().addTo(ui.map);
             segs.forEach(seg => { seg.pl = L.polyline(seg.pts, segStyle(color, selected.has(seg.key))).addTo(layer); });

@@ -4,9 +4,12 @@
 import { syncToGist } from './gist.js';
 
 let toastTimer;
-export const showToast = (msg, duration = 2400) => {
+// kind: '' (neutral) or 'error' — failures must LOOK different from successes
+// (docs/AUDIT.md F-11), not just read differently.
+export const showToast = (msg, duration = 2400, kind = '') => {
     const el = document.getElementById('toast');
     el.textContent = msg;
+    el.classList.toggle('toast--error', kind === 'error');
     el.classList.add('show');
     clearTimeout(toastTimer);
     toastTimer = setTimeout(() => el.classList.remove('show'), duration);

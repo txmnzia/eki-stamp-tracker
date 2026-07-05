@@ -33,13 +33,18 @@ Runtime dependencies are loaded from CDNs (no npm install needed to run):
 ## What the app does
 
 1. **Map of stamp stations.** Every station that has a real eki stamp is drawn as
-   a circle marker. Tap one to see its name(s) and lines, and a **Collect stamp**
-   button. Collected stamps turn gold.
+   a circle marker. Tap one and a compact **stamp card** opens: the station's
+   name(s), its lines as coloured dots, and a big round **stamp seal**. Tap the
+   seal — or just tap the dot again — to collect (tap again to remove). On
+   desktop, hovering opens the card, so a single click on the dot collects.
+   Collected stamps turn gold. There is no first-run modal: the map itself is
+   the welcome, and a one-time hint after the first stamp points to the
+   Session panel for naming/sync.
 2. **Train lines.** All railway lines are drawn from GeoJSON track geometry. They
    are **faint by default** and brighten on hover/tap.
-3. **Ride sections** (independent from stamps). Tap a line → **Add a ride** → pick
-   the stretch of stations you rode in a vertical line diagram → that stretch is
-   painted onto the map in the line's colour, following the real track. See
+3. **Ride sections** (independent from stamps). Tap a line → **Add a ride** →
+   paint the stretch you rode directly on the map (tap or drag along any line)
+   → it is drawn in the line's colour, following the real track. See
    [Ride sections](#ride-sections-feature) below.
 4. **Sync.** Progress (stamps *and* rides) is always saved locally
    (`localStorage`). Optionally, the user adds their **own** GitHub token
@@ -132,7 +137,7 @@ design of record for the split):
 | `rides.js` | **ridden-stretch overlays** + saved-ride key migration (see below) |
 | `ride-edit.js` | select ridden stretches **on the map** (handles branches) |
 | `markers.js` | builds/merges station markers, station popup, `loadStations` |
-| `search.js` / `search-rank.js` / `lang.js` / `stats.js` / `session.js` / `welcome.js` | search UI + **pure** relevance/proximity ranking (unit-tested), language toggle, stats, session panel, welcome modal |
+| `search.js` / `search-rank.js` / `lang.js` / `stats.js` / `session.js` | search UI + **pure** relevance/proximity ranking (unit-tested), language toggle, stats, session panel |
 | `main.js` | init, popup-button event delegation, and the **`window.__eki` test hook** that `scripts/audit-ride-gaps.mjs` drives the app through |
 
 State is read via `state.*` and written via `setState(...)` (which persists some

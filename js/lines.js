@@ -8,7 +8,7 @@ import { APP_VERSION, CACHE_TTL, BATCH_SIZE, HOVER_RESET_MS, LINE_BASE, SHINKANS
 import { getLineColor } from './line-colors.js';
 import { state } from './state.js';
 import { ui, linesByName, allLineSegs, lineColorMap, lineEnMap, lineGeomCache,
-         shinkansenData, shinkansenGeo, esc, orderLineNames } from './registry.js';
+         shinkansenData, shinkansenGeo, esc, orderLineNames, uiColors } from './registry.js';
 import { cacheGet, cacheSet } from './idb-cache.js';
 import { showToast } from './notify.js';
 import { shinkansenPath } from './line-geometry.js';
@@ -47,11 +47,11 @@ const highlightLine = (name, map) => {
 /** Popup shown when a line is clicked — carries the "add a ride" button. */
 const buildLinePopupHtml = (name) => {
     const { primary, secondary } = orderLineNames(name);
-    const color   = lineColorMap[name] || '#6b6b7a';
+    const color   = lineColorMap[name] || uiColors.lineUnknown;
     const ridden  = state.rides[name]?.length || 0;
     const summary = ridden ? 'Ride logged — edit it on the map' : 'No ride logged yet';
     const label   = ridden ? 'Edit ride' : 'Add a ride';
-    const btnCls  = 'popup-line-ride-btn' + (ridden ? ' has-rides' : '');
+    const btnCls  = 'btn btn--block popup-line-ride-btn' + (ridden ? ' has-rides' : '');
     const nameHtml = secondary
         ? `<span class="popup-line-label"><span class="popup-line-jp">${esc(primary)}</span><span class="popup-line-en">${esc(secondary)}</span></span>`
         : `<span class="popup-line-jp">${esc(primary)}</span>`;
@@ -112,7 +112,7 @@ const attachLineInteractions = (polyline, name, map) => {
 const drawShinkansen = (map) => {
     Object.entries(shinkansenData).forEach(([name, info]) => {
         if (linesByName[name]) return;
-        const color = info.color || '#888';
+        const color = info.color || uiColors.lineUnknown;
         lineColorMap[name] = color;
         if (info.name_en) lineEnMap[name] = info.name_en;
         const pl = L.polyline(shinkansenPath(name).coords,
@@ -205,6 +205,6 @@ export const loadLines = async (map) => {
         cacheSet(`eki_lines_${APP_VERSION}`, { data, ts: Date.now() }).catch(() => {});
     } catch (err) {
         console.error('loadLines:', err);
-        showToast('Failed to load train lines — map may be incomplete', 4000);
+        showToast('Failed to load train lines — map may be incomplete', 4000, 'error');
     }
 };

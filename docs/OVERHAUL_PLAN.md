@@ -125,3 +125,33 @@ D2 ships whenever its decision gate clears (independent of C order)
 - No feature additions. The overhaul earns minimalism by subtraction and
   regularity; new capabilities (achievements, sharing, offline tiles…)
   are out of scope until the system exists for them to land on.
+
+---
+
+## Addendum — implementation record (July 2026, this branch)
+
+Phases A–D were implemented on `claude/ux-audit-refactoring-p38bb4`, with two
+owner decisions taken during implementation:
+
+1. **The collect control was redesigned beyond C1's repaint** (owner request:
+   "lightweight, seamless, almost text-free"). The station popup became a
+   *stamp card*: name + line-color dots + one big round **stamp seal**
+   (`.popup-collect-btn`, class kept as the tooling contract). Toggling works
+   three ways — tap the seal, tap the station dot again while its card is
+   open, or (desktop) hover-then-single-click the dot. A literal
+   double-click-to-collect was considered and rejected: it collides with
+   desktop double-click zoom and the app's custom touch double-tap zoom.
+   Instead the tap-tap rhythm is kept but the gestures are de-conflicted:
+   popup taps never count toward zoom gestures, station-tap sequences
+   suppress the double-tap zoom (`ui.lastStationTap`), and a
+   `STAMP_TOGGLE_GUARD_MS` window stops a double-click from
+   collect-then-remove.
+2. **D2 is resolved: hover-open stays.** With the card now lightweight and
+   hover+click forming the 1-click desktop collect, removing hover-open would
+   have destroyed the flow it was meant to clean up. The grace-timer
+   machinery is retained.
+
+Deviations from the letter of the plan: C4's "quiet toast after first stamp"
+uses a one-time localStorage flag (`eki_first_stamp_hint`); C6 hides plain
+markers below `PLAIN_MIN_ZOOM` on touch *and* drops them to desktop sizing;
+the session panel's cloud-sync fold uses a native `<details>` element (no JS).

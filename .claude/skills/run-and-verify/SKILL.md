@@ -24,7 +24,7 @@ cd /home/user/eki-stamp-tracker
 
 # 1. Unit tests (pure geometry). NOTE: `node --test tests/` (the form in the
 #    docs) fails with MODULE_NOT_FOUND on this sandbox's node v22; use the glob:
-node --test tests/*.test.mjs          # expect: pass 10, fail 0
+node --test tests/*.test.mjs          # expect: pass 18, fail 0
 
 # 2. Data structural checks (fast, no network):
 python3 scripts/check_data.py
@@ -122,16 +122,18 @@ await page.waitForTimeout(500);
 
 | # | Check | Command / how | Pass looks like |
 |---|---|---|---|
-| 1 | Pure-geometry unit tests | `node --test tests/*.test.mjs` | `pass 10, fail 0` |
+| 1 | Pure unit tests (geometry + search ranking) | `node --test tests/*.test.mjs` | `pass 18, fail 0` |
 | 2 | Data structural checks | `python3 scripts/check_data.py` | `all data checks passed: …` |
 | 3 | Headless load, zero console errors | snippet below (collect `console`/`pageerror` events) | 0 errors after full settle |
 | 4 | Interaction smoke | search→jump; collect stamp→toast+gold marker+`eki_local_progress` in localStorage, persists across reload; language toggle (`<html lang="ja">`, button 日本語); line click→popup→`.popup-line-ride-btn`→paint→`#ride-edit-close`→"Ride changes saved" toast+overlay | every step observable |
 | 5 | Ride-gap audit at baseline | `MAX_GAPS=15 node scripts/audit-ride-gaps.mjs` | `… 15 gaps total`, exit 0 — see the **ride-gap-audit** skill |
 
-Interaction selectors that matter: `#modal-skip` (welcome modal — reappears on
-every anonymous load, dismiss it after each reload), `#stationSearch` +
-`.suggestion-item`, `.popup-collect-btn`, `#lang-toggle`, `.popup-line-ride-btn`,
-`#ride-edit-close`, `#toast`. Stamps/rides persist in localStorage key
+Interaction selectors that matter: `#stationSearch` + `.suggestion-item`,
+`.popup-collect-btn` (the round stamp SEAL in the station card — since v1.6
+there is NO welcome modal and no `#modal-skip`; the map loads directly),
+`#lang-toggle`, `.popup-line-ride-btn`, `#ride-edit-close`, `#toast`.
+Collect can also be driven by clicking the station DOT again while its card
+is open (same toggle; guarded ~350 ms against double-fire). Stamps/rides persist in localStorage key
 `eki_local_progress` (see the **state-and-sync** skill).
 
 ## Minimal smoke snippet (run successfully here; adapt, don't trust blindly)
@@ -159,7 +161,7 @@ if (process.env.CDN_LOCAL) {              // offline sandbox: local Leaflet, stu
     (route) => route.fulfill({ status: 200, contentType: 'text/plain', body: '' }));
 }
 await page.goto((process.env.BASE_URL || 'http://127.0.0.1:8110') + '/index.html', { waitUntil: 'load' });
-await page.click('#modal-skip');          // fresh profile → welcome modal
+// (no welcome modal since v1.6 — the map loads directly)
 /* … paste the wait idiom from above here … */
 await page.fill('#stationSearch', 'Shinjuku');
 await page.waitForSelector('.suggestion-item');
@@ -198,7 +200,6 @@ gotchas (each cost a real debugging cycle):
 | `node --test tests/` → `Cannot find module …/tests` | node v22 here rejects the bare directory arg | use `node --test tests/*.test.mjs` (what CI runs) |
 | `Executable doesn't exist at …chromium_headless_shell-1228…` | npm playwright newer than preinstalled browsers | `PW_CHROMIUM=/opt/pw-browsers/chromium` |
 | Blank page, `L is not defined`, page hangs on load | unpkg blocked by the proxy (CONNECT 403) | set `CDN_LOCAL` to the npm leaflet `dist/` dir |
-| Clicks time out, `#name-modal-overlay … intercepts pointer events` | welcome modal reappears on every anonymous load/reload | click `#modal-skip` after every `goto`/`reload` |
 | Phantom ride gaps / wrong overlays in your script | geometry touched before rendering settled | use the wait idiom; never poll less than 5 stable ticks |
 | "Lines are still loading — try again in a moment." toast | `enterRideEditMode` called before `ui.linesReady` | wait for `__eki.ui.linesReady` first (it's a guard, not a bug) |
 | `EADDRINUSE` on 8110 | a previous server still running | kill only the exact port (`pkill -f "http.server 8110"` — a broader pattern can kill other sessions' servers), or pick another port |
@@ -206,7 +207,7 @@ gotchas (each cost a real debugging cycle):
 
 ## Checklist before you're done
 
-- [ ] `node --test tests/*.test.mjs` → 10 pass
+- [ ] `node --test tests/*.test.mjs` → 18 pass
 - [ ] `python3 scripts/check_data.py` → all checks passed
 - [ ] Headless load with **zero** console/page errors after full settle
 - [ ] Interaction smoke: collect+reload-persist, search, lang toggle, ride edit→save→overlay

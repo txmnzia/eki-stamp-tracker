@@ -12,7 +12,7 @@ say so.
 
 | Change touches | Required validation |
 |---|---|
-| `js/` only | `node --test tests/*.test.mjs` (10 tests, all pass) + drive the affected flow in the real app — use the `run-and-verify` skill. If geometry/ride code changed: also the ride-gap audit (`ride-gap-audit` skill) — the baseline must stay exactly at the accepted count |
+| `js/` only | `node --test tests/*.test.mjs` (18 tests, all pass) + drive the affected flow in the real app — use the `run-and-verify` skill. If geometry/ride code changed: also the ride-gap audit (`ride-gap-audit` skill) — the baseline must stay exactly at the accepted count |
 | `data/` (any regenerated file) | `python3 scripts/check_data.py` (prints `all data checks passed: …`) + ride-gap audit + spot-check names/colours in the running app |
 | `css/app.css` / `index.html` markup | Visual pass via the `run-and-verify` skill (desktop + narrow/touch viewport); confirm keyboard flows (search, session panel, modal) still work |
 | `js/state.js`, `js/gist.js`, `js/session.js` | ALL of the above that apply **plus** the manual sync test sequence in the `state-and-sync` skill |
@@ -21,7 +21,7 @@ say so.
 Commands verified in this repo (run from the repo root):
 
 ```sh
-node --test tests/*.test.mjs     # pass 10 / fail 0 — same invocation CI uses
+node --test tests/*.test.mjs     # pass 18 / fail 0 — same invocation CI uses
 python3 scripts/check_data.py    # "all data checks passed: 10452 stations, 2411 stamps, …"
 ```
 

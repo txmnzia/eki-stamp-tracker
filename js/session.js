@@ -151,7 +151,7 @@ export const setupSessionPanel = (map) => {
         const file = e.target.files?.[0];
         if (!file) return;
         const reader = new FileReader();
-        reader.onerror = () => showToast('Could not read file');
+        reader.onerror = () => showToast('Could not read file', 2400, 'error');
         reader.onload  = async (ev) => {
             // Clear input AFTER read so same file can be re-imported
             e.target.value = '';
@@ -170,7 +170,7 @@ export const setupSessionPanel = (map) => {
                 await syncToGist();
             } catch (err) {
                 console.error('Import:', err);
-                showToast('Import failed — not a valid Eki JSON file');
+                showToast('Import failed — check it is an Eki JSON export', 4000, 'error');
             }
         };
         reader.readAsText(file);

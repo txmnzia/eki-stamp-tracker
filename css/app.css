@@ -1,21 +1,43 @@
 /* ── Reset & base ─────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+/* ── Design tokens (docs/DESIGN_SYSTEM.md §2) ─────────────────────────
+   The single source of visual truth. Rule: NO color/size/spacing/radius/
+   shadow/duration values outside this block — except inside the Leaflet
+   override rules, where we match library geometry we don't own. JS reads
+   the color tokens at boot (uiColors in js/registry.js), so the map layers
+   use the same palette. */
 :root {
-    --bg:         #0f0f12;
-    --surface:    #18181e;
-    --surface2:   #22222a;
-    --border:     #2e2e3a;
-    --text:       #e4e4ec;
-    --muted:      #9898b0;
-    --accent:     #7eb8f7;
-    --accent-dim: rgba(126,184,247,0.12);
-    --stamp-on:   #f7c948;
-    --stamp-off:  #3a3a48;
-    --radius:     6px;
-    --ui-font:    'Space Mono', monospace;
-    --jp-font:    'Zen Kaku Gothic New', sans-serif;
-    /* Z-index scale — centralised so layers never conflict */
+    /* color */
+    --bg:           #0f0f12;
+    --surface:      #18181e;
+    --surface2:     #22222a;
+    --border:       #2e2e3a;
+    --text:         #e4e4ec;
+    --muted:        #9898b0;
+    --accent:       #7eb8f7;
+    --gold:         #f7c948;   /* the product color: collected, progress */
+    --danger:       #f77e7e;
+    --success:      #6fdd8b;
+    --marker-idle:  #9aa0ac;   /* uncollected/plain station dots (canvas) */
+    --line-unknown: #6b6b7a;   /* fallback for lines with no official color */
+    /* state alphas — a hue may appear at exactly these three levels */
+    --a-tint: 12%; --a-hover: 22%; --a-outline: 35%;
+    /* type */
+    --ui-font: 'Space Mono', monospace;            /* labels, numbers — 1 line max */
+    --jp-font: 'Zen Kaku Gothic New', sans-serif;  /* names + any multi-line copy */
+    --fs-xs: 11px; --fs-sm: 12px; --fs-md: 14px; --fs-lg: 17px; --fs-xl: 20px;
+    --track-caps: 0.07em;
+    /* spacing */
+    --sp-1: 4px; --sp-2: 8px; --sp-3: 12px; --sp-4: 16px; --sp-5: 24px;
+    /* radii */
+    --r-sm: 4px; --r-md: 8px; --r-full: 999px;
+    /* elevation */
+    --shadow-1: 0 4px 16px rgba(0,0,0,0.45);   /* attached chrome */
+    --shadow-2: 0 12px 32px rgba(0,0,0,0.55);  /* floating surfaces */
+    /* motion */
+    --t-fast: 120ms; --t-move: 250ms;
+    /* z-index scale — centralised so layers never conflict */
     --z-map-ui:  1000;
     --z-modal:   2000;
     --z-toast:   3000;
@@ -24,7 +46,70 @@
 
 html, body { height: 100%; background: var(--bg); color: var(--text); font-family: var(--ui-font); }
 
-:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 3px; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: var(--r-sm); }
+
+/* ── Primitives (docs/DESIGN_SYSTEM.md §3) ────────────────────────── */
+
+/* Button — one family; tones + sizes as modifiers. State classes the JS
+   already toggles (.active, .confirm-pending, .collected, .has-rides) are
+   styled here so behaviour code didn't have to change. */
+.btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: var(--sp-1);
+    padding: 10px var(--sp-3);
+    font-family: var(--ui-font); font-size: var(--fs-xs); font-weight: 700;
+    letter-spacing: var(--track-caps); text-transform: uppercase; white-space: nowrap;
+    background: var(--surface); color: var(--text);
+    border: 1px solid var(--border); border-radius: var(--r-sm);
+    cursor: pointer;
+    transition: background var(--t-fast), border-color var(--t-fast), color var(--t-fast);
+}
+.btn:hover  { background: var(--surface2); border-color: var(--accent); color: var(--accent); }
+.btn.active { background: color-mix(in srgb, var(--accent) var(--a-tint), transparent);
+              border-color: var(--accent); color: var(--accent); }
+.btn--primary {
+    background: color-mix(in srgb, var(--accent) var(--a-tint), transparent);
+    border-color: var(--accent); color: var(--accent);
+}
+.btn--primary:hover { background: color-mix(in srgb, var(--accent) var(--a-hover), transparent); color: var(--accent); }
+.btn--danger { color: var(--danger); border-color: color-mix(in srgb, var(--danger) var(--a-outline), transparent); }
+.btn--danger:hover { background: color-mix(in srgb, var(--danger) var(--a-tint), transparent); border-color: var(--danger); color: var(--danger); }
+.btn--block { display: flex; width: 100%; }
+.btn--pill  { border-radius: var(--r-full); padding: 10px var(--sp-4); }
+/* Two-step confirm state for destructive actions */
+.btn.confirm-pending {
+    background: color-mix(in srgb, var(--danger) var(--a-tint), transparent);
+    border-color: var(--danger); color: var(--danger);
+    animation: pulse-warn 0.4s ease;
+}
+@keyframes pulse-warn { 0%,100% { transform: scale(1); } 50% { transform: scale(1.02); } }
+
+/* Input — one recipe everywhere */
+.input {
+    width: 100%; padding: var(--sp-2) 10px;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: var(--r-sm); color: var(--text);
+    font-family: var(--ui-font); font-size: var(--fs-sm); outline: none;
+    transition: border-color var(--t-fast);
+}
+.input:focus { border-color: var(--accent); }
+.input::placeholder { color: var(--muted); }
+
+/* Card — floating surface */
+.card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--r-md); box-shadow: var(--shadow-2);
+}
+
+/* Field — label + control + one hint line (enforces the copy diet) */
+.field { display: flex; flex-direction: column; gap: var(--sp-1); }
+.field > label { font-size: 10px; font-weight: 700; color: var(--text);
+                 letter-spacing: var(--track-caps); text-transform: uppercase; }
+.field > .hint { font-family: var(--jp-font); font-size: var(--fs-xs); color: var(--muted);
+                 line-height: 1.5; padding: 0 2px; }
+.field > .hint a { color: var(--accent); text-decoration: none; }
+.field > .hint a:hover { text-decoration: underline; }
+
+.hidden { display: none !important; }
 
 /* ── Map ──────────────────────────────────────────────────────────── */
 #map { height: 100vh; width: 100%;
@@ -44,7 +129,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 #loading-overlay {
     position: fixed; inset: 0; z-index: var(--z-loading);
     background: var(--bg);
-    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--sp-4);
     transition: opacity 0.4s ease;
 }
 #loading-overlay.fade-out { opacity: 0; pointer-events: none; }
@@ -54,36 +139,23 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
     border-radius: 50%; animation: spin 0.8s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
-.loading-text { font-size: 11px; color: var(--muted); letter-spacing: 0.12em; text-transform: uppercase; }
-.loading-sub  { font-size: 10px; color: var(--muted); letter-spacing: 0.06em; }
-
-/* ── Shared UI button ─────────────────────────────────────────────── */
-.ui-btn {
-    display: inline-flex; align-items: center; gap: 6px;
-    padding: 8px 14px;
-    font-family: var(--ui-font); font-size: 11px; font-weight: 700;
-    letter-spacing: 0.08em; text-transform: uppercase;
-    background: var(--surface); color: var(--text);
-    border: 1px solid var(--border); border-radius: var(--radius);
-    cursor: pointer; transition: background 0.15s, border-color 0.15s, color 0.15s;
-}
-.ui-btn:hover  { background: var(--surface2); border-color: var(--accent); color: var(--accent); }
-.ui-btn.active { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
+.loading-text { font-size: var(--fs-xs); color: var(--muted); letter-spacing: var(--track-caps); text-transform: uppercase; }
+.loading-sub  { font-size: var(--fs-xs); color: var(--muted); letter-spacing: var(--track-caps); }
 
 /* ── Top bar (search + controls) ──────────────────────────────────── */
 #topbar {
     /* Offset by the safe-area top inset so the bar clears the notch /
        Dynamic Island (needs viewport-fit=cover on the viewport meta). */
-    position: absolute; top: calc(env(safe-area-inset-top, 0px) + 12px); left: 12px; right: 12px;
+    position: absolute; top: calc(env(safe-area-inset-top, 0px) + var(--sp-3)); left: var(--sp-3); right: var(--sp-3);
     z-index: var(--z-map-ui);
-    display: flex; align-items: flex-start; gap: 8px;
+    display: flex; align-items: flex-start; gap: var(--sp-2);
 }
 #search-container { position: relative; flex: 1 1 0; min-width: 0; max-width: 360px; }
 #search-wrap {
-    display: flex; align-items: center; gap: 8px;
+    display: flex; align-items: center; gap: var(--sp-2);
     background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); padding: 8px 12px;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.4); transition: border-color 0.15s;
+    border-radius: var(--r-sm); padding: 10px var(--sp-3);
+    box-shadow: var(--shadow-1); transition: border-color var(--t-fast);
 }
 #search-wrap:focus-within { border-color: var(--accent); }
 #search-icon { color: var(--muted); flex-shrink: 0; }
@@ -95,190 +167,166 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 #suggestions {
     position: absolute; top: calc(100% + 6px); left: 0; right: 0;
     background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    border-radius: var(--r-md); box-shadow: var(--shadow-2);
     display: none; overflow: hidden;
 }
 .suggestion-item {
-    padding: 10px 14px; cursor: pointer;
+    padding: 10px var(--sp-3); cursor: pointer;
     display: flex; justify-content: space-between; align-items: center;
-    font-size: 12px; border-bottom: 1px solid var(--border); transition: background 0.1s;
+    font-size: var(--fs-sm); border-bottom: 1px solid var(--border); transition: background var(--t-fast);
 }
 .suggestion-item:last-child { border-bottom: none; }
 .suggestion-item:hover, .suggestion-item.active { background: var(--surface2); }
-.suggestion-item .sug-primary   { font-family: var(--jp-font); font-size: 14px; }
-.suggestion-item .sug-secondary { color: var(--muted); font-size: 11px; margin-top: 1px; }
+.suggestion-item .sug-primary   { font-family: var(--jp-font); font-size: var(--fs-md); }
+.suggestion-item .sug-secondary { color: var(--muted); font-size: var(--fs-xs); margin-top: 1px; }
 .suggestion-item .collected-badge {
-    font-size: 10px; padding: 2px 6px;
-    background: rgba(247,201,72,0.15); color: var(--stamp-on);
-    border-radius: 10px; border: 1px solid rgba(247,201,72,0.3);
-    flex-shrink: 0; margin-left: 8px;
+    font-size: var(--fs-xs); padding: 2px 6px;
+    background: color-mix(in srgb, var(--gold) var(--a-tint), transparent); color: var(--gold);
+    border-radius: var(--r-full); border: 1px solid color-mix(in srgb, var(--gold) var(--a-outline), transparent);
+    flex-shrink: 0; margin-left: var(--sp-2);
 }
 
 /* ── Controls ─────────────────────────────────────────────────────── */
 #controls { flex: 0 0 auto; display: flex; gap: 6px; }
-#session-toggle { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
-#session-toggle:hover  { background: rgba(126,184,247,0.22); }
-#session-toggle.active { background: rgba(126,184,247,0.28); }
+#session-toggle { background: color-mix(in srgb, var(--accent) var(--a-tint), transparent);
+                  border-color: var(--accent); color: var(--accent); }
+#session-toggle:hover  { background: color-mix(in srgb, var(--accent) var(--a-hover), transparent); }
+#session-toggle.active { background: color-mix(in srgb, var(--accent) var(--a-hover), transparent); }
 
-/* ── Popup ────────────────────────────────────────────────────────── */
+/* ── Popup (station stamp card + line card) ───────────────────────── */
 .leaflet-popup-content-wrapper {
     background: var(--surface) !important; border: 1px solid var(--border) !important;
-    border-radius: var(--radius) !important; box-shadow: 0 8px 24px rgba(0,0,0,0.5) !important; padding: 0 !important;
+    border-radius: var(--r-md) !important; box-shadow: var(--shadow-2) !important; padding: 0 !important;
 }
 .leaflet-popup-tip { background: var(--surface) !important; }
 .leaflet-popup-content { margin: 0 !important; }
 .leaflet-popup-close-button { color: var(--muted) !important; font-size: 18px !important; padding: 4px 8px !important; }
 .leaflet-popup-close-button:hover { color: var(--text) !important; }
-.popup-inner { padding: 14px 16px 12px; min-width: 190px; }
-.popup-name { font-family: var(--jp-font); font-size: 17px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
-.popup-name-secondary { font-size: 11px; color: var(--muted); letter-spacing: 0.06em; margin-bottom: 10px; }
+.popup-inner { padding: var(--sp-3) var(--sp-4); min-width: 170px; text-align: center; }
+.popup-name { font-family: var(--jp-font); font-size: var(--fs-lg); font-weight: 700; color: var(--text); margin-bottom: 1px; }
+.popup-name-secondary { font-size: var(--fs-xs); color: var(--muted); letter-spacing: 0.05em; margin-bottom: var(--sp-2); }
+/* Compact connections row on stamp cards: colored dots only (names on hover) */
+.popup-line-dots { display: flex; justify-content: center; gap: 5px; margin-bottom: var(--sp-2); }
+.popup-line-dots span { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+/* Full line badges (non-stamp station popup, where identification is the job) */
 .popup-line {
-    display: inline-flex; align-items: flex-start; gap: 5px;
-    font-size: 11px; color: var(--muted); background: var(--surface2);
-    border-radius: 4px; padding: 3px 7px; margin-bottom: 4px;
+    display: inline-flex; align-items: flex-start; gap: 5px; text-align: left;
+    font-size: var(--fs-xs); color: var(--muted); background: var(--surface2);
+    border-radius: var(--r-sm); padding: 3px 7px; margin-bottom: var(--sp-1);
 }
 .popup-line-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 2px; }
 .popup-line-label { display: flex; flex-direction: column; gap: 1px; line-height: 1.3; }
 .popup-line-jp { color: var(--text); }
-.popup-line-en { font-size: 9.5px; opacity: 0.65; letter-spacing: 0.03em; }
+.popup-line-en { font-size: var(--fs-xs); opacity: 0.65; letter-spacing: 0.03em; }
+
+/* The stamp seal — THE collect control (docs/AUDIT.md F-collect rework).
+   A big, text-free round stamp: outlined when uncollected, gold-inked when
+   collected. Tapping the station dot again (or the seal) toggles it.
+   Class name .popup-collect-btn is a tooling contract (run-and-verify). */
 .popup-collect-btn {
-    display: flex; align-items: center; gap: 7px;
-    width: 100%; padding: 9px 12px; margin-top: 10px;
-    font-family: var(--ui-font); font-size: 11px; font-weight: 700;
-    letter-spacing: 0.06em; text-transform: uppercase;
-    background: var(--surface2); color: var(--text);
-    border: 1px solid var(--border); border-radius: var(--radius);
-    cursor: pointer; transition: background 0.15s, border-color 0.15s, color 0.15s;
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 64px; height: 64px; border-radius: 50%;
+    margin: var(--sp-1) auto 2px; padding: 0;
+    background: transparent; color: var(--muted);
+    border: 2px solid var(--border);
+    cursor: pointer;
+    transition: border-color var(--t-fast), color var(--t-fast), background var(--t-fast), transform var(--t-fast);
 }
-.popup-collect-btn:hover { background: var(--border); }
-.popup-collect-btn.collected { background: rgba(247,201,72,0.15); border-color: rgba(247,201,72,0.35); color: var(--stamp-on); }
-.popup-collect-btn.collected:hover { background: rgba(247,201,72,0.08); border-color: rgba(247,201,72,0.2); color: #d4a830; }
-/* Non-stamp station: no button at all — the whole popup is muted so it's implicit
+.popup-collect-btn svg { width: 26px; height: 26px; }
+.popup-collect-btn:hover { border-color: var(--gold); color: var(--gold);
+    background: color-mix(in srgb, var(--gold) var(--a-tint), transparent); }
+.popup-collect-btn:active { transform: scale(0.92); }
+.popup-collect-btn.collected {
+    background: var(--gold); border-color: var(--gold); color: var(--bg);
+    animation: stamp-in var(--t-move) ease;
+}
+.popup-collect-btn.collected:hover {
+    background: color-mix(in srgb, var(--gold) 85%, var(--bg));
+    border-color: var(--gold); color: var(--bg);
+}
+@keyframes stamp-in {
+    0% { transform: scale(1.25); opacity: 0.4; }
+    55% { transform: scale(0.94); opacity: 1; }
+    100% { transform: scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+    .popup-collect-btn, .popup-collect-btn.collected { animation: none; transition: none; }
+}
+/* Non-stamp station: no seal at all — the whole popup is muted so it's implicit
    there's nothing to collect here (#20). */
+.popup-inner.nostamp { text-align: left; }
 .popup-inner.nostamp .popup-name { color: var(--muted); font-weight: 400; }
 .popup-inner.nostamp .popup-line { opacity: 0.75; }
 
 /* Read-only station popup shown while editing a ride (#17): name + optional
    "collected" indicator, nothing interactive. */
-.popup-inner.readonly { padding-bottom: 14px; }
+.popup-inner.readonly { padding-bottom: var(--sp-3); text-align: left; }
 .popup-collected {
-    display: inline-flex; align-items: center; gap: 6px; margin-top: 8px;
-    font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
-    color: var(--stamp-on);
+    display: inline-flex; align-items: center; gap: 6px; margin-top: var(--sp-2);
+    font-size: 10px; font-weight: 700; letter-spacing: var(--track-caps); text-transform: uppercase;
+    color: var(--gold);
 }
 
 /* ── Session panel ────────────────────────────────────────────────── */
 #session-panel {
     /* Safe-area aware like the topbar, so it never overlaps it on notched phones. */
-    position: absolute; top: calc(env(safe-area-inset-top, 0px) + 56px); right: 12px;
+    position: absolute; top: calc(env(safe-area-inset-top, 0px) + 60px); right: var(--sp-3);
     z-index: var(--z-map-ui); width: min(290px, calc(100vw - 24px));
     max-height: calc(100vh - env(safe-area-inset-top, 0px) - 72px); overflow-y: auto;
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); box-shadow: 0 8px 24px rgba(0,0,0,0.5);
 }
-#session-header { padding: 14px 16px 10px; border-bottom: 1px solid var(--border); }
-#session-user-row { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+#session-header { padding: var(--sp-3) var(--sp-4) 10px; border-bottom: 1px solid var(--border); }
+#session-user-row { display: flex; align-items: center; gap: var(--sp-2); margin-bottom: var(--sp-1); }
 #session-avatar {
     width: 28px; height: 28px; border-radius: 50%;
-    background: var(--accent-dim); border: 1px solid var(--accent);
+    background: color-mix(in srgb, var(--accent) var(--a-tint), transparent);
+    border: 1px solid var(--accent);
     display: flex; align-items: center; justify-content: center;
-    font-size: 12px; font-weight: 700; color: var(--accent); flex-shrink: 0;
+    font-size: var(--fs-sm); font-weight: 700; color: var(--accent); flex-shrink: 0;
 }
 #session-username { font-size: 13px; font-weight: 700; color: var(--text); }
 #session-username.placeholder { color: var(--muted); font-weight: 400; font-style: italic; }
-#session-stats { font-size: 11px; color: var(--muted); display: flex; align-items: center; gap: 8px; }
+#session-stats { font-size: var(--fs-xs); color: var(--muted); display: flex; align-items: center; gap: var(--sp-2); }
 #session-progress-bar { flex: 1; height: 3px; background: var(--surface2); border-radius: 2px; overflow: hidden; }
-#session-progress-fill { height: 100%; background: var(--stamp-on); border-radius: 2px; transition: width 0.4s ease; width: 0%; }
-.sync-status { font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; padding: 2px 0 6px; min-height: 16px; transition: color 0.2s; }
+#session-progress-fill { height: 100%; background: var(--gold); border-radius: 2px; transition: width 0.4s ease; width: 0%; }
+.sync-status { font-size: 10px; letter-spacing: var(--track-caps); text-transform: uppercase; padding: 2px 0 6px; min-height: 16px; transition: color var(--t-fast); }
 .sync-status.saving { color: var(--muted); }
-.sync-status.saved  { color: #6fdd8b; }
-.sync-status.error  { color: #f77e7e; }
+.sync-status.saved  { color: var(--success); }
+.sync-status.error  { color: var(--danger); }
 .sync-status.local  { color: var(--muted); }
-.sync-status a { color: var(--accent); text-decoration: none; margin-left: 4px; }
+.sync-status a { color: var(--accent); text-decoration: none; margin-left: var(--sp-1); }
 .sync-status a:hover { text-decoration: underline; }
-#session-body { padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+#session-body { padding: var(--sp-3); display: flex; flex-direction: column; gap: var(--sp-2); }
 /* Loaded state */
 #session-loaded-row {
-    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    display: flex; align-items: center; justify-content: space-between; gap: var(--sp-2);
     background: var(--surface2); border: 1px solid var(--border);
-    border-radius: var(--radius); padding: 8px 10px;
+    border-radius: var(--r-sm); padding: var(--sp-2) 10px;
 }
-.session-loaded-label { font-size: 10px; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 2px; }
+.session-loaded-label { font-size: 10px; color: var(--muted); letter-spacing: var(--track-caps); text-transform: uppercase; margin-bottom: 2px; }
 #session-loaded-name { font-size: 13px; font-weight: 700; color: var(--text); }
-/* Input section */
-.session-input-section { display: flex; flex-direction: column; gap: 4px; }
-.session-label-heading { font-size: 10px; font-weight: 700; color: var(--text); letter-spacing: 0.06em; text-transform: uppercase; }
-.session-hint-text { font-size: 10px; color: var(--muted); line-height: 1.5; padding: 0 2px; }
-.session-hint-text a { color: var(--accent); text-decoration: none; }
-.session-hint-text a:hover { text-decoration: underline; }
-#session-name-input, #session-token-input {
-    width: 100%; padding: 8px 10px;
-    background: var(--surface2); border: 1px solid var(--border);
-    border-radius: 4px; color: var(--text);
-    font-family: var(--ui-font); font-size: 12px; outline: none; transition: border-color 0.15s;
+/* Cloud-sync disclosure: setup lives behind a fold, not permanently on screen */
+#session-sync-details > summary {
+    list-style: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: var(--sp-2) 10px;
+    font-size: 10px; font-weight: 700; color: var(--muted);
+    letter-spacing: var(--track-caps); text-transform: uppercase;
+    background: var(--surface2); border: 1px solid var(--border); border-radius: var(--r-sm);
+    transition: color var(--t-fast), border-color var(--t-fast);
 }
-#session-name-input:focus, #session-token-input:focus { border-color: var(--accent); }
-#session-name-input::placeholder, #session-token-input::placeholder { color: var(--muted); }
-/* Buttons */
+#session-sync-details > summary::-webkit-details-marker { display: none; }
+#session-sync-details > summary::after { content: '+'; font-size: var(--fs-sm); }
+#session-sync-details[open] > summary::after { content: '–'; }
+#session-sync-details > summary:hover { color: var(--text); border-color: var(--accent); }
+#session-sync-details .field { padding: var(--sp-2) 2px 0; }
+/* Buttons inside the panel are small */
+.session-btn { flex: 1; padding: var(--sp-2) 10px; font-size: 10px; }
 .session-row { display: flex; gap: 6px; }
-.session-btn {
-    flex: 1; padding: 7px 10px;
-    font-family: var(--ui-font); font-size: 10px; font-weight: 700;
-    letter-spacing: 0.07em; text-transform: uppercase;
-    background: var(--surface2); color: var(--text);
-    border: 1px solid var(--border); border-radius: 4px;
-    cursor: pointer; transition: background 0.15s, border-color 0.15s, color 0.15s; white-space: nowrap;
-}
-.session-btn:hover { background: var(--border); }
-.session-btn.primary { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
-.session-btn.primary:hover { background: rgba(126,184,247,0.2); }
-.session-btn.danger { color: #f77e7e; border-color: #3a2222; }
-.session-btn.danger:hover { background: rgba(247,126,126,0.1); border-color: #f77e7e; }
-/* Two-step confirm state for destructive actions */
-.session-btn.confirm-pending {
-    background: rgba(247,126,126,0.15); border-color: #f77e7e; color: #f77e7e;
-    animation: pulse-warn 0.4s ease;
-}
-@keyframes pulse-warn { 0%,100% { transform: scale(1); } 50% { transform: scale(1.02); } }
-
-/* ── Name modal ───────────────────────────────────────────────────── */
-#name-modal-overlay {
-    position: fixed; inset: 0; z-index: var(--z-modal);
-    background: rgba(0,0,0,0.7);
-    display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px);
-}
-#name-modal {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 10px; padding: 28px 28px 24px;
-    width: min(360px, calc(100vw - 32px)); box-shadow: 0 20px 60px rgba(0,0,0,0.7);
-}
-#name-modal h2 { font-family: var(--jp-font); font-size: 20px; color: var(--text); margin-bottom: 6px; }
-#name-modal p  { font-size: 12px; color: var(--muted); margin-bottom: 20px; line-height: 1.7; }
-#app-version { margin-top: 14px; text-align: right; font-size: 10px; color: var(--muted); opacity: 0.5; letter-spacing: 0.05em; }
-#modal-name-input {
-    width: 100%; padding: 10px 12px; margin-bottom: 8px;
-    background: var(--surface2); border: 1px solid var(--border);
-    border-radius: 4px; color: var(--text);
-    font-family: var(--jp-font); font-size: 16px; outline: none; transition: border-color 0.15s;
-}
-#modal-name-input:focus { border-color: var(--accent); }
-#modal-name-hint {
-    font-size: 11px; color: var(--muted); margin-bottom: 18px; line-height: 1.6;
-    padding: 8px 10px; background: rgba(247,201,72,0.06);
-    border: 1px solid rgba(247,201,72,0.15); border-radius: 4px;
-}
-.modal-buttons { display: flex; gap: 8px; }
-.modal-btn {
-    flex: 1; padding: 10px;
-    font-family: var(--ui-font); font-size: 11px; font-weight: 700;
-    letter-spacing: 0.08em; text-transform: uppercase;
-    border-radius: 4px; cursor: pointer; border: 1px solid var(--border);
-    transition: background 0.15s, color 0.15s;
-}
-.modal-btn.secondary { background: var(--surface2); color: var(--muted); }
-.modal-btn.secondary:hover { color: var(--text); }
-.modal-btn.confirm { background: var(--accent-dim); color: var(--accent); border-color: var(--accent); }
-.modal-btn.confirm:hover { background: rgba(126,184,247,0.2); }
+/* Reset sits alone at the bottom, quiet until armed */
+#session-reset { margin-top: var(--sp-1); }
+/* Discreet version label inside the session panel */
+#session-version { padding: 6px var(--sp-3) 10px; text-align: right; font-size: 10px;
+    color: var(--muted); opacity: 0.5; letter-spacing: 0.05em; }
 
 /* ── Toast ────────────────────────────────────────────────────────── */
 /* Sits ABOVE the bottom-centre slot (stats bar / ride-edit close button), so a
@@ -289,14 +337,17 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
     bottom: max(72px, calc(env(safe-area-inset-bottom, 0px) + 64px));
     z-index: var(--z-toast);
     background: var(--surface2); border: 1px solid var(--border);
-    border-radius: var(--radius); padding: 10px 18px;
-    font-size: 12px; color: var(--text); text-align: center;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.4);
-    transition: transform 0.3s ease, opacity 0.3s ease;
+    border-radius: var(--r-sm); padding: 10px 18px;
+    font-family: var(--jp-font); font-size: var(--fs-sm); color: var(--text); text-align: center;
+    box-shadow: var(--shadow-1);
+    transition: transform var(--t-move) ease, opacity var(--t-move) ease;
     opacity: 0; pointer-events: none;
     max-width: min(480px, calc(100vw - 32px));
 }
 #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+/* Errors look like errors: say what happened + how to fix (F-11) */
+#toast.toast--error { border-color: var(--danger); color: var(--danger);
+    background: color-mix(in srgb, var(--danger) var(--a-tint), var(--surface2)); }
 
 /* ── Stats bar ────────────────────────────────────────────────────── */
 #stats-bar {
@@ -305,70 +356,53 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
     left: 50%; transform: translateX(-50%);
     z-index: var(--z-map-ui);
     background: var(--surface); border: 1px solid var(--border);
-    border-radius: 20px; padding: 6px 16px;
-    font-size: 11px; color: var(--muted);
-    box-shadow: 0 2px 12px rgba(0,0,0,0.4);
-    letter-spacing: 0.06em; white-space: nowrap; max-width: calc(100vw - 32px);
+    border-radius: var(--r-full); padding: 6px var(--sp-4);
+    font-size: var(--fs-xs); color: var(--muted);
+    box-shadow: var(--shadow-1);
+    letter-spacing: 0.05em; white-space: nowrap; max-width: calc(100vw - 32px);
 }
-#stats-bar strong { color: var(--stamp-on); font-weight: 700; }
+#stats-bar strong { color: var(--gold); font-weight: 700; }
 #stats-hint { color: var(--muted); font-style: italic; }
 
 /* ── Line tooltip ─────────────────────────────────────────────────── */
-.line-tooltip { background: var(--surface) !important; border: 1px solid var(--border) !important; border-radius: var(--radius) !important; box-shadow: 0 4px 16px rgba(0,0,0,0.5) !important; padding: 0 !important; pointer-events: none; }
+.line-tooltip { background: var(--surface) !important; border: 1px solid var(--border) !important; border-radius: var(--r-sm) !important; box-shadow: var(--shadow-1) !important; padding: 0 !important; pointer-events: none; }
 .line-tooltip::before { display: none !important; }
-.line-tip { padding: 8px 12px; }
-.line-tip b    { display: block; font-family: var(--jp-font); font-size: 14px; font-weight: 700; color: var(--text); }
-.line-tip span { font-size: 11px; color: var(--muted); letter-spacing: 0.04em; }
-
-.hidden { display: none !important; }
-
-@media (pointer: coarse) {
-    .session-btn { padding: 9px 10px; }
-    .popup-collect-btn { padding: 12px 14px; font-size: 12px; }
-}
-/* Narrow screens: drop the "Session" text so the top bar never overflows,
-   and the stats-bar hint so the count never clips at the screen edge (F-7) */
-@media (max-width: 480px) {
-    #topbar { gap: 6px; }
-    .ui-btn { padding: 8px 10px; }
-    .session-label { display: none; }
-    #stats-hint { display: none; }
-}
-/* Discreet version label inside the session panel */
-#session-version { padding: 6px 12px 10px; text-align: right; font-size: 10px;
-    color: var(--muted); opacity: 0.5; letter-spacing: 0.05em; }
+.line-tip { padding: var(--sp-2) var(--sp-3); }
+.line-tip b    { display: block; font-family: var(--jp-font); font-size: var(--fs-md); font-weight: 700; color: var(--text); }
+.line-tip span { font-size: var(--fs-xs); color: var(--muted); letter-spacing: 0.03em; }
 
 /* ── Line popup: "add a ride" ─────────────────────────────────────── */
-.popup-ride-summary { font-size: 11px; color: var(--muted); margin: 2px 0 10px; }
-.popup-line-ride-btn {
-    display: flex; align-items: center; justify-content: center; gap: 6px;
-    width: 100%; padding: 9px 12px; cursor: pointer;
-    font-family: var(--ui-font); font-size: 11px; font-weight: 700;
-    letter-spacing: 0.04em; border-radius: 4px;
-    background: var(--surface2); color: var(--text); border: 1px solid var(--border);
-    transition: background 0.15s, border-color 0.15s, color 0.15s;
+.popup-ride-summary { font-family: var(--jp-font); font-size: var(--fs-xs); color: var(--muted); margin: 2px 0 10px; }
+.popup-line-ride-btn.has-rides {
+    background: color-mix(in srgb, var(--accent) var(--a-tint), transparent);
+    border-color: color-mix(in srgb, var(--accent) var(--a-outline), transparent);
+    color: var(--accent);
 }
-.popup-line-ride-btn:hover { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
-.popup-line-ride-btn.has-rides { background: rgba(126,184,247,0.12); border-color: rgba(126,184,247,0.35); color: var(--accent); }
 
 /* ── Ride edit mode (selection happens directly on the map) ────────── */
 /* Fade the base map tiles so the (brought-forward) lines stand out. Station dots
    and saved-ride overlays stay fully visible — the user keeps seeing their
    collected stamps and existing rides while editing. */
-#map.ride-editing .leaflet-tile-pane { opacity: 0.3; filter: grayscale(0.4); transition: opacity 0.25s, filter 0.25s; }
+#map.ride-editing .leaflet-tile-pane { opacity: 0.3; filter: grayscale(0.4); transition: opacity var(--t-move), filter var(--t-move); }
 
 /* A single discreet button: signals edit mode AND saves-and-exits on click (#19). */
 #ride-edit-close {
     position: fixed; left: 50%; transform: translateX(-50%);
     bottom: max(20px, calc(env(safe-area-inset-bottom, 0px) + 14px));
     z-index: var(--z-modal);
-    display: inline-flex; align-items: center; gap: 8px;
-    padding: 10px 18px; cursor: pointer;
-    font-family: var(--ui-font); font-size: 11px; font-weight: 700;
-    letter-spacing: 0.08em; text-transform: uppercase;
-    color: var(--text); background: var(--surface);
-    border: 1px solid var(--border); border-radius: 999px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
-    transition: background 0.15s, border-color 0.15s, color 0.15s;
+    box-shadow: var(--shadow-2);
 }
-#ride-edit-close:hover { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
+
+/* ── Responsive / touch ───────────────────────────────────────────── */
+@media (pointer: coarse) {
+    .session-btn { padding: 10px; }
+    .popup-collect-btn { width: 72px; height: 72px; }
+}
+/* Narrow screens: drop the "Session" text so the top bar never overflows,
+   and the stats-bar hint so the count never clips at the screen edge (F-7) */
+@media (max-width: 480px) {
+    #topbar { gap: 6px; }
+    #controls .btn { padding: 10px; }
+    .session-label { display: none; }
+    #stats-hint { display: none; }
+}

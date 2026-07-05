@@ -4,11 +4,13 @@
 
 import { APP_VERSION, CACHE_TTL, IS_TOUCH, POPUP_GRACE_MS, MARKER_BASE_R, MARKER_BASE_R_TOUCH,
          MARKER_ABS_MIN, MARKER_COLL_BONUS, MARKER_MAX_R, ZOOM_BASE, ZOOM_SCALE,
+         STAMP_TOGGLE_GUARD_MS, PLAIN_MIN_ZOOM,
          ICON_STAMP_FILLED, ICON_STAMP_OUTLINE } from './config.js';
 import { state } from './state.js';
 import { ui, markers, plainMarkers, dedupeMarkers, lineColorMap, lineEnMap, allStations,
-         lineGroups, stationByCode, esc, orderLineNames } from './registry.js';
+         lineGroups, stationByCode, esc, orderLineNames, uiColors, hexA } from './registry.js';
 import { cacheGet, cacheSet } from './idb-cache.js';
+import { scheduleSave } from './gist.js';
 import { showToast, hideLoading } from './notify.js';
 import { updateStats } from './stats.js';
 
@@ -22,12 +24,23 @@ export const bringCollectedToFront = () => {
     markers.forEach(m => { if (m._isCollected) m.bringToFront(); });
 };
 
+// True while the plain (non-stamp) markers are pulled off the map on touch —
+// below PLAIN_MIN_ZOOM they are noise that buries the stamp dots (F-6).
+let plainHidden = false;
+const updatePlainVisibility = (map) => {
+    const hide = IS_TOUCH && map.getZoom() < PLAIN_MIN_ZOOM;
+    if (hide === plainHidden) return;
+    plainHidden = hide;
+    plainMarkers.forEach(m => hide ? m.removeFrom(map) : m.addTo(map));
+    if (!hide) bringStationsToFront();   // re-added plain dots must not cover stamp dots
+};
+
 // Re-add markers so they draw above the lines. Stamp markers are restacked every
 // call (cheap, ~2.3k); the ~6.7k plain markers are only restacked when asked
 // (includePlain, once after lines load) to avoid churning them on every overlay.
 export const bringStationsToFront = (includePlain = false) => {
     if (!ui.map) return;
-    if (includePlain) plainMarkers.forEach(m => { m.removeFrom(ui.map); m.addTo(ui.map); });
+    if (includePlain && !plainHidden) plainMarkers.forEach(m => { m.removeFrom(ui.map); m.addTo(ui.map); });
     markers.forEach(m => { m.removeFrom(ui.map); m.addTo(ui.map); });
     bringCollectedToFront();
 };
@@ -66,18 +79,23 @@ const markerRadius = (collected, zoom) => {
 };
 
 export const circleStyle = (collected, zoom) => collected
-    ? { radius: markerRadius(true,  zoom), fillColor: '#f7c948', fillOpacity: 1,    color: 'rgba(247,201,72,0.4)', weight: 2, renderer: ui.canvasRenderer }
+    ? { radius: markerRadius(true,  zoom), fillColor: uiColors.gold, fillOpacity: 1,    color: hexA(uiColors.gold, 0.4),   weight: 2, renderer: ui.canvasRenderer }
     // Uncollected stamp: visible but discreet — soft grey, semi-transparent, no
     // border — so the gold collected markers clearly stand out against them.
-    : { radius: markerRadius(false, zoom), fillColor: '#9aa0ac', fillOpacity: 0.5,  color: '#9aa0ac',              weight: 0, renderer: ui.canvasRenderer };
+    : { radius: markerRadius(false, zoom), fillColor: uiColors.markerIdle, fillOpacity: 0.5, color: uiColors.markerIdle, weight: 0, renderer: ui.canvasRenderer };
 
-// Non-stamp stations: SAME size as an uncollected stamp dot but much LIGHTER (far
-// lower opacity), so they read as "minor station, no stamp" without competing with
-// the stamp dots. Still clickable for a name/lines popup.
-const plainStyle = (zoom) => ({
-    radius: markerRadius(false, zoom),
-    fillColor: '#9aa0ac', fillOpacity: 0.18, color: '#9aa0ac', weight: 0, renderer: ui.canvasRenderer,
-});
+// Non-stamp stations: much LIGHTER than stamp dots, and on touch also SMALLER
+// (desktop-sized, not finger-sized) — they're context, not targets, and at the
+// doubled touch radius they buried the stamp dots (docs/AUDIT.md F-6).
+// Still clickable for a name/lines popup where they're visible.
+const plainStyle = (zoom) => {
+    const base = MARKER_BASE_R * Math.pow(ZOOM_SCALE, zoom - ZOOM_BASE);
+    return {
+        radius: Math.min(MARKER_MAX_R, Math.max(MARKER_ABS_MIN, base)),
+        fillColor: uiColors.markerIdle, fillOpacity: 0.18, color: uiColors.markerIdle, weight: 0,
+        renderer: ui.canvasRenderer,
+    };
+};
 const styleFor = (marker, zoom) => marker._noStamp ? plainStyle(zoom) : circleStyle(marker._isCollected, zoom);
 
 // ── 9. POPUP ──────────────────────────────────────────────────────────────
@@ -97,7 +115,7 @@ export const buildPopupHtml = (marker) => {
     const secondary = state.lang === 'jp' ? en : jp;
 
     const lineBadges = (marker._lineCodes ?? [s.line_code]).filter(Boolean).map(lc => {
-        const color = lineColorMap[lc] ?? '#6b6b7a';
+        const color = lineColorMap[lc] ?? uiColors.lineUnknown;
         const { primary, secondary } = orderLineNames(lc);
         const label = secondary
             ? `<span class="popup-line-label"><span class="popup-line-jp">${esc(primary)}</span><span class="popup-line-en">${esc(secondary)}</span></span>`
@@ -117,25 +135,78 @@ export const buildPopupHtml = (marker) => {
         </div>`;
     }
 
-    // Normal mode: the collect action shows only for a stamp station. A non-stamp
-    // station (#20) never gets a button — just the name + lines, greyed via the
-    // `nostamp` class so it's implicit there's nothing to collect here.
-    let action = '';
-    if (!marker._noStamp) {
-        const collected = marker._isCollected;
-        const btnIcon   = collected ? ICON_STAMP_FILLED : ICON_STAMP_OUTLINE;
-        const btnLabel  = collected ? 'Collected' : 'Collect stamp';
-        const btnClass  = 'popup-collect-btn' + (collected ? ' collected' : '');
-        const btnAria   = `${collected ? 'Remove stamp' : 'Collect stamp'} for ${primary}`;
-        action = `<button class="${btnClass}" aria-label="${esc(btnAria)}">${btnIcon} ${btnLabel}</button>`;
+    // Non-stamp station (#20): no collect control — just the name + full line
+    // badges (identification is this popup's whole job), greyed via `nostamp`.
+    if (marker._noStamp) {
+        return `<div class="popup-inner nostamp">
+            <div class="popup-name">${esc(primary)}</div>
+            ${secondary ? `<div class="popup-name-secondary">${esc(secondary)}</div>` : ''}
+            ${lineBadges}
+        </div>`;
     }
 
-    return `<div class="popup-inner${marker._noStamp ? ' nostamp' : ''}">
+    // Stamp station → the stamp card: name + a big text-free round SEAL that
+    // toggles the stamp (tapping the station dot again does the same — see the
+    // marker click handler). Lines shrink to a row of colored dots with the
+    // names on their title tooltips; the full badges live on the lines
+    // themselves and on non-stamp popups.
+    const lineDots = (marker._lineCodes ?? []).filter(Boolean).map(lc => {
+        const { primary: lp, secondary: ls } = orderLineNames(lc);
+        const color = lineColorMap[lc] ?? uiColors.lineUnknown;
+        return `<span style="background:${esc(color)}" title="${esc(ls ? `${lp} · ${ls}` : lp)}"></span>`;
+    }).join('');
+    const collected = marker._isCollected;
+    const btnAria   = `${collected ? 'Remove stamp' : 'Collect stamp'} for ${primary}`;
+    return `<div class="popup-inner stamp-card">
         <div class="popup-name">${esc(primary)}</div>
         ${secondary ? `<div class="popup-name-secondary">${esc(secondary)}</div>` : ''}
-        ${lineBadges}
-        ${action}
+        ${lineDots ? `<div class="popup-line-dots">${lineDots}</div>` : ''}
+        <button class="popup-collect-btn${collected ? ' collected' : ''}"
+                aria-label="${esc(btnAria)}" aria-pressed="${collected}">
+            ${collected ? ICON_STAMP_FILLED : ICON_STAMP_OUTLINE}
+        </button>
     </div>`;
+};
+
+/**
+ * Toggle a station's stamp — THE collect action, shared by the seal button in
+ * the popup (event delegation in main.js) and by tapping the station dot while
+ * its card is open. A short guard window means a desktop double-click can't
+ * collect-then-instantly-remove (two click events land before dblclick).
+ */
+export const toggleStamp = (marker) => {
+    if (!marker || marker._noStamp) return;
+    const now = Date.now();
+    if (now - (marker._lastToggleAt || 0) < STAMP_TOGGLE_GUARD_MS) return;
+    marker._lastToggleAt = now;
+
+    const next = !marker._isCollected;
+    marker._isCollected = next;
+    state.stamps[next ? 'add' : 'delete'](marker._stationData.code);
+    scheduleSave();
+    marker.setStyle(circleStyle(next, ui.map.getZoom()));
+    if (next) marker.bringToFront();   // gold marker on top of grey ones
+
+    // Update the seal in place if the card is open (popup HTML is otherwise a
+    // function, rebuilt on next open — no manual sync needed).
+    const btn = marker.getPopup()?.getElement()?.querySelector('.popup-collect-btn');
+    if (btn) {
+        const ariaName = state.lang === 'jp' ? (marker.stationNameJP || marker.stationNameEN)
+                                             : (marker.stationNameEN || marker.stationNameJP);
+        btn.className = 'popup-collect-btn' + (next ? ' collected' : '');
+        btn.setAttribute('aria-label', `${next ? 'Remove stamp' : 'Collect stamp'} for ${ariaName}`);
+        btn.setAttribute('aria-pressed', String(next));
+        btn.innerHTML = next ? ICON_STAMP_FILLED : ICON_STAMP_OUTLINE;
+    }
+    updateStats();
+    showToast(next ? `${marker.stationName} — stamped!` : `${marker.stationName} — removed`);
+
+    // One-time nudge after the very first stamp, now that the welcome modal is
+    // gone: the map is the welcome, the Session panel is where naming lives.
+    if (next && state.stamps.size === 1 && !state.user && !localStorage.getItem('eki_first_stamp_hint')) {
+        try { localStorage.setItem('eki_first_stamp_hint', '1'); } catch { /* storage blocked */ }
+        setTimeout(() => showToast('Saved on this device — open Session to name & sync your collection', 5000), 1800);
+    }
 };
 
 export const dedupeKey = (s) => `${s.name_kanji}|${s.lat.toFixed(2)}|${s.lon.toFixed(2)}`;
@@ -178,12 +249,33 @@ const createMarker = (station, map, plain = false) => {
     // having to re-push HTML into thousands of markers.
     marker.bindPopup(() => buildPopupHtml(marker), { offset: L.point(0, -4), closeButton: true, maxWidth: 260 });
 
-    // Click opens popup permanently (no auto-close on mouseout).
+    // Click opens the card; clicking the dot AGAIN while its card is open
+    // toggles the stamp. So: touch = tap-tap on the dot to collect; desktop =
+    // hover opens the card, a single click collects. The map's double-tap
+    // zoom is suppressed around station taps (map-setup.js, ui.lastStationTap).
+    //
+    // The open-state must be captured on 'preclick': Leaflet auto-closes the
+    // open popup on preclick (closePopupOnClick), so by 'click' time
+    // isPopupOpen() is already false for exactly the card we care about.
+    marker.on('preclick', () => {
+        marker._cardWasOpen = !marker._noStamp && marker.isPopupOpen?.() && ui.currentPopupMarker === marker;
+    });
     marker.on('click', () => {
+        const wasOpen = marker._cardWasOpen;
+        marker._cardWasOpen = false;
         if (ui.suppressTap) { ui.suppressTap = false; return; }   // ignore long-press
         if (ui.rideEdit) return;   // stations aren't clickable while editing a ride
+        ui.lastStationTap = Date.now();
         clearTimeout(marker._popupTimer);
         marker._hoverOpened = false;
+        if (wasOpen) {
+            // Second activation = collect/remove; keep the card up so the seal
+            // visibly flips (preclick closed it — reopen without animation churn).
+            ui.currentPopupMarker = marker;
+            marker.openPopup();
+            toggleStamp(marker);
+            return;
+        }
         ui.currentPopupMarker = marker;
         marker.openPopup();
     });
@@ -365,11 +457,13 @@ export const loadStations = async (map) => {
             clearTimeout(zoomDebounce);
             zoomDebounce = setTimeout(() => {
                 const zoom = map.getZoom();
+                updatePlainVisibility(map);
                 plainMarkers.forEach(m => m.setStyle(plainStyle(zoom)));
                 markers.forEach(m => m.setStyle(circleStyle(m._isCollected, zoom)));
                 bringCollectedToFront();
             }, 150);
         });
+        updatePlainVisibility(map);
         bringCollectedToFront();
         updateStats();
         hideLoading();
@@ -397,6 +491,6 @@ export const loadStations = async (map) => {
     } catch (err) {
         console.error('loadStations:', err);
         hideLoading();
-        showToast('Failed to load stations — check connection and refresh', 5000);
+        showToast('Failed to load stations — check connection and refresh', 5000, 'error');
     }
 };
