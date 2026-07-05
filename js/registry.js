@@ -45,6 +45,34 @@ export const ui = {
     currentPopupLine:   null,   // line whose popup is open (for the ride button)
     linePopupSeed:      null,   // {lat,lng} where the open line popup was clicked (corridor seed)
     rideEdit:           null,   // active ride edit session (or null) — see ride-edit.js
+    // Timestamp of the last tap that landed on a station marker. The touch
+    // double-tap-zoom gesture checks it so that tap-dot-then-tap-again (the
+    // stamp-collect gesture) never doubles as a zoom (map-setup.js).
+    lastStationTap:     0,
+};
+
+// UI colors for the canvas layers (markers, line fallbacks), read from the
+// CSS design tokens at boot (main.js) so the map and the chrome can never
+// drift apart (docs/DESIGN_SYSTEM.md §2.1). Canvas needs concrete color
+// strings, hence the copy — the tokens stay the single source of truth
+// (the literals below are only a pre-boot fallback).
+export const uiColors = {
+    gold: '#f7c948', markerIdle: '#9aa0ac', lineUnknown: '#6b6b7a',
+    accent: '#7eb8f7', bg: '#0f0f12',
+};
+export const loadUiColors = () => {
+    const cs = getComputedStyle(document.documentElement);
+    const read = (name, fallback) => (cs.getPropertyValue(name) || '').trim() || fallback;
+    uiColors.gold        = read('--gold', uiColors.gold);
+    uiColors.markerIdle  = read('--marker-idle', uiColors.markerIdle);
+    uiColors.lineUnknown = read('--line-unknown', uiColors.lineUnknown);
+    uiColors.accent      = read('--accent', uiColors.accent);
+    uiColors.bg          = read('--bg', uiColors.bg);
+};
+// #rrggbb → rgba() string for canvas strokes that need transparency.
+export const hexA = (hex, a) => {
+    const [r, g, b] = [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16));
+    return `rgba(${r},${g},${b},${a})`;
 };
 
 // HTML-escape for every name interpolated into popup/tooltip markup. Names

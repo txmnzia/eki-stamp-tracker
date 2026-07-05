@@ -108,7 +108,7 @@ export const loadFromGist = async (username, { mergeLocal = false } = {}) => {
         setSyncStatus('saved');
     } catch (err) {
         console.error('loadFromGist:', err);
-        setSyncStatus('error');
+        setSyncStatus('error', err);
     }
 };
 
@@ -152,7 +152,7 @@ export const syncToGist = async () => {
         setSyncStatus('saved');
     } catch (err) {
         console.error('syncToGist:', err);
-        setSyncStatus('error');
+        setSyncStatus('error', err);
     }
 };
 

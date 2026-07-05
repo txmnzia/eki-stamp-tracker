@@ -3,6 +3,7 @@
 import { MAX_SUGGESTIONS, SEARCH_JUMP_MS } from './config.js';
 import { state } from './state.js';
 import { ui, markers } from './registry.js';
+import { rankCandidates } from './search-rank.js';
 
 /**
  * Render search suggestions for the current input value and language.
@@ -17,11 +18,14 @@ export const renderSuggestions = (map, term) => {
     input.removeAttribute('aria-activedescendant');
     if (!term) return;
 
-    const lc   = term.toLowerCase();
-    const hits = markers.filter(m =>
-        m.stationNameEN.toLowerCase().includes(lc) ||
-        m.stationNameJP.toLowerCase().includes(lc)
-    ).slice(0, MAX_SUGGESTIONS);
+    // Rank by relevance (prefix > word-start > substring — docs/AUDIT.md F-1),
+    // then by distance from the current map view so equally-relevant results
+    // favour where the user is looking; line count breaks remaining ties.
+    const ctr  = map.getCenter();
+    const hits = rankCandidates(term, markers.map(m => ({
+        m, en: m.stationNameEN, jp: m.stationNameJP,
+        dist: ctr.distanceTo(m.getLatLng()), weight: m._lineCodes.length,
+    }))).slice(0, MAX_SUGGESTIONS).map(c => c.m);
 
     if (!hits.length) return;
     box.style.display = 'block';

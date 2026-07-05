@@ -4,26 +4,22 @@
    (docs/REFACTOR-2026-07.md):
      config, line-colors, state, registry, gist, notify, map-setup, idb-cache,
      geometry (pure), line-geometry, lines, rides, ride-edit, markers,
-     search, lang, stats, session, welcome, main
+     search, search-rank (pure), lang, stats, session, main
 ========================================================================== */
 
-import { ICON_STAMP_FILLED, ICON_STAMP_OUTLINE } from './config.js';
 import { state } from './state.js';
-import { ui, linesByName, allLineSegs } from './registry.js';
-import { loadFromGist, scheduleSave } from './gist.js';
-import { showToast } from './notify.js';
+import { ui, linesByName, allLineSegs, loadUiColors } from './registry.js';
+import { loadFromGist } from './gist.js';
 import { initMap } from './map-setup.js';
 import { cachePrune } from './idb-cache.js';
 import { buildLineGeometry, buildRideSegments } from './line-geometry.js';
 import { loadLines } from './lines.js';
 import { renderAllRideOverlays } from './rides.js';
 import { enterRideEditMode, setupRideEdit } from './ride-edit.js';
-import { circleStyle, refreshAllMarkerStates, loadStations } from './markers.js';
+import { toggleStamp, refreshAllMarkerStates, loadStations } from './markers.js';
 import { setupSearch } from './search.js';
 import { setupLanguageToggle } from './lang.js';
-import { updateStats } from './stats.js';
 import { setupSessionPanel } from './session.js';
-import { setupModal } from './welcome.js';
 
 // Test hook — the public contract for tooling (scripts/audit-ride-gaps.mjs
 // drives the real geometry pipeline through it). Module bindings are not
@@ -33,6 +29,7 @@ window.__eki = { buildLineGeometry, buildRideSegments, linesByName, allLineSegs,
 
 document.addEventListener('DOMContentLoaded', async () => {
     document.documentElement.lang = state.lang === 'jp' ? 'ja' : 'en';   // honour the stored preference
+    loadUiColors();   // canvas layers read the CSS color tokens (single source of truth)
     const map   = initMap();
     ui.map = map;
     cachePrune();   // clear other versions' cached data (best-effort)
@@ -40,7 +37,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     setupSearch(map);
     setupLanguageToggle(map);
     setupSessionPanel(map);
-    setupModal(map);
     setupRideEdit();
 
     // Event delegation for the line popup's "add a ride" button → map edit mode
@@ -54,28 +50,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         enterRideEditMode(name);
     });
 
-    // Event delegation for popup collect button
-    // Reliable alternative to popupopen+getElement (which returns null in Leaflet)
+    // Event delegation for the stamp seal in the station card.
+    // Reliable alternative to popupopen+getElement (which returns null in Leaflet);
+    // the toggle itself (state, style, seal, toast) lives in toggleStamp.
     document.addEventListener('click', (e) => {
         const btn = e.target.closest('.popup-collect-btn');
         if (!btn || !ui.currentPopupMarker) return;
         e.stopPropagation();
-        const marker = ui.currentPopupMarker;
-        const next   = !marker._isCollected;
-        marker._isCollected = next;
-        state.stamps[next ? 'add' : 'delete'](marker._stationData.code);
-        scheduleSave();
-        marker.setStyle(circleStyle(next, map.getZoom()));
-        if (next) marker.bringToFront();   // gold marker on top of grey ones
-        // Update button in-place without rebuilding popup
-        btn.className   = 'popup-collect-btn' + (next ? ' collected' : '');
-        const ariaName = state.lang === 'jp' ? (marker.stationNameJP || marker.stationNameEN)
-                                              : (marker.stationNameEN || marker.stationNameJP);
-        btn.setAttribute('aria-label', `${next ? 'Remove stamp' : 'Collect stamp'} for ${ariaName}`);
-        btn.innerHTML   = `${next ? ICON_STAMP_FILLED : ICON_STAMP_OUTLINE} ${next ? 'Collected' : 'Collect stamp'}`;
-        // Popup content is a function (rebuilt on next open) — no manual sync needed.
-        updateStats();
-        showToast(next ? `${marker.stationName} — stamped!` : `${marker.stationName} — removed`);
+        toggleStamp(ui.currentPopupMarker);
     });
 
     // Load stations first (they appear fast, often from cache)
