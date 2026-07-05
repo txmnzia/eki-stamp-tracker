@@ -31,7 +31,7 @@ python3 scripts/check_data.py
 # expect: "all data checks passed: 10452 stations, 2411 stamps, 22016 track
 #          features, 20718 graph nodes, 8 shinkansen"
 
-# 3. Serve the repo. Use ports 8110-8119 ONLY (other agents use other ranges):
+# 3. Serve the repo (any free port; examples use 8110, CI uses 8097):
 python3 -m http.server 8110 &         # from the repo root; kill it when done
 
 # 4. One-time Playwright setup OUTSIDE the repo (never commit node_modules):
@@ -55,8 +55,8 @@ Total runtime: unit tests <1 s, check_data ~5 s, smoke ~10 s, audit ~10 s.
 
 The app is native ES modules; browsers refuse to load them over `file://`
 (module CORS), and the app `fetch()`es `data/*.json` over HTTP anyway. Any
-static server from the repo root works. In shared sandboxes stick to
-**8110–8119** to avoid colliding with other agents' servers.
+static server from the repo root works. If several sessions/agents share the
+sandbox, pick a distinct port each (check with `pkill -0 -f http.server`).
 
 ## Playwright in this sandbox (the parts that bite)
 

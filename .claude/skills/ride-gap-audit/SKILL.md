@@ -37,7 +37,7 @@ corridors like `本線` that merge 京成/相鉄/京急 (README "Ride gaps" sect
 
 ```bash
 cd /home/user/eki-stamp-tracker
-python3 -m http.server 8110 &                 # ports 8110-8119 only; kill when done
+python3 -m http.server 8110 &                 # any free port; kill it when done
 
 SCRATCH=$(mktemp -d)                          # outside the repo; never commit node_modules
 (cd "$SCRATCH" && npm init -y >/dev/null && \
