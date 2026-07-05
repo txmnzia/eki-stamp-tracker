@@ -49,7 +49,8 @@ MAX_GAPS=15 node scripts/audit-ride-gaps.mjs      # see the ride-gap-audit skill
 ```
 
 Total runtime: unit tests <1 s, check_data ~5 s, smoke ~10 s, audit ~10 s.
-**Kill the server** (`kill %1` or `pkill -f "http.server 8110"`) before finishing.
+**Kill the server** before finishing — prefer `kill %1` (a `pkill -f "http.server …"`
+pattern can match your own shell's command line and kill it, exit 144).
 
 ## Serving: a static server is REQUIRED
 
@@ -176,8 +177,18 @@ process.exit(saved && errors.length === 0 ? 0 : 1);
 Verified output: `ok collect+persist eki_2200701 | console errors: 0` (~7 s).
 For the ride-edit leg: click a screen point on a line (compute it via
 `ui.map.latLngToContainerPoint` on a vertex from `__eki.linesByName[name]`),
-then `.popup-line-ride-btn`, then mouse-drag through the same point (hit radius
-14 px desktop / 24 px touch), then `#ride-edit-close` saves.
+then `.popup-line-ride-btn`, then paint and `#ride-edit-close` to save. Painting
+gotchas (each cost a real debugging cycle):
+- The **initial `pointerdown` must land ON the line** (within the hit radius,
+  14 px desktop / 24 px touch) — `rideHitTest` in `js/ride-edit.js` bails
+  otherwise and the whole drag is a silent no-op that pans the map instead.
+  Dragging *through* the line from an off-line start paints nothing.
+- The "Ride changes saved" toast only fires if painting set `ui.rideEdit.dirty`
+  — its absence after close means your press missed the line, not that saving
+  is broken.
+- Proof of a saved ride is `eki_local_progress`.rides in localStorage, NOT a
+  key in `rideOverlays` (an empty `rideOverlays[name]` entry exists for any
+  rendered line).
 
 ## Failure modes
 
