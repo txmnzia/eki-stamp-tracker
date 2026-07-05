@@ -101,7 +101,8 @@ window.__eki = { buildLineGeometry, buildRideSegments, linesByName, allLineSegs,
 **The wait idiom (MUST use before touching geometry).** Line features render in
 RAF batches over several frames; building geometry mid-render caches an
 incomplete graph → phantom gaps (the P1 bug in `docs/AUDIT-2026-07.md` §2.1).
-Copy this verbatim (same idiom as the audit script):
+Copy this verbatim (the audit script's stability idiom, plus an explicit
+`ui.linesReady` check the audit itself doesn't need):
 
 ```js
 await page.waitForFunction(
@@ -200,7 +201,7 @@ gotchas (each cost a real debugging cycle):
 | Clicks time out, `#name-modal-overlay … intercepts pointer events` | welcome modal reappears on every anonymous load/reload | click `#modal-skip` after every `goto`/`reload` |
 | Phantom ride gaps / wrong overlays in your script | geometry touched before rendering settled | use the wait idiom; never poll less than 5 stable ticks |
 | "Lines are still loading — try again in a moment." toast | `enterRideEditMode` called before `ui.linesReady` | wait for `__eki.ui.linesReady` first (it's a guard, not a bug) |
-| `EADDRINUSE` on 8110 | a previous server still running | `pkill -f "http.server 811"` then restart, or use 8111-8119 |
+| `EADDRINUSE` on 8110 | a previous server still running | kill only the exact port (`pkill -f "http.server 8110"` — a broader pattern can kill other sessions' servers), or pick another port |
 | node_modules appears in `git status` | playwright installed inside the repo | delete it; only `__pycache__/` is gitignored — install outside the repo |
 
 ## Checklist before you're done
