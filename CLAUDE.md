@@ -34,7 +34,7 @@ the area you're touching before editing.
    ordered groups pick which stations.
 5. **NEVER introduce a build step/toolchain.** New code = new ES module in `js/`
    matching the existing header style; `js/geometry.js` stays pure (unit-testable
-   via `node --test tests/`).
+   via `node --test tests/*.test.mjs`).
 6. **Bump `APP_VERSION`** (`js/config.js`) on every merge to main — it keys both
    IndexedDB caches; forgetting it leaves users on stale data for up to 7 days.
 7. **`esc()` every value interpolated into HTML** — names come from a scraped
@@ -50,7 +50,7 @@ the area you're touching before editing.
 
 ```bash
 python3 -m http.server 8000          # serve (required; file:// cannot load ES modules)
-node --test tests/                   # pure-geometry unit tests
+node --test tests/*.test.mjs         # pure-geometry unit tests (the bare "tests/" dir form fails on Node 22)
 python3 scripts/check_data.py        # structural data sanity
 # full regression gate (see .claude/skills/ride-gap-audit):
 BASE_URL=http://127.0.0.1:8097 MAX_GAPS=15 node scripts/audit-ride-gaps.mjs
