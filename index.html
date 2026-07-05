@@ -75,9 +75,10 @@
             <div class="session-input-section" id="session-token-section">
                 <label for="session-token-input" class="session-label-heading">GitHub token (cloud sync)</label>
                 <input type="password" id="session-token-input" placeholder="Paste a gist-scope token…" autocomplete="off" />
-                <small class="session-hint-text">Optional. Cloud sync saves progress to a private Gist on <em>your</em> GitHub account.
-                    Create a token with <strong>only the gist scope</strong> at github.com → Settings → Developer settings → Tokens.
-                    Without one, progress is saved on this device only.</small>
+                <small class="session-hint-text">Optional — syncs to a private Gist on <em>your</em> GitHub account.
+                    <a href="https://github.com/settings/tokens/new?scopes=gist&amp;description=eki-stamp-tracker"
+                       target="_blank" rel="noopener">Create a gist-only token</a> and paste it here.
+                    Without one, progress stays on this device.</small>
             </div>
             <!-- Load (only when no session) -->
             <div class="session-row" id="session-load-row">

@@ -144,6 +144,9 @@ export const enterRideEditMode = (name) => {
     ui.map.on('moveend zoomend', refreshAllCaches);
 
     document.getElementById('ride-edit-close').classList.remove('hidden');
+    // The Close button takes over the bottom-centre slot — hide the stats bar
+    // so the two never overlap (docs/AUDIT.md F-3).
+    document.getElementById('stats-bar')?.classList.add('hidden');
     ui.map.getContainer().style.cursor = 'crosshair';
     showToast('Tap or drag along any line to mark the stretch you rode. Tap Close when done.', 3500);
 };
@@ -170,6 +173,7 @@ const exitRideEditMode = () => {
     const c = ui.map.getContainer();
     c.style.cursor = ''; c.style.touchAction = ''; c.classList.remove('ride-editing');
     document.getElementById('ride-edit-close').classList.add('hidden');
+    document.getElementById('stats-bar')?.classList.remove('hidden');
     ui.rideEdit = null;
 
     // Restore the normal look, then redraw the saved-ride overlays for every line

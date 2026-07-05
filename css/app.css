@@ -55,7 +55,7 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 .loading-text { font-size: 11px; color: var(--muted); letter-spacing: 0.12em; text-transform: uppercase; }
-.loading-sub  { font-size: 10px; color: var(--border); letter-spacing: 0.06em; }
+.loading-sub  { font-size: 10px; color: var(--muted); letter-spacing: 0.06em; }
 
 /* ── Shared UI button ─────────────────────────────────────────────── */
 .ui-btn {
@@ -209,14 +209,16 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .session-input-section { display: flex; flex-direction: column; gap: 4px; }
 .session-label-heading { font-size: 10px; font-weight: 700; color: var(--text); letter-spacing: 0.06em; text-transform: uppercase; }
 .session-hint-text { font-size: 10px; color: var(--muted); line-height: 1.5; padding: 0 2px; }
-#session-name-input {
+.session-hint-text a { color: var(--accent); text-decoration: none; }
+.session-hint-text a:hover { text-decoration: underline; }
+#session-name-input, #session-token-input {
     width: 100%; padding: 8px 10px;
     background: var(--surface2); border: 1px solid var(--border);
     border-radius: 4px; color: var(--text);
     font-family: var(--ui-font); font-size: 12px; outline: none; transition: border-color 0.15s;
 }
-#session-name-input:focus { border-color: var(--accent); }
-#session-name-input::placeholder { color: var(--muted); }
+#session-name-input:focus, #session-token-input:focus { border-color: var(--accent); }
+#session-name-input::placeholder, #session-token-input::placeholder { color: var(--muted); }
 /* Buttons */
 .session-row { display: flex; gap: 6px; }
 .session-btn {
@@ -279,15 +281,20 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .modal-btn.confirm:hover { background: rgba(126,184,247,0.2); }
 
 /* ── Toast ────────────────────────────────────────────────────────── */
+/* Sits ABOVE the bottom-centre slot (stats bar / ride-edit close button), so a
+   toast never covers the control it refers to (docs/AUDIT.md F-3). Wraps
+   instead of clipping on narrow screens (F-7). */
 #toast {
-    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
+    position: fixed; left: 50%; transform: translateX(-50%) translateY(80px);
+    bottom: max(72px, calc(env(safe-area-inset-bottom, 0px) + 64px));
     z-index: var(--z-toast);
     background: var(--surface2); border: 1px solid var(--border);
     border-radius: var(--radius); padding: 10px 18px;
-    font-size: 12px; color: var(--text);
+    font-size: 12px; color: var(--text); text-align: center;
     box-shadow: 0 4px 16px rgba(0,0,0,0.4);
     transition: transform 0.3s ease, opacity 0.3s ease;
-    opacity: 0; pointer-events: none; white-space: nowrap;
+    opacity: 0; pointer-events: none;
+    max-width: min(480px, calc(100vw - 32px));
 }
 #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
 
@@ -319,11 +326,13 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
     .session-btn { padding: 9px 10px; }
     .popup-collect-btn { padding: 12px 14px; font-size: 12px; }
 }
-/* Narrow screens: drop the "Session" text so the top bar never overflows */
+/* Narrow screens: drop the "Session" text so the top bar never overflows,
+   and the stats-bar hint so the count never clips at the screen edge (F-7) */
 @media (max-width: 480px) {
     #topbar { gap: 6px; }
     .ui-btn { padding: 8px 10px; }
     .session-label { display: none; }
+    #stats-hint { display: none; }
 }
 /* Discreet version label inside the session panel */
 #session-version { padding: 6px 12px 10px; text-align: right; font-size: 10px;

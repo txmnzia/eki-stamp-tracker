@@ -6,7 +6,7 @@ export const GIST_PREFIX       = 'eki-stamp-tracker:';
 // App version — shown discreetly on the welcome modal. Bump on every merge
 // to main. It is also part of the station-cache key, so each release
 // invalidates the 7-day IndexedDB cache and users immediately get fresh data.
-export const APP_VERSION       = 'v1.5.0';
+export const APP_VERSION       = 'v1.6.0';
 export const CACHE_TTL         = 7 * 24 * 60 * 60 * 1000;  // 7 days
 export const BATCH_SIZE        = 150;      // features per animation frame (line rendering)
 export const SYNC_DEBOUNCE_MS  = 2000;     // ms after last stamp change before auto-save
@@ -30,7 +30,6 @@ export const MAX_ZOOM          = 19;       // maximum tile zoom level
 export const LINE_BASE     = { weight: 1.5, opacity: 0.20 };  // faint colour tint — default look
 export const SHINKANSEN_BASE = { ...LINE_BASE };              // Shinkansen fade exactly like every other line
 export const LINE_DIM      = { weight: 1.2, opacity: 0.10 };  // other lines while one is focused
-export const LINE_EDIT_DIM = { weight: 1,   opacity: 0.05 };  // other lines while editing a ride
 export const LINE_EDIT_SHOW = { weight: 2.4, opacity: 0.75 }; // ALL lines while in (global) edit mode — brought
                                     // forward over the dimmed base map so the network is the clear focus
 export const LINE_FOCUS    = { weight: 4,   opacity: 0.85 };  // hovered/tapped line

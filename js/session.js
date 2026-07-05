@@ -92,13 +92,15 @@ export const setupSessionPanel = (map) => {
         if (prevUser && prevUser !== name && isSyncDirty()) { cancelPendingSync(); await syncToGist(); }
         setState('user', name);
         updateSessionUI();
-        showToast(`Loading ${name}…`);
+        // Tokenless "load" fetches nothing — it names the local collection.
+        // Say that, instead of implying a cloud round-trip (docs/AUDIT.md F-10).
+        if (getToken()) showToast(`Loading ${name}…`);
         // Anonymous progress being claimed under a name must be merged in,
         // never wiped by whatever the (possibly empty) gist holds.
         await loadFromGist(name, { mergeLocal: !prevUser });
         refreshAllMarkerStates();
         renderAllRideOverlays();
-        showToast(`Session loaded: ${name}`);
+        showToast(getToken() ? `Session loaded: ${name}` : `Collecting as ${name} on this device`);
     });
 
     // Save progress

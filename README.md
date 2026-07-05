@@ -132,7 +132,7 @@ design of record for the split):
 | `rides.js` | **ridden-stretch overlays** + saved-ride key migration (see below) |
 | `ride-edit.js` | select ridden stretches **on the map** (handles branches) |
 | `markers.js` | builds/merges station markers, station popup, `loadStations` |
-| `search.js` / `lang.js` / `stats.js` / `session.js` / `welcome.js` | search, language toggle, stats, session panel, welcome modal |
+| `search.js` / `search-rank.js` / `lang.js` / `stats.js` / `session.js` / `welcome.js` | search UI + **pure** relevance/proximity ranking (unit-tested), language toggle, stats, session panel, welcome modal |
 | `main.js` | init, popup-button event delegation, and the **`window.__eki` test hook** that `scripts/audit-ride-gaps.mjs` drives the app through |
 
 State is read via `state.*` and written via `setState(...)` (which persists some
