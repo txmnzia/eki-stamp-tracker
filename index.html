@@ -31,8 +31,8 @@
         </div>
 
         <div id="controls">
-            <button class="ui-btn" id="lang-toggle">EN</button>
-            <button class="ui-btn" id="session-toggle" aria-expanded="false" aria-controls="session-panel">
+            <button class="btn" id="lang-toggle">EN</button>
+            <button class="btn" id="session-toggle" aria-expanded="false" aria-controls="session-panel">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                     <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
                 </svg>
@@ -41,7 +41,7 @@
         </div>
     </div>
 
-    <div id="session-panel" class="hidden" role="region" aria-label="Session management">
+    <div id="session-panel" class="card hidden" role="region" aria-label="Session management">
         <div id="session-header">
             <div id="session-user-row">
                 <div id="session-avatar" aria-hidden="true">?</div>
@@ -62,62 +62,51 @@
                     <div class="session-loaded-label">Active session</div>
                     <div id="session-loaded-name"></div>
                 </div>
-                <button class="session-btn" id="session-change">Change</button>
+                <button class="btn session-btn" id="session-change">Change</button>
             </div>
             <!-- Input row (shown when no session) -->
-            <div id="session-input-section" class="session-input-section">
-                <label for="session-name-input" class="session-label-heading">Sync name</label>
-                <input type="text" id="session-name-input" placeholder="Enter your sync name…" autocomplete="off" />
-                <small class="session-hint-text">⚠ Case-sensitive — type it exactly the same on every device.</small>
-            </div>
-            <!-- Sync token (always visible): progress is stored in a private Gist on
-                 the USER'S OWN GitHub account, so each user supplies their own token. -->
-            <div class="session-input-section" id="session-token-section">
-                <label for="session-token-input" class="session-label-heading">GitHub token (cloud sync)</label>
-                <input type="password" id="session-token-input" placeholder="Paste a gist-scope token…" autocomplete="off" />
-                <small class="session-hint-text">Optional. Cloud sync saves progress to a private Gist on <em>your</em> GitHub account.
-                    Create a token with <strong>only the gist scope</strong> at github.com → Settings → Developer settings → Tokens.
-                    Without one, progress is saved on this device only.</small>
+            <div id="session-input-section" class="field">
+                <label for="session-name-input">Sync name</label>
+                <input type="text" id="session-name-input" class="input" placeholder="Enter your sync name…" autocomplete="off" />
+                <small class="hint">Case-sensitive — use the same name on every device.</small>
             </div>
             <!-- Load (only when no session) -->
             <div class="session-row" id="session-load-row">
-                <button class="session-btn primary" id="session-load">Load session</button>
+                <button class="btn btn--primary session-btn" id="session-load">Load session</button>
             </div>
             <!-- Save (only when session active) -->
             <div class="session-row hidden" id="session-save-row">
-                <button class="session-btn primary" id="session-save">Save progress</button>
+                <button class="btn btn--primary session-btn" id="session-save">Save progress</button>
             </div>
             <!-- Data ops (always visible) -->
             <div class="session-row">
-                <button class="session-btn" id="session-export">Export JSON</button>
-                <button class="session-btn" id="session-import">Import JSON</button>
+                <button class="btn session-btn" id="session-export">Export JSON</button>
+                <button class="btn session-btn" id="session-import">Import JSON</button>
             </div>
+            <!-- Cloud sync setup lives behind a fold: progress is stored in a private
+                 Gist on the USER'S OWN GitHub account, so each user supplies their
+                 own token (never a shared credential — docs/AUDIT-2026-07.md). -->
+            <details id="session-sync-details">
+                <summary>Cloud sync</summary>
+                <div class="field" id="session-token-section">
+                    <label for="session-token-input">GitHub token</label>
+                    <input type="password" id="session-token-input" class="input" placeholder="Paste a gist-scope token…" autocomplete="off" />
+                    <small class="hint">Optional — syncs to a private Gist on <em>your</em> GitHub account.
+                        <a href="https://github.com/settings/tokens/new?scopes=gist&amp;description=eki-stamp-tracker"
+                           target="_blank" rel="noopener">Create a gist-only token</a> and paste it here.
+                        Without one, progress stays on this device.</small>
+                </div>
+            </details>
             <!-- Danger zone -->
-            <button class="session-btn danger" id="session-reset">Reset stamps &amp; rides</button>
+            <button class="btn btn--danger session-btn" id="session-reset">Reset stamps &amp; rides</button>
             <input type="file" id="session-import-file" accept=".json" style="display:none" aria-label="Import stamps JSON file">
         </div>
         <div id="session-version"></div>
     </div>
 
-    <div id="name-modal-overlay" class="hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-        <div id="name-modal">
-            <h2 id="modal-title">Welcome!</h2>
-            <p>Choose a sync name for your stamp collection. Progress is saved on this device;
-               to sync it across devices, add a GitHub token in the Session panel.</p>
-            <label for="modal-name-input" class="hidden">Your sync name</label>
-            <input type="text" id="modal-name-input" placeholder="Your sync name" maxlength="32" />
-            <div id="modal-name-hint">⚠ This name is your sync key — type it <strong>exactly</strong> the same on every device. Case-sensitive.</div>
-            <div class="modal-buttons">
-                <button class="modal-btn secondary" id="modal-skip">Skip for now</button>
-                <button class="modal-btn confirm" id="modal-confirm">Start collecting</button>
-            </div>
-            <div id="app-version" aria-hidden="true"></div>
-        </div>
-    </div>
-
     <!-- Ride edit mode: a single discreet button. It both signals that editing is
          active and, on click, saves every change and returns to normal mode (#19). -->
-    <button id="ride-edit-close" class="hidden" aria-label="Close ride editing — your changes are saved">
+    <button id="ride-edit-close" class="btn btn--pill hidden" aria-label="Close ride editing — your changes are saved">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M20 6 9 17l-5-5"/>
         </svg>

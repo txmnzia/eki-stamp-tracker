@@ -5,7 +5,7 @@
 import { RIDE_OVERLAY } from './config.js';
 import { state } from './state.js';
 import { ui, linesByName, lineColorMap, rideOverlays, stationByCode,
-         shinkansenData } from './registry.js';
+         shinkansenData, uiColors } from './registry.js';
 import { ptDist } from './geometry.js';
 import { buildLineGeometry, buildRideSegments } from './line-geometry.js';
 import { scheduleSave } from './gist.js';
@@ -89,7 +89,7 @@ export const renderRideOverlays = (name) => {
     // Render through the SAME segments the picker offers (incl. gap bridges), so
     // anything tickable renders identically — no segment silently dropped.
     const segByKey = new Map(buildRideSegments(geom).map(s => [s.key, s]));
-    const color = lineColorMap[name] || '#7eb8f7';
+    const color = lineColorMap[name] || uiColors.accent;
     const keyOf  = (a, b) => [a, b].sort().join('|');
     const drawKey = (k) => {
         const s = segByKey.get(k);

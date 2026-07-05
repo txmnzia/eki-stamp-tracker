@@ -21,8 +21,11 @@ const setupTouchGestures = (map) => {
         if (Math.abs(e.touches[0].clientX - downX) > 12 ||
             Math.abs(e.touches[0].clientY - downY) > 12) moved = true;
     }, { passive: true });
-    el.addEventListener('touchend', () => {
+    el.addEventListener('touchend', (e) => {
         if (multi) { multi = false; return; }
+        // Taps on popup DOM (e.g. the stamp seal) are button presses, never
+        // zoom gestures — without this, dot-tap + seal-tap = double-tap zoom.
+        if (e.target.closest?.('.leaflet-popup')) { count = 0; clearTimeout(timer); return; }
         const dur = Date.now() - downT;
         if (dur > 500) { ui.suppressTap = true; count = 0; clearTimeout(timer); return; }  // long press
         if (moved)     { count = 0; clearTimeout(timer); return; }                       // pan
@@ -32,6 +35,9 @@ const setupTouchGestures = (map) => {
         const pt = L.point(downX - rect.left, downY - rect.top);
         clearTimeout(timer);
         timer = setTimeout(() => {
+            // Tap sequences that touched a station dot are collect gestures
+            // (tap-tap on a dot toggles its stamp) — don't also zoom.
+            if (Date.now() - (ui.lastStationTap || 0) < 700) { count = 0; return; }
             const ll = map.containerPointToLatLng(pt);
             if (count >= 3)      map.setZoomAround(ll, map.getZoom() - 1);
             else if (count === 2) map.setZoomAround(ll, map.getZoom() + 1);
