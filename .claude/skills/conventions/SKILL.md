@@ -1,6 +1,6 @@
 ---
 name: conventions
-description: Architecture and coding conventions for adding or modifying Eki Stamp Tracker features — module layout, shared-state rules, security (esc/XSS), naming/i18n precedence, touch and keyboard accessibility, and where tunables/colours live. Use when writing any new code in js/ or css/app.css, adding a UI element, popup, panel, or config value, or reviewing a change for codebase fit. Design of record: docs/REFACTOR-2026-07.md.
+description: "Architecture and coding conventions for adding or modifying Eki Stamp Tracker features — module layout, shared-state rules, security (esc/XSS), naming/i18n precedence, touch and keyboard accessibility, and where tunables/colours live. Use when writing any new code in js/ or css/app.css, adding a UI element, popup, panel, or config value, or reviewing a change for codebase fit. Design of record: docs/REFACTOR-2026-07.md."
 ---
 
 # Conventions — extend without degrading

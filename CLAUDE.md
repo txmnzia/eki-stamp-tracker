@@ -52,6 +52,7 @@ the area you're touching before editing.
 python3 -m http.server 8000          # serve (required; file:// cannot load ES modules)
 node --test tests/*.test.mjs         # pure-geometry unit tests (the bare "tests/" dir form fails on Node 22)
 python3 scripts/check_data.py        # structural data sanity
-# full regression gate (see .claude/skills/ride-gap-audit):
+# full regression gate — needs a served repo + playwright setup first;
+# follow .claude/skills/ride-gap-audit for the working sandbox recipe:
 BASE_URL=http://127.0.0.1:8097 MAX_GAPS=15 node scripts/audit-ride-gaps.mjs
 ```

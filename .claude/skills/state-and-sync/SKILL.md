@@ -1,6 +1,6 @@
 ---
 name: state-and-sync
-description: User-data persistence and Gist sync for the Eki Stamp Tracker — the state model (stamps/rides), localStorage local-first mirroring, and the per-user GitHub Gist sync in js/state.js, js/gist.js, js/session.js. Use when touching state.js, gist.js, session.js, welcome.js, import/export/reset, loadFromGist/syncToGist/scheduleSave, or when debugging lost stamps, wrong-session writes, broken ride overlays after import, or "✗ sync error". This is the highest-stakes area: a 2026-07 audit found one P0 and three P1 data-loss bugs here; the fixes are load-bearing and must never regress.
+description: "User-data persistence and Gist sync for the Eki Stamp Tracker — the state model (stamps/rides), localStorage local-first mirroring, and the per-user GitHub Gist sync in js/state.js, js/gist.js, js/session.js. Use when touching state.js, gist.js, session.js, welcome.js, import/export/reset, loadFromGist/syncToGist/scheduleSave, or when debugging lost stamps, wrong-session writes, broken ride overlays after import, or '✗ sync error'. This is the highest-stakes area: a 2026-07 audit found one P0 and three P1 data-loss bugs here; the fixes are load-bearing and must never regress."
 ---
 
 # State & sync (user data — handle with care)

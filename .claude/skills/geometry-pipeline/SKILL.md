@@ -142,13 +142,14 @@ BASE_URL=http://127.0.0.1:8097 MAX_GAPS=15 node scripts/audit-ride-gaps.mjs
 build than the preinstalled `/opt/pw-browsers` set. Online (CI does this),
 plain `npx playwright install --with-deps chromium` + no `CDN_LOCAL` works.
 
-To probe ONE line, copy the audit's setup (routes, `waitForFunction` on
-`window.__eki?.ui?.linesReady`, seed = centroid of `linesByName[name]`'s
-vertices) and `page.evaluate` `buildLineGeometry` + `buildRideSegments`.
-Verified example: `中央線` → 337 polylines, 28 chains, 112 stations, 111
-segments. The wait for `linesReady` (or the audit's allLineSegs-stability loop)
-is NOT optional — probing early reproduces the mid-render cache bug and reports
-false gaps.
+To probe ONE line, copy the audit's setup (routes + its allLineSegs-stability
+wait; also check `__eki.ui.linesReady` — the audit's own wait covers it
+implicitly), seed at the centroid of `linesByName[name]`'s vertices, and
+`page.evaluate` `buildLineGeometry` + `buildRideSegments`.
+Verified example (2026-07, v1.5.0 data — will shift on a data refresh):
+`中央線` → 337 polylines, 28 chains, 112 stations, 111 segments. The wait
+is NOT optional — probing early reproduces the mid-render cache bug and
+reports false gaps.
 
 **Tuning problem vs data problem:** run the audit and read the class.
 `SPLIT-TRACK` (track nearby, route absent/over cap) *might* respond to
