@@ -66,9 +66,19 @@ Blocks 0–1, all fixed in v1.4.0). The rules below are regression guards, not s
 3. **MUST merge (union), never replace, when a load meets local unsynced
    progress.** "Load session" used to wipe the very stamps the user was trying to
    claim (AUDIT 1.2). `loadFromGist(name, { mergeLocal: true })` unions stamps and
-   per-line ride keys; the welcome modal, the token-change handler, and an
-   anonymous "Load session" all pass `mergeLocal` — keep it that way for any new
-   entry point.
+   per-line ride keys. The four call sites and their deliberate semantics:
+   | Call site | `mergeLocal` | Why |
+   |---|---|---|
+   | welcome modal claim (`js/welcome.js`) | `true` | anonymous progress must survive the claim |
+   | token-change reload (`js/session.js`) | `true` | never lose local progress |
+   | "Load session" (`js/session.js`) | `!prevUser` | anonymous→named merges; **named→named deliberately replaces** (dirty changes are flushed to the *previous* user's gist first via `isSyncDirty()`/`cancelPendingSync()`/`await syncToGist()`) |
+   | returning-user boot (`js/main.js`) | absent (`false`) | **deliberate replace**: the gist is the source of truth across devices, so un-collections made elsewhere propagate |
+   Any NEW entry point must decide `mergeLocal` this consciously — default to
+   `true` whenever local unsynced progress can exist.
+   Known residual loss window (accepted, don't widen it): merged progress rides
+   on the 2 s `scheduleSave` debounce and there is no `beforeunload`/`pagehide`
+   flush, so killing the tab within ~2 s of a claim can leave the gist stale
+   until the next local-mirrored boot.
 4. **MUST clear the debounce before a session switch, and set `state.gistId` only
    after the content fetch succeeds.** A pending debounced save once fired mid-load
    and wrote user A's stamps into user B's gist (AUDIT 1.3). The guards:
@@ -111,7 +121,8 @@ skill's `CDN_LOCAL` note if the CDN is unreachable).
 | Symptom | Cause | Fix |
 |---|---|---|
 | Progress gone after reload (anonymous) | A mutation path skipped `scheduleSave`/`persistLocal` | Add the call at the mutation site (see landmine 2) |
-| Loading a session wiped local stamps | An entry point calls `loadFromGist` without `mergeLocal` when local progress exists | Pass `{ mergeLocal: true }` (landmine 3) |
+| User says stamps vanished after "loading my session" | First check `localStorage.eki_current_user` — if a stale sync name was set, the user wasn't anonymous, so `mergeLocal: !prevUser` was `false` and the load replaced; their stamps were flushed to the *previous* name's gist (check its revision history) | Expected semantics (landmine 3 table); recover from the previous gist / local export |
+| Loading a session wiped local stamps | A NEW entry point calls `loadFromGist` without `mergeLocal` when local progress exists | Pass `{ mergeLocal: true }` (landmine 3) |
 | One user's stamps in another user's gist | Debounce not cleared / `gistId` set before fetch / snapshot removed | Restore the three guards in landmine 4 |
 | Permanent "✗ sync error", retry useless | Cached `eki_gist:<user>` points at a deleted gist and the 404-drop path was broken | Both 404 handlers in `js/gist.js` must remove the cache key and rediscover/create |
 | All ride overlays vanish after an import | `sanitizeRides` missing on an ingress path | Call it wherever `state.rides` is assigned from external data |

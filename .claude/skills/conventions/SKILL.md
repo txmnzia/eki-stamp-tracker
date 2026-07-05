@@ -63,9 +63,10 @@ description: Architecture and coding conventions for adding or modifying Eki Sta
 
 ## Security & UX conventions (each rule has a scar behind it)
 
-- **`esc()` for every `innerHTML` interpolation** — names, colours-in-attributes,
-  aria-labels. Station/line names come from a **scraped external site**, so an
-  unescaped interpolation is stored XSS armed at the next data regen (AUDIT 0.2).
+- **`esc()` for every HTML string you construct from data** — `innerHTML`,
+  attribute values, aria-labels, and equally HTML built for clipboard/export.
+  Station/line names come from a **scraped external site**, so an unescaped
+  interpolation is stored XSS armed at the next data regen (AUDIT 0.2).
   Prefer `textContent`/`createElement` where practical (see `renderSuggestions`
   in `js/search.js` for the pattern).
 - **Curated-name precedence for ANY name-showing UI** (README "Conventions"):
@@ -76,7 +77,9 @@ description: Architecture and coding conventions for adding or modifying Eki Sta
   3. ekidata romaji only as last resort.
   ekidata's auto-romaji is frequently garbage (米原 → "Yonehara"). The resolver
   already exists (`resolveEn` inside `loadStations`, `js/markers.js`); reuse the
-  resolved `name_en` on station records rather than reimplementing.
+  resolved `name_en` on station records rather than reimplementing. Common
+  lookup: station code (`eki_*`/`fk_*`) → station record is `stationByCode`
+  in `js/registry.js` (populated by `loadStations`).
 - **Respect `state.lang` and rebuild on toggle.** Primary/secondary name order
   flips with the language (`orderLineNames` in `js/registry.js`, `getDisplayName`
   in `js/markers.js`). Popup content is bound as a *function* so it re-renders on
