@@ -126,7 +126,7 @@ design of record for the split):
 | `notify.js` | toasts + sync-status indicator |
 | `map-setup.js` | Leaflet map, canvas renderer, custom touch gestures |
 | `idb-cache.js` | IndexedDB cache (get/set/prune) |
-| `geometry.js` | **pure** track geometry (stitching, bridging, projection) — no DOM/Leaflet/state; unit-tested via `node --test tests/` |
+| `geometry.js` | **pure** track geometry (stitching, bridging, projection) — no DOM/Leaflet/state; unit-tested via `node --test tests/*.test.mjs` |
 | `line-geometry.js` | corridor building (`buildLineGeometry`), track routing (`trackBetween`), `buildRideSegments`, Shinkansen paths |
 | `lines.js` | draws GeoJSON lines (faint by default), hover/tap highlight, **line popup** |
 | `rides.js` | **ridden-stretch overlays** + saved-ride key migration (see below) |
@@ -367,7 +367,7 @@ automatically at startup.
 - **One module ≈ one concern.** Shared layer collections and cross-module
   runtime scalars live in `js/registry.js` (`ui.*`); user progress lives on
   `state`. `js/geometry.js` must stay pure (no DOM/Leaflet/app state) so its
-  unit tests keep running under plain `node --test tests/`.
+  unit tests keep running under plain `node --test tests/*.test.mjs`.
 - **Tooling contract.** Anything CI/scripts need from inside the app is
   exposed on `window.__eki` (set in `js/main.js`) — extend it, don't reshape
   it.
