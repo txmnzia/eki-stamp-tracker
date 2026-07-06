@@ -202,40 +202,50 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .leaflet-popup-content { margin: 0 !important; }
 .leaflet-popup-close-button { color: var(--muted) !important; font-size: 18px !important; padding: 4px 8px !important; }
 .leaflet-popup-close-button:hover { color: var(--text) !important; }
-.popup-inner { padding: var(--sp-3) var(--sp-4) var(--sp-3); min-width: 150px; max-width: 230px; }
-.popup-name { font-family: var(--jp-font); font-size: var(--fs-lg); font-weight: 700; color: var(--text); margin-bottom: 1px; }
-.popup-name-secondary { font-size: var(--fs-xs); color: var(--muted); letter-spacing: 0.05em; margin-bottom: var(--sp-2); }
-/* Line badges — the SAME popup layout for stamp and non-stamp stations */
-.popup-line {
-    display: inline-flex; align-items: flex-start; gap: 5px; text-align: left;
-    font-size: var(--fs-xs); color: var(--muted); background: var(--surface2);
-    border-radius: var(--r-sm); padding: 3px 7px; margin-bottom: var(--sp-1); margin-right: var(--sp-1);
+/* Standardised popup (docs mock-up): fixed width so every station popup is the
+   same size — header row (name left, stamp badge right) · divider · stacked
+   line rows. --popup-w keeps the width in one place. */
+.popup-inner { --popup-w: 216px; width: var(--popup-w); padding: var(--sp-3) var(--sp-4); }
+.popup-head {
+    display: flex; align-items: flex-start; justify-content: space-between; gap: var(--sp-2);
+    padding-bottom: var(--sp-2); border-bottom: 1px solid var(--border);
 }
-.popup-line-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 2px; }
-.popup-line-label { display: flex; flex-direction: column; gap: 1px; line-height: 1.3; }
+.popup-name-wrap { min-width: 0; flex: 1; }          /* min-width:0 lets long names ellipsize */
+.popup-name { font-family: var(--jp-font); font-size: var(--fs-lg); font-weight: 700; color: var(--text);
+    margin-bottom: 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.popup-name-secondary { font-size: var(--fs-xs); color: var(--muted); letter-spacing: 0.05em;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Line badges — stacked full-width rows (same for stamp and non-stamp) */
+.popup-lines { display: flex; flex-direction: column; gap: var(--sp-1); margin-top: var(--sp-2); }
+.popup-line {
+    display: flex; align-items: flex-start; gap: 6px; text-align: left;
+    font-size: var(--fs-xs); color: var(--muted); background: var(--surface2);
+    border-radius: var(--r-sm); padding: 5px 8px;
+}
+.popup-line-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 3px; }
+.popup-line-label { display: flex; flex-direction: column; gap: 1px; line-height: 1.3; min-width: 0; }
 .popup-line-jp { color: var(--text); }
 .popup-line-en { font-size: var(--fs-xs); opacity: 0.65; letter-spacing: 0.03em; }
 
-/* Stamp state row — discreet, one line. Shows Stamped/Not stamped and is the
-   keyboard/colorblind-safe fallback toggle (the marker itself toggles on
-   double click). Class name .popup-collect-btn is a tooling contract. */
+/* Stamp badge — the round eki-stamp ring (same glyph as the map pin) sitting
+   top-right of the popup: grey ring when uncollected, ink-filled when stamped.
+   Click toggles (the map pin also toggles on double click). .popup-collect-btn
+   is a tooling contract (run-and-verify). */
 .popup-collect-btn {
-    display: flex; align-items: center; gap: 6px;
-    width: 100%; margin-top: var(--sp-2); padding: 5px var(--sp-2);
-    font-family: var(--ui-font); font-size: 10px; font-weight: 700;
-    letter-spacing: var(--track-caps); text-transform: uppercase;
-    background: transparent; color: var(--muted);
-    border: 1px solid var(--border); border-radius: var(--r-sm);
-    cursor: pointer;
-    transition: border-color var(--t-fast), color var(--t-fast), background var(--t-fast);
+    flex-shrink: 0; width: 40px; height: 40px; padding: 0;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: transparent; border: none; cursor: pointer; color: var(--marker-idle);
+    transition: color var(--t-fast), transform var(--t-fast);
 }
-.popup-collect-btn:hover { border-color: var(--ink); color: var(--ink); }
-.popup-collect-btn.collected { color: var(--ink);
-    border-color: color-mix(in srgb, var(--ink) var(--a-outline), transparent);
-    background: color-mix(in srgb, var(--ink) var(--a-tint), transparent); }
+.popup-collect-btn svg { width: 100%; height: 100%; }
+.popup-collect-btn:hover { color: var(--ink); transform: scale(1.06); }
+.popup-collect-btn:active { transform: scale(0.94); }
+.popup-collect-btn.collected { color: var(--ink); }
+@media (prefers-reduced-motion: reduce) { .popup-collect-btn { transition: none; } }
 /* Non-stamp station: same popup, muted name — implicit there's no stamp (#20). */
 .popup-inner.nostamp .popup-name { color: var(--muted); font-weight: 400; }
-.popup-inner.nostamp .popup-line { opacity: 0.75; }
+.popup-inner.nostamp .popup-line { opacity: 0.85; }
 
 /* ── Stamp markers (the dot IS the stamp) ─────────────────────────── */
 /* DOM markers: grey silhouette = collectible, ink red = stamped (double click

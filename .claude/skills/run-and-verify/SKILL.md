@@ -130,9 +130,9 @@ await page.waitForTimeout(500);
 
 Interaction selectors that matter: `#stationSearch` + `.suggestion-item`,
 `.stamp-marker` (DOM stamp-glyph markers — DOUBLE click/tap toggles the
-stamp; grey→ink-red via the `stamped` class), `.popup-collect-btn` (the
-Stamped/Not stamped row inside the click popup — single-click toggle, the
-keyboard path), `#lang-toggle`, `.popup-line-ride-btn`, `#ride-edit-close`,
+stamp; grey→ink-red via the `stamped` class), `.popup-collect-btn` (the round stamp
+RING BADGE in the popup header — single-click toggle, the keyboard path;
+no text, state shown by grey ring vs ink-red fill + aria-pressed), `#lang-toggle`, `.popup-line-ride-btn`, `#ride-edit-close`,
 `#toast`. Since v1.6 there is NO welcome modal and no `#modal-skip`. A lone
 click on a stamp marker opens its popup only after the ~280 ms click-pair
 window (`STAMP_DBL_MS`), so scripts should waitForSelector after a single

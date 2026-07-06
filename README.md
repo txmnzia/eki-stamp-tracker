@@ -33,15 +33,17 @@ Runtime dependencies are loaded from CDNs (no npm install needed to run):
 ## What the app does
 
 1. **Map of stamp stations.** Every station that has a real eki stamp is drawn
-   as a small **hand-stamp glyph** — grey while uncollected, **ink red** once
-   stamped. Hover shows the station name; a single click/tap opens a compact
-   popup with the name and line badges (identical for stamp and non-stamp
-   stations) plus a discreet Stamped/Not stamped row (the accessible toggle);
-   **double click / double tap the stamp to collect or remove it** (double-tap
-   zoom is suppressed on stamps, and still works elsewhere). Non-stamp
-   stations stay plain grey dots. There is no first-run modal: the map itself
-   is the welcome, and a one-time hint after the first stamp points to the
-   Session panel for naming/sync.
+   as a small **eki-stamp glyph inside a thick ring** (sized to match the plain
+   station dots) — grey while uncollected, **ink red** once stamped. Hover
+   shows the station name; a single click/tap opens a compact, fixed-width
+   popup: station name with the stamp ring badge top-right, a divider, then the
+   line badges stacked (identical layout for stamp and non-stamp stations).
+   **Double click / double tap the stamp to collect or remove it** (double-tap
+   zoom is suppressed on stamps, still works elsewhere); the popup's ring badge
+   is the equivalent single-click toggle. Non-stamp stations stay plain grey
+   dots. There is no first-run modal: the map itself is the welcome, and a
+   one-time hint after the first stamp points to the Session panel for
+   naming/sync.
 2. **Train lines.** All railway lines are drawn from GeoJSON track geometry. They
    are **faint by default** and brighten on hover/tap.
 3. **Ride sections** (independent from stamps). Tap a line → **Add a ride** →
