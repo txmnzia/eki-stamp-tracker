@@ -23,9 +23,11 @@ const setupTouchGestures = (map) => {
     }, { passive: true });
     el.addEventListener('touchend', (e) => {
         if (multi) { multi = false; return; }
-        // Taps on popup DOM (e.g. the stamp seal) are button presses, never
-        // zoom gestures — without this, dot-tap + seal-tap = double-tap zoom.
-        if (e.target.closest?.('.leaflet-popup')) { count = 0; clearTimeout(timer); return; }
+        // Taps on popup DOM or on a stamp marker are interactions with THAT
+        // element (stamp row press, tap-tap toggle), never zoom gestures.
+        if (e.target.closest?.('.leaflet-popup') || e.target.closest?.('.stamp-marker')) {
+            count = 0; clearTimeout(timer); return;
+        }
         const dur = Date.now() - downT;
         if (dur > 500) { ui.suppressTap = true; count = 0; clearTimeout(timer); return; }  // long press
         if (moved)     { count = 0; clearTimeout(timer); return; }                       // pan
@@ -49,6 +51,15 @@ const setupTouchGestures = (map) => {
 export const initMap = () => {
     const map = L.map('map', { zoomControl: true, preferCanvas: true }).setView([35.682839, 139.759455], 13);
     map.zoomControl.setPosition('bottomleft');   // bottom-left, clear of the top search bar
+    // Double click on a STAMP marker toggles the stamp (markers.js) — it must
+    // not also zoom. Native doubleClickZoom can't be excluded per-target, so
+    // reimplement it with the stamp markers carved out (Leaflet's own default:
+    // zoom in, shift = zoom out). Touch replaces this entirely below.
+    map.doubleClickZoom.disable();
+    map.on('dblclick', (e) => {
+        if (e.originalEvent?.target?.closest?.('.stamp-marker')) return;
+        map.setZoomAround(e.containerPoint, map.getZoom() + (e.originalEvent?.shiftKey ? -1 : 1));
+    });
     // `tolerance` extends the clickable area around thin lines (and markers)
     // so they're easy to hit — the 2.5px lines were nearly impossible to tap,
     // especially on touch. Single shared renderer (see PR #8) so events work.

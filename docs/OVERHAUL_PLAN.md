@@ -155,3 +155,26 @@ Deviations from the letter of the plan: C4's "quiet toast after first stamp"
 uses a one-time localStorage flag (`eki_first_stamp_hint`); C6 hides plain
 markers below `PLAIN_MIN_ZOOM` on touch *and* drops them to desktop sizing;
 the session panel's cloud-sync fold uses a native `<details>` element (no JS).
+
+### Iteration 3 (owner feedback on the v1.6 stamp card)
+
+The v1.6 seal-card was rejected in review: popups were oversized, stamp
+popups lost the line names, and stamp/non-stamp behaviour diverged. Shipped
+replacement (v1.7.0), per owner spec with two challenged amendments:
+
+- **The dot IS the stamp**: stamp stations render as DOM markers with a
+  hand-stamp glyph (`ICON_STAMP_MARKER`), grey when uncollected, **ink red**
+  (`--ink`, replacing `--gold` app-wide) when stamped. Glyphs scale via one
+  `--stamp-scale` property per zoom; plain stations remain canvas dots.
+- **Double click / double tap toggles** (owner spec, kept): implemented as
+  our own click-pair window (`STAMP_DBL_MS`) so desktop and touch behave
+  identically; desktop `doubleClickZoom` reimplemented with stamp markers
+  carved out; touch tap sequences on stamps never zoom.
+- **Amendment 1 — hover is a tooltip, click is one consistent popup**: every
+  station (stamp or not) shows the same compact name+line-badges popup on
+  single click, restoring line names and killing the inconsistency.
+- **Amendment 2 — a discreet Stamped/Not stamped row** stays in the popup as
+  the keyboard-accessible and colorblind-safe toggle (`.popup-collect-btn`
+  class kept as the tooling contract).
+- Leaflet's built-in marker click→popup toggle is removed (same as lines.js)
+  — it raced the click-pair logic and flashed popups during double clicks.

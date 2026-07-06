@@ -6,28 +6,29 @@ export const GIST_PREFIX       = 'eki-stamp-tracker:';
 // App version — shown discreetly in the session panel. Bump on every merge
 // to main. It is also part of the station-cache key, so each release
 // invalidates the 7-day IndexedDB cache and users immediately get fresh data.
-export const APP_VERSION       = 'v1.6.0';
+export const APP_VERSION       = 'v1.7.0';
 export const CACHE_TTL         = 7 * 24 * 60 * 60 * 1000;  // 7 days
 export const BATCH_SIZE        = 150;      // features per animation frame (line rendering)
 export const SYNC_DEBOUNCE_MS  = 2000;     // ms after last stamp change before auto-save
 export const HOVER_RESET_MS    = 60;       // ms debounce on line mouseout
-export const POPUP_GRACE_MS    = 600;      // ms grace period before hover-opened popup auto-closes
-                                    // (long enough to move the cursor onto the popup's button)
 export const SEARCH_JUMP_MS    = 300;      // ms before popup opens after search jump
 export const FOCUS_DELAY_MS    = 100;      // ms before focusing modal input (after paint)
-export const MARKER_BASE_R     = 4;        // circle radius at ZOOM_BASE on desktop
-export const MARKER_BASE_R_TOUCH = 8;      // circle radius at ZOOM_BASE on touch (tappable)
+export const MARKER_BASE_R     = 4;        // plain-dot circle radius at ZOOM_BASE
 export const MARKER_ABS_MIN    = 1.4;      // hard floor so dots stay visible but don't blob when zoomed out
-export const MARKER_COLL_BONUS = 3;        // extra radius for collected markers
 export const MARKER_MAX_R      = 18;       // cap radius at high zoom to avoid clutter
-export const ZOOM_BASE         = 12;       // zoom at which radius = MARKER_BASE_R
-export const ZOOM_SCALE        = 1.18;     // radius multiplier per zoom step away from ZOOM_BASE
+export const ZOOM_BASE         = 12;       // zoom at which radius = MARKER_BASE_R (and stamp scale = 1)
+export const ZOOM_SCALE        = 1.18;     // radius/scale multiplier per zoom step away from ZOOM_BASE
+export const STAMP_ICON_PX     = 26;       // stamp-marker box size; the visual glyph scales inside it
+export const STAMP_MIN_SCALE   = 0.35;     // glyph floor when zoomed out (desktop; touch uses a higher
+export const STAMP_MIN_SCALE_TOUCH = 0.55; //   floor so the tap target never gets too small)
+export const STAMP_MAX_SCALE   = 1.3;      // glyph cap at street zoom
+export const STAMP_DBL_MS      = 280;      // click-pair window: two clicks/taps on a stamp within this
+                                    // toggle it; a lone click opens the info popup after the window
 export const MAX_SUGGESTIONS   = 6;
 export const RESET_CONFIRM_MS  = 3000;     // window for second click on destructive action
 export const MAX_ZOOM          = 19;       // maximum tile zoom level
-export const STAMP_TOGGLE_GUARD_MS = 350;  // ignore a repeat stamp toggle within this window — a
-                                    // desktop double-click otherwise collects then instantly
-                                    // un-collects (two click events fire before dblclick)
+export const STAMP_TOGGLE_GUARD_MS = 350;  // ignore a repeat stamp toggle within this window (a triple
+                                    // click must not toggle twice)
 export const PLAIN_MIN_ZOOM    = 11;       // touch only: hide the ~6.7k non-stamp dots below this
                                     // zoom so they don't bury the stamp targets on phones
                                     // (docs/AUDIT.md F-6); desktop always shows them
@@ -62,8 +63,12 @@ export const SHK_SNAP_M    = 3500;         // a curated Shinkansen stop is "on r
 // Touch device detection
 export const IS_TOUCH = window.matchMedia('(pointer: coarse)').matches;
 
-// SVG icon constants (used in popup button)
-// Rubber stamp shape: handle (top rect) + wide body + base line.
+// SVG icon constants.
+// Marker glyph: hand-stamp silhouette (round knob, waisted neck, wide base) —
+// matches the classic eki-stamp pictogram; fill comes from CSS currentColor
+// so one markup serves both the grey (unstamped) and ink-red (stamped) states.
+export const ICON_STAMP_MARKER  = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="4.6" r="3.4"/><path d="M10.2 7.4 C10.6 9.6, 8.6 10.4, 8.6 12.6 L15.4 12.6 C15.4 10.4, 13.4 9.6, 13.8 7.4 Z"/><rect x="4.6" y="12.4" width="14.8" height="8.4" rx="1.8"/></svg>';
+// Small stamp glyph for the popup state row.
 export const ICON_STAMP_FILLED  = '<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="9" y="2" width="6" height="6" rx="1"/><rect x="3" y="8" width="18" height="10" rx="2"/><rect x="2" y="20" width="20" height="3" rx="1"/></svg>';
 export const ICON_STAMP_OUTLINE = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="2" width="6" height="6" rx="1"/><rect x="3" y="8" width="18" height="10" rx="2"/><line x1="2" y1="21.5" x2="22" y2="21.5"/></svg>';
 // Route/ride icon: two nodes joined by a path.

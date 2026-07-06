@@ -32,13 +32,15 @@ Runtime dependencies are loaded from CDNs (no npm install needed to run):
 
 ## What the app does
 
-1. **Map of stamp stations.** Every station that has a real eki stamp is drawn as
-   a circle marker. Tap one and a compact **stamp card** opens: the station's
-   name(s), its lines as coloured dots, and a big round **stamp seal**. Tap the
-   seal — or just tap the dot again — to collect (tap again to remove). On
-   desktop, hovering opens the card, so a single click on the dot collects.
-   Collected stamps turn gold. There is no first-run modal: the map itself is
-   the welcome, and a one-time hint after the first stamp points to the
+1. **Map of stamp stations.** Every station that has a real eki stamp is drawn
+   as a small **hand-stamp glyph** — grey while uncollected, **ink red** once
+   stamped. Hover shows the station name; a single click/tap opens a compact
+   popup with the name and line badges (identical for stamp and non-stamp
+   stations) plus a discreet Stamped/Not stamped row (the accessible toggle);
+   **double click / double tap the stamp to collect or remove it** (double-tap
+   zoom is suppressed on stamps, and still works elsewhere). Non-stamp
+   stations stay plain grey dots. There is no first-run modal: the map itself
+   is the welcome, and a one-time hint after the first stamp points to the
    Session panel for naming/sync.
 2. **Train lines.** All railway lines are drawn from GeoJSON track geometry. They
    are **faint by default** and brighten on hover/tap.
@@ -155,18 +157,18 @@ keys to `localStorage`). Map data is cached in **IndexedDB** (`eki-cache`, keyed
 - **All lines are discreet by default** — a faint tint of their own colour
   (`LINE_BASE`). The stretch you rode is drawn over them at full colour
   (`RIDE_OVERLAY`).
-- **Tap a line → popup → "Add a ride"** puts the map into **ride edit mode** for
-  that line (section 7c). Selection happens *on the map* — the right model for
-  branched/looping lines, which a single list can't represent. Each inter-station
-  segment is drawn individually with a node at each station (collected stamps are
-  gold). A floating toolbar shows the line name + Save / Cancel.
+- **Tap a line → popup → "Add a ride"** puts the map into **ride edit mode**
+  (section 7c). Selection happens *on the map* — the right model for
+  branched/looping lines, which a single list can't represent. Every line is
+  unlocked for painting; hovering/tapping one makes it the active target.
 - **Tap a segment** to toggle it; **drag along the line** to paint a stretch (the
   first segment touched decides add-vs-remove). A drag that starts *on* the line
   paints and locks map-panning for that gesture; a drag that starts *off* the line
-  still pans. The map auto-fits the line on entry.
-- **Save** writes the selection and paints the ridden stretches onto the map,
-  following the real track geometry. Branches and multiple separate stretches are
-  supported because each segment is independent.
+  still pans. The view stays where you are (no auto-fit).
+- **Close editing** (single bottom button, or Esc) saves the selection and paints
+  the ridden stretches onto the map, following the real track geometry. Branches
+  and multiple separate stretches are supported because each segment is
+  independent.
 - **Focus:** while editing, every other line is faded right down, other lines'
   ride overlays are faded, and hover-highlight is suppressed, so only the line
   being edited stands out.

@@ -57,22 +57,17 @@ export const ui = {
 // strings, hence the copy — the tokens stay the single source of truth
 // (the literals below are only a pre-boot fallback).
 export const uiColors = {
-    gold: '#f7c948', markerIdle: '#9aa0ac', lineUnknown: '#6b6b7a',
+    ink: '#e8543f', markerIdle: '#9aa0ac', lineUnknown: '#6b6b7a',
     accent: '#7eb8f7', bg: '#0f0f12',
 };
 export const loadUiColors = () => {
     const cs = getComputedStyle(document.documentElement);
     const read = (name, fallback) => (cs.getPropertyValue(name) || '').trim() || fallback;
-    uiColors.gold        = read('--gold', uiColors.gold);
+    uiColors.ink         = read('--ink', uiColors.ink);
     uiColors.markerIdle  = read('--marker-idle', uiColors.markerIdle);
     uiColors.lineUnknown = read('--line-unknown', uiColors.lineUnknown);
     uiColors.accent      = read('--accent', uiColors.accent);
     uiColors.bg          = read('--bg', uiColors.bg);
-};
-// #rrggbb → rgba() string for canvas strokes that need transparency.
-export const hexA = (hex, a) => {
-    const [r, g, b] = [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16));
-    return `rgba(${r},${g},${b},${a})`;
 };
 
 // HTML-escape for every name interpolated into popup/tooltip markup. Names
