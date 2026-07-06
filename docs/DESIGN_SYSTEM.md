@@ -72,7 +72,7 @@ them) so the five JS-only colors (AUDIT.md §1.4) stop drifting.
 | `--border` | `#2e2e3a` | hairlines (exists) |
 | `--text` | `#e4e4ec` | primary text; `--muted` `#9898b0` remains the single secondary tier (exists) |
 | `--accent` | `#7eb8f7` | interactive blue: focus, primary buttons, links, ride color fallback (exists) |
-| `--gold` | `#f7c948` | *the product color*: collected stamps, progress (exists as `--stamp-on`; rename for honesty — it marks achievement everywhere, not just stamps) |
+| `--ink` | `#e8543f` | *the product color*: stamped stations, progress. Originally specced as gold (`--stamp-on` heritage); changed to vermillion stamp-ink red at owner request during the v1.7 collect redesign — real eki stamps are red, and the marker glyph IS the stamp now |
 
 Semantic accents (kept, now tokenized instead of hardcoded):
 `--danger: #f77e7e`, `--success: #6fdd8b`.
@@ -88,7 +88,7 @@ evergreen browsers well before this app's baseline (it already uses
 fourth alpha is redesigned, not excepted.
 
 Deleted: `--stamp-off` (`#3a3a48`, no longer load-bearing once markers
-tokenize), `#d4a830` (one-off hover gold → `--gold` at hover alpha),
+tokenize), `#d4a830` (one-off hover gold → superseded with `--ink`),
 `#3a2222` (one-off danger border → `--danger` outline alpha), `#888`
 fallback (→ `--line-unknown`).
 

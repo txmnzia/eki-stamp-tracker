@@ -125,15 +125,18 @@ await page.waitForTimeout(500);
 | 1 | Pure unit tests (geometry + search ranking) | `node --test tests/*.test.mjs` | `pass 18, fail 0` |
 | 2 | Data structural checks | `python3 scripts/check_data.py` | `all data checks passed: …` |
 | 3 | Headless load, zero console errors | snippet below (collect `console`/`pageerror` events) | 0 errors after full settle |
-| 4 | Interaction smoke | search→jump; collect stamp→toast+gold marker+`eki_local_progress` in localStorage, persists across reload; language toggle (`<html lang="ja">`, button 日本語); line click→popup→`.popup-line-ride-btn`→paint→`#ride-edit-close`→"Ride changes saved" toast+overlay | every step observable |
+| 4 | Interaction smoke | search→jump; collect stamp→toast+ink-red glyph+`eki_local_progress` in localStorage, persists across reload; language toggle (`<html lang="ja">`, button 日本語); line click→popup→`.popup-line-ride-btn`→paint→`#ride-edit-close`→"Ride changes saved" toast+overlay | every step observable |
 | 5 | Ride-gap audit at baseline | `MAX_GAPS=15 node scripts/audit-ride-gaps.mjs` | `… 15 gaps total`, exit 0 — see the **ride-gap-audit** skill |
 
 Interaction selectors that matter: `#stationSearch` + `.suggestion-item`,
-`.popup-collect-btn` (the round stamp SEAL in the station card — since v1.6
-there is NO welcome modal and no `#modal-skip`; the map loads directly),
-`#lang-toggle`, `.popup-line-ride-btn`, `#ride-edit-close`, `#toast`.
-Collect can also be driven by clicking the station DOT again while its card
-is open (same toggle; guarded ~350 ms against double-fire). Stamps/rides persist in localStorage key
+`.stamp-marker` (DOM stamp-glyph markers — DOUBLE click/tap toggles the
+stamp; grey→ink-red via the `stamped` class), `.popup-collect-btn` (the
+Stamped/Not stamped row inside the click popup — single-click toggle, the
+keyboard path), `#lang-toggle`, `.popup-line-ride-btn`, `#ride-edit-close`,
+`#toast`. Since v1.6 there is NO welcome modal and no `#modal-skip`. A lone
+click on a stamp marker opens its popup only after the ~280 ms click-pair
+window (`STAMP_DBL_MS`), so scripts should waitForSelector after a single
+click. Hover = name tooltip (`.line-tooltip`), never a popup. Stamps/rides persist in localStorage key
 `eki_local_progress` (see the **state-and-sync** skill).
 
 ## Minimal smoke snippet (run successfully here; adapt, don't trust blindly)

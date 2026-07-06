@@ -2,13 +2,14 @@
 // Marker styles/creation, the station popup HTML, and loadStations (the
 // ekidata + stamp-catalogue join that populates the registries).
 
-import { APP_VERSION, CACHE_TTL, IS_TOUCH, POPUP_GRACE_MS, MARKER_BASE_R, MARKER_BASE_R_TOUCH,
-         MARKER_ABS_MIN, MARKER_COLL_BONUS, MARKER_MAX_R, ZOOM_BASE, ZOOM_SCALE,
-         STAMP_TOGGLE_GUARD_MS, PLAIN_MIN_ZOOM,
-         ICON_STAMP_FILLED, ICON_STAMP_OUTLINE } from './config.js';
+import { APP_VERSION, CACHE_TTL, IS_TOUCH, MARKER_BASE_R,
+         MARKER_ABS_MIN, MARKER_MAX_R, ZOOM_BASE, ZOOM_SCALE,
+         STAMP_TOGGLE_GUARD_MS, STAMP_DBL_MS, PLAIN_MIN_ZOOM,
+         STAMP_ICON_PX, STAMP_MIN_SCALE, STAMP_MIN_SCALE_TOUCH, STAMP_MAX_SCALE,
+         ICON_STAMP_MARKER, ICON_STAMP_FILLED, ICON_STAMP_OUTLINE } from './config.js';
 import { state } from './state.js';
 import { ui, markers, plainMarkers, dedupeMarkers, lineColorMap, lineEnMap, allStations,
-         lineGroups, stationByCode, esc, orderLineNames, uiColors, hexA } from './registry.js';
+         lineGroups, stationByCode, esc, orderLineNames, uiColors } from './registry.js';
 import { cacheGet, cacheSet } from './idb-cache.js';
 import { scheduleSave } from './gist.js';
 import { showToast, hideLoading } from './notify.js';
@@ -16,33 +17,27 @@ import { updateStats } from './stats.js';
 
 let zoomDebounce;
 
-/** Repaint all station markers on top of lines (they were added first to the canvas). */
-// Collected (gold) markers are drawn last so they sit on top of grey ones —
-// makes progress easy to see when zoomed out and markers overlap.
+// Stamped markers rise above unstamped ones (DOM z-index), so progress reads
+// at a glance where icons overlap when zoomed out.
 export const bringCollectedToFront = () => {
-    if (!ui.map) return;
-    markers.forEach(m => { if (m._isCollected) m.bringToFront(); });
+    markers.forEach(m => m.setZIndexOffset?.(m._isCollected ? 1000 : 0));
 };
 
 // True while the plain (non-stamp) markers are pulled off the map on touch —
-// below PLAIN_MIN_ZOOM they are noise that buries the stamp dots (F-6).
+// below PLAIN_MIN_ZOOM they are noise that buries the stamp icons (F-6).
 let plainHidden = false;
 const updatePlainVisibility = (map) => {
     const hide = IS_TOUCH && map.getZoom() < PLAIN_MIN_ZOOM;
     if (hide === plainHidden) return;
     plainHidden = hide;
     plainMarkers.forEach(m => hide ? m.removeFrom(map) : m.addTo(map));
-    if (!hide) bringStationsToFront();   // re-added plain dots must not cover stamp dots
 };
 
-// Re-add markers so they draw above the lines. Stamp markers are restacked every
-// call (cheap, ~2.3k); the ~6.7k plain markers are only restacked when asked
-// (includePlain, once after lines load) to avoid churning them on every overlay.
+// Re-add the CANVAS plain dots so they draw above freshly-drawn lines. The
+// stamp markers are DOM (marker pane) — always above the canvas, no restack.
 export const bringStationsToFront = (includePlain = false) => {
     if (!ui.map) return;
     if (includePlain && !plainHidden) plainMarkers.forEach(m => { m.removeFrom(ui.map); m.addTo(ui.map); });
-    markers.forEach(m => { m.removeFrom(ui.map); m.addTo(ui.map); });
-    bringCollectedToFront();
 };
 // ── 8. MARKER MANAGEMENT ──────────────────────────────────────────────────
 
@@ -68,26 +63,8 @@ export const getEnName = (station, code) => {
     return raw.replace(/([A-Z])/g, ' $1').trim();
 };
 
-const markerRadius = (collected, zoom) => {
-    // Single smooth exponential anchored at the device base size, so dots
-    // shrink as you zoom OUT (down to MARKER_ABS_MIN) instead of staying a
-    // flat ~8px and merging into one blob over the whole country.
-    const base = (IS_TOUCH ? MARKER_BASE_R_TOUCH : MARKER_BASE_R)
-                 * Math.pow(ZOOM_SCALE, zoom - ZOOM_BASE);
-    const r = Math.min(MARKER_MAX_R, Math.max(MARKER_ABS_MIN, base));
-    return collected ? r + MARKER_COLL_BONUS : r;
-};
-
-export const circleStyle = (collected, zoom) => collected
-    ? { radius: markerRadius(true,  zoom), fillColor: uiColors.gold, fillOpacity: 1,    color: hexA(uiColors.gold, 0.4),   weight: 2, renderer: ui.canvasRenderer }
-    // Uncollected stamp: visible but discreet — soft grey, semi-transparent, no
-    // border — so the gold collected markers clearly stand out against them.
-    : { radius: markerRadius(false, zoom), fillColor: uiColors.markerIdle, fillOpacity: 0.5, color: uiColors.markerIdle, weight: 0, renderer: ui.canvasRenderer };
-
-// Non-stamp stations: much LIGHTER than stamp dots, and on touch also SMALLER
-// (desktop-sized, not finger-sized) — they're context, not targets, and at the
-// doubled touch radius they buried the stamp dots (docs/AUDIT.md F-6).
-// Still clickable for a name/lines popup where they're visible.
+// Non-stamp stations: light grey CANVAS dots — context, not targets. Still
+// clickable for a name/lines popup where they're visible.
 const plainStyle = (zoom) => {
     const base = MARKER_BASE_R * Math.pow(ZOOM_SCALE, zoom - ZOOM_BASE);
     return {
@@ -96,7 +73,29 @@ const plainStyle = (zoom) => {
         renderer: ui.canvasRenderer,
     };
 };
-const styleFor = (marker, zoom) => marker._noStamp ? plainStyle(zoom) : circleStyle(marker._isCollected, zoom);
+
+// Stamp stations: the dot IS the stamp — a DOM marker with the hand-stamp
+// glyph (grey = collectible, ink red = stamped; state lives in the `stamped`
+// class, colors in css/app.css). One shared divIcon: Leaflet clones its HTML
+// per marker. keyboard:false — 2.4k tab stops would wreck keyboard use; the
+// accessible toggle is the popup's stamp row.
+const STAMP_DIV_ICON = L.divIcon({
+    className: 'stamp-marker',
+    html: ICON_STAMP_MARKER,
+    iconSize: [STAMP_ICON_PX, STAMP_ICON_PX],
+    iconAnchor: [STAMP_ICON_PX / 2, STAMP_ICON_PX / 2],
+    popupAnchor: [0, -STAMP_ICON_PX / 2],
+    tooltipAnchor: [0, -STAMP_ICON_PX / 2],
+});
+
+// All 2.4k glyphs scale via ONE custom property on the map container — a
+// single style write per zoom instead of rebuilding every icon.
+const applyStampScale = (map) => {
+    const s = Math.min(STAMP_MAX_SCALE,
+        Math.max(IS_TOUCH ? STAMP_MIN_SCALE_TOUCH : STAMP_MIN_SCALE,
+                 Math.pow(ZOOM_SCALE, map.getZoom() - ZOOM_BASE)));
+    map.getContainer().style.setProperty('--stamp-scale', s.toFixed(3));
+};
 
 // ── 9. POPUP ──────────────────────────────────────────────────────────────
 
@@ -123,56 +122,44 @@ export const buildPopupHtml = (marker) => {
         return `<div class="popup-line"><span class="popup-line-dot" style="background:${esc(color)}"></span>${label}</div>`;
     }).join('');
 
-    // Ride edit mode (#17/#18): stations aren't clickable — this popup is purely
-    // to identify what's under the cursor. Show just the station name and, if the
-    // stamp is already collected, a discreet indicator. No line badges, no button.
-    if (ui.rideEdit) {
-        const collected = !marker._noStamp && marker._isCollected;
-        return `<div class="popup-inner readonly">
-            <div class="popup-name">${esc(primary)}</div>
-            ${secondary ? `<div class="popup-name-secondary">${esc(secondary)}</div>` : ''}
-            ${collected ? `<div class="popup-collected">${ICON_STAMP_FILLED} Stamp collected</div>` : ''}
-        </div>`;
-    }
-
-    // Non-stamp station (#20): no collect control — just the name + full line
-    // badges (identification is this popup's whole job), greyed via `nostamp`.
-    if (marker._noStamp) {
-        return `<div class="popup-inner nostamp">
-            <div class="popup-name">${esc(primary)}</div>
-            ${secondary ? `<div class="popup-name-secondary">${esc(secondary)}</div>` : ''}
-            ${lineBadges}
-        </div>`;
-    }
-
-    // Stamp station → the stamp card: name + a big text-free round SEAL that
-    // toggles the stamp (tapping the station dot again does the same — see the
-    // marker click handler). Lines shrink to a row of colored dots with the
-    // names on their title tooltips; the full badges live on the lines
-    // themselves and on non-stamp popups.
-    const lineDots = (marker._lineCodes ?? []).filter(Boolean).map(lc => {
-        const { primary: lp, secondary: ls } = orderLineNames(lc);
-        const color = lineColorMap[lc] ?? uiColors.lineUnknown;
-        return `<span style="background:${esc(color)}" title="${esc(ls ? `${lp} · ${ls}` : lp)}"></span>`;
-    }).join('');
-    const collected = marker._isCollected;
-    const btnAria   = `${collected ? 'Remove stamp' : 'Collect stamp'} for ${primary}`;
-    return `<div class="popup-inner stamp-card">
+    // ONE popup layout for every station — name + full line badges — so stamp
+    // and non-stamp stations behave identically. Stamp stations add a single
+    // discreet state row: it shows Stamped/Not stamped and is the keyboard /
+    // colorblind-safe toggle (the marker itself toggles on double click).
+    const collected = !marker._noStamp && marker._isCollected;
+    const stampRow  = marker._noStamp ? '' :
+        `<button class="popup-collect-btn${collected ? ' collected' : ''}"
+                 aria-label="${esc(`${collected ? 'Remove stamp' : 'Collect stamp'} for ${primary}`)}"
+                 aria-pressed="${collected}">
+            ${collected ? ICON_STAMP_FILLED : ICON_STAMP_OUTLINE} ${collected ? 'Stamped' : 'Not stamped'}
+        </button>`;
+    return `<div class="popup-inner${marker._noStamp ? ' nostamp' : ''}">
         <div class="popup-name">${esc(primary)}</div>
         ${secondary ? `<div class="popup-name-secondary">${esc(secondary)}</div>` : ''}
-        ${lineDots ? `<div class="popup-line-dots">${lineDots}</div>` : ''}
-        <button class="popup-collect-btn${collected ? ' collected' : ''}"
-                aria-label="${esc(btnAria)}" aria-pressed="${collected}">
-            ${collected ? ICON_STAMP_FILLED : ICON_STAMP_OUTLINE}
-        </button>
+        ${lineBadges}
+        ${stampRow}
     </div>`;
 };
 
+// Reflect a marker's stamped state onto its DOM element (glyph color + stack
+// order). `justNow` also replays the ink-press animation.
+const paintStampMarker = (marker, justNow = false) => {
+    const el = marker.getElement?.();
+    if (el) {
+        el.classList.toggle('stamped', marker._isCollected);
+        el.classList.remove('just-stamped');
+        if (justNow && marker._isCollected) {
+            void el.offsetWidth;   // restart the CSS animation
+            el.classList.add('just-stamped');
+        }
+    }
+    marker.setZIndexOffset?.(marker._isCollected ? 1000 : 0);
+};
+
 /**
- * Toggle a station's stamp — THE collect action, shared by the seal button in
- * the popup (event delegation in main.js) and by tapping the station dot while
- * its card is open. A short guard window means a desktop double-click can't
- * collect-then-instantly-remove (two click events land before dblclick).
+ * Toggle a station's stamp — THE collect action, shared by double-clicking
+ * the marker and by the popup's stamp row (event delegation in main.js).
+ * A short guard window means a stray triple click can't toggle twice.
  */
 export const toggleStamp = (marker) => {
     if (!marker || marker._noStamp) return;
@@ -184,11 +171,10 @@ export const toggleStamp = (marker) => {
     marker._isCollected = next;
     state.stamps[next ? 'add' : 'delete'](marker._stationData.code);
     scheduleSave();
-    marker.setStyle(circleStyle(next, ui.map.getZoom()));
-    if (next) marker.bringToFront();   // gold marker on top of grey ones
+    paintStampMarker(marker, true);
 
-    // Update the seal in place if the card is open (popup HTML is otherwise a
-    // function, rebuilt on next open — no manual sync needed).
+    // Update the state row in place if the popup is open (popup HTML is
+    // otherwise a function, rebuilt on next open — no manual sync needed).
     const btn = marker.getPopup()?.getElement()?.querySelector('.popup-collect-btn');
     if (btn) {
         const ariaName = state.lang === 'jp' ? (marker.stationNameJP || marker.stationNameEN)
@@ -196,7 +182,7 @@ export const toggleStamp = (marker) => {
         btn.className = 'popup-collect-btn' + (next ? ' collected' : '');
         btn.setAttribute('aria-label', `${next ? 'Remove stamp' : 'Collect stamp'} for ${ariaName}`);
         btn.setAttribute('aria-pressed', String(next));
-        btn.innerHTML = next ? ICON_STAMP_FILLED : ICON_STAMP_OUTLINE;
+        btn.innerHTML = `${next ? ICON_STAMP_FILLED : ICON_STAMP_OUTLINE} ${next ? 'Stamped' : 'Not stamped'}`;
     }
     updateStats();
     showToast(next ? `${marker.stationName} — stamped!` : `${marker.stationName} — removed`);
@@ -234,7 +220,9 @@ const createMarker = (station, map, plain = false) => {
     }
 
     const collected = !plain && state.stamps.has(code);
-    const marker    = L.circleMarker([station.lat, station.lon], plain ? plainStyle(map.getZoom()) : circleStyle(collected, map.getZoom()));
+    const marker = plain
+        ? L.circleMarker([station.lat, station.lon], plainStyle(map.getZoom()))
+        : L.marker([station.lat, station.lon], { icon: STAMP_DIV_ICON, keyboard: false });
 
     marker._stationData  = station;
     marker._isCollected  = collected;
@@ -244,106 +232,85 @@ const createMarker = (station, map, plain = false) => {
     marker.stationNameJP = station.name_kanji || '';
     marker.stationNameEN = getEnName(station, code);
 
-    // Function content so the popup is rebuilt on each open — it then reflects the
-    // current stamp state AND whether we're in ride-edit mode (read-only) without
-    // having to re-push HTML into thousands of markers.
-    marker.bindPopup(() => buildPopupHtml(marker), { offset: L.point(0, -4), closeButton: true, maxWidth: 260 });
+    // Hover = the station's name only, in the same lightweight tooltip the
+    // lines use (content is a function → language-aware on every open).
+    marker.bindTooltip(() => {
+        const primary   = state.lang === 'jp' ? (marker.stationNameJP || marker.stationNameEN)
+                                              : (marker.stationNameEN || marker.stationNameJP);
+        const secondary = state.lang === 'jp' ? marker.stationNameEN : marker.stationNameJP;
+        return `<div class="line-tip"><b>${esc(primary)}</b>${secondary ? `<br><span>${esc(secondary)}</span>` : ''}</div>`;
+    }, { direction: 'top', offset: plain ? [0, -8] : [0, -STAMP_ICON_PX / 2], className: 'line-tooltip' });
 
-    // Click opens the card; clicking the dot AGAIN while its card is open
-    // toggles the stamp. So: touch = tap-tap on the dot to collect; desktop =
-    // hover opens the card, a single click collects. The map's double-tap
-    // zoom is suppressed around station taps (map-setup.js, ui.lastStationTap).
-    //
-    // The open-state must be captured on 'preclick': Leaflet auto-closes the
-    // open popup on preclick (closePopupOnClick), so by 'click' time
-    // isPopupOpen() is already false for exactly the card we care about.
-    marker.on('preclick', () => {
-        marker._cardWasOpen = !marker._noStamp && marker.isPopupOpen?.() && ui.currentPopupMarker === marker;
-    });
-    marker.on('click', () => {
-        const wasOpen = marker._cardWasOpen;
-        marker._cardWasOpen = false;
-        if (ui.suppressTap) { ui.suppressTap = false; return; }   // ignore long-press
-        if (ui.rideEdit) return;   // stations aren't clickable while editing a ride
-        ui.lastStationTap = Date.now();
-        clearTimeout(marker._popupTimer);
-        marker._hoverOpened = false;
-        if (wasOpen) {
-            // Second activation = collect/remove; keep the card up so the seal
-            // visibly flips (preclick closed it — reopen without animation churn).
-            ui.currentPopupMarker = marker;
-            marker.openPopup();
-            toggleStamp(marker);
-            return;
-        }
-        ui.currentPopupMarker = marker;
-        marker.openPopup();
-    });
+    // Click = the compact info popup (function content → rebuilt on open, so
+    // it always reflects current stamp state and language). Plain canvas dots
+    // need an explicit offset; stamp markers get theirs from the divIcon's
+    // popupAnchor — passing `offset: undefined` would clobber Leaflet's
+    // default and break popup positioning, so the key is only set for plain.
+    const popupOpts = { closeButton: true, maxWidth: 260 };
+    if (plain) popupOpts.offset = L.point(0, -4);
+    marker.bindPopup(() => buildPopupHtml(marker), popupOpts);
+    // bindPopup installs Leaflet's own click→toggle-popup handler, which would
+    // fight the click-pair logic below (popping the popup open/closed on every
+    // click without tracking ui.currentPopupMarker). Same removal as lines.js.
+    marker.off('click', marker._openPopup, marker);
 
-    // On desktop, hovering a station opens its popup immediately.
-    // Touch devices have no hover — click remains the only trigger.
-    if (!IS_TOUCH) {
-        marker.on('mouseover', () => {
-            clearTimeout(marker._popupTimer);
-            marker._hoverOpened = true;
+    if (plain) {
+        // Plain station: single click/tap opens the popup. Nothing to toggle.
+        marker.on('click', () => {
+            if (ui.suppressTap) { ui.suppressTap = false; return; }   // ignore long-press
+            if (ui.rideEdit) return;   // stations aren't clickable while editing a ride
+            ui.lastStationTap = Date.now();
             ui.currentPopupMarker = marker;
             marker.openPopup();
         });
-
-        // When the cursor leaves the marker, schedule the popup to close.
-        // If the user moves into the popup HTML (to click Collect), the
-        // popup's mouseenter cancels the timer so it stays open.
-        marker.on('mouseout', () => {
-            if (!marker._hoverOpened) return;
-            marker._popupTimer = setTimeout(() => {
-                if (marker._hoverOpened && ui.currentPopupMarker === marker) {
-                    marker._hoverOpened = false;
-                    ui.currentPopupMarker = null;
-                    marker.closePopup();
-                }
-            }, POPUP_GRACE_MS);
+    } else {
+        // Stamp station: double click/tap toggles the stamp; a lone click
+        // opens the info popup after the pair window. Own click-pair counting
+        // (not native dblclick) so desktop and touch behave identically.
+        // If the popup was open when the click landed, the lone click acts as
+        // a dismiss (Leaflet's preclick already closed it — don't reopen).
+        marker.on('preclick', () => {
+            marker._popupWasOpen = marker.isPopupOpen?.() && ui.currentPopupMarker === marker;
         });
-
-        // Attach grace-period handlers to the popup DOM element once it opens.
-        // onmouseenter = property assignment avoids accumulating listeners.
-        marker.on('popupopen', () => {
-            const el = marker.getPopup()?.getElement();
-            if (!el) return;
-            el.onmouseenter = () => clearTimeout(marker._popupTimer);
-            el.onmouseleave = () => {
-                if (!marker._hoverOpened) return;
-                marker._popupTimer = setTimeout(() => {
-                    if (marker._hoverOpened && ui.currentPopupMarker === marker) {
-                        marker._hoverOpened = false;
-                        ui.currentPopupMarker = null;
-                        marker.closePopup();
-                    }
-                }, POPUP_GRACE_MS);
-            };
+        marker.on('click', () => {
+            if (ui.suppressTap) { ui.suppressTap = false; return; }   // ignore long-press
+            if (ui.rideEdit) return;   // stations aren't clickable while editing a ride
+            ui.lastStationTap = Date.now();
+            if (marker._clickArmed) {                     // second click of a pair → toggle
+                clearTimeout(marker._clickTimer);
+                marker._clickArmed = false;
+                toggleStamp(marker);
+                return;
+            }
+            marker._clickArmed = true;
+            const wasOpen = marker._popupWasOpen;
+            marker._clickTimer = setTimeout(() => {
+                marker._clickArmed = false;
+                if (wasOpen) return;                      // lone click on an open popup = dismiss
+                ui.currentPopupMarker = marker;
+                marker.openPopup();
+            }, STAMP_DBL_MS);
         });
     }
 
     // Clear tracking state when popup closes for any reason.
     marker.on('popupclose', () => {
-        clearTimeout(marker._popupTimer);
-        marker._hoverOpened = false;
         if (ui.currentPopupMarker === marker) ui.currentPopupMarker = null;
     });
 
     dedupeMarkers[key] = marker;
     (plain ? plainMarkers : markers).push(marker);
     marker.addTo(map);
+    if (!plain) paintStampMarker(marker);   // element exists only after addTo
 };
 export const refreshAllMarkerStates = () => {
     if (!ui.map) return;
     ui.map.closePopup();
-    const zoom = ui.map.getZoom();
     markers.forEach(m => {
         m._isCollected = state.stamps.has(m._stationData.code);
-        m.setStyle(circleStyle(m._isCollected, zoom));
+        paintStampMarker(m);
         // Popup content is a function (rebuilt on open) — no need to re-push HTML.
     });
-    bringCollectedToFront();
     updateStats();
 };
 
@@ -410,8 +377,9 @@ export const loadStations = async (map) => {
         }));
 
         // Pass C: every OTHER station (nowhere stamped at its location) as a
-        // discreet, clickable non-stamp marker. Created BEFORE the stamp passes so
-        // the gold/grey stamp dots draw on top of these. Same name resolver so the
+        // discreet, clickable non-stamp marker. Created BEFORE the stamp passes
+        // (stamp markers are DOM, always above these canvas dots). Same name
+        // resolver so the
         // romaji is decent. These live in plainMarkers (excluded from stats/search).
         stations.forEach(g => {
             if (g.line_name_en && !lineEnMap[g.line_name]) lineEnMap[g.line_name] = g.line_name_en;
@@ -454,17 +422,16 @@ export const loadStations = async (map) => {
                            line_code: (s.lines && s.lines[0]) || '' }, map);
         });
         map.on('zoomend', () => {
+            applyStampScale(map);   // one CSS-var write scales every stamp glyph
             clearTimeout(zoomDebounce);
             zoomDebounce = setTimeout(() => {
                 const zoom = map.getZoom();
                 updatePlainVisibility(map);
                 plainMarkers.forEach(m => m.setStyle(plainStyle(zoom)));
-                markers.forEach(m => m.setStyle(circleStyle(m._isCollected, zoom)));
-                bringCollectedToFront();
             }, 150);
         });
+        applyStampScale(map);
         updatePlainVisibility(map);
-        bringCollectedToFront();
         updateStats();
         hideLoading();
     };
