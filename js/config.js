@@ -6,7 +6,7 @@ export const GIST_PREFIX       = 'eki-stamp-tracker:';
 // App version — shown discreetly in the session panel. Bump on every merge
 // to main. It is also part of the station-cache key, so each release
 // invalidates the 7-day IndexedDB cache and users immediately get fresh data.
-export const APP_VERSION       = 'v1.7.1';
+export const APP_VERSION       = 'v1.7.2';
 export const CACHE_TTL         = 7 * 24 * 60 * 60 * 1000;  // 7 days
 export const BATCH_SIZE        = 150;      // features per animation frame (line rendering)
 export const SYNC_DEBOUNCE_MS  = 2000;     // ms after last stamp change before auto-save
@@ -67,18 +67,12 @@ export const IS_TOUCH = window.matchMedia('(pointer: coarse)').matches;
 
 // SVG icon constants.
 // Marker badge: the classic eki-stamp pictogram — hand-stamp silhouette
-// (round knob, waisted neck, wide base) inside a THICK circular ring, like
-// the reference sign. currentColor drives both ring and glyph so one markup
-// serves the grey (unstamped) and ink-red (stamped) states. The first,
-// unpainted circle is the hit area (pointer-events=all): a circle matching
-// the badge, so lines/dots next to a stamp stay clickable.
-export const ICON_STAMP_MARKER  = '<svg viewBox="0 0 24 24" aria-hidden="true">'
-    + '<circle cx="12" cy="12" r="12" fill="none" pointer-events="all"/>'
-    + '<circle cx="12" cy="12" r="10.6" fill="none" stroke="currentColor" stroke-width="2.4"/>'
-    + '<g fill="currentColor" transform="translate(12 12) scale(0.7) translate(-12 -11)">'
-    + '<circle cx="12" cy="4.6" r="3.4"/>'
-    + '<path d="M10.2 7.4 C10.6 9.6, 8.6 10.4, 8.6 12.6 L15.4 12.6 C15.4 10.4, 13.4 9.6, 13.8 7.4 Z"/>'
-    + '<rect x="4.6" y="12.4" width="14.8" height="8.4" rx="1.8"/>'
-    + '</g></svg>';
+// (hand-stamp silhouette inside a thick ring, the reference artwork the owner
+// supplied as img/badge.svg). It's a fixed-colour raster, so we render it as a
+// CSS mask and fill it with a design token — that recolours the exact artwork
+// to grey (--marker-idle, unstamped) or ink red (--ink, stamped) crisply, and
+// the same markup serves the map marker and the popup badge. See css/app.css
+// `.stamp-glyph`.
+export const ICON_STAMP_MARKER  = '<span class="stamp-glyph" aria-hidden="true"></span>';
 // Route/ride icon: two nodes joined by a path.
 export const ICON_RIDE = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="5" cy="19" r="2.4"/><circle cx="19" cy="5" r="2.4"/><path d="M7 17 C 12 12, 9 8, 17 6.5"/></svg>';

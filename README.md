@@ -33,8 +33,8 @@ Runtime dependencies are loaded from CDNs (no npm install needed to run):
 ## What the app does
 
 1. **Map of stamp stations.** Every station that has a real eki stamp is drawn
-   as a small **eki-stamp glyph inside a thick ring** (sized to match the plain
-   station dots) — grey while uncollected, **ink red** once stamped. Hover
+   as a small **eki-stamp badge** (`img/badge.svg`, recoloured via CSS mask;
+   sized to match the plain station dots) — grey while uncollected, **ink red** once stamped. Hover
    shows the station name; a single click/tap opens a compact, fixed-width
    popup: station name with the stamp ring badge top-right, a divider, then the
    line badges stacked (identical layout for stamp and non-stamp stations).

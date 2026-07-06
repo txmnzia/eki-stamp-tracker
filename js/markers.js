@@ -255,7 +255,9 @@ const createMarker = (station, map, plain = false) => {
     // need an explicit offset; stamp markers get theirs from the divIcon's
     // popupAnchor — passing `offset: undefined` would clobber Leaflet's
     // default and break popup positioning, so the key is only set for plain.
-    const popupOpts = { closeButton: true, maxWidth: 260 };
+    // No close button on station popups — the stamp badge owns the top-right
+    // corner (per the mock-up); the popup closes on a map tap / opening another.
+    const popupOpts = { closeButton: false, maxWidth: 260 };
     if (plain) popupOpts.offset = L.point(0, -4);
     marker.bindPopup(() => buildPopupHtml(marker), popupOpts);
     // bindPopup installs Leaflet's own click→toggle-popup handler, which would
