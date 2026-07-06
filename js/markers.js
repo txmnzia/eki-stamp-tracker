@@ -5,8 +5,8 @@
 import { APP_VERSION, CACHE_TTL, IS_TOUCH, MARKER_BASE_R,
          MARKER_ABS_MIN, MARKER_MAX_R, ZOOM_BASE, ZOOM_SCALE,
          STAMP_TOGGLE_GUARD_MS, STAMP_DBL_MS, PLAIN_MIN_ZOOM,
-         STAMP_ICON_PX, STAMP_MIN_SCALE, STAMP_MIN_SCALE_TOUCH, STAMP_MAX_SCALE,
-         ICON_STAMP_MARKER, ICON_STAMP_FILLED, ICON_STAMP_OUTLINE } from './config.js';
+         STAMP_ICON_PX, STAMP_SIZE_FACTOR, STAMP_MIN_SCALE_TOUCH,
+         ICON_STAMP_MARKER } from './config.js';
 import { state } from './state.js';
 import { ui, markers, plainMarkers, dedupeMarkers, lineColorMap, lineEnMap, allStations,
          lineGroups, stationByCode, esc, orderLineNames, uiColors } from './registry.js';
@@ -88,12 +88,15 @@ const STAMP_DIV_ICON = L.divIcon({
     tooltipAnchor: [0, -STAMP_ICON_PX / 2],
 });
 
-// All 2.4k glyphs scale via ONE custom property on the map container — a
-// single style write per zoom instead of rebuilding every icon.
+// All 2.4k badges scale via ONE custom property on the map container — a
+// single style write per zoom instead of rebuilding every icon. The badge
+// follows the SAME size curve as the plain dots (×STAMP_SIZE_FACTOR, ring
+// included) so stamp and non-stamp stations stay visually consistent.
 const applyStampScale = (map) => {
-    const s = Math.min(STAMP_MAX_SCALE,
-        Math.max(IS_TOUCH ? STAMP_MIN_SCALE_TOUCH : STAMP_MIN_SCALE,
-                 Math.pow(ZOOM_SCALE, map.getZoom() - ZOOM_BASE)));
+    const r = Math.min(MARKER_MAX_R, Math.max(MARKER_ABS_MIN,
+              MARKER_BASE_R * Math.pow(ZOOM_SCALE, map.getZoom() - ZOOM_BASE)));
+    let s = (2 * r * STAMP_SIZE_FACTOR) / STAMP_ICON_PX;
+    if (IS_TOUCH) s = Math.max(s, STAMP_MIN_SCALE_TOUCH);   // tap floor (plain dots hidden at these zooms)
     map.getContainer().style.setProperty('--stamp-scale', s.toFixed(3));
 };
 
@@ -122,22 +125,27 @@ export const buildPopupHtml = (marker) => {
         return `<div class="popup-line"><span class="popup-line-dot" style="background:${esc(color)}"></span>${label}</div>`;
     }).join('');
 
-    // ONE popup layout for every station — name + full line badges — so stamp
-    // and non-stamp stations behave identically. Stamp stations add a single
-    // discreet state row: it shows Stamped/Not stamped and is the keyboard /
-    // colorblind-safe toggle (the marker itself toggles on double click).
+    // ONE popup layout for every station (docs mock-up): a header row with the
+    // station name on the left and — for stamp stations — the stamp badge on
+    // the right, a divider, then the line badges stacked. Fixed width, so every
+    // popup is the same size regardless of name/line lengths. The badge is the
+    // discoverable, keyboard- and colorblind-safe toggle (click it; the map pin
+    // also toggles on double click). Same ring glyph as the map marker.
     const collected = !marker._noStamp && marker._isCollected;
-    const stampRow  = marker._noStamp ? '' :
+    const stampBadge = marker._noStamp ? '' :
         `<button class="popup-collect-btn${collected ? ' collected' : ''}"
+                 title="${collected ? 'Remove stamp' : 'Collect stamp'}"
                  aria-label="${esc(`${collected ? 'Remove stamp' : 'Collect stamp'} for ${primary}`)}"
-                 aria-pressed="${collected}">
-            ${collected ? ICON_STAMP_FILLED : ICON_STAMP_OUTLINE} ${collected ? 'Stamped' : 'Not stamped'}
-        </button>`;
+                 aria-pressed="${collected}">${ICON_STAMP_MARKER}</button>`;
     return `<div class="popup-inner${marker._noStamp ? ' nostamp' : ''}">
-        <div class="popup-name">${esc(primary)}</div>
-        ${secondary ? `<div class="popup-name-secondary">${esc(secondary)}</div>` : ''}
-        ${lineBadges}
-        ${stampRow}
+        <div class="popup-head">
+            <div class="popup-name-wrap">
+                <div class="popup-name">${esc(primary)}</div>
+                ${secondary ? `<div class="popup-name-secondary">${esc(secondary)}</div>` : ''}
+            </div>
+            ${stampBadge}
+        </div>
+        ${lineBadges ? `<div class="popup-lines">${lineBadges}</div>` : ''}
     </div>`;
 };
 
@@ -173,16 +181,17 @@ export const toggleStamp = (marker) => {
     scheduleSave();
     paintStampMarker(marker, true);
 
-    // Update the state row in place if the popup is open (popup HTML is
-    // otherwise a function, rebuilt on next open — no manual sync needed).
+    // Update the stamp badge in place if the popup is open (popup HTML is
+    // otherwise a function, rebuilt on next open — no manual sync needed). Only
+    // the collected class + labels change; the ring glyph is the same markup.
     const btn = marker.getPopup()?.getElement()?.querySelector('.popup-collect-btn');
     if (btn) {
         const ariaName = state.lang === 'jp' ? (marker.stationNameJP || marker.stationNameEN)
                                              : (marker.stationNameEN || marker.stationNameJP);
-        btn.className = 'popup-collect-btn' + (next ? ' collected' : '');
+        btn.classList.toggle('collected', next);
+        btn.title = next ? 'Remove stamp' : 'Collect stamp';
         btn.setAttribute('aria-label', `${next ? 'Remove stamp' : 'Collect stamp'} for ${ariaName}`);
         btn.setAttribute('aria-pressed', String(next));
-        btn.innerHTML = `${next ? ICON_STAMP_FILLED : ICON_STAMP_OUTLINE} ${next ? 'Stamped' : 'Not stamped'}`;
     }
     updateStats();
     showToast(next ? `${marker.stationName} — stamped!` : `${marker.stationName} — removed`);
