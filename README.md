@@ -38,7 +38,10 @@ Runtime dependencies are loaded from CDNs (no npm install needed to run):
    plain station dots) — grey while uncollected, **ink red** once stamped. Hover
    shows the station name; a single click/tap opens a compact, fixed-width
    popup: station name with the stamp ring badge top-right, a divider, then the
-   line badges stacked (identical layout for stamp and non-stamp stations).
+   line badges stacked (identical layout for stamp and non-stamp stations). The
+   name has its network qualifier stripped ("Toei Subway Morishita" → "Morishita",
+   the operator is already in the line badges) and wraps to two lines rather than
+   truncating.
    **Double click / double tap the stamp to collect or remove it** (double-tap
    zoom is suppressed on stamps, still works elsewhere); the popup's ring badge
    is the equivalent single-click toggle. Non-stamp stations stay plain grey
@@ -175,6 +178,12 @@ keys to `localStorage`). Map data is cached in **IndexedDB** (`eki-cache`, keyed
 - **Focus:** while editing, every other line is faded right down, other lines'
   ride overlays are faded, and hover-highlight is suppressed, so only the line
   being edited stands out.
+- **Reading state:** ridden stretches are drawn bold and full colour, un-ridden
+  ones thin and faint (a wide gap so the two never blur together); a persistent
+  legend (top-left) names them. Non-stamp station dots are brought forward as
+  read-only, tappable landmarks so you can see where each stretch begins and
+  ends. The line popup has its own header (route-icon chip + "Line" kicker) so it
+  is never mistaken for a station card.
 
 Rides are stored as **segment keys** `"codeA|codeB"` (the two stations of a ridden
 inter-station segment). `renderRideOverlays` also still understands the older

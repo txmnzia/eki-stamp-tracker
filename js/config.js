@@ -6,7 +6,7 @@ export const GIST_PREFIX       = 'eki-stamp-tracker:';
 // App version — shown discreetly in the session panel. Bump on every merge
 // to main. It is also part of the station-cache key, so each release
 // invalidates the 7-day IndexedDB cache and users immediately get fresh data.
-export const APP_VERSION       = 'v1.7.4';
+export const APP_VERSION       = 'v1.8.0';
 export const CACHE_TTL         = 7 * 24 * 60 * 60 * 1000;  // 7 days
 export const BATCH_SIZE        = 150;      // features per animation frame (line rendering)
 export const SYNC_DEBOUNCE_MS  = 2000;     // ms after last stamp change before auto-save
