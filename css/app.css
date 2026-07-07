@@ -240,7 +240,10 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 }
 .popup-collect-btn:hover { transform: scale(1.06); }
 .popup-collect-btn:active { transform: scale(0.94); }
-.popup-collect-btn:hover, .popup-collect-btn.collected { color: var(--ink); }
+/* Colour reflects the collected STATE only — never :hover. A hover/tap tint
+   would stick on touch (mobile Safari holds :hover until the next tap) and
+   leave a just-removed badge looking red. Hover affordance = the scale above. */
+.popup-collect-btn.collected { color: var(--ink); }
 @media (prefers-reduced-motion: reduce) { .popup-collect-btn { transition: none; } }
 /* Non-stamp station: same popup, muted name — implicit there's no stamp (#20). */
 .popup-inner.nostamp .popup-name { color: var(--muted); font-weight: 400; }

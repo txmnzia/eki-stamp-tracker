@@ -6,7 +6,7 @@ export const GIST_PREFIX       = 'eki-stamp-tracker:';
 // App version — shown discreetly in the session panel. Bump on every merge
 // to main. It is also part of the station-cache key, so each release
 // invalidates the 7-day IndexedDB cache and users immediately get fresh data.
-export const APP_VERSION       = 'v1.7.3';
+export const APP_VERSION       = 'v1.7.4';
 export const CACHE_TTL         = 7 * 24 * 60 * 60 * 1000;  // 7 days
 export const BATCH_SIZE        = 150;      // features per animation frame (line rendering)
 export const SYNC_DEBOUNCE_MS  = 2000;     // ms after last stamp change before auto-save
@@ -19,11 +19,11 @@ export const MARKER_MAX_R      = 18;       // cap radius at high zoom to avoid c
 export const ZOOM_BASE         = 12;       // zoom at which radius = MARKER_BASE_R (and stamp scale = 1)
 export const ZOOM_SCALE        = 1.18;     // radius/scale multiplier per zoom step away from ZOOM_BASE
 export const STAMP_ICON_PX     = 26;       // stamp-marker box size; the visual badge scales inside it
-export const STAMP_SIZE_FACTOR = 1.15;     // stamp badge diameter vs the plain-dot diameter at the same
-                                    // zoom (ring included) — keeps stamp and non-stamp station
-                                    // markers visually consistent in size (owner spec)
-export const STAMP_MIN_SCALE_TOUCH = 0.5;  // touch tap floor; only kicks in at zooms where the plain
-                                    // dots are hidden anyway (PLAIN_MIN_ZOOM), so consistency holds
+export const STAMP_SIZE_FACTOR = 1.4375;   // stamp badge diameter vs the plain-dot diameter at the same
+                                    // zoom (ring included). Base was 1.15; bumped +25% (owner request)
+                                    // so stamps read a little larger than the plain dots at every zoom.
+export const STAMP_MIN_SCALE_TOUCH = 0.625; // touch tap floor (also +25%); only kicks in at zooms where the
+                                    // plain dots are hidden anyway (PLAIN_MIN_ZOOM), so consistency holds
 export const STAMP_DBL_MS      = 280;      // click-pair window: two clicks/taps on a stamp within this
                                     // toggle it; a lone click opens the info popup after the window
 export const MAX_SUGGESTIONS   = 6;
