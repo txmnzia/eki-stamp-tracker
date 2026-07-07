@@ -211,8 +211,11 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
     padding-bottom: var(--sp-2); border-bottom: 1px solid var(--border);
 }
 .popup-name-wrap { min-width: 0; flex: 1; }          /* min-width:0 lets long names ellipsize */
+/* Wrap to at most 2 lines (ellipsis only past line 2) instead of cutting a long
+   name mid-word — the fixed popup WIDTH is kept, height grows one line at most. */
 .popup-name { font-family: var(--jp-font); font-size: var(--fs-lg); font-weight: 700; color: var(--text);
-    margin-bottom: 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    margin-bottom: 1px; overflow: hidden; overflow-wrap: anywhere;
+    display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; }
 .popup-name-secondary { font-size: var(--fs-xs); color: var(--muted); letter-spacing: 0.05em;
     overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
@@ -387,6 +390,26 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .line-tip span { font-size: var(--fs-xs); color: var(--muted); letter-spacing: 0.03em; }
 
 /* ── Line popup: "add a ride" ─────────────────────────────────────── */
+/* Header is deliberately unlike the station popup's name+seal head: a route-icon
+   chip in the line colour + a "Line" kicker, so the two card types never read the
+   same (docs UX audit #2). */
+.popup-line-head {
+    display: flex; align-items: center; gap: var(--sp-2);
+    padding-bottom: var(--sp-2); margin-bottom: 8px; border-bottom: 1px solid var(--border);
+}
+.popup-line-icon {
+    flex-shrink: 0; width: 28px; height: 28px; border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: color-mix(in srgb, currentColor var(--a-tint), transparent);
+    border: 1px solid color-mix(in srgb, currentColor var(--a-outline), transparent);
+}
+.popup-line-titlewrap { min-width: 0; }
+.popup-line-kicker {
+    display: block; font-family: var(--ui-font); font-size: 10px; font-weight: 700;
+    letter-spacing: var(--track-caps); text-transform: uppercase; color: var(--muted); margin-bottom: 1px;
+}
+.popup-line-title { display: flex; flex-direction: column; gap: 1px; line-height: 1.3; min-width: 0;
+    font-family: var(--jp-font); font-size: var(--fs-md); font-weight: 700; }
 .popup-ride-summary { font-family: var(--jp-font); font-size: var(--fs-xs); color: var(--muted); margin: 2px 0 10px; }
 .popup-line-ride-btn.has-rides {
     background: color-mix(in srgb, var(--accent) var(--a-tint), transparent);
@@ -407,6 +430,23 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
     z-index: var(--z-modal);
     box-shadow: var(--shadow-2);
 }
+
+/* Persistent segment-style key while editing — sits top-left, mirroring the
+   session panel's top-right slot, so it never fights the bottom controls (#6). */
+#ride-edit-legend {
+    position: fixed; left: var(--sp-3);
+    top: calc(env(safe-area-inset-top, 0px) + 60px);
+    z-index: var(--z-map-ui);
+    display: flex; flex-direction: column; gap: 6px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--r-md); padding: var(--sp-2) var(--sp-3);
+    box-shadow: var(--shadow-1);
+    font-size: 10px; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted);
+}
+.rl-item { display: flex; align-items: center; gap: var(--sp-2); }
+.rl-swatch { width: 20px; flex-shrink: 0; border-radius: var(--r-full); background: var(--text); }
+.rl-ridden   { height: 5px; }
+.rl-unridden { height: 2px; background: var(--muted); opacity: 0.4; }
 
 /* ── Responsive / touch ───────────────────────────────────────────── */
 @media (pointer: coarse) {

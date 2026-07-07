@@ -6,7 +6,7 @@ export const GIST_PREFIX       = 'eki-stamp-tracker:';
 // App version — shown discreetly in the session panel. Bump on every merge
 // to main. It is also part of the station-cache key, so each release
 // invalidates the 7-day IndexedDB cache and users immediately get fresh data.
-export const APP_VERSION       = 'v1.7.4';
+export const APP_VERSION       = 'v1.8.0';
 export const CACHE_TTL         = 7 * 24 * 60 * 60 * 1000;  // 7 days
 export const BATCH_SIZE        = 150;      // features per animation frame (line rendering)
 export const SYNC_DEBOUNCE_MS  = 2000;     // ms after last stamp change before auto-save
@@ -41,8 +41,23 @@ export const SHINKANSEN_BASE = { ...LINE_BASE };              // Shinkansen fade
 export const LINE_DIM      = { weight: 1.2, opacity: 0.10 };  // other lines while one is focused
 export const LINE_EDIT_SHOW = { weight: 2.4, opacity: 0.75 }; // ALL lines while in (global) edit mode — brought
                                     // forward over the dimmed base map so the network is the clear focus
+export const LINE_EDIT_DIM = { weight: 1.2, opacity: 0.12 };  // edit mode spotlight: every line EXCEPT the active
+                                    // paint target fades back, so the line you're editing is unmistakably the
+                                    // foreground (also fixes the old inversion where an active line read fainter
+                                    // than its untouched neighbours)
 export const LINE_FOCUS    = { weight: 4,   opacity: 0.85 };  // hovered/tapped line
 export const RIDE_OVERLAY  = { weight: 4.5, opacity: 0.95 };  // ridden-stretch overlay (full colour)
+export const RIDE_OVERLAY_FOCUS = { weight: 6.5, opacity: 1 }; // a ridden line's overlay while it is hovered/focused —
+                                    // so a fully-ridden line visibly responds to hover (the overlay used to sit
+                                    // inert on top of the focus highlight)
+export const RIDE_OVERLAY_DIM = { weight: 2.5, opacity: 0.30 }; // other ridden lines' overlays while one is focused
+// Edit-mode painted segments: the RIDDEN and UNRIDDEN styles must be far apart so
+// "have I painted this stretch?" reads at a glance (widened from 0.95/w6 vs 0.45/w3,
+// which users found too alike). Same hue for both — the gap is weight + opacity.
+export const RIDE_SEG_ON   = { weight: 7,   opacity: 1 };     // a stretch you've marked ridden — bold, full colour
+export const RIDE_SEG_OFF  = { weight: 2,   opacity: 0.35 };  // not yet ridden — thin, faint
+export const PLAIN_EDIT_FILL_OPACITY = 0.5; // non-stamp dots are boosted this opaque (from 0.18) while ride-editing,
+                                    // so they work as real landmarks for picking the stretch you rode (#3)
 export const RIDE_SNAP_M   = 60;           // station must sit this close to the line to *score* a group
 export const RIDE_INCLUDE_M = 220;         // once the line is chosen, include its OWN stations this far
                                     // out (tolerates rapid/local alignment offsets; safe because
