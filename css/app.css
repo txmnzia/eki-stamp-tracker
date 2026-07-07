@@ -228,50 +228,47 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 .popup-line-jp { color: var(--text); }
 .popup-line-en { font-size: var(--fs-xs); opacity: 0.65; letter-spacing: 0.03em; }
 
-/* Stamp badge — the round eki-stamp ring (same glyph as the map pin) sitting
-   top-right of the popup: grey ring when uncollected, ink-filled when stamped.
-   Click toggles (the map pin also toggles on double click). .popup-collect-btn
-   is a tooling contract (run-and-verify). */
+/* Stamp badge — the 駅 seal (same glyph as the map pin) sitting top-right of
+   the popup: grey when uncollected, ink red when stamped. Click toggles (the
+   map pin also toggles on double click). .popup-collect-btn is a tooling
+   contract (run-and-verify). */
 .popup-collect-btn {
     flex-shrink: 0; width: 40px; height: 40px; padding: 0;
     display: inline-flex; align-items: center; justify-content: center;
-    background: transparent; border: none; cursor: pointer;
-    transition: transform var(--t-fast);
+    background: transparent; border: none; cursor: pointer; color: var(--marker-idle);
+    transition: transform var(--t-fast), color var(--t-fast);
 }
 .popup-collect-btn:hover { transform: scale(1.06); }
 .popup-collect-btn:active { transform: scale(0.94); }
-.popup-collect-btn:hover .stamp-glyph,
-.popup-collect-btn.collected .stamp-glyph { background: var(--ink); }
+.popup-collect-btn:hover, .popup-collect-btn.collected { color: var(--ink); }
 @media (prefers-reduced-motion: reduce) { .popup-collect-btn { transition: none; } }
 /* Non-stamp station: same popup, muted name — implicit there's no stamp (#20). */
 .popup-inner.nostamp .popup-name { color: var(--muted); font-weight: 400; }
 .popup-inner.nostamp .popup-line { opacity: 0.85; }
 
-/* ── Stamp glyph (owner artwork img/badge.svg, recoloured via mask) ── */
-/* The badge is a fixed-colour raster, so we use it as a mask and paint it with
-   a token — grey (--marker-idle) unstamped, ink red (--ink) stamped — so the
-   exact artwork recolours crisply and one asset serves marker + popup badge. */
-.stamp-glyph {
-    display: block; width: 100%; height: 100%;
-    background: var(--marker-idle);
-    -webkit-mask: url("../img/badge.svg") center / contain no-repeat;
-            mask: url("../img/badge.svg") center / contain no-repeat;
-}
+/* ── Stamp seal glyph (design A: 駅 hanko) ────────────────────────── */
+/* One-colour, fully-filled inline SVG: the disc is currentColor (set per state
+   below), the thick ring + 駅 kanji are drawn in --bg so the whole badge is
+   opaque (no transparency) and recolouring is a single token change. 駅 is a
+   baked vector path (js/config.js ICON_STAMP_MARKER) — no runtime font. */
+.stamp-glyph { display: block; width: 100%; height: 100%; }
+.seal-disc { fill: currentColor; }
+.seal-ring { fill: none; stroke: var(--bg); stroke-width: 1.5; }
+.seal-mark { fill: var(--bg); }
 
 /* ── Stamp markers (the dot IS the stamp) ─────────────────────────── */
-/* DOM markers: grey artwork = collectible, ink red = stamped (double click
+/* DOM markers: grey seal = collectible, ink-red seal = stamped (double click
    toggles). Positioned by Leaflet; the glyph scales with zoom via a single
    --stamp-scale custom property on #map (one write per zoom, not 2.4k). Hit
    area = the glyph only (pointer-events), so lines stay hoverable next to
    stations. */
 .stamp-marker { pointer-events: none; }
 .stamp-marker .stamp-glyph {
-    pointer-events: auto; opacity: 0.7; cursor: pointer;   /* faint placeholder until stamped */
+    pointer-events: auto; cursor: pointer; color: var(--marker-idle);
     transform: scale(var(--stamp-scale, 1)); transform-origin: 50% 50%;
-    transition: background var(--t-fast), opacity var(--t-fast);
+    transition: color var(--t-fast);
 }
-.stamp-marker .stamp-glyph:hover { opacity: 1; }
-.stamp-marker.stamped .stamp-glyph { background: var(--ink); opacity: 1; }
+.stamp-marker.stamped .stamp-glyph { color: var(--ink); }
 .stamp-marker.stamped.just-stamped .stamp-glyph { animation: stamp-in var(--t-move) ease; }
 @keyframes stamp-in {
     0% { transform: scale(calc(var(--stamp-scale, 1) * 1.6)); opacity: 0.3; }
