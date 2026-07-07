@@ -6,7 +6,7 @@ export const GIST_PREFIX       = 'eki-stamp-tracker:';
 // App version — shown discreetly in the session panel. Bump on every merge
 // to main. It is also part of the station-cache key, so each release
 // invalidates the 7-day IndexedDB cache and users immediately get fresh data.
-export const APP_VERSION       = 'v1.7.2';
+export const APP_VERSION       = 'v1.7.3';
 export const CACHE_TTL         = 7 * 24 * 60 * 60 * 1000;  // 7 days
 export const BATCH_SIZE        = 150;      // features per animation frame (line rendering)
 export const SYNC_DEBOUNCE_MS  = 2000;     // ms after last stamp change before auto-save
@@ -66,13 +66,14 @@ export const SHK_SNAP_M    = 3500;         // a curated Shinkansen stop is "on r
 export const IS_TOUCH = window.matchMedia('(pointer: coarse)').matches;
 
 // SVG icon constants.
-// Marker badge: the classic eki-stamp pictogram — hand-stamp silhouette
-// (hand-stamp silhouette inside a thick ring, the reference artwork the owner
-// supplied as img/badge.svg). It's a fixed-colour raster, so we render it as a
-// CSS mask and fill it with a design token — that recolours the exact artwork
-// to grey (--marker-idle, unstamped) or ink red (--ink, stamped) crisply, and
-// the same markup serves the map marker and the popup badge. See css/app.css
-// `.stamp-glyph`.
-export const ICON_STAMP_MARKER  = '<span class="stamp-glyph" aria-hidden="true"></span>';
+// Stamp seal (design A): a hanko-style eki stamp — a FULLY-FILLED disc with a
+// thick ring and the kanji 駅 ("station") reading out, no checkmark. One colour:
+// the disc is currentColor (grey --marker-idle when uncollected, ink red --ink
+// when stamped) and the ring + kanji are drawn in --bg (fully opaque, no
+// transparency) so recolouring is a single token change. 駅 is a baked VECTOR
+// path (extracted from a JP gothic font) so it needs no font at runtime. Same
+// markup serves the map marker and the popup badge — styled in css/app.css
+// (`.stamp-glyph` / `.seal-disc` / `.seal-ring` / `.seal-mark`).
+export const ICON_STAMP_MARKER  = '<svg class="stamp-glyph" viewBox="0 0 24 24" aria-hidden="true"><circle class="seal-disc" cx="12" cy="12" r="11.3"/><circle class="seal-ring" cx="12" cy="12" r="9.1" fill="none"/><g class="seal-mark" transform="translate(5.81 16.4) scale(0.006 -0.006)"><path d="M1276 825Q1276 532 1249 352Q1210 71 1047 -148L951 -21Q1074 142 1110 389Q1139 583 1139 917V1595H1868V825H1606Q1667 316 1974 30L1882 -113Q1550 208 1473 825ZM1276 956H1731V1464H1276ZM997 743Q981 208 938 13Q916 -77 876 -110Q838 -143 749 -143Q654 -143 553 -131L534 10Q624 -12 706 -12Q789 -12 805 68Q839 221 854 603V628H190V1614H1005V1495H686V1323H946V1210H686V1038H946V925H686V743ZM327 1495V1323H555V1495ZM327 1210V1038H555V1210ZM327 925V743H555V925ZM90 51Q152 250 174 510L278 487Q266 194 205 -31ZM350 70Q350 330 330 485L422 500Q454 316 463 96ZM551 117Q529 334 487 506L571 528Q625 365 653 147ZM729 178Q696 382 639 541L725 571Q792 382 821 217Z"/></g></svg>';
 // Route/ride icon: two nodes joined by a path.
 export const ICON_RIDE = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="5" cy="19" r="2.4"/><circle cx="19" cy="5" r="2.4"/><path d="M7 17 C 12 12, 9 8, 17 6.5"/></svg>';
