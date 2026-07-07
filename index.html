@@ -113,6 +113,13 @@
         <span>Close editing</span>
     </button>
 
+    <!-- Ride-edit legend: what the painted segment styles mean, shown only while
+         editing so the guidance outlives the opening toast (#6 UX audit). -->
+    <div id="ride-edit-legend" class="hidden" aria-hidden="true">
+        <span class="rl-item"><span class="rl-swatch rl-ridden"></span>Ridden</span>
+        <span class="rl-item"><span class="rl-swatch rl-unridden"></span>Not ridden</span>
+    </div>
+
     <div id="toast" role="status" aria-live="polite"></div>
 
     <div id="stats-bar" aria-live="polite">

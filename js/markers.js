@@ -6,7 +6,7 @@ import { APP_VERSION, CACHE_TTL, IS_TOUCH, MARKER_BASE_R,
          MARKER_ABS_MIN, MARKER_MAX_R, ZOOM_BASE, ZOOM_SCALE,
          STAMP_TOGGLE_GUARD_MS, STAMP_DBL_MS, PLAIN_MIN_ZOOM,
          STAMP_ICON_PX, STAMP_SIZE_FACTOR, STAMP_MIN_SCALE_TOUCH,
-         ICON_STAMP_MARKER } from './config.js';
+         PLAIN_EDIT_FILL_OPACITY, ICON_STAMP_MARKER } from './config.js';
 import { state } from './state.js';
 import { ui, markers, plainMarkers, dedupeMarkers, lineColorMap, lineEnMap, allStations,
          lineGroups, stationByCode, esc, orderLineNames, uiColors } from './registry.js';
@@ -72,6 +72,21 @@ const plainStyle = (zoom) => {
         fillColor: uiColors.markerIdle, fillOpacity: 0.18, color: uiColors.markerIdle, weight: 0,
         renderer: ui.canvasRenderer,
     };
+};
+
+// Ride-edit variant: the same dots pulled forward — brighter fill plus a thin
+// ring — so they read as real landmarks for picking the stretch you rode, while
+// the base map is dimmed behind them (#3 UX audit).
+const editPlainStyle = (zoom) => ({
+    ...plainStyle(zoom), fillOpacity: PLAIN_EDIT_FILL_OPACITY, weight: 1, opacity: 0.7,
+});
+
+// Swap all non-stamp dots between their discreet and edit-mode looks. Called by
+// ride-edit.js on enter (true) / exit (false).
+export const setEditPlainStyle = (on) => {
+    if (!ui.map) return;
+    const zoom = ui.map.getZoom();
+    plainMarkers.forEach(m => m.setStyle((on ? editPlainStyle : plainStyle)(zoom)));
 };
 
 // Stamp stations: the dot IS the stamp — a DOM marker with the hand-stamp
@@ -267,9 +282,11 @@ const createMarker = (station, map, plain = false) => {
 
     if (plain) {
         // Plain station: single click/tap opens the popup. Nothing to toggle.
+        // In ride-edit mode it stays a read-only landmark — the tap still shows
+        // the name/lines popup (the popup carries no stamp action) so you can
+        // confirm which stations you're painting between (#3 UX audit).
         marker.on('click', () => {
             if (ui.suppressTap) { ui.suppressTap = false; return; }   // ignore long-press
-            if (ui.rideEdit) return;   // stations aren't clickable while editing a ride
             ui.lastStationTap = Date.now();
             ui.currentPopupMarker = marker;
             marker.openPopup();
@@ -438,7 +455,7 @@ export const loadStations = async (map) => {
             zoomDebounce = setTimeout(() => {
                 const zoom = map.getZoom();
                 updatePlainVisibility(map);
-                plainMarkers.forEach(m => m.setStyle(plainStyle(zoom)));
+                plainMarkers.forEach(m => m.setStyle((ui.rideEdit ? editPlainStyle : plainStyle)(zoom)));
             }, 150);
         });
         applyStampScale(map);
