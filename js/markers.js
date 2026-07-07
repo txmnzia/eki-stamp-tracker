@@ -396,12 +396,16 @@ export const loadStations = async (map) => {
         // Shinjuku…) has several rows at the same place. So we render every
         // ekidata line-row at a stamped location and let createMarker merge
         // them into one marker showing all its lines.
+        // Strip the network qualifier the SAME way non-stamp names are cleaned
+        // (curated-precedence rule): "Toei Subway Morishita" → "Morishita". The
+        // operator is already shown in the line badges, so the prefix is pure
+        // padding — and it was overflowing the fixed-width popup name.
         const stampedLoc = {};   // dedupeKey -> curated English name (or null)
         stations.forEach(g => g.stations.forEach(s => {
             const en = stampNames[s.code];
             if (en === undefined) return;
             const k = dedupeKey(s);
-            if (!(k in stampedLoc)) stampedLoc[k] = en || null;
+            if (!(k in stampedLoc)) stampedLoc[k] = cleanEn(en) || null;
         }));
 
         // Pass C: every OTHER station (nowhere stamped at its location) as a
@@ -445,7 +449,7 @@ export const loadStations = async (map) => {
         // coords/names and an fk_* code, which works with state.stamps like
         // any other — without this pass 84 real stamps could never be seen.
         (orphanStamps || []).forEach(s => {
-            createMarker({ code: s.code, name_kanji: s.name_kanji, name_en: s.name_en,
+            createMarker({ code: s.code, name_kanji: s.name_kanji, name_en: cleanEn(s.name_en),
                            lat: s.lat, lon: s.lon,
                            line_code: (s.lines && s.lines[0]) || '' }, map);
         });
