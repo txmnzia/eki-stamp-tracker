@@ -4,10 +4,10 @@
 // rides.js (onLinesReady → renderAllRideOverlays).
 
 import { APP_VERSION, CACHE_TTL, BATCH_SIZE, HOVER_RESET_MS, LINE_BASE, SHINKANSEN_BASE,
-         LINE_DIM, LINE_FOCUS, ICON_RIDE } from './config.js';
+         LINE_DIM, LINE_FOCUS, RIDE_OVERLAY, RIDE_OVERLAY_FOCUS, RIDE_OVERLAY_DIM, ICON_RIDE } from './config.js';
 import { getLineColor } from './line-colors.js';
 import { state } from './state.js';
-import { ui, linesByName, allLineSegs, lineColorMap, lineEnMap, lineGeomCache,
+import { ui, linesByName, allLineSegs, lineColorMap, lineEnMap, lineGeomCache, rideOverlays,
          shinkansenData, shinkansenGeo, esc, orderLineNames, uiColors } from './registry.js';
 import { cacheGet, cacheSet } from './idb-cache.js';
 import { showToast } from './notify.js';
@@ -20,10 +20,15 @@ let hoverTimer;
 
 export const resetAllLines = () => {
     allLineSegs.forEach(p => p.setStyle(p._baseStyle || LINE_BASE));
+    // Ridden-stretch overlays are a separate layer on top; keep them in step so a
+    // focus pass never leaves one stuck bright/dim.
+    Object.values(rideOverlays).forEach(arr => arr?.forEach(p => p.setStyle(RIDE_OVERLAY)));
 };
 
 // Highlight every segment of a line (dim the rest). Shared by hover (desktop)
-// and tap (touch) so lines are usable without a mouse.
+// and tap (touch) so lines are usable without a mouse. The ridden-stretch
+// OVERLAY sits on top of the base line, so a fully-ridden line looked inert on
+// hover until we also restyled its overlay here (#4 UX audit).
 const highlightLine = (name, map) => {
     if (ui.rideEdit) return;   // no hover-highlight while editing a ride (distracting)
     clearTimeout(hoverTimer);
@@ -38,10 +43,13 @@ const highlightLine = (name, map) => {
     hoveredLine = name;
     if (prev === null) {
         allLineSegs.forEach(p => p.setStyle(LINE_DIM));
+        Object.values(rideOverlays).forEach(arr => arr?.forEach(p => p.setStyle(RIDE_OVERLAY_DIM)));
     } else {
         linesByName[prev]?.forEach(p => p.setStyle(LINE_DIM));
+        rideOverlays[prev]?.forEach(p => p.setStyle(RIDE_OVERLAY_DIM));
     }
     linesByName[name]?.forEach(p => p.setStyle(LINE_FOCUS));
+    rideOverlays[name]?.forEach(p => p.setStyle(RIDE_OVERLAY_FOCUS));
 };
 
 /** Popup shown when a line is clicked — carries the "add a ride" button. */
@@ -52,11 +60,18 @@ const buildLinePopupHtml = (name) => {
     const summary = ridden ? 'Ride logged — edit it on the map' : 'No ride logged yet';
     const label   = ridden ? 'Edit ride' : 'Add a ride';
     const btnCls  = 'btn btn--block popup-line-ride-btn' + (ridden ? ' has-rides' : '');
+    // Distinct header from the station popup (which leads with a big name + stamp
+    // seal): a route-icon chip in the line colour, a "Line" kicker, then the name.
+    // So a line card and a (badge-less) non-stamp station card can't be confused
+    // (#2 UX audit).
     const nameHtml = secondary
-        ? `<span class="popup-line-label"><span class="popup-line-jp">${esc(primary)}</span><span class="popup-line-en">${esc(secondary)}</span></span>`
-        : `<span class="popup-line-jp">${esc(primary)}</span>`;
-    return `<div class="popup-inner">
-        <div class="popup-line" style="margin-bottom:6px"><span class="popup-line-dot" style="background:${esc(color)}"></span>${nameHtml}</div>
+        ? `<span class="popup-line-title"><span class="popup-line-jp">${esc(primary)}</span><span class="popup-line-en">${esc(secondary)}</span></span>`
+        : `<span class="popup-line-title popup-line-jp">${esc(primary)}</span>`;
+    return `<div class="popup-inner popup-inner--line">
+        <div class="popup-line-head">
+            <span class="popup-line-icon" style="color:${esc(color)}">${ICON_RIDE}</span>
+            <span class="popup-line-titlewrap"><span class="popup-line-kicker">Line</span>${nameHtml}</span>
+        </div>
         <div class="popup-ride-summary">${summary}</div>
         <button class="${btnCls}" data-line="${encodeURIComponent(name)}" aria-label="${esc(label + ' on ' + primary)}">${ICON_RIDE} ${label}</button>
     </div>`;

@@ -13,7 +13,7 @@
 // exits (#19). Station hover still shows a read-only name popup (#17), rendered
 // by markers.js off the ui.rideEdit flag.
 
-import { IS_TOUCH, LINE_EDIT_SHOW } from './config.js';
+import { IS_TOUCH, LINE_EDIT_SHOW, LINE_EDIT_DIM, RIDE_OVERLAY, RIDE_SEG_ON, RIDE_SEG_OFF } from './config.js';
 import { state } from './state.js';
 import { ui, allLineSegs, lineColorMap, rideOverlays, uiColors } from './registry.js';
 import { buildLineGeometry, buildRideSegments } from './line-geometry.js';
@@ -21,11 +21,17 @@ import { scheduleSave } from './gist.js';
 import { showToast } from './notify.js';
 import { resetAllLines } from './lines.js';
 import { renderRideOverlays } from './rides.js';
-import { bringStationsToFront } from './markers.js';
+import { bringStationsToFront, setEditPlainStyle } from './markers.js';
 
-const segStyle = (color, on) => on
-    ? { color, weight: 6, opacity: 0.95, lineCap: 'round', renderer: ui.canvasRenderer, interactive: false }
-    : { color, weight: 3, opacity: 0.45, lineCap: 'round', renderer: ui.canvasRenderer, interactive: false };
+const segStyle = (color, on) => ({
+    color, ...(on ? RIDE_SEG_ON : RIDE_SEG_OFF),
+    lineCap: 'round', renderer: ui.canvasRenderer, interactive: false,
+});
+
+// Edit-mode spotlight: fade every line back to LINE_EDIT_DIM so the active paint
+// target (drawn on top as its own bright/faint segments) is unmistakably the
+// foreground. Called whenever the active line changes.
+const spotlightActive = () => { if (ui.rideEdit) allLineSegs.forEach(p => p.setStyle(LINE_EDIT_DIM)); };
 
 // Initial selection from saved state (segment keys, or legacy station codes).
 const initialRideSelection = (name, segs) => {
@@ -117,7 +123,7 @@ const activateLine = (name, latlng) => {
     if (!ui.rideEdit) return;
     const seed = latlng ? { lat: latlng.lat, lng: latlng.lng } : undefined;
     const entry = ensureBuilt(name, seed);
-    if (entry) ui.rideEdit.active = name;   // barren line: keep the previous active target
+    if (entry) { ui.rideEdit.active = name; spotlightActive(); }   // barren line: keep the previous active target
 };
 
 export const enterRideEditMode = (name) => {
@@ -132,18 +138,24 @@ export const enterRideEditMode = (name) => {
     // editing. Lines stay interactive, so hovering one shows its name tooltip and
     // makes it the active paint target.
     allLineSegs.forEach(p => { p.closeTooltip(); p.setStyle(LINE_EDIT_SHOW); });
+    // Clear any leftover hover focus/dim from the overlays so every saved ride
+    // shows at its normal strength while editing.
+    Object.values(rideOverlays).forEach(arr => arr?.forEach(p => p.setStyle(RIDE_OVERLAY)));
     ui.map.getContainer().classList.add('ride-editing');
+    setEditPlainStyle(true);   // non-stamp dots become visible landmarks while editing (#3)
 
     // Pre-activate the clicked line, seeded from where its popup was opened.
     const seed = ui.linePopupSeed ? { lat: ui.linePopupSeed.lat, lng: ui.linePopupSeed.lng } : undefined;
     const entry = ensureBuilt(name, seed);
     ui.rideEdit.active = entry ? name : null;
+    if (entry) spotlightActive();   // fade the rest so the active line reads as the foreground (#4/#5)
 
     // Stay on the user's current view (they're usually already looking at the
     // stretch they want). Keep every built line's hit-test cache fresh on pan/zoom.
     ui.map.on('moveend zoomend', refreshAllCaches);
 
     document.getElementById('ride-edit-close').classList.remove('hidden');
+    document.getElementById('ride-edit-legend')?.classList.remove('hidden');
     // The Close button takes over the bottom-centre slot — hide the stats bar
     // so the two never overlap (docs/AUDIT.md F-3).
     document.getElementById('stats-bar')?.classList.add('hidden');
@@ -172,7 +184,9 @@ const exitRideEditMode = () => {
     ui.map.dragging.enable();
     const c = ui.map.getContainer();
     c.style.cursor = ''; c.style.touchAction = ''; c.classList.remove('ride-editing');
+    setEditPlainStyle(false);   // restore the discreet non-stamp dots
     document.getElementById('ride-edit-close').classList.add('hidden');
+    document.getElementById('ride-edit-legend')?.classList.add('hidden');
     document.getElementById('stats-bar')?.classList.remove('hidden');
     ui.rideEdit = null;
 
