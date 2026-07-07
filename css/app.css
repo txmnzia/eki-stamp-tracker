@@ -211,8 +211,11 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
     padding-bottom: var(--sp-2); border-bottom: 1px solid var(--border);
 }
 .popup-name-wrap { min-width: 0; flex: 1; }          /* min-width:0 lets long names ellipsize */
+/* Wrap to at most 2 lines (ellipsis only past line 2) instead of cutting a long
+   name mid-word — the fixed popup WIDTH is kept, height grows one line at most. */
 .popup-name { font-family: var(--jp-font); font-size: var(--fs-lg); font-weight: 700; color: var(--text);
-    margin-bottom: 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    margin-bottom: 1px; overflow: hidden; overflow-wrap: anywhere;
+    display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; }
 .popup-name-secondary { font-size: var(--fs-xs); color: var(--muted); letter-spacing: 0.05em;
     overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
