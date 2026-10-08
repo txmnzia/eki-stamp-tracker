@@ -22,6 +22,7 @@ export const updateSessionUI = () => {
     document.getElementById('session-save-row').classList.toggle('hidden', !signedIn);
     document.getElementById('session-signin-form').classList.toggle('hidden', signedIn);
     document.getElementById('session-loaded-name').textContent = state.user;
+    document.getElementById('session-loaded-name').title = state.user;
     updateStats();
 };
 
