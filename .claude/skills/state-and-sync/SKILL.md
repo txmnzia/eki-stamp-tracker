@@ -1,138 +1,88 @@
 ---
 name: state-and-sync
-description: "User-data persistence and Gist sync for the Eki Stamp Tracker — the state model (stamps/rides), localStorage local-first mirroring, and the per-user GitHub Gist sync in js/state.js, js/gist.js, js/session.js. Use when touching state.js, gist.js, session.js, welcome.js, import/export/reset, loadFromGist/syncToGist/scheduleSave, or when debugging lost stamps, wrong-session writes, broken ride overlays after import, or '✗ sync error'. This is the highest-stakes area: a 2026-07 audit found one P0 and three P1 data-loss bugs here; the fixes are load-bearing and must never regress."
+description: User-data persistence and Supabase cloud sync for the Eki Stamp Tracker — the state model (stamps/rides), localStorage local-first mirroring, magic-link auth, and the three-way-merge row sync in js/state.js, js/cloud.js, js/sync-merge.js, js/session.js. Use when touching any of those, import/export/reset, scheduleSave/syncNow/signOut, the eki schema (supabase/migrations), or when debugging lost stamps, cross-device overwrites, wrong-account writes, broken ride overlays after import, or '✗ sync failed'. Highest-stakes area: a 2026-07 audit found one P0 and three P1 data-loss bugs here; the guards are load-bearing.
 ---
 
 # State & sync (user data — handle with care)
 
-Every bug class in this area has already happened once (see `docs/AUDIT-2026-07.md`
-Blocks 0–1, all fixed in v1.4.0). The rules below are regression guards, not style.
+Gist sync was retired in v1.9.0 (it was the source of both token incidents,
+`docs/AUDIT-2026-07.md` Block 0). Sync is now Supabase: shared project
+**txmnzia-dbs**, schema `eki`, magic-link auth, RLS per user.
 
 ## Quick reference
 
-**The state model** (`js/state.js`, exported `state`):
+**State** (`js/state.js`, exported `state`):
 
 | Key | Type | Persisted where |
 |---|---|---|
 | `state.lang` | `'en'`/`'jp'` | localStorage `eki_lang` (via `setState`) |
-| `state.user` | sync-name string, `''` = anonymous | localStorage `eki_current_user` (via `setState`) |
-| `state.gistId` | gist id or `null` | memory only — rediscovered per session |
-| `state.stamps` | `Set` of station codes (`eki_*`, `fk_*`) | localStorage `eki_local_progress` (via `persistLocal`) |
-| `state.rides` | `{ lineNameKanji: ["codeA\|codeB", …] }` | localStorage `eki_local_progress` (via `persistLocal`) |
+| `state.user` | signed-in email, `''` = signed out | not persisted; set by `js/cloud.js` from the auth session |
+| `state.stamps` | `Set` of station codes | localStorage `eki_local_progress` (`persistLocal`) |
+| `state.rides` | `{ lineNameKanji: ["codeA\|codeB", …] }` | localStorage `eki_local_progress` (`persistLocal`) |
 
-- Write scalars via `setState(key, value)`; mutate `stamps`/`rides` directly, then
-  call `scheduleSave()` (which calls `persistLocal()` immediately).
-- `state.js` hydrates `stamps`/`rides` from `eki_local_progress` at **module load**
-  (top-level code), so anonymous progress survives reload with no init call.
-- Ride values are **segment keys** `"codeA|codeB"` (two station codes, sorted,
-  joined with `|`). `renderRideOverlays` (`js/rides.js`) also still renders the
-  legacy format — a plain array of station codes — so old saved rides keep working.
-  Never drop the legacy branch.
-- Other localStorage keys: `eki_gh_token` (the user's own gist-scope PAT),
-  `eki_gist:<user>` (cached gist id per sync name).
+- Mutate `stamps`/`rides` directly, then call `scheduleSave()` (`js/cloud.js`):
+  `persistLocal()` now + debounced `syncNow` after `SYNC_DEBOUNCE_MS` when signed in.
+- Ride values are segment keys (`"codeA|codeB"`, sorted). Legacy rides are plain
+  station-code arrays; `renderRideOverlays` still renders them. Never drop that branch.
+- `state.js` purges the retired gist keys (`eki_gh_token`, `eki_current_user`,
+  `eki_gist:*`) at load. Keep that: the token is a credential.
 
-**The sync architecture** (`js/gist.js`):
+**Cloud** (`js/cloud.js`, pure helpers in `js/sync-merge.js`):
 
-- Per-user **BYO token**: `getToken()`/`setToken()` (`js/state.js`) read/write
-  `eki_gh_token`. No token ⇒ fully functional local-only mode (`setSyncStatus('local')`).
-- The gist is found by **description**: `GIST_PREFIX + user`
-  (`GIST_PREFIX = 'eki-stamp-tracker:'` in `js/config.js`). `findGistId` paginates
-  `GET /gists`, caches the hit in `eki_gist:<user>`, and takes `fresh=true` to bypass
-  the cache. Both `loadFromGist` and `syncToGist` **drop the cached id on a 404**
-  (gist deleted elsewhere) and rediscover / fall through to create — AUDIT 1.4.
-- `scheduleSave()` = `persistLocal()` now + debounced `syncToGist` after
-  `SYNC_DEBOUNCE_MS` (2000 ms). `isSyncDirty()` / `cancelPendingSync()` are the only
-  external handles on the debounce (used by `js/session.js`).
-- `syncToGist()` is a **full-content replace**: it PATCHes the entire
-  `stamps.json` file (`{stamps:[…], rides:{…}}`). There is no server-side merge —
-  whatever is in `state` at snapshot time overwrites the gist. That is why the
-  merge/flush rules below exist.
-- `sanitizeRides()` (`js/state.js`) must run on **every rides ingress**: boot
-  hydrate (state.js), `loadFromGist` (gist.js), JSON import (session.js). A
-  malformed value (non-array, non-strings) used to throw inside
-  `renderRideOverlays` and break ALL overlay rendering — AUDIT 1.6.
+- Tables `eki.stamps(user_id, code)` and `eki.rides(user_id, line, seg)`, one row
+  per item, PK on all columns, RLS `user_id = auth.uid()`
+  (`supabase/migrations/0001_init.sql`).
+- supabase-js is a pinned jsdelivr ESM loaded by dynamic `import()`; failure means
+  `getClient()` → `null` → local-only. Never make the app depend on it at boot.
+- `syncNow()`: pull all rows (paged, 1000/page) → `merge3(remote, local, base)` →
+  push only the diff (upsert ignore-duplicates / delete by key) → store `base`
+  (`eki_sync_base:<uid>`) → re-apply edits made while in flight → `onApplied()`
+  repaints. Calls coalesce; syncs never overlap.
+- Triggers: `scheduleSave` debounce, auth change to a new uid, tab
+  `visibilitychange` → visible, `online`, the "Sync now" button, sync-error retry link.
 
-## The five regression landmines (MUST / NEVER)
+## Regression landmines (MUST / NEVER)
 
-1. **NEVER embed or share a credential — however obfuscated.** v1.3 shipped an
-   XOR-obfuscated shared GitHub PAT to evade secret scanning; anyone could decode
-   it and read/overwrite every user's data (AUDIT 0.1). The old token is still in
-   git history — treat it as compromised forever; per-user gist-scope token in
-   localStorage is the only model.
-2. **MUST mirror every stamps/rides mutation to localStorage** (`persistLocal`,
-   already inside `scheduleSave`). Anonymous progress used to live only in memory
-   and evaporate on refresh (AUDIT 1.1). Any new mutation path must call
-   `scheduleSave()` (or at minimum `persistLocal()`).
-3. **MUST merge (union), never replace, when a load meets local unsynced
-   progress.** "Load session" used to wipe the very stamps the user was trying to
-   claim (AUDIT 1.2). `loadFromGist(name, { mergeLocal: true })` unions stamps and
-   per-line ride keys. The four call sites and their deliberate semantics:
-   | Call site | `mergeLocal` | Why |
-   |---|---|---|
-   | welcome modal claim (`js/welcome.js`) | `true` | anonymous progress must survive the claim |
-   | token-change reload (`js/session.js`) | `true` | never lose local progress |
-   | "Load session" (`js/session.js`) | `!prevUser` | anonymous→named merges; **named→named deliberately replaces** (dirty changes are flushed to the *previous* user's gist first via `isSyncDirty()`/`cancelPendingSync()`/`await syncToGist()`) |
-   | returning-user boot (`js/main.js`) | absent (`false`) | **deliberate replace**: the gist is the source of truth across devices, so un-collections made elsewhere propagate |
-   Any NEW entry point must decide `mergeLocal` this consciously — default to
-   `true` whenever local unsynced progress can exist.
-   Known residual loss window (accepted, don't widen it): merged progress rides
-   on the 2 s `scheduleSave` debounce and there is no `beforeunload`/`pagehide`
-   flush, so killing the tab within ~2 s of a claim can leave the gist stale
-   until the next local-mirrored boot.
-4. **MUST clear the debounce before a session switch, and set `state.gistId` only
-   after the content fetch succeeds.** A pending debounced save once fired mid-load
-   and wrote user A's stamps into user B's gist (AUDIT 1.3). The guards:
-   `clearTimeout(syncDebounce)` at the top of `loadFromGist`; `state.gistId = gistId`
-   only after the fetch; `syncToGist` snapshots `user`/`content`/`gistId` at entry;
-   `session-load` flushes dirty changes (`isSyncDirty()` → `cancelPendingSync()` +
-   `await syncToGist()`) before switching users. Removing any one reopens the race.
-5. **MUST clear stamps AND rides on reset** (and keep the button label saying so).
-   They are one dataset in export/import/gist; reset once cleared only stamps
-   (AUDIT 1.5). Reset and import both use the `RESET_CONFIRM_MS` two-step confirm —
-   destructive actions never fire on first tap.
+1. **NEVER embed a secret.** Only the publishable key + URL go in `js/config.js`.
+   The secret / service_role key never enters the repo. No per-user tokens either.
+2. **MUST mirror every mutation locally** (`scheduleSave` or `persistLocal`).
+   Signed-out progress lives only in localStorage (AUDIT 1.1).
+3. **MUST merge, never replace.** Empty/missing base ⇒ `merge3` is a union, so a
+   device's first sign-in never drops local progress (AUDIT 1.2). Never "load"
+   remote over local wholesale.
+4. **Account isolation.** `syncOnce` snapshots `uid` at entry and bails (keeping
+   `syncDirty`) if it changed before writing or applying (AUDIT 1.3 equivalent).
+   Writes always pass `user_id: me`; RLS rejects a mismatch anyway.
+   `signOut` flushes first and **refuses** if the flush failed; only after a clean
+   flush does it clear local state, so the next account doesn't inherit it.
+5. **Reset clears stamps AND rides** (two-step `RESET_CONFIRM_MS` confirm); the
+   diff then deletes them remotely. Import replaces local state then `scheduleSave`.
+6. **`sanitizeRides` on every rides ingress**: boot hydrate, sync apply, import
+   (AUDIT 1.6).
+7. **Don't await supabase calls inside `onAuthStateChange`** (supabase-js
+   deadlock); defer with `setTimeout`.
 
-## Manual test sequence (run after ANY change in this area)
+## Verify
 
-Serve with `python3 -m http.server 8000`, open `http://localhost:8000/index.html`
-(no token needed for tests 1–2; the `run-and-verify` skill covers headless driving).
-
-1. **Anonymous survives reload:** skip the welcome modal → collect a stamp →
-   reload → the stamp is still gold, and localStorage `eki_local_progress`
-   contains it.
-2. **Claim merges:** collect a stamp anonymously → Session panel → type a new
-   sync name → Load session → the local stamp is still collected (merged, not
-   wiped by the empty/loaded gist).
-3. **No cross-gist write** (needs a token): collect a stamp, then within 2 s
-   load a *different* session name → verify (gist history on github.com) that
-   session A's gist never received session B's data and vice versa.
-4. **Malformed rides don't break rendering:** in devtools, set
-   `localStorage.eki_local_progress = JSON.stringify({stamps:[],rides:{bad:42}})`
-   → reload → no console error, other overlays still render (the bad entry is
-   silently dropped by `sanitizeRides`).
-
-Tests 1, 2 and 4 can be exercised headlessly by dynamic-importing the real module
-in the page: `await import('/js/state.js')` in `page.evaluate` returns the live
-singleton (`state`, `persistLocal`, `sanitizeRides`). Verified working in this
-repo's sandbox (the app page itself needs Leaflet — see the `ride-gap-audit`
-skill's `CDN_LOCAL` note if the CDN is unreachable).
+- `node --test tests/*.test.mjs` covers `merge3` semantics (`tests/sync-merge.test.mjs`).
+- The sandbox cannot reach `*.supabase.co` or jsdelivr. Headless end-to-end: route
+  `https://cdn.jsdelivr.net/**` to an in-memory mock exporting `createClient`
+  (`from().select/eq/in/order/range/upsert/delete`, `auth.onAuthStateChange/
+  signInWithOtp/signOut`), with rows kept Node-side via `exposeFunction` so two
+  browser contexts act as two devices. Check: signed-out survives reload; sign-in
+  unions; device A's edit doesn't clobber device B's; edit during in-flight sync
+  survives; reset deletes remotely; sign-out flushes then clears; second account
+  sees nothing; malformed `eki_local_progress` rides are dropped.
+- Live checks only the owner can do: magic link email arrives and returns signed
+  in; rows appear in the Supabase table editor.
 
 ## Failure modes
 
 | Symptom | Cause | Fix |
 |---|---|---|
-| Progress gone after reload (anonymous) | A mutation path skipped `scheduleSave`/`persistLocal` | Add the call at the mutation site (see landmine 2) |
-| User says stamps vanished after "loading my session" | First check `localStorage.eki_current_user` — if a stale sync name was set, the user wasn't anonymous, so `mergeLocal: !prevUser` was `false` and the load replaced; their stamps were flushed to the *previous* name's gist (check its revision history) | Expected semantics (landmine 3 table); recover from the previous gist / local export |
-| Loading a session wiped local stamps | A NEW entry point calls `loadFromGist` without `mergeLocal` when local progress exists | Pass `{ mergeLocal: true }` (landmine 3) |
-| One user's stamps in another user's gist | Debounce not cleared / `gistId` set before fetch / snapshot removed | Restore the three guards in landmine 4 |
-| Permanent "✗ sync error", retry useless | Cached `eki_gist:<user>` points at a deleted gist and the 404-drop path was broken | Both 404 handlers in `js/gist.js` must remove the cache key and rediscover/create |
-| All ride overlays vanish after an import | `sanitizeRides` missing on an ingress path | Call it wherever `state.rides` is assigned from external data |
-| Sync writes with someone else's gists listed | Token changed but stale `eki_gist:*` caches survive | The token `change` handler in `js/session.js` purges every `eki_gist:*` key — keep it |
-
-## Checklist before you're done
-
-- [ ] Every new `state.stamps`/`state.rides` mutation calls `scheduleSave()`.
-- [ ] Every new `loadFromGist` call site decided `mergeLocal` deliberately.
-- [ ] Every assignment of `state.rides` from external data goes through `sanitizeRides`.
-- [ ] No credential (token, gist id of another account) appears in code, comments, or fixtures.
-- [ ] Manual tests 1–2 and 4 pass; test 3 if you touched `gist.js`.
-- [ ] Destructive UI actions still use the two-step `RESET_CONFIRM_MS` confirm.
+| Magic link lands on the wrong page / not signed in | Redirect URL not allowed in Supabase Auth URL config | Add `https://txmnzia.github.io/eki-stamp-tracker/**` |
+| `✗ sync failed (HTTP 404/406)` | `eki` schema not exposed in Data API settings, or migration not run | Run migration, expose schema |
+| `✗ signed out — sign in again` | 401/403: session expired or RLS rejected | Sign in again; check policies |
+| Status stays "saved on this device" when signed in elsewhere | CDN blocked → client null | Expected local-only fallback |
+| Edits from another device don't show | No sync since tab focus | "Sync now"; visibility trigger should cover it |
+| Overlays vanish after import | `sanitizeRides` missing on an ingress | Add it |

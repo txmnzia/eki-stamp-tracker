@@ -2,14 +2,22 @@
 // All tunables in one place. Values and comments moved verbatim from the old
 // single-file app (docs/REFACTOR-2026-07.md describes the split).
 
-export const GIST_PREFIX       = 'eki-stamp-tracker:';
+// Cloud sync: the shared txmnzia-dbs Supabase project, schema `eki`
+// (supabase/migrations/0001_init.sql). URL + publishable key are public by
+// design; row-level security restricts every row to its owner. Never put the
+// secret/service_role key anywhere in this repo.
+export const SUPABASE_URL      = 'https://srnrnfrugpumzsmfsgjt.supabase.co';
+export const SUPABASE_KEY      = 'sb_publishable_6NRDcc1RO15_sEpqtOgd9g_oT7P8RZE';
+export const SUPABASE_SCHEMA   = 'eki';
+// Pinned ESM build, loaded lazily so a CDN failure degrades to local-only.
+export const SUPABASE_JS_URL   = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.0/+esm';
 // App version — shown discreetly in the session panel. Bump on every merge
 // to main. It is also part of the station-cache key, so each release
 // invalidates the 7-day IndexedDB cache and users immediately get fresh data.
-export const APP_VERSION       = 'v1.8.0';
+export const APP_VERSION       = 'v1.9.0';
 export const CACHE_TTL         = 7 * 24 * 60 * 60 * 1000;  // 7 days
 export const BATCH_SIZE        = 150;      // features per animation frame (line rendering)
-export const SYNC_DEBOUNCE_MS  = 2000;     // ms after last stamp change before auto-save
+export const SYNC_DEBOUNCE_MS  = 2000;     // ms after last stamp/ride change before cloud sync
 export const HOVER_RESET_MS    = 60;       // ms debounce on line mouseout
 export const SEARCH_JUMP_MS    = 300;      // ms before popup opens after search jump
 export const FOCUS_DELAY_MS    = 100;      // ms before focusing modal input (after paint)

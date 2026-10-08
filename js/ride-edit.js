@@ -17,7 +17,7 @@ import { IS_TOUCH, LINE_EDIT_SHOW, LINE_EDIT_DIM, RIDE_OVERLAY, RIDE_SEG_ON, RID
 import { state } from './state.js';
 import { ui, allLineSegs, lineColorMap, rideOverlays, uiColors } from './registry.js';
 import { buildLineGeometry, buildRideSegments } from './line-geometry.js';
-import { scheduleSave } from './gist.js';
+import { scheduleSave } from './cloud.js';
 import { showToast } from './notify.js';
 import { resetAllLines } from './lines.js';
 import { renderRideOverlays } from './rides.js';

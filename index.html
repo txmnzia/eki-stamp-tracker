@@ -51,7 +51,7 @@
         <div id="session-header">
             <div id="session-user-row">
                 <div id="session-avatar" aria-hidden="true">?</div>
-                <div id="session-username" class="placeholder">No session</div>
+                <div id="session-username" class="placeholder">Not signed in</div>
             </div>
             <div id="sync-status" class="sync-status" aria-live="polite"></div>
             <div id="session-stats">
@@ -62,47 +62,33 @@
             </div>
         </div>
         <div id="session-body">
-            <!-- Active session row (hidden until loaded) -->
+            <!-- Signed-in row (hidden until signed in) -->
             <div id="session-loaded-row" class="hidden">
                 <div>
-                    <div class="session-loaded-label">Active session</div>
+                    <div class="session-loaded-label">Signed in</div>
                     <div id="session-loaded-name"></div>
                 </div>
-                <button class="btn session-btn" id="session-change">Change</button>
+                <button class="btn session-btn" id="session-signout">Sign out</button>
             </div>
-            <!-- Input row (shown when no session) -->
-            <div id="session-input-section" class="field">
-                <label for="session-name-input">Sync name</label>
-                <input type="text" id="session-name-input" class="input" placeholder="Enter your sync name…" autocomplete="off" />
-                <small class="hint">Case-sensitive — use the same name on every device.</small>
-            </div>
-            <!-- Load (only when no session) -->
-            <div class="session-row" id="session-load-row">
-                <button class="btn btn--primary session-btn" id="session-load">Load session</button>
-            </div>
-            <!-- Save (only when session active) -->
+            <!-- Sign-in form (shown when signed out). Accounts live on the shared
+                 Supabase project; no token or credential ever touches this page. -->
+            <form id="session-signin-form" class="field" novalidate>
+                <label for="session-email-input">Email</label>
+                <input type="email" id="session-email-input" class="input" placeholder="you@example.com" autocomplete="email" inputmode="email" required />
+                <small class="hint" id="session-signin-hint">Sign in to sync across devices. Stamps already on this device are merged into your account.</small>
+                <div class="session-row">
+                    <button type="submit" class="btn btn--primary session-btn" id="session-signin">Email me a sign-in link</button>
+                </div>
+            </form>
+            <!-- Sync now (only when signed in) -->
             <div class="session-row hidden" id="session-save-row">
-                <button class="btn btn--primary session-btn" id="session-save">Save progress</button>
+                <button class="btn btn--primary session-btn" id="session-save">Sync now</button>
             </div>
             <!-- Data ops (always visible) -->
             <div class="session-row">
                 <button class="btn session-btn" id="session-export">Export JSON</button>
                 <button class="btn session-btn" id="session-import">Import JSON</button>
             </div>
-            <!-- Cloud sync setup lives behind a fold: progress is stored in a private
-                 Gist on the USER'S OWN GitHub account, so each user supplies their
-                 own token (never a shared credential — docs/AUDIT-2026-07.md). -->
-            <details id="session-sync-details">
-                <summary>Cloud sync</summary>
-                <div class="field" id="session-token-section">
-                    <label for="session-token-input">GitHub token</label>
-                    <input type="password" id="session-token-input" class="input" placeholder="Paste a gist-scope token…" autocomplete="off" />
-                    <small class="hint">Optional — syncs to a private Gist on <em>your</em> GitHub account.
-                        <a href="https://github.com/settings/tokens/new?scopes=gist&amp;description=eki-stamp-tracker"
-                           target="_blank" rel="noopener">Create a gist-only token</a> and paste it here.
-                        Without one, progress stays on this device.</small>
-                </div>
-            </details>
             <!-- Danger zone -->
             <button class="btn btn--danger session-btn" id="session-reset">Reset stamps &amp; rides</button>
             <input type="file" id="session-import-file" accept=".json" style="display:none" aria-label="Import stamps JSON file">
