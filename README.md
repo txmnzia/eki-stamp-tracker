@@ -354,9 +354,9 @@ Sign-out flushes first, refuses if that fails, then clears the device's copy.
 > never the secret/service_role key.
 
 **One-time setup (owner):** run the migration in the Supabase SQL editor, add
-`eki` under Settings > Data API > Exposed schemas, and add
-`https://txmnzia.github.io/eki-stamp-tracker/**` to Authentication > URL
-Configuration > Redirect URLs.
+`eki` under Settings > Data API > Exposed schemas. The magic-link redirect
+(`location.origin + location.pathname`) is already allowed by the project-wide
+`https://txmnzia.github.io/**` entry in Authentication > URL Configuration.
 
 ---
 
