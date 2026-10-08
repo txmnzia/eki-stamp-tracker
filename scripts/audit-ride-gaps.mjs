@@ -48,7 +48,7 @@ if (process.env.CDN_LOCAL) {
       contentType: file.endsWith('.css') ? 'text/css' : 'application/javascript',
       body: readFileSync(join(process.env.CDN_LOCAL, file)) });
   });
-  await page.route(/https:\/\/(fonts\.(googleapis|gstatic)\.com|[a-d]\.basemaps\.cartocdn\.com)\/.*/,
+  await page.route(/https:\/\/(fonts\.(googleapis|gstatic)\.com|[a-d]\.basemaps\.cartocdn\.com|tile\.openstreetmap\.org)\/.*/,
     (route) => route.fulfill({ status: 200, contentType: 'text/plain', body: '' }));
 }
 await page.goto(`${BASE_URL}/index.html`, { waitUntil: 'load' });
