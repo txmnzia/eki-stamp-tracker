@@ -34,7 +34,7 @@ description: "Architecture and coding conventions for adding or modifying Eki St
     A scalar only moves onto `ui` when it gains a **second writer module**;
     single-module scalars stay module-local `let`s (`hoveredLine`, `toastTimer`, …).
 - **Two import cycles are deliberate** (they mirror the old call graph):
-  `notify ↔ gist` (sync error → retry link → `syncToGist`) and `lines ↔ rides`
+  `notify ↔ cloud` (sync error → retry link → `syncNow`) and `lines ↔ rides`
   (render-complete → overlays; in current code the rides→lines edge routes through
   `js/markers.js` `bringStationsToFront`, so only lines→rides is a direct import).
   They are safe because every cross-edge reference happens inside a function called
@@ -52,7 +52,7 @@ description: "Architecture and coding conventions for adding or modifying Eki St
   ```js
   // ── 7b. RIDE SECTIONS ─────────────────────────────────────────────────────
   // One or two lines saying what lives here and any deliberate oddity
-  // (e.g. "Runtime-only cycle with gist.js (see gist.js header).").
+  // (e.g. "Runtime-only cycle with notify.js (see cloud.js header).").
   ```
 
 - **`window.__eki` contract** (`js/main.js`): currently

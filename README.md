@@ -55,10 +55,8 @@ Runtime dependencies are loaded from CDNs (no npm install needed to run):
    → it is drawn in the line's colour, following the real track. See
    [Ride sections](#ride-sections-feature) below.
 4. **Sync.** Progress (stamps *and* rides) is always saved locally
-   (`localStorage`). Optionally, the user adds their **own** GitHub token
-   (gist scope) in the Session panel and progress also syncs to a private Gist
-   on their account, keyed by a chosen "sync name", so it follows them across
-   devices. Also importable/exportable as JSON.
+   (`localStorage`). Signing in with a magic link (Session panel) syncs it
+   across devices through Supabase. Also importable/exportable as JSON.
 5. **Bilingual.** Toggle EN / 日本語 for all station and line names.
 
 ---
@@ -133,9 +131,10 @@ design of record for the split):
 |---|---|
 | `config.js` | tunables: cache TTL, marker sizing, **line prominence styles**, **ride snap distance**, `APP_VERSION` |
 | `line-colors.js` | official operator colour table (pure data) + `getLineColor` |
-| `state.js` | `state` = `{ lang, user, gistId, stamps:Set, rides:{} }`, `setState`, local-first persistence, token get/set |
+| `state.js` | `state` = `{ lang, user, stamps:Set, rides:{} }` (`user` = signed-in email), `setState`, local-first persistence |
 | `registry.js` | shared layer collections (`linesByName`, `markers`, caches…) + the `ui` runtime scalars + `esc()` |
-| `gist.js` | `loadFromGist`, `syncToGist` (persists stamps **and** rides), `findGistId` |
+| `cloud.js` | Supabase magic-link auth + sync (`initCloud`, `syncNow`, `scheduleSave`, `signOut`) of stamps **and** rides |
+| `sync-merge.js` | **pure** three-way merge set algebra behind sync; unit-tested |
 | `notify.js` | toasts + sync-status indicator |
 | `map-setup.js` | Leaflet map, canvas renderer, custom touch gestures |
 | `idb-cache.js` | IndexedDB cache (get/set/prune) |
@@ -316,7 +315,7 @@ relabelling fix, not a faked line.
 
 ### Persistence shape
 
-Rides are stored on `state.rides` and saved in the same Gist as stamps:
+Rides are stored on `state.rides` (one `eki.rides` row per segment key in the cloud); the local / export shape is:
 
 ```jsonc
 {
@@ -329,21 +328,35 @@ Rides are stored on `state.rides` and saved in the same Gist as stamps:
 
 ## Sync / accounts
 
-There is no server. Progress is **local-first**: every change is mirrored to
-`localStorage` immediately, so the app works fully offline / anonymously.
+Progress is **local-first**: every change is mirrored to `localStorage`
+immediately, so the app works fully offline and signed out.
 
-For cross-device sync, the user pastes their **own** GitHub token (create one
-with **only the `gist` scope**) into the Session panel. It is stored in
-`localStorage` on that device only. With a token set, the app finds (or
-creates) a private Gist **on the user's own account** whose description is
-`GIST_PREFIX + name` and reads/writes `stamps.json` in it, on a short debounce
-after any change (`scheduleSave`).
+Cross-device sync uses the shared **txmnzia-dbs** Supabase project, schema
+`eki` (`supabase/migrations/0001_init.sql`): one row per stamp
+(`eki.stamps`) and per ridden segment (`eki.rides`), row-level security
+restricting every row to its owner. Sign-in is a **magic link** (email in the
+Session panel). The URL and publishable key in `js/config.js` are public by
+design; supabase-js is loaded lazily from jsdelivr, so a CDN failure only
+means local-only mode.
 
-> **Never embed a shared token in this file.** An earlier version shipped an
-> obfuscated account token; anyone could decode it and read/overwrite every
-> user's data through it, and all users shared one API rate limit. That token
-> must be treated as compromised and revoked. Users of the old version need to
-> **Export JSON** from a device that still has their data and re-import it.
+Every sync (`syncNow` in `js/cloud.js`, debounced after each change, on
+sign-in, on tab focus and on reconnect) pulls the account's rows, does a
+**three-way merge** (`js/sync-merge.js`, unit-tested) of local edits since the
+last synced snapshot (`eki_sync_base:<uid>` in localStorage) onto the remote,
+and pushes only the diff. So two devices never clobber each other, and the
+first sign-in on a device is a plain union (local progress is never dropped).
+Sign-out flushes first, refuses if that fails, then clears the device's copy.
+
+> **Never embed a credential.** An earlier version shipped an obfuscated
+> GitHub token (docs/AUDIT-2026-07.md Block 0); the later per-user Gist token
+> sync was retired in v1.9.0 and the app deletes leftover `eki_gh_token` /
+> `eki_gist:*` keys on load. Only the public publishable key belongs here,
+> never the secret/service_role key.
+
+**One-time setup (owner):** run the migration in the Supabase SQL editor, add
+`eki` under Settings > Data API > Exposed schemas, and add
+`https://txmnzia.github.io/eki-stamp-tracker/**` to Authentication > URL
+Configuration > Redirect URLs.
 
 ---
 

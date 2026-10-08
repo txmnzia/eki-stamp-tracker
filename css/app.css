@@ -322,21 +322,9 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 }
 .session-loaded-label { font-size: 10px; color: var(--muted); letter-spacing: var(--track-caps); text-transform: uppercase; margin-bottom: 2px; }
 #session-loaded-name { font-size: 13px; font-weight: 700; color: var(--text); }
-/* Cloud-sync disclosure: setup lives behind a fold, not permanently on screen */
-#session-sync-details > summary {
-    list-style: none; cursor: pointer;
-    display: flex; align-items: center; justify-content: space-between;
-    padding: var(--sp-2) 10px;
-    font-size: 10px; font-weight: 700; color: var(--muted);
-    letter-spacing: var(--track-caps); text-transform: uppercase;
-    background: var(--surface2); border: 1px solid var(--border); border-radius: var(--r-sm);
-    transition: color var(--t-fast), border-color var(--t-fast);
-}
-#session-sync-details > summary::-webkit-details-marker { display: none; }
-#session-sync-details > summary::after { content: '+'; font-size: var(--fs-sm); }
-#session-sync-details[open] > summary::after { content: '–'; }
-#session-sync-details > summary:hover { color: var(--text); border-color: var(--accent); }
-#session-sync-details .field { padding: var(--sp-2) 2px 0; }
+/* Magic-link sign-in form */
+#session-signin-form .session-row { margin-top: var(--sp-1); }
+#session-loaded-name { overflow-wrap: anywhere; }
 /* Buttons inside the panel are small */
 .session-btn { flex: 1; padding: var(--sp-2) 10px; font-size: 10px; }
 .session-row { display: flex; gap: 6px; }

@@ -118,7 +118,7 @@ load-bearing:
   `enterRideEditMode` in `js/ride-edit.js` refuses to start until it is true.
 
 Deleting either one reintroduces the bug — in the app for returning users whose
-gist loads mid-render, and in tooling as false audit failures.
+cloud sync applies mid-render, and in tooling as false audit failures.
 
 ## Acting on each class of new gap
 

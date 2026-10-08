@@ -1,19 +1,10 @@
 // ── 3a. APP STATE ─────────────────────────────────────────────────────────
 // User-progress state and its persistence. Local-first: every change is
-// mirrored to localStorage; the Gist (when a token is set) is a mirror.
+// mirrored to localStorage; the cloud (js/cloud.js, when signed in) is a
+// mirror that merges, never replaces.
 
-// ── Sync token: each user supplies their OWN GitHub token (gist scope only),
-//    stored in localStorage on their device. Progress then syncs to a private
-//    Gist on the user's own account. No shared credential is ever embedded in
-//    this file: a baked-in token — however obfuscated — is readable by anyone
-//    and would give them access to every user's data (and one shared API rate
-//    limit). Without a token the app is fully usable in local-only mode.
-const TOKEN_KEY         = 'eki_gh_token';
-export const getToken          = () => localStorage.getItem(TOKEN_KEY) || '';
-export const setToken          = (t) => { const v = (t || '').trim();
-                                   if (v) localStorage.setItem(TOKEN_KEY, v); else localStorage.removeItem(TOKEN_KEY); };
 // Drop anything that isn't a { lineName: [string keys] } map — malformed ride
-// data (bad import, hand-edited gist) must never break overlay rendering.
+// data (bad import, hand-edited row) must never break overlay rendering.
 export const sanitizeRides = (r) => {
     const out = {};
     if (r && typeof r === 'object' && !Array.isArray(r)) {
@@ -28,16 +19,15 @@ export const sanitizeRides = (r) => {
 
 // All mutable app state lives here. Read via state.*, write via setState().
 export const state = {
-    lang:   localStorage.getItem('eki_lang')         || 'en',
-    user:   localStorage.getItem('eki_current_user') || '',
-    gistId: null,
+    lang:   localStorage.getItem('eki_lang') || 'en',
+    user:   '',   // signed-in account email ('' = not signed in); owned by js/cloud.js
     stamps: new Set(),
     rides:  {},   // lineName(kanji) -> ["codeA|codeB", ...] ridden segment keys
 };
 
-// ── Local-first persistence: progress always lives on the device too, so an
-//    anonymous user's stamps survive a refresh and a synced user still has
-//    their data when offline. The Gist (when a token is set) is a mirror.
+// ── Local-first persistence: progress always lives on the device too, so a
+//    signed-out user's stamps survive a refresh and a signed-in user still has
+//    their data when offline.
 const LOCAL_KEY = 'eki_local_progress';
 export const persistLocal = () => {
     try { localStorage.setItem(LOCAL_KEY, JSON.stringify({ stamps: [...state.stamps], rides: state.rides })); }
@@ -51,9 +41,15 @@ try {
     }
 } catch { /* corrupt entry — start clean */ }
 
+// Leftovers of the retired Gist sync: the per-user GitHub token is a
+// credential, so it must not linger on the device once the feature is gone.
+try {
+    ['eki_gh_token', 'eki_current_user'].forEach(k => localStorage.removeItem(k));
+    Object.keys(localStorage).filter(k => k.startsWith('eki_gist:')).forEach(k => localStorage.removeItem(k));
+} catch { /* storage blocked */ }
+
 // Persist a state key and trigger any required side effects
 export const setState = (key, value) => {
     state[key] = value;
-    if (key === 'lang')  localStorage.setItem('eki_lang',         value);
-    if (key === 'user')  localStorage.setItem('eki_current_user', value);
+    if (key === 'lang') localStorage.setItem('eki_lang', value);
 };

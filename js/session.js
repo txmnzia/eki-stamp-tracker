@@ -1,44 +1,34 @@
 // ── 13. SESSION PANEL ─────────────────────────────────────────────────────
 
 import { APP_VERSION, RESET_CONFIRM_MS } from './config.js';
-import { state, setState, getToken, setToken, sanitizeRides } from './state.js';
-import { loadFromGist, syncToGist, isSyncDirty, cancelPendingSync } from './gist.js';
-import { showToast, setSyncStatus } from './notify.js';
+import { state, sanitizeRides } from './state.js';
+import { scheduleSave, syncNow, cancelPendingSync, signOut, sendMagicLink,
+         onAuthChange, setOnRemoteApplied, cloudAvailable } from './cloud.js';
+import { showToast } from './notify.js';
 import { refreshAllMarkerStates } from './markers.js';
 import { renderAllRideOverlays } from './rides.js';
 import { updateStats } from './stats.js';
 
-const showInputMode = () => {
-    document.getElementById('session-loaded-row').classList.add('hidden');
-    document.getElementById('session-input-section').classList.remove('hidden');
-    document.getElementById('session-load-row').classList.remove('hidden');
-    document.getElementById('session-save-row').classList.add('hidden');
-};
-
-const showLoadedMode = () => {
-    document.getElementById('session-loaded-row').classList.remove('hidden');
-    document.getElementById('session-input-section').classList.add('hidden');
-    document.getElementById('session-load-row').classList.add('hidden');
-    document.getElementById('session-save-row').classList.remove('hidden');
-    document.getElementById('session-loaded-name').textContent = state.user;
-};
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export const updateSessionUI = () => {
     const avatar   = document.getElementById('session-avatar');
     const username = document.getElementById('session-username');
-    const input    = document.getElementById('session-name-input');
-    if (state.user) {
-        avatar.textContent = state.user.charAt(0).toUpperCase();
-        username.textContent = state.user;
-        username.classList.remove('placeholder');
-        if (input) input.value = state.user;
-        showLoadedMode();
-    } else {
-        avatar.textContent = '?';
-        username.textContent = 'No session';
-        username.classList.add('placeholder');
-        showInputMode();
-    }
+    const signedIn = !!state.user;
+    avatar.textContent = signedIn ? state.user.charAt(0).toUpperCase() : '?';
+    username.textContent = signedIn ? state.user : 'Not signed in';
+    username.classList.toggle('placeholder', !signedIn);
+    document.getElementById('session-loaded-row').classList.toggle('hidden', !signedIn);
+    document.getElementById('session-save-row').classList.toggle('hidden', !signedIn);
+    document.getElementById('session-signin-form').classList.toggle('hidden', signedIn);
+    document.getElementById('session-loaded-name').textContent = state.user;
+    updateStats();
+};
+
+// Repaint everything that reads stamps/rides after a sync changed them.
+const repaintProgress = () => {
+    refreshAllMarkerStates();
+    renderAllRideOverlays();
     updateStats();
 };
 
@@ -55,69 +45,55 @@ export const setupSessionPanel = (map) => {
     });
 
     updateSessionUI();
+    onAuthChange(() => updateSessionUI());
+    setOnRemoteApplied(repaintProgress);
 
-    // Change session
-    document.getElementById('session-change').addEventListener('click', () => {
-        showInputMode();
-        const input = document.getElementById('session-name-input');
-        input.value = state.user;
-        input.focus();
-    });
-
-    // Sync token (per-user; enables cloud sync)
-    const tokenInput = document.getElementById('session-token-input');
-    tokenInput.value = getToken();
-    tokenInput.addEventListener('change', async () => {
-        setToken(tokenInput.value);
-        // Cached gist ids may belong to a different account — forget them all.
-        Object.keys(localStorage).filter(k => k.startsWith('eki_gist:')).forEach(k => localStorage.removeItem(k));
-        if (getToken() && state.user) {
-            showToast('Token saved — syncing…');
-            await loadFromGist(state.user, { mergeLocal: true });   // never lose local progress
-            refreshAllMarkerStates();
-            renderAllRideOverlays();
-        } else {
-            setSyncStatus(getToken() ? '' : 'local');
-            showToast(getToken() ? 'Token saved' : 'Token removed — local-only mode');
+    // Magic-link sign-in. The account is the only identity: no names, no tokens.
+    const form    = document.getElementById('session-signin-form');
+    const emailIn = document.getElementById('session-email-input');
+    const sendBtn = document.getElementById('session-signin');
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = emailIn.value.trim();
+        if (!EMAIL_RE.test(email)) { showToast('Enter a valid email', 2400, 'error'); emailIn.focus(); return; }
+        if (!(await cloudAvailable())) { showToast('Cloud sync is unavailable (offline?)', 3000, 'error'); return; }
+        sendBtn.disabled = true;
+        try {
+            await sendMagicLink(email);
+            showToast(`Sign-in link sent to ${email} — open it on this device`, 5000);
+        } catch (err) {
+            console.error('Magic link:', err);
+            showToast(err.status === 429 ? 'Too many requests — wait a minute and retry'
+                                         : 'Could not send the link — try again', 4000, 'error');
+        } finally {
+            sendBtn.disabled = false;
         }
     });
 
-    // Load session
-    document.getElementById('session-load').addEventListener('click', async () => {
-        const name = document.getElementById('session-name-input').value.trim();
-        if (!name) { showToast('Enter a sync name first'); return; }
-        const prevUser = state.user;
-        // Flush any unsynced changes of the PREVIOUS session before switching,
-        // so they aren't dropped (or written into the new session's gist).
-        if (prevUser && prevUser !== name && isSyncDirty()) { cancelPendingSync(); await syncToGist(); }
-        setState('user', name);
-        updateSessionUI();
-        // Tokenless "load" fetches nothing — it names the local collection.
-        // Say that, instead of implying a cloud round-trip (docs/AUDIT.md F-10).
-        if (getToken()) showToast(`Loading ${name}…`);
-        // Anonymous progress being claimed under a name must be merged in,
-        // never wiped by whatever the (possibly empty) gist holds.
-        await loadFromGist(name, { mergeLocal: !prevUser });
-        refreshAllMarkerStates();
-        renderAllRideOverlays();
-        showToast(getToken() ? `Session loaded: ${name}` : `Collecting as ${name} on this device`);
+    // Sign out (flushes first; refuses rather than lose unsynced changes)
+    document.getElementById('session-signout').addEventListener('click', async () => {
+        try {
+            await signOut();
+            updateSessionUI();
+            showToast('Signed out — your progress is safe in your account');
+        } catch (err) {
+            showToast(err.message, 4000, 'error');
+        }
     });
 
-    // Save progress
+    // Sync now
     document.getElementById('session-save').addEventListener('click', async () => {
-        if (!state.user) { showToast('Load a session first'); return; }
         cancelPendingSync();
-        await syncToGist();
-        showToast(getToken() ? `✓ Synced as ${state.user}` : 'Saved on this device (add a token to sync)');
+        await syncNow();
     });
 
     // Export JSON
     document.getElementById('session-export').addEventListener('click', () => {
-        const payload = { user: state.user, stamps: [...state.stamps], rides: state.rides };
+        const payload = { stamps: [...state.stamps], rides: state.rides };
         const url = URL.createObjectURL(new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' }));
         const a   = Object.assign(document.createElement('a'), {
             href: url,
-            download: `eki-${state.user || 'stamps'}-${new Date().toISOString().slice(0, 10)}.json`
+            download: `eki-stamps-${new Date().toISOString().slice(0, 10)}.json`
         });
         a.click();
         URL.revokeObjectURL(url);  // free memory
@@ -160,14 +136,10 @@ export const setupSessionPanel = (map) => {
                 if (!Array.isArray(data.stamps)) throw new Error('Missing stamps array');
                 state.stamps = new Set(data.stamps.filter(s => typeof s === 'string'));
                 state.rides  = sanitizeRides(data.rides);
-                if (data.user && !state.user) {
-                    setState('user', data.user);
-                    updateSessionUI();
-                }
+                scheduleSave();   // local mirror now; the cloud gets the diff
                 refreshAllMarkerStates();
                 renderAllRideOverlays();
                 showToast(`Imported ${state.stamps.size} stamps`);
-                await syncToGist();
             } catch (err) {
                 console.error('Import:', err);
                 showToast('Import failed — check it is an Eki JSON export', 4000, 'error');
@@ -199,7 +171,7 @@ export const setupSessionPanel = (map) => {
         // sync), so reset clears both — the button says so.
         state.stamps.clear();
         state.rides = {};
-        await syncToGist();
+        scheduleSave();
         refreshAllMarkerStates();
         renderAllRideOverlays();
         showToast('All progress reset');

@@ -2,21 +2,20 @@
    EKI STAMP TRACKER — entry point (§15 init)
    The app was split from a single index.html into these modules
    (docs/REFACTOR-2026-07.md):
-     config, line-colors, state, registry, gist, notify, map-setup, idb-cache,
+     config, line-colors, state, registry, cloud, sync-merge (pure), notify, map-setup, idb-cache,
      geometry (pure), line-geometry, lines, rides, ride-edit, markers,
      search, search-rank (pure), lang, stats, session, main
 ========================================================================== */
 
 import { state } from './state.js';
 import { ui, linesByName, allLineSegs, loadUiColors } from './registry.js';
-import { loadFromGist } from './gist.js';
+import { initCloud } from './cloud.js';
 import { initMap } from './map-setup.js';
 import { cachePrune } from './idb-cache.js';
 import { buildLineGeometry, buildRideSegments } from './line-geometry.js';
 import { loadLines } from './lines.js';
-import { renderAllRideOverlays } from './rides.js';
 import { enterRideEditMode, setupRideEdit } from './ride-edit.js';
-import { toggleStamp, refreshAllMarkerStates, loadStations } from './markers.js';
+import { toggleStamp, loadStations } from './markers.js';
 import { setupSearch } from './search.js';
 import { setupLanguageToggle } from './lang.js';
 import { setupSessionPanel } from './session.js';
@@ -66,10 +65,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Load lines in background shortly after — they are visually large and slow
     setTimeout(() => loadLines(map), 100);
 
-    // If returning user, load their stamps
-    if (state.user) {
-        await loadFromGist(state.user);
-        refreshAllMarkerStates();
-        renderAllRideOverlays();
-    }
+    // Restore the account session (or finish a magic-link sign-in) and sync.
+    // Local progress is already on screen; a sync only merges into it.
+    await initCloud();
 });

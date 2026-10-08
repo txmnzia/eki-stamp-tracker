@@ -1,7 +1,7 @@
 // ── 5. NOTIFICATIONS ──────────────────────────────────────────────────────
-// Runtime-only cycle with gist.js (see gist.js header).
+// Runtime-only cycle with cloud.js (see cloud.js header).
 
-import { syncToGist } from './gist.js';
+import { syncNow } from './cloud.js';
 
 let toastTimer;
 // kind: '' (neutral) or 'error' — failures must LOOK different from successes
@@ -24,14 +24,14 @@ export const setSyncStatus = (status, err) => {
         // actionable (docs/AUDIT.md F-10). err.status is fetch's numeric
         // Response.status (coerced, so nothing external reaches innerHTML).
         const code   = Number(err?.status) || 0;
-        const reason = (code === 401 || code === 403) ? '✗ token rejected — check or replace it'
+        const reason = (code === 401 || code === 403) ? '✗ signed out — sign in again'
                      : code                           ? `✗ sync failed (HTTP ${code})`
                      :                                  '✗ offline? sync failed';
         el.innerHTML = `${reason} · <a href="#" class="sync-retry-link">retry</a>`;
-        el.querySelector('.sync-retry-link')?.addEventListener('click', (e) => { e.preventDefault(); syncToGist(); });
+        el.querySelector('.sync-retry-link')?.addEventListener('click', (e) => { e.preventDefault(); syncNow(); });
     } else {
         el.textContent = { saving: '↑ saving…', saved: '✓ synced',
-                           local: 'saved on this device · add a token to sync', '': '' }[status] ?? '';
+                           local: 'saved on this device · sign in to sync', '': '' }[status] ?? '';
     }
 };
 

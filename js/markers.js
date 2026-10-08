@@ -11,7 +11,7 @@ import { state } from './state.js';
 import { ui, markers, plainMarkers, dedupeMarkers, lineColorMap, lineEnMap, allStations,
          lineGroups, stationByCode, esc, orderLineNames, uiColors } from './registry.js';
 import { cacheGet, cacheSet } from './idb-cache.js';
-import { scheduleSave } from './gist.js';
+import { scheduleSave } from './cloud.js';
 import { showToast, hideLoading } from './notify.js';
 import { updateStats } from './stats.js';
 
@@ -212,10 +212,10 @@ export const toggleStamp = (marker) => {
     showToast(next ? `${marker.stationName} — stamped!` : `${marker.stationName} — removed`);
 
     // One-time nudge after the very first stamp, now that the welcome modal is
-    // gone: the map is the welcome, the Session panel is where naming lives.
+    // gone: the map is the welcome, the Session panel is where sign-in lives.
     if (next && state.stamps.size === 1 && !state.user && !localStorage.getItem('eki_first_stamp_hint')) {
         try { localStorage.setItem('eki_first_stamp_hint', '1'); } catch { /* storage blocked */ }
-        setTimeout(() => showToast('Saved on this device — open Session to name & sync your collection', 5000), 1800);
+        setTimeout(() => showToast('Saved on this device — sign in under Session to sync across devices', 5000), 1800);
     }
 };
 

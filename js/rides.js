@@ -8,7 +8,7 @@ import { ui, linesByName, lineColorMap, rideOverlays, stationByCode,
          shinkansenData, uiColors } from './registry.js';
 import { ptDist } from './geometry.js';
 import { buildLineGeometry, buildRideSegments } from './line-geometry.js';
-import { scheduleSave } from './gist.js';
+import { scheduleSave } from './cloud.js';
 import { bringStationsToFront } from './markers.js';
 
 // Rides were historically keyed by the geojson's bare 路線名 (日光線, 本線…).

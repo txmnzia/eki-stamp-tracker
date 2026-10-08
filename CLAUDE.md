@@ -16,15 +16,16 @@ the area you're touching before editing.
 | Ride overlays, line highlighting, stitching/routing, gaps, Shinkansen paths, `js/geometry.js`, `js/line-geometry.js` | `.claude/skills/geometry-pipeline` |
 | The gap audit, CI `MAX_GAPS` baseline, a new/changed gap count | `.claude/skills/ride-gap-audit` |
 | `data/*` files, scrapers, `scripts/build_*`, regenerating or validating data | `.claude/skills/data-pipeline` |
-| Stamps/rides persistence, localStorage, Gist sync, sessions, import/export, tokens | `.claude/skills/state-and-sync` |
+| Stamps/rides persistence, localStorage, Supabase sync, sign-in, import/export | `.claude/skills/state-and-sync` |
 | Adding/changing any feature or UI, new modules, popups, names, styling | `.claude/skills/conventions` |
 | Shipping to main, `APP_VERSION`, CI failures, README updates | `.claude/skills/release-checklist` |
 
 ## Hard rules (history-backed; details + whys live in the skills)
 
 1. **NEVER embed or share credentials.** A previous version shipped an obfuscated
-   GitHub PAT — full audit fiasco (`docs/AUDIT-2026-07.md` Block 0). Per-user
-   `gist`-scope token in localStorage only.
+   GitHub PAT — full audit fiasco (`docs/AUDIT-2026-07.md` Block 0). Sync is now
+   Supabase magic-link + RLS; only the public publishable key lives in
+   `js/config.js`, never the secret/service_role key.
 2. **NEVER lose user progress.** Local-first: every stamps/rides mutation mirrors to
    localStorage; session load MERGES local unsynced progress, never replaces.
 3. **NEVER invent straight track.** Ride overlays only slice existing drawn geometry;
