@@ -64,9 +64,11 @@ export const initMap = () => {
     // so they're easy to hit — the 2.5px lines were nearly impossible to tap,
     // especially on touch. Single shared renderer (see PR #8) so events work.
     ui.canvasRenderer = L.canvas({ padding: 0.5, tolerance: IS_TOUCH ? 12 : 6 });
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
-        subdomains: 'abcd', maxZoom: MAX_ZOOM
+    // Standard OSM tiles, darkened in CSS (.leaflet-tile-pane filter): CARTO's
+    // keyless dark basemap started stamping "API KEY REQUIRED" over every tile.
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        maxZoom: MAX_ZOOM
     }).addTo(map);
     if (IS_TOUCH) setupTouchGestures(map);
     return map;

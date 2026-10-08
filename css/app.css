@@ -410,7 +410,11 @@ html, body { height: 100%; background: var(--bg); color: var(--text); font-famil
 /* Fade the base map tiles so the (brought-forward) lines stand out. Station dots
    and saved-ride overlays stay fully visible — the user keeps seeing their
    collected stamps and existing rides while editing. */
-#map.ride-editing .leaflet-tile-pane { opacity: 0.3; filter: grayscale(0.4); transition: opacity var(--t-move), filter var(--t-move); }
+/* OSM's light tiles turned into a muted dark basemap (invert, then rotate hues
+   back so water stays blue-ish); lines and stamps sit above in other panes. */
+:root { --tile-filter: invert(1) hue-rotate(180deg) brightness(0.9) contrast(0.85) saturate(0.3); }
+.leaflet-tile-pane { filter: var(--tile-filter); }
+#map.ride-editing .leaflet-tile-pane { opacity: 0.3; filter: var(--tile-filter) grayscale(0.4); transition: opacity var(--t-move), filter var(--t-move); }
 
 /* A single discreet button: signals edit mode AND saves-and-exits on click (#19). */
 #ride-edit-close {

@@ -66,7 +66,7 @@ sandbox, pick a distinct port each (check with `pkill -0 -f http.server`).
 | No `package.json`/`node_modules` in the repo — **keep it that way** | install playwright in a temp dir outside the repo; point `PW_MODULE` at its `index.mjs` |
 | Chromium is preinstalled at `/opt/pw-browsers` (chromium-1194) | do NOT `npx playwright install` (downloads may be blocked anyway) |
 | npm-installed playwright is newer than the bundled browser (wants 1228, "Executable doesn't exist") | always pass `PW_CHROMIUM=/opt/pw-browsers/chromium` as `executablePath` |
-| `https://unpkg.com` and `*.basemaps.cartocdn.com` → proxy 403 (blocked) | Leaflet + tiles never load online here → use `CDN_LOCAL` (below) |
+| `https://unpkg.com` and `tile.openstreetmap.org` → proxy 403 (blocked) | Leaflet + tiles never load online here → use `CDN_LOCAL` (below) |
 | `fonts.googleapis.com` → 200 (reachable) | fonts are fine, but stub them anyway for determinism |
 | npm registry works through the proxy | `npm install playwright leaflet` is the supported way to get Leaflet's `dist/` |
 
@@ -161,7 +161,7 @@ if (process.env.CDN_LOCAL) {              // offline sandbox: local Leaflet, stu
     route.fulfill({ status: 200, contentType: file.endsWith('.css') ? 'text/css' : 'application/javascript',
                     body: readFileSync(join(process.env.CDN_LOCAL, file)) });
   });
-  await page.route(/https:\/\/(fonts\.(googleapis|gstatic)\.com|[a-d]\.basemaps\.cartocdn\.com)\/.*/,
+  await page.route(/https:\/\/(fonts\.(googleapis|gstatic)\.com|[a-d]\.basemaps\.cartocdn\.com|tile\.openstreetmap\.org)\/.*/,
     (route) => route.fulfill({ status: 200, contentType: 'text/plain', body: '' }));
 }
 await page.goto((process.env.BASE_URL || 'http://127.0.0.1:8110') + '/index.html', { waitUntil: 'load' });

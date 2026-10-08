@@ -25,7 +25,7 @@ over HTTP anyway.
 Runtime dependencies are loaded from CDNs (no npm install needed to run):
 
 - **Leaflet 1.9** (map engine) from unpkg
-- **CARTO dark** basemap tiles
+- **OpenStreetMap** basemap tiles, darkened via a CSS filter (`--tile-filter`)
 - Google Fonts (Zen Kaku Gothic New, Space Mono)
 
 ---
