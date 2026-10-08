@@ -80,7 +80,7 @@ Gist sync was retired in v1.9.0 (it was the source of both token incidents,
 
 | Symptom | Cause | Fix |
 |---|---|---|
-| Magic link lands on the wrong page / not signed in | Redirect URL not allowed in Supabase Auth URL config | Add `https://txmnzia.github.io/eki-stamp-tracker/**` |
+| Magic link lands on the wrong page / not signed in | Redirect URL not allowed (falls back to Site URL) | Normally covered by the project-wide `https://txmnzia.github.io/**` entry; check it still exists in Auth > URL Configuration |
 | `✗ sync failed (HTTP 404/406)` | `eki` schema not exposed in Data API settings, or migration not run | Run migration, expose schema |
 | `✗ signed out — sign in again` | 401/403: session expired or RLS rejected | Sign in again; check policies |
 | Status stays "saved on this device" when signed in elsewhere | CDN blocked → client null | Expected local-only fallback |
