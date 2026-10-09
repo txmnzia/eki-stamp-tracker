@@ -2,7 +2,7 @@
 
 import { APP_VERSION, RESET_CONFIRM_MS } from './config.js';
 import { state, sanitizeRides } from './state.js';
-import { scheduleSave, syncNow, cancelPendingSync, signOut, sendMagicLink,
+import { scheduleSave, allowMassDelete, syncNow, cancelPendingSync, signOut, sendMagicLink,
          onAuthChange, setOnRemoteApplied, cloudAvailable } from './cloud.js';
 import { showToast } from './notify.js';
 import { refreshAllMarkerStates } from './markers.js';
@@ -155,6 +155,7 @@ export const setupSessionPanel = (map) => {
                 if (!Array.isArray(data.stamps)) throw new Error('Missing stamps array');
                 state.stamps = new Set(data.stamps.filter(s => typeof s === 'string'));
                 state.rides  = sanitizeRides(data.rides);
+                allowMassDelete();   // an import may legitimately replace most of the cloud copy
                 scheduleSave();   // local mirror now; the cloud gets the diff
                 refreshAllMarkerStates();
                 renderAllRideOverlays();
@@ -190,6 +191,7 @@ export const setupSessionPanel = (map) => {
         // sync), so reset clears both — the button says so.
         state.stamps.clear();
         state.rides = {};
+        allowMassDelete();   // explicit, two-step-confirmed wipe
         scheduleSave();
         refreshAllMarkerStates();
         renderAllRideOverlays();
