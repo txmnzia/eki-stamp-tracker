@@ -13,7 +13,11 @@ import { setSyncStatus } from './notify.js';
 
 const PAGE  = 1000;   // PostgREST max rows per select (project default)
 const CHUNK = 100;    // codes per delete .in() filter, keeps URLs short
-const BASE_KEY = (uid) => `eki_sync_base:${uid}`;
+// v2: snapshots written before v1.9.5 may be stale (sign-out kept them while
+// clearing local), and a stale snapshot makes merge3 delete real data. They
+// are discarded once at load (initCloud), so the next sync is a plain union.
+const BASE_KEY = (uid) => `eki_sync_base2:${uid}`;
+const LEGACY_BASE_PREFIX = 'eki_sync_base:';
 
 let clientP      = null;    // Promise<SupabaseClient|null>, created once
 let uid          = null;    // signed-in user id, null when signed out
@@ -152,8 +156,20 @@ const syncOnce = async () => {
             };
         }
         if (uid !== me) { syncDirty = true; return; }
+        const wrote = !sameSet(remote.stamps, merged.stamps) || !sameSet(remote.rides, merged.rides);
         await pushDiff(c, me, remote, merged);
         if (uid !== me) { syncDirty = true; return; }
+        if (wrote) {
+            // Read back: a write the server didn't keep must show as an error,
+            // never as "synced" (and must not become the new snapshot).
+            const check = await fetchRemote(c, me);
+            if (!sameSet(check.stamps, merged.stamps) || !sameSet(check.rides, merged.rides)) {
+                const err = new Error(`cloud kept ${check.stamps.size}/${merged.stamps.size} stamps, ${check.rides.size}/${merged.rides.size} ride segments`);
+                err.status = 0;
+                throw err;
+            }
+        }
+        console.info(`Cloud sync: ${merged.stamps.size} stamps, ${merged.rides.size} ride segments`);
         writeBase(me, merged);
         if (allowWipe) massDeleteOk = false;
         // Re-apply anything the user changed while the requests were in flight.
@@ -198,6 +214,8 @@ export const scheduleSave = () => {
 
 /** Wire auth. Resolves once the initial session (incl. a magic-link return) is known. */
 export const initCloud = async () => {
+    try { Object.keys(localStorage).filter(k => k.startsWith(LEGACY_BASE_PREFIX)).forEach(k => localStorage.removeItem(k)); }
+    catch { /* storage blocked */ }
     const c = await getClient();
     if (!c) { authListeners.forEach(fn => fn(false)); setSyncStatus('local'); return; }
     await new Promise((resolve) => {

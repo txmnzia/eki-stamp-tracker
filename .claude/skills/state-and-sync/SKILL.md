@@ -63,7 +63,11 @@ Gist sync was retired in v1.9.0 (it was the source of both token incidents,
    as N deletions and **wiped the user's account**. Second line of defence:
    `isMassDelete` makes sync fall back to a union when it would delete >10 items
    and >50% of the cloud copy, unless `allowMassDelete()` was called (Reset and
-   Import only). Never remove either guard. Always test sign-out → sign-in again.
+   Import only). Snapshots from before v1.9.5 (`eki_sync_base:*`) are
+   purged at `initCloud`; the key is now `eki_sync_base2:<uid>`. A sync that wrote
+   reads the rows back and errors if the cloud didn't keep them. Never remove
+   any of these guards. Always test sign-out → sign-in again, and a stale
+   snapshot with a SMALL collection (the mass-delete guard alone misses it).
 6. **Reset clears stamps AND rides** (two-step `RESET_CONFIRM_MS` confirm); the
    diff then deletes them remotely. Import replaces local state then `scheduleSave`.
 7. **`sanitizeRides` on every rides ingress**: boot hydrate, sync apply, import
