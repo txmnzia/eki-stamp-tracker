@@ -42,3 +42,16 @@ test('minus and sameSet', () => {
   assert.ok(sameSet(S('a', 'b'), S('b', 'a')));
   assert.ok(!sameSet(S('a'), S('a', 'b')));
 });
+
+test('isMassDelete: an implicit wipe of most of the cloud copy is flagged', async () => {
+  const { isMassDelete } = await import('../js/sync-merge.js');
+  const many = new Set(Array.from({ length: 74 }, (_, i) => 's' + i));
+  // the v1.9.0 bug: snapshot had 74, local cleared by sign-out → merge says delete all
+  const merged = { stamps: merge3(many, S(), many), rides: S() };
+  assert.ok(isMassDelete({ stamps: many, rides: S() }, merged));
+  // a normal un-collect of a few stamps is not
+  const few = new Set([...many].slice(3));
+  assert.ok(!isMassDelete({ stamps: many, rides: S() }, { stamps: few, rides: S() }));
+  // tiny collections never trigger it
+  assert.ok(!isMassDelete({ stamps: S('a', 'b'), rides: S() }, { stamps: S(), rides: S() }));
+});

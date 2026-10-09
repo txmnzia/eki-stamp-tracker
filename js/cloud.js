@@ -7,7 +7,8 @@
 import { SUPABASE_URL, SUPABASE_KEY, SUPABASE_SCHEMA, SUPABASE_JS_URL,
          SYNC_DEBOUNCE_MS } from './config.js';
 import { state, sanitizeRides, persistLocal } from './state.js';
-import { toItems, fromRideItems, merge3, minus, sameSet, rideItem, splitRideItem } from './sync-merge.js';
+import { toItems, fromRideItems, merge3, minus, sameSet, rideItem, splitRideItem,
+         isMassDelete } from './sync-merge.js';
 import { setSyncStatus } from './notify.js';
 
 const PAGE  = 1000;   // PostgREST max rows per select (project default)
@@ -22,6 +23,10 @@ let running      = null;    // in-flight sync promise (syncs never overlap)
 let rerun        = false;
 const authListeners = [];
 let onApplied = () => {};
+let massDeleteOk = false;   // set by an explicit Reset/Import, consumed by the next successful sync
+
+/** Reset/Import call this: the next sync may delete most of the cloud copy. */
+export const allowMassDelete = () => { massDeleteOk = true; };
 
 export const isSyncDirty       = () => syncDirty;
 export const cancelPendingSync = () => clearTimeout(syncDebounce);
@@ -56,6 +61,7 @@ const readBase = (id) => {
     } catch { /* corrupt → treat as first sync (union, never loses data) */ }
     return { stamps: new Set(), rides: new Set() };
 };
+const dropBase = (id) => { try { localStorage.removeItem(BASE_KEY(id)); } catch { /* blocked */ } };
 const writeBase = (id, m) => {
     try { localStorage.setItem(BASE_KEY(id), JSON.stringify({ stamps: [...m.stamps], rides: [...m.rides] })); }
     catch { /* storage full — next sync falls back to a union */ }
@@ -131,14 +137,25 @@ const syncOnce = async () => {
     try {
         const remote = await fetchRemote(c, me);
         const base   = readBase(me);
-        const merged = {
+        let merged = {
             stamps: merge3(remote.stamps, local0.stamps, base.stamps),
             rides:  merge3(remote.rides,  local0.rides,  base.rides),
         };
+        // Never wipe the cloud on an implicit "everything was deleted here":
+        // fall back to a union (an empty base) unless the user asked for it.
+        const allowWipe = massDeleteOk;
+        if (!allowWipe && isMassDelete(remote, merged)) {
+            console.warn('Cloud sync: refusing mass delete, merging instead');
+            merged = {
+                stamps: merge3(remote.stamps, local0.stamps, new Set()),
+                rides:  merge3(remote.rides,  local0.rides,  new Set()),
+            };
+        }
         if (uid !== me) { syncDirty = true; return; }
         await pushDiff(c, me, remote, merged);
         if (uid !== me) { syncDirty = true; return; }
         writeBase(me, merged);
+        if (allowWipe) massDeleteOk = false;
         // Re-apply anything the user changed while the requests were in flight.
         const localNow = toItems(state.stamps, state.rides);
         const fin = {
@@ -232,14 +249,19 @@ export const signOut = async ({ force = false } = {}) => {
             throw err;
         }
     }
+    const me = uid;
     const keepLocal = force && syncDirty;
     // Local sign-out only clears this browser's stored session; ignore server errors.
     await c.auth.signOut({ scope: 'local' }).catch(() => {});
     uid = null;
     state.user = '';
     if (!keepLocal) {
+        // The sync snapshot describes the local copy; clearing one without the
+        // other made the next sign-in read "0 local vs N in snapshot" as N
+        // deletions and wipe the account (v1.9.0–1.9.3 bug).
         state.stamps = new Set();
         state.rides  = {};
+        dropBase(me);
     }
     persistLocal();
     onApplied();

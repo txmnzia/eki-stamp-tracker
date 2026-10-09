@@ -39,6 +39,19 @@ export const merge3 = (remote, local, base) => {
     return out;
 };
 
+/**
+ * True when applying `merged` would delete a large share of what the cloud
+ * holds. Local state can vanish without the user meaning it (cleared storage,
+ * a stale sync snapshot), and merge3 would then read it as "deleted
+ * everything". Only an explicit Reset/Import may do that.
+ */
+export const MASS_DELETE_MIN = 10;
+export const isMassDelete = (remote, merged) => {
+    const total = remote.stamps.size + remote.rides.size;
+    const gone  = minus(remote.stamps, merged.stamps).length + minus(remote.rides, merged.rides).length;
+    return gone > MASS_DELETE_MIN && gone * 2 > total;
+};
+
 /** Items in a but not in b. */
 export const minus = (a, b) => [...a].filter(x => !b.has(x));
 

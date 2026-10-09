@@ -57,11 +57,18 @@ Gist sync was retired in v1.9.0 (it was the source of both token incidents,
    flush does it clear local state, so the next account doesn't inherit it.
    If the flush fails the button arms "Sign out anyway" (`signOut({ force: true })`),
    which signs out but KEEPS local state. Never let a broken sync trap the user.
-5. **Reset clears stamps AND rides** (two-step `RESET_CONFIRM_MS` confirm); the
+5. **The sync snapshot (`eki_sync_base:<uid>`) MUST be dropped whenever the local
+   copy is cleared** (`dropBase` in `signOut`). v1.9.0–1.9.3 cleared local on
+   sign-out but kept the snapshot; the next sign-in read "N in snapshot, 0 local"
+   as N deletions and **wiped the user's account**. Second line of defence:
+   `isMassDelete` makes sync fall back to a union when it would delete >10 items
+   and >50% of the cloud copy, unless `allowMassDelete()` was called (Reset and
+   Import only). Never remove either guard. Always test sign-out → sign-in again.
+6. **Reset clears stamps AND rides** (two-step `RESET_CONFIRM_MS` confirm); the
    diff then deletes them remotely. Import replaces local state then `scheduleSave`.
-6. **`sanitizeRides` on every rides ingress**: boot hydrate, sync apply, import
+7. **`sanitizeRides` on every rides ingress**: boot hydrate, sync apply, import
    (AUDIT 1.6).
-7. **Don't await supabase calls inside `onAuthStateChange`** (supabase-js
+8. **Don't await supabase calls inside `onAuthStateChange`** (supabase-js
    deadlock); defer with `setTimeout`.
 
 ## Verify
