@@ -55,6 +55,8 @@ Gist sync was retired in v1.9.0 (it was the source of both token incidents,
    Writes always pass `user_id: me`; RLS rejects a mismatch anyway.
    `signOut` flushes first and **refuses** if the flush failed; only after a clean
    flush does it clear local state, so the next account doesn't inherit it.
+   If the flush fails the button arms "Sign out anyway" (`signOut({ force: true })`),
+   which signs out but KEEPS local state. Never let a broken sync trap the user.
 5. **Reset clears stamps AND rides** (two-step `RESET_CONFIRM_MS` confirm); the
    diff then deletes them remotely. Import replaces local state then `scheduleSave`.
 6. **`sanitizeRides` on every rides ingress**: boot hydrate, sync apply, import

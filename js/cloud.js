@@ -215,21 +215,32 @@ export const sendMagicLink = async (email) => {
 
 /**
  * Sign out of this device. Unsynced edits are flushed first; if that fails
- * the sign-out is refused so nothing is lost. After a clean flush the local
- * copy is cleared (it is safe in the cloud), so the next account to sign in
- * here doesn't inherit it.
+ * the sign-out is refused (err.unsynced) so nothing is lost. After a clean
+ * flush the local copy is cleared (it is safe in the cloud), so the next
+ * account to sign in here doesn't inherit it. `force` signs out despite a
+ * failed flush and KEEPS the local copy, so a broken sync can't trap the user.
  */
-export const signOut = async () => {
+export const signOut = async ({ force = false } = {}) => {
     const c = await getClient();
     if (!c || !uid) return;
     cancelPendingSync();
-    await syncNow();
-    if (syncDirty) throw new Error('Could not sync your latest changes, so you are still signed in');
-    must(await c.auth.signOut({ scope: 'local' }));
+    if (!force) {
+        await syncNow();
+        if (syncDirty) {
+            const err = new Error('Could not sync your latest changes, so you are still signed in');
+            err.unsynced = true;
+            throw err;
+        }
+    }
+    const keepLocal = force && syncDirty;
+    // Local sign-out only clears this browser's stored session; ignore server errors.
+    await c.auth.signOut({ scope: 'local' }).catch(() => {});
     uid = null;
     state.user = '';
-    state.stamps = new Set();
-    state.rides  = {};
+    if (!keepLocal) {
+        state.stamps = new Set();
+        state.rides  = {};
+    }
     persistLocal();
     onApplied();
     authListeners.forEach(fn => fn(false));
