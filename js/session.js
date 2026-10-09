@@ -71,14 +71,32 @@ export const setupSessionPanel = (map) => {
         }
     });
 
-    // Sign out (flushes first; refuses rather than lose unsynced changes)
-    document.getElementById('session-signout').addEventListener('click', async () => {
+    // Sign out (flushes first; refuses rather than lose unsynced changes).
+    // If the flush fails the button arms a "sign out anyway" that keeps the
+    // progress on this device, so a broken sync never traps the user.
+    const outBtn = document.getElementById('session-signout');
+    let outArmTimer = null;
+    const disarmOut = () => {
+        clearTimeout(outArmTimer);
+        delete outBtn.dataset.force;
+        outBtn.textContent = 'Sign out';
+        outBtn.classList.remove('confirm-pending');
+    };
+    outBtn.addEventListener('click', async () => {
+        const force = !!outBtn.dataset.force;
+        disarmOut();
         try {
-            await signOut();
+            await signOut({ force });
             updateSessionUI();
-            showToast('Signed out — your progress is safe in your account');
+            showToast(force ? 'Signed out — progress kept on this device'
+                            : 'Signed out — your progress is safe in your account');
         } catch (err) {
             showToast(err.message, 4000, 'error');
+            if (!err.unsynced) return;
+            outBtn.dataset.force = '1';
+            outBtn.textContent = 'Sign out anyway (keeps progress here)';
+            outBtn.classList.add('confirm-pending');
+            outArmTimer = setTimeout(disarmOut, RESET_CONFIRM_MS * 2);
         }
     });
 
