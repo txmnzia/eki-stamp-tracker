@@ -25,7 +25,11 @@ over HTTP anyway.
 Runtime dependencies are loaded from CDNs (no npm install needed to run):
 
 - **Leaflet 1.9** (map engine) from unpkg
-- **OpenStreetMap** basemap tiles, darkened via a CSS filter (`--tile-filter`)
+- **OpenFreeMap** `dark` vector basemap (free, keyless), drawn by **MapLibre GL 5** via
+  `@maplibre/maplibre-gl-leaflet` from jsDelivr, loaded lazily after the map is up. If any
+  of that fails (CDN, no WebGL, style fetch, 10 s timeout) the app falls back to raster
+  **OpenStreetMap** tiles darkened by a CSS filter (`--tile-filter`). Override with
+  `?basemap=dark|fiord|positron|liberty|osm` to compare styles.
 - Google Fonts (Zen Kaku Gothic New, Space Mono)
 
 ---
@@ -136,7 +140,7 @@ design of record for the split):
 | `cloud.js` | Supabase magic-link auth + sync (`initCloud`, `syncNow`, `scheduleSave`, `signOut`) of stamps **and** rides |
 | `sync-merge.js` | **pure** three-way merge set algebra behind sync; unit-tested |
 | `notify.js` | toasts + sync-status indicator |
-| `map-setup.js` | Leaflet map, canvas renderer, custom touch gestures |
+| `map-setup.js` | Leaflet map, vector basemap with raster fallback, canvas renderer, custom touch gestures |
 | `idb-cache.js` | IndexedDB cache (get/set/prune) |
 | `geometry.js` | **pure** track geometry (stitching, bridging, projection) — no DOM/Leaflet/state; unit-tested via `node --test tests/*.test.mjs` |
 | `line-geometry.js` | corridor building (`buildLineGeometry`), track routing (`trackBetween`), `buildRideSegments`, Shinkansen paths |

@@ -1,6 +1,7 @@
 // ── 6. MAP INITIALISATION ─────────────────────────────────────────────────
 
-import { IS_TOUCH, MAX_ZOOM } from './config.js';
+import { IS_TOUCH, MAX_ZOOM, BASEMAP_STYLES, BASEMAP_DEFAULT, BASEMAP_LOAD_MS,
+         MAPLIBRE_JS_URL, MAPLIBRE_CSS_URL, MAPLIBRE_LEAFLET_URL } from './config.js';
 import { ui } from './registry.js';
 
 // Custom touch gestures: double-tap = zoom in, triple-tap = zoom out,
@@ -48,6 +49,55 @@ const setupTouchGestures = (map) => {
     }, { passive: true });
 };
 
+// Raster fallback: standard OSM tiles, darkened in CSS (#map.basemap-raster
+// .leaflet-tile-pane filter). CARTO's keyless dark tiles are watermarked now.
+const addRasterBasemap = (map) => {
+    map.getContainer().classList.add('basemap-raster');
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        maxZoom: MAX_ZOOM
+    }).addTo(map);
+};
+
+const loadScript = (src) => new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = src; s.onload = resolve; s.onerror = () => reject(new Error(`failed to load ${src}`));
+    document.head.appendChild(s);
+});
+
+// Vector basemap (OpenFreeMap via MapLibre GL), loaded after the map is up so a
+// slow CDN never delays first paint. Until the style loads the map is bare
+// background; any failure before that swaps in the raster fallback.
+const addBasemap = (map) => {
+    const choice = new URLSearchParams(location.search).get('basemap') || BASEMAP_DEFAULT;
+    const styleUrl = BASEMAP_STYLES[choice];
+    if (!styleUrl) { addRasterBasemap(map); return; }
+    let settled = false;
+    let gl = null;
+    const fallback = (why) => {
+        if (settled) return;
+        settled = true;
+        console.warn('vector basemap unavailable, using raster tiles:', why);
+        if (gl) map.removeLayer(gl);
+        addRasterBasemap(map);
+    };
+    const timer = setTimeout(() => fallback('style load timeout'), BASEMAP_LOAD_MS);
+    const css = document.createElement('link');
+    css.rel = 'stylesheet'; css.href = MAPLIBRE_CSS_URL;
+    document.head.appendChild(css);
+    loadScript(MAPLIBRE_JS_URL)
+        .then(() => loadScript(MAPLIBRE_LEAFLET_URL))
+        .then(() => {
+            if (settled) return;
+            if (!L.maplibreGL) throw new Error('maplibre-gl-leaflet missing');
+            gl = L.maplibreGL({ style: styleUrl, maxZoom: MAX_ZOOM }).addTo(map);
+            const glMap = gl.getMaplibreMap();
+            glMap.on('error', (e) => { if (!glMap.isStyleLoaded()) fallback(e?.error?.message || 'style error'); });
+            glMap.once('load', () => { settled = true; clearTimeout(timer); });
+        })
+        .catch((err) => { clearTimeout(timer); fallback(err.message); });
+};
+
 export const initMap = () => {
     const map = L.map('map', { zoomControl: true, preferCanvas: true }).setView([35.682839, 139.759455], 13);
     map.zoomControl.setPosition('bottomleft');   // bottom-left, clear of the top search bar
@@ -64,12 +114,7 @@ export const initMap = () => {
     // so they're easy to hit — the 2.5px lines were nearly impossible to tap,
     // especially on touch. Single shared renderer (see PR #8) so events work.
     ui.canvasRenderer = L.canvas({ padding: 0.5, tolerance: IS_TOUCH ? 12 : 6 });
-    // Standard OSM tiles, darkened in CSS (.leaflet-tile-pane filter): CARTO's
-    // keyless dark basemap started stamping "API KEY REQUIRED" over every tile.
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-        maxZoom: MAX_ZOOM
-    }).addTo(map);
+    addBasemap(map);
     if (IS_TOUCH) setupTouchGestures(map);
     return map;
 };

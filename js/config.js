@@ -14,7 +14,7 @@ export const SUPABASE_JS_URL   = 'https://cdn.jsdelivr.net/npm/@supabase/supabas
 // App version — shown discreetly in the session panel. Bump on every merge
 // to main. It is also part of the station-cache key, so each release
 // invalidates the 7-day IndexedDB cache and users immediately get fresh data.
-export const APP_VERSION       = 'v1.9.5';
+export const APP_VERSION       = 'v1.10.0';
 export const CACHE_TTL         = 7 * 24 * 60 * 60 * 1000;  // 7 days
 export const BATCH_SIZE        = 150;      // features per animation frame (line rendering)
 export const SYNC_DEBOUNCE_MS  = 2000;     // ms after last stamp/ride change before cloud sync
@@ -37,6 +37,23 @@ export const STAMP_DBL_MS      = 280;      // click-pair window: two clicks/taps
 export const MAX_SUGGESTIONS   = 6;
 export const RESET_CONFIRM_MS  = 3000;     // window for second click on destructive action
 export const MAX_ZOOM          = 19;       // maximum tile zoom level
+
+// Basemap: OpenFreeMap vector styles (free, keyless) drawn by MapLibre GL inside
+// Leaflet's tile pane. Any failure (CDN, no WebGL, style fetch) falls back to raster
+// OSM darkened by CSS (--tile-filter). `?basemap=<style>|osm` overrides the default,
+// for side-by-side comparison. Light styles look wrong under the dark UI; kept for testing.
+export const BASEMAP_STYLES = {
+    dark:     'https://tiles.openfreemap.org/styles/dark',
+    fiord:    'https://tiles.openfreemap.org/styles/fiord',
+    positron: 'https://tiles.openfreemap.org/styles/positron',
+    liberty:  'https://tiles.openfreemap.org/styles/liberty',
+};
+export const BASEMAP_DEFAULT   = 'dark';
+export const BASEMAP_LOAD_MS   = 10000;    // style must finish loading within this, else raster fallback
+// Pinned UMD builds, loaded lazily so a CDN failure only costs the vector basemap.
+export const MAPLIBRE_JS_URL   = 'https://cdn.jsdelivr.net/npm/maplibre-gl@5.24.0/dist/maplibre-gl.js';
+export const MAPLIBRE_CSS_URL  = 'https://cdn.jsdelivr.net/npm/maplibre-gl@5.24.0/dist/maplibre-gl.css';
+export const MAPLIBRE_LEAFLET_URL = 'https://cdn.jsdelivr.net/npm/@maplibre/maplibre-gl-leaflet@0.1.4/leaflet-maplibre-gl.js';
 export const STAMP_TOGGLE_GUARD_MS = 350;  // ignore a repeat stamp toggle within this window (a triple
                                     // click must not toggle twice)
 export const PLAIN_MIN_ZOOM    = 11;       // touch only: hide the ~6.7k non-stamp dots below this
